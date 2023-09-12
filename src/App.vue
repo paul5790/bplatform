@@ -1,30 +1,45 @@
 <template>
-  <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
-  </nav>
-  <router-view />
+  <v-card>
+    <v-layout>
+      <v-navigation-drawer>
+        <v-list>
+          <v-list-item>
+            <v-img src="https://cdn.imweb.me/thumbnail/20201112/e6675247d2e47.png"
+            width="130"
+            height="60"
+            ></v-img>
+          </v-list-item>
+        </v-list>
+
+        <v-divider></v-divider>
+
+        <v-list density="compact" nav>
+          <v-list-item
+            v-for="(item, index) in menuItems"
+            :key="index"
+            :to="item.route" 
+            :exact="true"
+            :prepend-icon="item.icon"
+            :title="item.title"
+            :value="item.route"
+          ></v-list-item>
+        </v-list>
+      </v-navigation-drawer>
+
+      <v-main>
+        <router-view></router-view>
+      </v-main>
+    </v-layout>
+  </v-card>
 </template>
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
+<script setup>
+import { ref } from 'vue';
 
-nav {
-  padding: 30px;
-}
-
-nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
+const menuItems = ref([
+  { title: '대시보드', icon: 'mdi-view-dashboard', route: '/' },
+  { title: '모니터링', icon: 'mdi-television', route: '/realtimeview' },
+  { title: '데이터 열람', icon: 'mdi-database-search-outline', route: '/trialrundata' },
+  { title: '환경 설정', icon: 'mdi-cog-outline', route: '/usersetting' },
+]);
+</script>

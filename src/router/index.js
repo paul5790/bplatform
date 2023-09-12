@@ -3,13 +3,23 @@ import { createRouter, createWebHistory } from "vue-router";
 const routes = [
   {
     path: "/",
-    name: "home",
-    component: () => import("../views/HomeView.vue"),
+    name: "dashboard",
+    component: () => import("../views/DashBoard.vue"),
   },
   {
-    path: "/about",
-    name: "about",
-    component: () => import("../views/AboutView.vue"),
+    path: "/realtimeview",
+    name: "realtimeview",
+    component: () => import("../views/RealtimeView.vue"),
+  },
+  {
+    path: "/trialrundata",
+    name: "trialrundata",
+    component: () => import("../views/TrialRunData.vue"),
+  },
+  {
+    path: "/usersetting",
+    name: "usersetting",
+    component: () => import("../views/UserSetting.vue"),
   },
 ];
 
