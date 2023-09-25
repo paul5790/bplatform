@@ -1,7 +1,9 @@
 <template>
   <v-card>
     <v-layout>
-      <v-navigation-drawer>
+      <v-navigation-drawer
+              expand-on-hover
+        rail>
         <v-list>
           <v-list-item>
             <v-img src="https://cdn.imweb.me/thumbnail/20201112/e6675247d2e47.png"
