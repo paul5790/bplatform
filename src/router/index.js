@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 const routes = [
+  // view
   {
     path: "/",
     name: "dashboard",
@@ -17,9 +18,31 @@ const routes = [
     component: () => import("../views/TrialRunData.vue"),
   },
   {
+    path: "/alldata",
+    name: "alldata",
+    component: () => import("../views/AllData.vue"),
+  },
+  {
     path: "/usersetting",
     name: "usersetting",
     component: () => import("../views/UserSetting.vue"),
+  },
+
+  // components
+  {
+    path: "/weathercard",
+    name: "weathercard",
+    component: () => import("../components/WeatherCard.vue"),
+  },
+  {
+    path: "/ex1",
+    name: "ex1",
+    component: () => import("../components/ExChart1.vue"),
+  },
+  {
+    path: "/sailling",
+    name: "sailling",
+    component: () => import("../components/SaillingLottie.vue"),
   },
 ];
 
