@@ -44,6 +44,11 @@ const routes = [
     name: "sailling",
     component: () => import("../components/SaillingLottie.vue"),
   },
+  {
+    path: "/donutgraph",
+    name: "donutgraph",
+    component: () => import("../components/DonutGraph.vue"),
+  },
 ];
 
 const router = createRouter({

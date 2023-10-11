@@ -12,13 +12,14 @@
     </v-col>
     <v-col  cols="3">
       <v-sheet class="bg-surface-variant"  style="height: 50vh">
-        <v-responsive width="100%">
-        <SaillingAnimation  class="pa-2"/>
-        </v-responsive>
+        
+        <DonutGraph/>
       </v-sheet>
     </v-col>
     <v-col  cols="3">
-      <v-sheet  style="height: 50vh"> .v-col-auto </v-sheet>
+      <v-sheet class="bg-surface-variant" style="height: 50vh">
+        <SaillingAnimation/>
+      </v-sheet>
     </v-col>
 
     <v-responsive width="100%"></v-responsive>
@@ -36,6 +37,7 @@
 import WeatherCard from "../components/WeatherCard.vue";
 import ex1 from "../components/ExChart1.vue";
 import SaillingAnimation from "../components/SaillingLottie.vue";
+import DonutGraph from "../components/DonutGraph.vue";
 
 </script>
 
