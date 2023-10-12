@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@mdi/font": "5.9.55",
+    "@syncfusion/ej2-vue-circulargauge": "^23.1.38",
     "chart.js": "^4.4.0",
     "core-js": "^3.8.3",
     "roboto-fontface": "*",

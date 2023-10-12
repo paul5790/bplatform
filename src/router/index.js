@@ -49,6 +49,11 @@ const routes = [
     name: "donutgraph",
     component: () => import("../components/DonutGraph.vue"),
   },
+  {
+    path: "/circulargauge",
+    name: "circulargauge",
+    component: () => import("../components/CircularGauge.vue"),
+  },
 ];
 
 const router = createRouter({

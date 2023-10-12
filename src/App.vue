@@ -1,121 +1,131 @@
 <template>
-  <v-card>
-    <v-layout>
-      <v-navigation-drawer expand-on-hover rail>
-        <v-list>
-          <v-list-item
-            prepend-avatar="S"
-            title="Sandra Adams"
-            subtitle="sandra_a88@gmailcom"
-          >
-          </v-list-item>
-        </v-list>
+  <div>
+    <!-- 사용자 이름이 'a' 일 때 대시보드를 보여줌 -->
+    <div v-if="showDashboard">
+      <Dashboard :username="userid" @logout="logout" />
+    </div>
+    <!-- 사용자 이름이 'a'가 아닐 때 로그인 양식 표시 -->
+    <div v-else>
+      <div class="form-signin">
+        <img
+          src="https://kassproject.org/include/download_img.php?idx=9b1c034190fcb2798286ff057bde5b56"
+          alt=""
+          width="172"
+          height="137"
+        />
+        <p class="ml-1 text-start">로그인하기</p>
+        <hr />
+        <v-sheet width="400" class="mx-auto">
+          <v-form fast-fail @submit="login">
+            <v-text-field
+              type="text"
+              v-model="userid"
+              label="ID"
+              :rules="IDRules"
+            ></v-text-field>
 
-        <v-divider></v-divider>
+            <v-text-field
+              type="password"
+              v-model="password"
+              label="Password"
+              :rules="PasswordRules"
+            ></v-text-field>
 
-        <v-list density="compact" nav>
-          <!-- <v-list-item
-            v-for="(item, index) in menuItems"
-            :key="index"
-            :to="item.route"
-            :exact="true"
-            :prepend-icon="item.icon"
-            :title="item.title"
-            :value="item.route"
-          ></v-list-item> -->
-          <v-list-item
-            :key="0"
-            :to="`/`"
-            :exact="true"
-            :prepend-icon="`mdi-view-dashboard`"
-            :title="`대시보드`"
-            :value="`/`"
-          ></v-list-item>
-          <v-list-item
-            :key="1"
-            :to="`/realtimeview`"
-            :exact="true"
-            :prepend-icon="`mdi-television`"
-            :title="`모니터링`"
-            :value="`/realtimeview`"
-          ></v-list-item>
-
-          <!-- <v-list-item
-            :key="2"
-            :to="`/trialrundata`"
-            :exact="true"
-            :prepend-icon="`mdi-database-search-outline`"
-            :title="`데이터 열람`"
-            :value="`/trialrundata`"
-          ></v-list-item> -->
-
-          <v-list-group value="trialrundata">
-            <template v-slot:activator="{ props }">
-              <v-list-item
-                v-bind="props"
-                title="데이터 열람"
-                :prepend-icon="`mdi-database-search-outline`"
-              ></v-list-item>
-            </template>
-
-            <v-list-item
-              :key="2"
-              :to="`/trialrundata`"
-              :exact="true"
-              :title="`시운전 별 데이터`"
-              :value="`/trialrundata`"
-            ></v-list-item>
-            <v-list-item
-              :key="3"
-              :to="`/alldata`"
-              :exact="true"
-              :title="`전체 데이터`"
-              :value="`/alldata`"
-            ></v-list-item>
-          </v-list-group>
-
-          <v-list-item
-            :key="4"
-            :to="`/usersetting`"
-            :exact="true"
-            :prepend-icon="`mdi-cog-outline`"
-            :title="`환경 설정`"
-            :value="`/usersetting`"
-          ></v-list-item>
-        </v-list>
-        <!-- 항상 맨 아래에 붙어있는 리스트 -->
-        <template v-slot:append>
-          <v-list-item
-            :key="5"
-            :to="`/anotherpage`"
-            :exact="true"
-            :prepend-icon="`mdi-link`"
-            :title="`로그인`"
-            :value="`/anotherpage`"
-          ></v-list-item>
-        </template>
-      </v-navigation-drawer>
-
-      <v-main>
-        <router-view></router-view>
-      </v-main>
-    </v-layout>
-  </v-card>
+            <v-btn type="submit" block class="btn-skyblue"
+              >Submit</v-btn
+            >
+          </v-form>
+          <a id="forget" href="#">비밀번호가 기억나지 않으세요?</a>
+          <hr />
+          <v-btn type="button" class="btn-skyblue btn-width">Sign up</v-btn>
+        </v-sheet>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-//import { ref } from "vue";
+import { ref, onMounted } from "vue";
+import Dashboard from "../src/views/MainDashBoard.vue";
 
-// const menuItems = ref([
-//   { title: "대시보드", icon: "mdi-view-dashboard", route: "/" },
-//   { title: "모니터링", icon: "mdi-television", route: "/realtimeview" },
-//   {
-//     title: "데이터 열람",
-//     icon: "mdi-database-search-outline",
-//     route: "/trialrundata",
-//   },
-//   { title: "환경 설정", icon: "mdi-cog-outline", route: "/usersetting" },
-// ]);
+// 사용자 로그인 상태를 세션 스토리지에서 가져옵니다.
+const showDashboard = ref(sessionStorage.getItem("showDashboard") === "true" || false);
+const userid = ref(sessionStorage.getItem("userid") || "");
+const password = ref("");
+const IDRules = [
+  value => {
+    if (value?.length > 0) return true
+    return 'First name must be at least 3 characters.'
+  },
+];
+const PasswordRules = [
+  value => {
+    if (/[^0-9]/.test(value)) return true
+    return 'Last name cannot contain digits.'
+  },
+];
+
+// 페이지가 처음 로드될 때 사용자 로그인 상태를 확인합니다.
+onMounted(() => {
+  if (userid.value === "a") {
+    showDashboard.value = true;
+  }
+});
+
+// 로그인 및 로그아웃 로직을 구현합니다.
+const login = () => {
+  if (userid.value === "a") {
+    showDashboard.value = true;
+  }
+  // 세션 스토리지에 사용자 로그인 상태를 저장합니다.
+  sessionStorage.setItem("showDashboard", showDashboard.value.toString());
+  sessionStorage.setItem("userid", userid.value);
+};
+
+const logout = (newUserid) => {
+  userid.value = newUserid;
+  showDashboard.value = false;
+  // 세션 스토리지에서 사용자 로그인 상태를 저장합니다.
+  sessionStorage.setItem("showDashboard", showDashboard.value.toString());
+  sessionStorage.setItem("userid", userid.value);
+};
 </script>
 
-<style scoped></style>
+<style scoped>
+.form-signin {
+  text-align: center;
+  max-width: 400px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+
+#logintext {
+  font-size: 14px;
+}
+
+hr {
+  color: skyblue;
+}
+
+#forget {
+  display: block;
+  text-align: left;
+  margin-top: 10px;
+}
+
+.btn-skyblue {
+  color: #fff;
+  background-color: #67caf1; /* 하늘색 HEX 코드 */
+  border-color: #67caf1; /* 하늘색 HEX 코드 */
+}
+
+.btn-skyblue:hover {
+  background-color: #5badee; /* 하늘색의 hover 상태 HEX 코드 */
+  border-color: #5badee; /* 하늘색의 hover 상태 HEX 코드 */
+}
+
+.btn-width {
+  width: 400px;
+  color: white;
+}
+</style>

@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col  cols="3">
-      <v-sheet class="bg-surface-variant" style="height: 50vh">
+      <v-sheet :rounded="rounded" class="bg-surface-variant" style="height: 50vh">
         <WeatherCard class="pa-2"/>
       </v-sheet>
     </v-col>

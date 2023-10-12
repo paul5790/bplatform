@@ -7,7 +7,7 @@
     </v-col>
     <v-col  cols="3">
       <v-sheet class="bg-surface-variant" style="height: 50vh"> 
-        <ex1  class="pa-2"/> 
+        <WeatherCard class="pa-2"/> 
       </v-sheet>
     </v-col>
     <v-col  cols="3">
@@ -35,7 +35,6 @@
 
 <script setup>
 import WeatherCard from "../components/WeatherCard.vue";
-import ex1 from "../components/ExChart1.vue";
 import SaillingAnimation from "../components/SaillingLottie.vue";
 import DonutGraph from "../components/DonutGraph.vue";
 

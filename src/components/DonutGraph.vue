@@ -15,12 +15,18 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
+const maxvalue = ref(30);
+const prevalue = ref(1);
+
+const maxval = ref(100 / (maxvalue.value + prevalue.value) * maxvalue.value);
+const preval = ref(100 / (maxvalue.value + prevalue.value) * prevalue.value);
+
 const chartData = ref({
   datasets: [
     {
       labels: ["value", "money"],
       backgroundColor: ["#ff8888", "#8888ff"],
-      data: [80, 20],
+      data: [maxval.value, preval.value],
     },
   ],
 });
