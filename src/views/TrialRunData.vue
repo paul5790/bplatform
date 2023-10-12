@@ -42,14 +42,22 @@
       </v-sheet>
     </v-col>
     <v-col cols="9">
-      <v-sheet style="height: 100vh; padding: 10px; padding-right: 30px; display: flex; align-items: center">
+      <v-sheet
+        style="
+          height: 85vh;
+          padding: 10px;
+          padding-right: 30px;
+          display: flex;
+          align-items: end;
+        "
+      >
         <v-data-table
-  v-model:page="page"
+          v-model:page="page"
           class="elevation-1"
           :headers="headers"
           :items="desserts"
-    :items-per-page="itemsPerPage"
-    hide-default-footer
+          :items-per-page="itemsPerPage"
+          hide-default-footer
           item-value="name"
         >
           <template v-slot:bottom>
@@ -59,13 +67,27 @@
           </template>
         </v-data-table>
       </v-sheet>
+      <v-sheet
+        style="
+          height: 15vh;
+          padding: 10px;
+          padding-right: 30px;
+          display: flex;
+          align-items: start;
+          justify-content: end;
+        "
+      >
+      <v-btn @click="exportToExcel()">엑셀 다운</v-btn>
+      </v-sheet>
     </v-col>
   </v-row>
 </template>
 
 <script setup>
 import { computed, ref, watch } from "vue";
+import * as XLSX from "xlsx";
 
+// 왼쪽 셀렉바 설정
 const trialrun = ref(["시운전1", "시운전2", "시운전3", "시운전4"]);
 const runitem = ref(null);
 
@@ -83,7 +105,7 @@ const GYROdata = ref(["THS", "HDT", "ROT"]);
 const AISdata = ref(["VDM", "VDO"]);
 const selectedItem3 = ref(null);
 
-const updateDynamicItems = () => {
+const updateItems2 = () => {
   if (selectedItem.value === "선내데이터") {
     itmes2.value = Onboarddata.value;
   } else if (selectedItem.value === "관제데이터") {
@@ -103,7 +125,7 @@ const updateItems3 = () => {
   } else if (selectedItem2.value === "시운전2-2") {
     items3.value = ["시운전2-2-1", "시운전2-2-2"];
   } else {
-    items3.value = [];
+    items3.value = ['비어있음'];
   }
 };
 
@@ -111,7 +133,7 @@ const updateItems3 = () => {
 watch(selectedItem, () => {
   selectedItem2.value = null;
   selectedItem3.value = null;
-  updateDynamicItems();
+  updateItems2();
 });
 
 // selectedItem2이 변경될 때마다 selectedItem3를 초기화하고 items3를 업데이트
@@ -120,6 +142,7 @@ watch(selectedItem2, () => {
   updateItems3();
 });
 
+// 데이터 테이블 하단 바 설정
 const page = ref(1);
 const itemsPerPage = ref(10);
 
@@ -127,6 +150,15 @@ const pageCount = computed(() => {
   return Math.ceil(desserts.value.length / itemsPerPage.value);
 });
 
+// 엑셀 설정
+const exportToExcel = () => {
+  const workbook = XLSX.utils.book_new();
+  const worksheet = XLSX.utils.json_to_sheet(desserts.value);
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+  XLSX.writeFile(workbook, `${selectedItem3.value}_datatable.xlsx`);
+};
+
+// 데이터 테이블 헤더
 const headers = ref([
   {
     title: "Dessert (100g serving)",
@@ -139,6 +171,8 @@ const headers = ref([
   { title: "Protein (g)", align: "end", key: "protein" },
   { title: "Iron (%)", align: "end", key: "iron" },
 ]);
+
+// 데이터 테이블 바디
 const desserts = ref([
   {
     name: "Frozen Yogurt",
