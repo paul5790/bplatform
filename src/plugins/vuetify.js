@@ -9,6 +9,7 @@ import {
   VDataTableServer,
   VDataTableVirtual,
 } from "vuetify/labs/VDataTable";
+import { VDataIterator } from "vuetify/labs/VDataIterator";
 
 export default createVuetify(
   {
@@ -16,6 +17,7 @@ export default createVuetify(
       VDataTable,
       VDataTableServer,
       VDataTableVirtual,
+      VDataIterator,
     },
   }
   // https://vuetifyjs.com/en/introduction/why-vuetify/#feature-guides

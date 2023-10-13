@@ -7,7 +7,7 @@
     </v-col>
     <v-col  cols="3">
       <v-sheet class="bg-surface-variant" style="height: 50vh"> 
-        <WeatherCard class="pa-2"/> 
+        <CircularGauge class="pa-2"/> 
       </v-sheet>
     </v-col>
     <v-col  cols="3">
@@ -35,6 +35,7 @@
 
 <script setup>
 import WeatherCard from "../components/WeatherCard.vue";
+import CircularGauge from "../components/CircularGauge.vue";
 import SaillingAnimation from "../components/SaillingLottie.vue";
 import DonutGraph from "../components/DonutGraph.vue";
 
