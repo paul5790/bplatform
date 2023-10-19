@@ -2,55 +2,109 @@
   <v-row>
     <v-col cols="3">
       <v-sheet
-        class="bg-surface-variant"
-        style="height: 100vh; justify-content: center; padding: 30px"
+        style="
+          height: 100vh;
+          padding: 30px;
+          display: flex;
+          flex-direction: column;
+          overflow-y: auto;
+        "
       >
-        <div>
-          <v-select
-            v-model="runitem"
-            :items="trialrun"
-            density="compact"
-            label="Compact"
-            variant="outlined"
-            style="margin-top: 30vh"
-          ></v-select>
+        <v-card :color="primary" :variant="elevated" style="flex: 1">
+          <v-card-item>
+            <div>
+              <v-select
+                v-model="runitem"
+                :items="trialrun"
+                density="compact"
+                label="Compact"
+                variant="outlined"
+                style="margin-top: 30vh"
+              ></v-select>
 
-          <v-select
-            v-model="selectedItem"
-            :items="items1"
-            density="compact"
-            label="Compact"
-            variant="outlined"
-          ></v-select>
+              <v-select
+                v-model="selectedItem"
+                :items="items1"
+                density="compact"
+                label="Compact"
+                variant="outlined"
+              ></v-select>
 
-          <v-select
-            v-model="selectedItem2"
-            :items="itmes2"
-            density="comfortable"
-            label="Comfortable"
-            variant="outlined"
-          ></v-select>
+              <v-select
+                v-model="selectedItem2"
+                :items="itmes2"
+                density="comfortable"
+                label="Comfortable"
+                variant="outlined"
+              ></v-select>
 
-          <v-select
-            v-model="selectedItem3"
-            :items="items3"
-            density="comfortable"
-            label="Default"
-            variant="outlined"
-          ></v-select>
-        </div>
+              <v-select
+                v-model="selectedItem3"
+                :items="items3"
+                density="comfortable"
+                label="Default"
+                variant="outlined"
+              ></v-select>
+              <v-btn-toggle v-model="toggle" divided variant="outlined">
+                <v-btn icon="mdi-format-align-right"></v-btn>
+                <v-btn icon="mdi-format-align-left"></v-btn>
+              </v-btn-toggle>
+              <v-btn-toggle v-model="toggle" divided variant="outlined">
+                <v-btn icon="mdi-format-align-right"></v-btn>
+              </v-btn-toggle></div
+          ></v-card-item>
+        </v-card>
       </v-sheet>
     </v-col>
     <v-col cols="9">
       <v-sheet
         style="
           height: 85vh;
-          padding: 10px;
+          padding: 1px;
+          margin-top: 30px;
           padding-right: 30px;
           display: flex;
+          flex-direction: column;
+          overflow-y: auto;
           align-items: end;
         "
       >
+        <v-sheet style="display: flex; flex-direction: row;">
+          <v-data-table
+          style="margin: 20px;"
+            v-model:page="page"
+            class="elevation-1"
+            :headers="headers"
+            :items="desserts"
+            :items-per-page="itemsPerPage"
+            hide-default-footer
+            item-value="name"
+          >
+            <template v-slot:bottom>
+              <div class="text-center pt-2">
+                <v-pagination v-model="page" :length="pageCount"></v-pagination>
+              </div>
+            </template>
+          </v-data-table>
+
+          <v-data-table
+          style="margin: 20px;"
+            v-model:page="page"
+            class="elevation-1"
+            :headers="headers"
+            :items="desserts"
+            :items-per-page="itemsPerPage"
+            hide-default-footer
+            item-value="name"
+          >
+            <template v-slot:bottom>
+              <div class="text-center pt-2">
+                <v-pagination v-model="page" :length="pageCount"></v-pagination>
+              </div>
+            </template>
+          </v-data-table>
+        </v-sheet>
+
         <v-data-table
           v-model:page="page"
           class="elevation-1"
@@ -66,6 +120,22 @@
             </div>
           </template>
         </v-data-table>
+        <v-data-table
+          style="margin-left: 10px"
+          v-model:page="page1"
+          class="elevation-1"
+          :headers="headers"
+          :items="desserts"
+          :items-per-page="itemsPerPage"
+          hide-default-footer
+          item-value="name"
+        >
+          <template v-slot:bottom>
+            <div class="text-center pt-2">
+              <v-pagination v-model="page1" :length="pageCount1"></v-pagination>
+            </div>
+          </template>
+        </v-data-table>
       </v-sheet>
       <v-sheet
         style="
@@ -77,7 +147,7 @@
           justify-content: end;
         "
       >
-      <v-btn @click="exportToExcel()">엑셀 다운</v-btn>
+        <v-btn @click="exportToExcel()">엑셀 다운</v-btn>
       </v-sheet>
     </v-col>
   </v-row>
@@ -125,7 +195,7 @@ const updateItems3 = () => {
   } else if (selectedItem2.value === "시운전2-2") {
     items3.value = ["시운전2-2-1", "시운전2-2-2"];
   } else {
-    items3.value = ['비어있음'];
+    items3.value = ["비어있음"];
   }
 };
 
@@ -147,6 +217,12 @@ const page = ref(1);
 const itemsPerPage = ref(10);
 
 const pageCount = computed(() => {
+  return Math.ceil(desserts.value.length / itemsPerPage.value);
+});
+
+const page1 = ref(1);
+
+const pageCount1 = computed(() => {
   return Math.ceil(desserts.value.length / itemsPerPage.value);
 });
 
@@ -714,4 +790,8 @@ const desserts = ref([
 ]);
 </script>
 
-<style scoped></style>
+<style scoped>
+.scrollbar {
+  overflow-y: auto;
+}
+</style>

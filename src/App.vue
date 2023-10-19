@@ -13,8 +13,82 @@
           width="172"
           height="137"
         />
-        <p class="ml-1 text-start">로그인하기</p>
-        <hr />
+
+        <v-form fast-fail @submit="login">
+          <div class="text-subtitle-1 text-medium-emphasis d-flex justify-left">
+            Account
+          </div>
+
+          <v-text-field
+            density="compact"
+            placeholder="Email address"
+            prepend-inner-icon="mdi-email-outline"
+            variant="outlined"
+            type="text"
+            v-model="userid"
+            :rules="IDRules"
+          ></v-text-field>
+
+          <div
+            class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
+          >
+            Password
+
+            <a
+              class="text-caption text-decoration-none text-blue"
+              href="#"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Forgot login password?</a
+            >
+          </div>
+
+          <v-text-field
+            :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+            :type="visible ? 'text' : 'password'"
+            v-model="password"
+            :rules="PasswordRules"
+            density="compact"
+            placeholder="Enter your password"
+            prepend-inner-icon="mdi-lock-outline"
+            variant="outlined"
+            @click:append-inner="visible = !visible"
+          ></v-text-field>
+
+          <v-card class="mb-12" color="surface-variant" variant="tonal">
+            <v-card-text class="text-medium-emphasis text-caption">
+              Warning: After 3 consecutive failed login attempts, you account
+              will be temporarily locked for three hours. If you must login now,
+              you can also click "Forgot login password?" below to reset the
+              login password.
+            </v-card-text>
+          </v-card>
+
+          <v-btn
+            type="submit"
+            block
+            class="mb-8"
+            color="blue"
+            size="large"
+            variant="tonal"
+          >
+            Log In
+          </v-btn>
+
+          <v-card-text class="text-center">
+            <a
+              class="text-blue text-decoration-none"
+              href="#"
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
+            </a>
+          </v-card-text>
+        </v-form>
+
+        <!-- <hr />
         <v-sheet width="400" class="mx-auto">
           <v-form fast-fail @submit="login">
             <v-text-field
@@ -31,14 +105,12 @@
               :rules="PasswordRules"
             ></v-text-field>
 
-            <v-btn type="submit" block class="btn-skyblue"
-              >Submit</v-btn
-            >
+            <v-btn type="submit" block class="btn-skyblue">Submit</v-btn>
           </v-form>
           <a id="forget" href="#">비밀번호가 기억나지 않으세요?</a>
           <hr />
           <v-btn type="button" class="btn-skyblue btn-width">Sign up</v-btn>
-        </v-sheet>
+        </v-sheet> -->
       </div>
     </div>
   </div>
@@ -48,20 +120,24 @@
 import { ref, onMounted } from "vue";
 import Dashboard from "../src/views/MainDashBoard.vue";
 
+const visible = ref(false);
+
 // 사용자 로그인 상태를 세션 스토리지에서 가져옵니다.
-const showDashboard = ref(sessionStorage.getItem("showDashboard") === "true" || false);
+const showDashboard = ref(
+  sessionStorage.getItem("showDashboard") === "true" || false
+);
 const userid = ref(sessionStorage.getItem("userid") || "");
 const password = ref("");
 const IDRules = [
-  value => {
-    if (value?.length > 0) return true
-    return 'First name must be at least 3 characters.'
+  (value) => {
+    if (value?.length > 0) return true;
+    return "First name must be at least 3 characters.";
   },
 ];
 const PasswordRules = [
-  value => {
-    if (/[^0-9]/.test(value)) return true
-    return 'Last name cannot contain digits.'
+  (value) => {
+    if (/[^0-9]/.test(value)) return true;
+    return "Last name cannot contain digits.";
   },
 ];
 
