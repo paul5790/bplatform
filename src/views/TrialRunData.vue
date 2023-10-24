@@ -69,40 +69,49 @@
           align-items: end;
         "
       >
-        <v-sheet style="display: flex; flex-direction: row;">
-          <v-data-table
-          style="margin: 20px;"
-            v-model:page="page"
-            class="elevation-1"
-            :headers="headers"
-            :items="desserts"
-            :items-per-page="itemsPerPage"
-            hide-default-footer
-            item-value="name"
-          >
-            <template v-slot:bottom>
-              <div class="text-center pt-2">
-                <v-pagination v-model="page" :length="pageCount"></v-pagination>
-              </div>
-            </template>
-          </v-data-table>
-
-          <v-data-table
-          style="margin: 20px;"
-            v-model:page="page"
-            class="elevation-1"
-            :headers="headers"
-            :items="desserts"
-            :items-per-page="itemsPerPage"
-            hide-default-footer
-            item-value="name"
-          >
-            <template v-slot:bottom>
-              <div class="text-center pt-2">
-                <v-pagination v-model="page" :length="pageCount"></v-pagination>
-              </div>
-            </template>
-          </v-data-table>
+        <v-sheet style="display: flex; flex-direction: row">
+          <v-col cols="6">
+            <v-data-table
+              style="margin: 20px"
+              v-model:page="page"
+              class="elevation-1"
+              :headers="headers"
+              :items="desserts"
+              :items-per-page="itemsPerPage"
+              hide-default-footer
+              item-value="name"
+            >
+              <template v-slot:bottom>
+                <div class="text-center pt-2">
+                  <v-pagination
+                    v-model="page"
+                    :length="pageCount"
+                  ></v-pagination>
+                </div>
+              </template>
+            </v-data-table>
+          </v-col>
+          <v-col cols="6">
+            <v-data-table
+              style="margin: 20px"
+              v-model:page="page"
+              class="elevation-1"
+              :headers="headers"
+              :items="desserts"
+              :items-per-page="itemsPerPage"
+              hide-default-footer
+              item-value="name"
+            >
+              <template v-slot:bottom>
+                <div class="text-center pt-2">
+                  <v-pagination
+                    v-model="page"
+                    :length="pageCount"
+                  ></v-pagination>
+                </div>
+              </template>
+            </v-data-table>
+          </v-col>
         </v-sheet>
 
         <v-data-table
@@ -161,7 +170,12 @@ import * as XLSX from "xlsx";
 const trialrun = ref(["시운전1", "시운전2", "시운전3", "시운전4"]);
 const runitem = ref(null);
 
-const items1 = ref(["선내데이터", "관제데이터", "엔진데이터", "KASS데이터"]);
+const items1 = ref([
+  "Ship Information",
+  "Kass Information",
+  "SYS Information",
+  "Control Data",
+]);
 const selectedItem = ref(null);
 
 const itmes2 = ref([]);

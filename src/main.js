@@ -5,6 +5,7 @@ import vuetify from "./plugins/vuetify";
 import Vue3Lottie from "vue3-lottie";
 import { loadFonts } from "./plugins/webfontloader";
 import VueApexCharts from "vue3-apexcharts";
+import socket from "vue3-websocket";
 
 loadFonts();
 
@@ -13,4 +14,5 @@ createApp(App)
   .use(router)
   .use(vuetify)
   .use(VueApexCharts)
+  .use(socket, "ws://192.168.0.24:8080/ws/shipinfo")
   .mount("#app");
