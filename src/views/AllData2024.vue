@@ -21,6 +21,32 @@
           density="comfortable"
         ></v-text-field>
 
+        <!-- 버튼 그룹 -->
+        <div class="d-flex flex-column mt-5">
+          <v-btn-toggle v-model="dataSelect" color="blue" mandatory>
+            <v-btn style="border: 1px solid #aaa" value="allbtn">전체</v-btn>
+            <v-btn style="border: 1px solid #aaa" value="onboard"
+              >선내데이터</v-btn
+            >
+            <v-btn style="border: 1px solid #aaa" value="control"
+              >관제데이터</v-btn
+            >
+          </v-btn-toggle>
+        </div>
+
+        <!-- <v-sheet>
+          <v-checkbox
+            v-for="label in keys"
+            :key="label"
+            :value="label"
+            v-model="selectedItems"
+            :label="label"
+          ></v-checkbox>
+        </v-sheet>
+
+        {{ selectedItems }} -->
+
+        <!-- 선택 리스트 기능 -->
         <div class="d-flex flex-column mt-5">
           <v-row>
             <!-- 첫번째 선택박스 -->
@@ -32,26 +58,6 @@
                 variant="outlined"
                 multiple
               >
-                <template v-slot:selection="{ item, index }">
-                  <div v-if="index < 2">
-                    <span>{{ item.title }}</span>
-                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                    <span
-                      v-if="
-                        firstSelectedItems.length > 1 &&
-                        index !== firstSelectedItems.length - 1
-                      "
-                      >,
-                    </span>
-                    <span v-else-if="firstSelectedItems.length >= 3"> </span>
-                  </div>
-                  <span
-                    v-if="index === 2"
-                    class="text-grey text-caption align-self-center"
-                  >
-                    (+{{ firstSelectedItems.length - 2 }} others)
-                  </span>
-                </template>
                 <template v-slot:prepend-item>
                   <v-list-item title="Select All" @click="selectAllItem1">
                     <template v-slot:prepend>
@@ -120,12 +126,7 @@
 
             <!-- 검색 버튼 -->
             <v-col cols="1">
-              <v-btn
-                class=""
-                color="blue"
-                style="display: flex; height: 50px; width: 100px"
-                >검색</v-btn
-              >
+              <v-btn class="" color="blue" style="display: flex; height: 50px; width: 100px;">검색</v-btn>
             </v-col>
           </v-row>
         </div>
@@ -138,26 +139,23 @@
 
       <!-- 결과 컴포넌트 -->
       <template v-slot:default="props">
-        <v-card
-          v-for="item in props.items"
-          :key="item.name"
-          style="border: 1px solid #aaa"
-        >
-          <!-- <v-card-title class="subheading font-weight-bold">
+            <v-card v-for="item in props.items"
+            :key="item.name" style="border: 1px solid #aaa;">
+              <!-- <v-card-title class="subheading font-weight-bold">
                 {{ item.raw.name }}
               </v-card-title>
               <v-divider></v-divider> -->
 
-          <v-list density="compact">
-            <v-list-item
-              v-for="(key, index) in filteredKeys"
-              :key="index"
-              :title="key"
-              :subtitle="String(item.raw[key.toLowerCase()])"
-              :class="{ 'text-blue': sortKey === key.toLowerCase() }"
-            ></v-list-item>
-          </v-list>
-        </v-card>
+              <v-list density="compact">
+                <v-list-item
+                  v-for="(key, index) in filteredKeys"
+                  :key="index"
+                  :title="key"
+                  :subtitle="String(item.raw[key.toLowerCase()])"
+                  :class="{ 'text-blue': sortKey === key.toLowerCase() }"
+                ></v-list-item>
+              </v-list>
+            </v-card>
       </template>
 
       <template v-slot:footer>
@@ -179,7 +177,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, watch } from "vue";
+import { ref, computed, watchEffect } from "vue";
 
 const itemsPerPage = ref(3);
 const page = ref(1);
@@ -187,43 +185,16 @@ const search = ref("");
 const sortKey = ref("name");
 // const selectedItems = ref([]);
 
-// 셀렉바 메뉴
-const firstSelect = ref([
-  "DGPS",
-  "GYRO",
-  "ANEMOMETER",
-  "RADAR",
-  "AIS",
-  "ECDIS",
-  "AUTOPILOT",
-  "SPEEDLOG",
-  "NO.1ENGINEPANEL",
-  "NO.2ENGINEPANEL",
-]);
+// 버튼 그룹
+const dataSelect = ref("allbtn");
 
+// 셀렉바 메뉴
+const firstSelect = ref([]);
 const secondSelect = ref([]);
 const thirdSelect = ref([]);
 const firstSelectedItems = ref([]);
 const secondSelectedItems = ref([]);
 const thirdSelectedItems = ref([]);
-const showfirstSelectedItems = ref([]);
-const showsecondSelectedItems = ref([]);
-
-watch(firstSelectedItems, (newSelectedItems) => {
-  if (newSelectedItems.length >= 3) {
-    // 처음 2가지 값 가져오기
-    const firstTwoItems = newSelectedItems.slice(0, 2);
-    // 나머지 항목 개수 가져오기
-    const othersCount = newSelectedItems.length - 2;
-    // "2가지 값 + (+ others)" 형태로 설정
-    showfirstSelectedItems.value =
-      firstTwoItems.join(", ") + ` (+ ${othersCount} others)`;
-  } else {
-    // 3개 미만의 항목이 선택된 경우
-    showfirstSelectedItems.value = newSelectedItems.join(", ");
-  }
-  console.log(showfirstSelectedItems.value);
-});
 
 const resetItems = () => {
   firstSelectedItems.value = [];
@@ -274,73 +245,57 @@ const selectAllItem3 = () => {
   }
 };
 
+// 버튼 그룹이 변경될 때 first 배열 업데이트
+watchEffect(() => {
+  if (dataSelect.value === "onboard") {
+    firstSelect.value = [
+      "Ship Information",
+      "Kass Information",
+      "SYS Information",
+    ];
+    resetItems();
+    console.log(`선내, ${firstSelect.value}`);
+  } else if (dataSelect.value === "control") {
+    firstSelect.value = ["Control Data"];
+    resetItems();
+    console.log(`관제, ${firstSelect.value}`);
+  } else {
+    firstSelect.value = [
+      "Ship Information",
+      "Kass Information",
+      "SYS Information",
+      "Control Data",
+    ];
+    resetItems();
+    console.log(`올, ${firstSelect.value}`);
+  }
+});
+
 // select1이 변경될 때 second 배열 업데이트
 watchEffect(() => {
   secondSelect.value = []; // 기존 secondSelect 초기화
   secondSelectedItems.value = [];
-  if (firstSelectedItems.value.includes("DGPS")) {
-    secondSelect.value.push("GLL", "GGA", "RMC", "VTG", "ZDA", "GSV", "GSA");
+  if (firstSelectedItems.value.includes("Ship Information")) {
+    secondSelect.value.push("쉽1", "쉽2", "쉽3");
   }
-  if (firstSelectedItems.value.includes("GYRO")) {
-    secondSelect.value.push("THS", "HDT", "ROT");
+  if (firstSelectedItems.value.includes("Kass Information")) {
+    secondSelect.value.push("카스1", "카스2", "카스3");
   }
-  if (firstSelectedItems.value.includes("ANEMOMETER")) {
-    secondSelect.value.push("MWV", "MTW");
+  if (firstSelectedItems.value.includes("SYS Information")) {
+    secondSelect.value.push("sys1", "sys2", "sys3");
   }
-  if (firstSelectedItems.value.includes("RADAR")) {
-    secondSelect.value.push();
+  if (firstSelectedItems.value.includes("Control Data")) {
+    secondSelect.value.push("cd1", "cd2", "cd3");
   }
-  if (firstSelectedItems.value.includes("AIS")) {
-    secondSelect.value.push("VDM", "VDO");
-  }
-  if (firstSelectedItems.value.includes("ECDIS")) {
-    secondSelect.value.push("ROUTEINFO", "WAYPOINTS");
-  }
-  if (firstSelectedItems.value.includes("AUTOPILOT")) {
-    secondSelect.value.push("RSA", "HTD");
-  }
-  if (firstSelectedItems.value.includes("SPEEDLOG")) {
-    secondSelect.value.push("VBW", "VHW", "VLW");
-  }
-  if (firstSelectedItems.value.includes("NO.1ENGINEPANEL")) {
-    secondSelect.value.push(
-      "NO.1ENGINE_PANEL_61444",
-      "NO.1ENGINE_PANEL_65262",
-      "NO.1ENGINE_PANEL_65263",
-      "NO.1ENGINE_PANEL_65272",
-      "NO.1ENGINE_PANEL_65271",
-      "NO.1ENGINE_PANEL_65253",
-      "NO.1ENGINE_PANEL_65270",
-      "NO.1ENGINE_PANEL_65276",
-      "NO.1ENGINE_PANEL_65360",
-      "NO.1ENGINE_PANEL_65361_LAMP",
-      "NO.1ENGINE_PANEL_65361_STATUS",
-      "NO.1ENGINE_PANEL_65378",
-      "NO.1ENGINE_PANEL_65376",
-      "NO.1ENGINE_PANEL_65379"
-    );
-  }
-  if (firstSelectedItems.value.includes("NO.2ENGINEPANEL")) {
-    secondSelect.value.push(
-      "NO.2ENGINE_PANEL_61444",
-      "NO.2ENGINE_PANEL_65262",
-      "NO.2ENGINE_PANEL_65263",
-      "NO.2ENGINE_PANEL_65272",
-      "NO.2ENGINE_PANEL_65271",
-      "NO.2ENGINE_PANEL_65253",
-      "NO.2ENGINE_PANEL_65270",
-      "NO.2ENGINE_PANEL_65276",
-      "NO.2ENGINE_PANEL_65360",
-      "NO.2ENGINE_PANEL_65361_LAMP",
-      "NO.2ENGINE_PANEL_65361_STATUS",
-      "NO.2ENGINE_PANEL_65378",
-      "NO.2ENGINE_PANEL_65376",
-      "NO.2ENGINE_PANEL_65379"
-    );
-  }
+
+  
 });
 
-const keys = ref(["Name", "Top", "Info"]);
+const keys = ref([
+  "Name",
+  "Top",
+  "Info",
+]);
 const allData = ref([
   {
     name: "GLL",
@@ -360,7 +315,7 @@ const allData = ref([
   {
     name: "VTG",
     top: "DGPS",
-    info: "현재 이동 방향과 지상 속도를 나타냅니다.",
+    info: "현재 이동 방향과 지상 속도를 나타냅니다."
   },
 ]);
 

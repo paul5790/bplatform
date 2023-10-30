@@ -121,6 +121,7 @@ import { ref, onMounted } from "vue";
 import Dashboard from "../src/views/MainDashBoard.vue";
 
 const visible = ref(false);
+const isAdmin = ref(false);
 
 // 사용자 로그인 상태를 세션 스토리지에서 가져옵니다.
 const showDashboard = ref(
@@ -156,6 +157,7 @@ const login = () => {
   // 세션 스토리지에 사용자 로그인 상태를 저장합니다.
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);
+  sessionStorage.setItem("isAdmin", userid.value);
 };
 
 const logout = (newUserid) => {
@@ -164,6 +166,7 @@ const logout = (newUserid) => {
   // 세션 스토리지에서 사용자 로그인 상태를 저장합니다.
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);
+  sessionStorage.setItem("isAdmin", userid.value);
 };
 </script>
 

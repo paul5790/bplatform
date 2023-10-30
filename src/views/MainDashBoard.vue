@@ -75,6 +75,25 @@
           </v-list-group>
 
           <v-list-item
+            v-if="isAdmin"
+            :key="5"
+            :to="`/realtimeview`"
+            :exact="true"
+            :prepend-icon="`mdi-television`"
+            :title="`권한 제어`"
+            :value="`/realtimeview`"
+          ></v-list-item>
+          <v-list-item
+            v-if="isAdmin"
+            :key="6"
+            :to="`/realtimeview`"
+            :exact="true"
+            :prepend-icon="`mdi-television`"
+            :title="`기록 조회`"
+            :value="`/realtimeview`"
+          ></v-list-item>
+
+          <v-list-item
             :key="4"
             :to="`/usersetting`"
             :exact="true"
@@ -99,7 +118,7 @@
         <router-view></router-view>
       </v-main>
     </v-layout>
-        <!-- 로그아웃 확인 모달 -->
+    <!-- 로그아웃 확인 모달 -->
     <v-dialog v-model="logoutDialog" max-width="300">
       <v-card>
         <v-card-title>로그아웃</v-card-title>
@@ -114,9 +133,11 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits } from "vue";
 
 const dynamicTitle = ref("초기 제목");
+
+const isAdmin = ref(true);
 
 const emits = defineEmits(["logout"]);
 
@@ -136,6 +157,5 @@ const cancelLogout = () => {
   logoutDialog.value = false;
 };
 </script>
-
 
 <style scoped></style>
