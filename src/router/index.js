@@ -54,6 +54,11 @@ const routes = [
     name: "circulargauge",
     component: () => import("../components/CircularGauge.vue"),
   },
+  {
+    path: "/osmap",
+    name: "osmap",
+    component: () => import("../components/OSMap.vue"),
+  },
 ];
 
 const router = createRouter({

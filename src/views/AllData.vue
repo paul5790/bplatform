@@ -1,18 +1,17 @@
 <template>
   <!-- 전체화면 패딩100px -->
-  <div style="padding: 100px; height: 100vh">
+  <div class="my-app">
     <v-data-iterator
       v-model:items-per-page="itemsPerPage"
       v-model:page="page"
-      :items="allData"
-      :search="search"
+      :items="searchFilteredData"
       :sort-by="sortBy"
     >
       <!-- 검색창 구현 -->
       <template v-slot:header>
         <v-text-field
           style="width: 50%"
-          v-model="search"
+          v-model="searchQuery"
           clearable
           hide-details
           prepend-inner-icon="mdi-magnify"
@@ -77,6 +76,26 @@
                 variant="outlined"
                 multiple
               >
+                <template v-slot:selection="{ item, index }">
+                  <div v-if="index < 2">
+                    <span>{{ item.title }}</span>
+                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                    <span
+                      v-if="
+                        secondSelectedItems.length > 1 &&
+                        index !== secondSelectedItems.length - 1
+                      "
+                      >,
+                    </span>
+                    <span v-else-if="secondSelectedItems.length >= 3"> </span>
+                  </div>
+                  <span
+                    v-if="index === 2"
+                    class="text-grey text-caption align-self-center"
+                  >
+                    (+{{ secondSelectedItems.length - 2 }} others)
+                  </span>
+                </template>
                 <template v-slot:prepend-item>
                   <v-list-item title="Select All" @click="selectAllItem2">
                     <template v-slot:prepend>
@@ -93,29 +112,13 @@
               </v-select>
             </v-col>
 
-            <!-- 세번째 선택박스 -->
+            <!-- 날짜 설정 -->
             <v-col cols="3">
-              <v-select
-                v-model="thirdSelectedItems"
-                :items="thirdSelect"
-                label="third"
-                variant="outlined"
-                multiple
-              >
-                <template v-slot:prepend-item>
-                  <v-list-item title="Select All" @click="selectAllItem3">
-                    <template v-slot:prepend>
-                      <v-checkbox-btn
-                        :color="likesSomeData3 ? 'indigo-darken-4' : undefined"
-                        :indeterminate="likesSomeData3 && !likesAllData3"
-                        :model-value="likesSomeData3"
-                      ></v-checkbox-btn>
-                    </template>
-                  </v-list-item>
-
-                  <v-divider class="mt-2"></v-divider>
-                </template>
-              </v-select>
+              <VueDatePicker
+                style="--dp-input-padding: 15px"
+                v-model="date"
+                range
+              />
             </v-col>
 
             <!-- 검색 버튼 -->
@@ -124,6 +127,7 @@
                 class=""
                 color="blue"
                 style="display: flex; height: 50px; width: 100px"
+                @click="searchData"
                 >검색</v-btn
               >
             </v-col>
@@ -155,6 +159,7 @@
               :title="key"
               :subtitle="String(item.raw[key.toLowerCase()])"
               :class="{ 'text-blue': sortKey === key.toLowerCase() }"
+              @click="showTable(subtitle)"
             ></v-list-item>
           </v-list>
         </v-card>
@@ -162,6 +167,7 @@
 
       <template v-slot:footer>
         <div class="d-flex align-center justify-space-around pa-4">
+          <v-btn color="blue" @click="dataDownload">데이터 다운로드</v-btn>
           <v-spacer></v-spacer>
           <span class="mr-4 grey--text">
             Page {{ page }} of {{ numberOfPages }}
@@ -179,13 +185,88 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, watch } from "vue";
+import { ref, computed, watchEffect, onMounted } from "vue";
 
 const itemsPerPage = ref(3);
 const page = ref(1);
-const search = ref("");
+const searchQuery = ref("");
 const sortKey = ref("name");
-// const selectedItems = ref([]);
+const sortOrder = ref("asc");
+
+// 데이터 검색
+const searchData = () => {
+  // alert(secondSelectedItems.value);
+  searchQuery.value = secondSelectedItems.value.join(", ");
+  console.log(date.value);
+  const startDateFormatted = date.value[0].toISOString().slice(0, 19); // ISO 기준 시간
+  const endDateFormatted = date.value[1].toISOString().slice(0, 19);
+  console.log(startDateFormatted); //
+  console.log(endDateFormatted); //
+};
+
+const keys = ref(["Name", "Top", "Info"]);
+const allData = ref([
+  {
+    name: "GLL",
+    top: "DGPS",
+    info: "GPS 수신기의 현재 위치를 위도와 경도로 표현하는 역할을 합니다.",
+  },
+  {
+    name: "GGA",
+    top: "DGPS",
+    info: "현재 위치, 위성 신호 품질, 해발고도 등의 정보를 제공하는 역할을 합니다.",
+  },
+  {
+    name: "RMC",
+    top: "DGPS",
+    info: "GPS 수신기의 권장 최소 탐색 정보를 제공합니다.",
+  },
+  {
+    name: "VTG",
+    top: "DGPS",
+    info: "현재 이동 방향과 지상 속도를 나타냅니다.",
+  },
+]);
+
+const filteredKeys = computed(() => {
+  return keys.value;
+});
+
+const sortBy = computed(() => {
+  return [
+    {
+      key: sortKey.value,
+      order: sortOrder.value,
+    },
+  ];
+});
+
+const searchFilteredData = computed(() => {
+  const query = searchQuery.value.toLowerCase().trim();
+  // 검색어를 콤마로 분리하여 배열로 만듭니다
+  const searchTerms = query.split(",").map((term) => term.trim());
+
+  // 검색어 배열이 비어있을 경우 모든 데이터를 반환합니다
+  if (searchTerms.length === 0) {
+    return allData.value;
+  }
+
+  // 검색어 배열의 모든 검색어가 데이터 항목에 포함되어 있는지 확인하는 함수
+  const anyTermsIncluded = (terms, item) => {
+    return terms.some((term) => {
+      return (
+        item.name.toLowerCase().includes(term) ||
+        item.top.toLowerCase().includes(term) ||
+        item.info.toLowerCase().includes(term)
+      );
+    });
+  };
+  console.log(
+    allData.value.filter((item) => anyTermsIncluded(searchTerms, item))
+  );
+  // 검색어 배열을 사용하여 데이터를 필터링합니다.
+  return allData.value.filter((item) => anyTermsIncluded(searchTerms, item));
+});
 
 // 셀렉바 메뉴
 const firstSelect = ref([
@@ -200,51 +281,20 @@ const firstSelect = ref([
   "NO.1ENGINEPANEL",
   "NO.2ENGINEPANEL",
 ]);
-
 const secondSelect = ref([]);
-const thirdSelect = ref([]);
 const firstSelectedItems = ref([]);
 const secondSelectedItems = ref([]);
-const thirdSelectedItems = ref([]);
-const showfirstSelectedItems = ref([]);
-const showsecondSelectedItems = ref([]);
 
-watch(firstSelectedItems, (newSelectedItems) => {
-  if (newSelectedItems.length >= 3) {
-    // 처음 2가지 값 가져오기
-    const firstTwoItems = newSelectedItems.slice(0, 2);
-    // 나머지 항목 개수 가져오기
-    const othersCount = newSelectedItems.length - 2;
-    // "2가지 값 + (+ others)" 형태로 설정
-    showfirstSelectedItems.value =
-      firstTwoItems.join(", ") + ` (+ ${othersCount} others)`;
-  } else {
-    // 3개 미만의 항목이 선택된 경우
-    showfirstSelectedItems.value = newSelectedItems.join(", ");
-  }
-  console.log(showfirstSelectedItems.value);
-});
-
-const resetItems = () => {
-  firstSelectedItems.value = [];
-  secondSelectedItems.value = [];
-  thirdSelectedItems.value = [];
-};
-
+//전체 선택
 const likesAllData1 = computed(
   () => firstSelectedItems.value.length === firstSelect.value.length
 );
 const likesSomeData1 = computed(() => firstSelectedItems.value.length > 0);
 
 const likesAllData2 = computed(
-  () => firstSelectedItems.value.length === firstSelect.value.length
+  () => secondSelectedItems.value.length === secondSelect.value.length
 );
-const likesSomeData2 = computed(() => firstSelectedItems.value.length > 0);
-
-const likesAllData3 = computed(
-  () => firstSelectedItems.value.length === firstSelect.value.length
-);
-const likesSomeData3 = computed(() => firstSelectedItems.value.length > 0);
+const likesSomeData2 = computed(() => secondSelectedItems.value.length > 0);
 
 // 전체 선택
 const selectAllItem1 = () => {
@@ -262,15 +312,6 @@ const selectAllItem2 = () => {
     secondSelectedItems.value = [];
   } else {
     secondSelectedItems.value = [...secondSelect.value];
-  }
-};
-
-const selectAllItem3 = () => {
-  if (likesAllData3.value) {
-    console.log(`선택 : ${thirdSelectedItems.value[0]}`);
-    thirdSelectedItems.value = [];
-  } else {
-    thirdSelectedItems.value = [...thirdSelect.value];
   }
 };
 
@@ -340,48 +381,9 @@ watchEffect(() => {
   }
 });
 
-const keys = ref(["Name", "Top", "Info"]);
-const allData = ref([
-  {
-    name: "GLL",
-    top: "DGPS",
-    info: "GPS 수신기의 현재 위치를 위도와 경도로 표현하는 역할을 합니다.",
-  },
-  {
-    name: "GGA",
-    top: "DGPS",
-    info: "현재 위치, 위성 신호 품질, 해발고도 등의 정보를 제공하는 역할을 합니다.",
-  },
-  {
-    name: "RMC",
-    top: "DGPS",
-    info: "GPS 수신기의 권장 최소 탐색 정보를 제공합니다.",
-  },
-  {
-    name: "VTG",
-    top: "DGPS",
-    info: "현재 이동 방향과 지상 속도를 나타냅니다.",
-  },
-]);
-
 const numberOfPages = computed(() => {
   return Math.ceil(allData.value.length / itemsPerPage.value);
 });
-
-const filteredKeys = computed(() => {
-  return keys.value;
-});
-
-const sortBy = computed(() => {
-  return [
-    {
-      key: sortKey.value,
-      order: sortOrder.value,
-    },
-  ];
-});
-
-const sortOrder = ref("asc");
 
 const nextPage = () => {
   if (page.value + 1 <= numberOfPages.value) {
@@ -394,4 +396,33 @@ const prevPage = () => {
     page.value -= 1;
   }
 };
+
+// 데이트 피커
+const date = ref();
+
+const startDate = new Date();
+const endDate = new Date();
+onMounted(() => {
+  date.value = [startDate, endDate];
+});
+
+// 데이터 다운로드
+const dataDownload = () => {
+  alert("다운로드 시작")
+}
+
+// 테이블 보이기
+const showTable = (data) => {
+  alert(data);
+}
+
+
 </script>
+
+
+
+<style scoped>
+.my-app {
+  padding: 100px;
+}
+</style>

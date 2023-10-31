@@ -17,7 +17,7 @@
       </v-sheet>
     </v-col>
     <v-col  cols="3">
-      <v-sheet class="bg-surface-variant" style="height: 50vh">
+      <v-sheet class="bg-surface-variant" style="height: auto">
         <SaillingAnimation/>
       </v-sheet>
     </v-col>

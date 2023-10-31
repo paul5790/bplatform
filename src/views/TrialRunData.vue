@@ -6,8 +6,6 @@
           height: 100vh;
           padding: 30px;
           display: flex;
-          flex-direction: column;
-          overflow-y: auto;
         "
       >
         <v-card :color="primary" :variant="elevated" style="flex: 1">
@@ -44,14 +42,7 @@
                 density="comfortable"
                 label="Default"
                 variant="outlined"
-              ></v-select>
-              <v-btn-toggle v-model="toggle" divided variant="outlined">
-                <v-btn icon="mdi-format-align-right"></v-btn>
-                <v-btn icon="mdi-format-align-left"></v-btn>
-              </v-btn-toggle>
-              <v-btn-toggle v-model="toggle" divided variant="outlined">
-                <v-btn icon="mdi-format-align-right"></v-btn>
-              </v-btn-toggle></div
+              ></v-select></div
           ></v-card-item>
         </v-card>
       </v-sheet>
@@ -148,7 +139,7 @@
       </v-sheet>
       <v-sheet
         style="
-          height: 15vh;
+          height: auto;
           padding: 10px;
           padding-right: 30px;
           display: flex;
@@ -805,7 +796,4 @@ const desserts = ref([
 </script>
 
 <style scoped>
-.scrollbar {
-  overflow-y: auto;
-}
 </style>

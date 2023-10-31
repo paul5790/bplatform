@@ -79,7 +79,7 @@
             :key="5"
             :to="`/realtimeview`"
             :exact="true"
-            :prepend-icon="`mdi-television`"
+            :prepend-icon="`mdi-account`"
             :title="`권한 제어`"
             :value="`/realtimeview`"
           ></v-list-item>
@@ -88,7 +88,7 @@
             :key="6"
             :to="`/realtimeview`"
             :exact="true"
-            :prepend-icon="`mdi-television`"
+            :prepend-icon="`mdi-file-search-outline`"
             :title="`기록 조회`"
             :value="`/realtimeview`"
           ></v-list-item>
@@ -104,13 +104,16 @@
         </v-list>
         <!-- 항상 맨 아래에 붙어있는 리스트 -->
         <template v-slot:append>
-          <v-list-item
+          <v-list density="compact" nav>
+            <v-list-item
             :key="5"
             @click="confirmLogout"
             :exact="true"
-            :prepend-icon="`mdi-link`"
+            :prepend-icon="`mdi-logout`"
             :title="`로그아웃`"
           ></v-list-item>
+          </v-list>
+          
         </template>
       </v-navigation-drawer>
 
