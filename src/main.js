@@ -8,6 +8,7 @@ import VueApexCharts from "vue3-apexcharts";
 import socket from "vue3-websocket";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
+import VueECharts from "vue-echarts";
 
 loadFonts();
 
@@ -18,4 +19,5 @@ createApp(App)
   .use(VueApexCharts)
   .use(socket, "ws://192.168.0.24:8080/ws/shipinfo")
   .component("VueDatePicker", VueDatePicker)
+  .component("v-chart", VueECharts)
   .mount("#app");
