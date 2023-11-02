@@ -39,6 +39,14 @@
             :title="`모니터링`"
             :value="`/realtimeview`"
           ></v-list-item>
+          <v-list-item
+            :key="2"
+            :to="`/mapview`"
+            :exact="true"
+            :prepend-icon="`mdi-map-outline`"
+            :title="`지도`"
+            :value="`/mapview`"
+          ></v-list-item>
 
           <!-- <v-list-item
             :key="2"
@@ -59,14 +67,14 @@
             </template>
 
             <v-list-item
-              :key="2"
+              :key="3"
               :to="`/trialrundata`"
               :exact="true"
               :title="`시운전 별 데이터`"
               :value="`/trialrundata`"
             ></v-list-item>
             <v-list-item
-              :key="3"
+              :key="4"
               :to="`/alldata`"
               :exact="true"
               :title="`전체 데이터`"
@@ -94,7 +102,7 @@
           ></v-list-item>
 
           <v-list-item
-            :key="4"
+            :key="7"
             :to="`/usersetting`"
             :exact="true"
             :prepend-icon="`mdi-cog-outline`"
@@ -106,14 +114,13 @@
         <template v-slot:append>
           <v-list density="compact" nav>
             <v-list-item
-            :key="5"
-            @click="confirmLogout"
-            :exact="true"
-            :prepend-icon="`mdi-logout`"
-            :title="`로그아웃`"
-          ></v-list-item>
+              :key="8"
+              @click="confirmLogout"
+              :exact="true"
+              :prepend-icon="`mdi-logout`"
+              :title="`로그아웃`"
+            ></v-list-item>
           </v-list>
-          
         </template>
       </v-navigation-drawer>
 

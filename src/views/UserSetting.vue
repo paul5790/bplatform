@@ -9,10 +9,10 @@
 </template>
 
 <script setup>
-import EchartGauge from "../components/EchartGauge.vue";
-import EchartBar from "../components/EchartBar.vue";
-import EchartLine from "../components/EchartLine.vue";
-import EchartStarPort from "../components/EchartStarPort.vue";
+import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
+import EchartBar from "../components/EchartGraph/EchartBar.vue";
+import EchartLine from "../components/EchartGraph/EchartLine.vue";
+import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 </script>
 
 <style scoped>

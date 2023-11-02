@@ -16,7 +16,6 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import VueApexCharts from "vue3-apexcharts"; // ApexCharts 라이브러리 import
-import "vue3-apexcharts/dist/vue3-apexcharts.css"; // 스타일 import
 
 const chartOptions = ref({
   annotations: {

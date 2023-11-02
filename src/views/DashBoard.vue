@@ -1,44 +1,51 @@
 <template>
   <v-row>
-    <v-col  cols="3">
-      <v-sheet :rounded="rounded" class="bg-surface-variant" style="height: 50vh">
-        <WeatherCard class="pa-2"/>
+    <v-col cols="4">
+      <v-sheet style="height: 50vh">
+        <ex1 />
+      </v-sheet>
+      <v-sheet style="height: 50vh">
+        <SaillingAnimation />
       </v-sheet>
     </v-col>
-    <v-col  cols="3">
-      <v-sheet class="bg-surface-variant" style="height: 50vh"> 
-        <ex1  class="pa-2"/> 
+    <v-col cols="4">
+      <v-sheet style="height: 50vh">
+        <EchartBar />
+      </v-sheet>
+      <v-sheet style="height: 50vh">
+        <EchartDrillDown />
       </v-sheet>
     </v-col>
-    <v-col  cols="3">
-      <v-sheet class="bg-surface-variant"  style="height: 50vh">
-        
-        <DonutGraph/>
+    <v-col cols="4">
+      <v-sheet style="height: 50vh">
+        <EchartDoughnut />
       </v-sheet>
-    </v-col>
-    <v-col  cols="3">
-      <v-sheet class="bg-surface-variant" style="height: auto">
-        <SaillingAnimation/>
+      <v-sheet style="height: 50vh">
+        <EchartHalfDoughnut />
       </v-sheet>
     </v-col>
 
-    <v-responsive width="100%"></v-responsive>
-
-    <v-col  cols="6">
-      <v-sheet  style="height: 50vh"> .v-col-auto </v-sheet>
+    <!-- <v-col cols="4">
+      <v-sheet class="bg-surface-variant" >
+        <SaillingAnimation />
+      </v-sheet>
     </v-col>
-    <v-col  cols="6">
-      <v-sheet  style="height: 50vh"> .v-col-auto </v-sheet>
+    <v-col cols="4">
+      <v-sheet style="height: 50vh"> .v-col-auto </v-sheet>
     </v-col>
+    <v-col cols="4">
+      <v-sheet style="height: 50vh"> .v-col-auto </v-sheet>
+    </v-col> -->
   </v-row>
 </template>
 
 <script setup>
-import WeatherCard from "../components/WeatherCard.vue";
-import ex1 from "../components/ExChart1.vue";
+import ex1 from "../components/EchartGraph/ExChart1.vue";
 import SaillingAnimation from "../components/SaillingLottie.vue";
-import DonutGraph from "../components/DonutGraph.vue";
-
+import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut";
+import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
+import EchartBar from "../components/EchartGraph/EchartBar.vue";
+import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
 </script>
 
 <style scoped></style>

@@ -27,6 +27,11 @@ const routes = [
     name: "usersetting",
     component: () => import("../views/UserSetting.vue"),
   },
+  {
+    path: "/mapview",
+    name: "mapview",
+    component: () => import("../views/MapView.vue"),
+  },
 
   // components
   {
@@ -37,7 +42,7 @@ const routes = [
   {
     path: "/ex1",
     name: "ex1",
-    component: () => import("../components/ExChart1.vue"),
+    component: () => import("../components/EchartGraph/ExChart1.vue"),
   },
   {
     path: "/sailling",
