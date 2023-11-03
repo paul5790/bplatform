@@ -8,28 +8,30 @@
               <ex1 />
             </v-sheet>
           </v-col>
+          <v-col cols="4">
+            <v-sheet style="height: 50vh">
+              <div style="padding: 30px">
+                <OSMap />
+              </div>
+            </v-sheet>
+            <v-sheet style="height: 50vh">
+              <EchartHalfDoughnut />
+            </v-sheet>
+          </v-col>
           <v-col cols="3">
             <v-sheet style="height: 50vh">
               <ex1 />
             </v-sheet>
             <v-sheet style="height: 50vh">
-              <SaillingAnimation />
+              <EchartWind />
             </v-sheet>
           </v-col>
           <v-col cols="3">
             <v-sheet style="height: 50vh">
-              <EchartBar />
+              <EchartGauge />
             </v-sheet>
             <v-sheet style="height: 50vh">
-              <EchartDrillDown />
-            </v-sheet>
-          </v-col>
-          <v-col cols="4">
-            <v-sheet style="height: 50vh">
-              <EchartDoughnut />
-            </v-sheet>
-            <v-sheet style="height: 50vh">
-              <EchartHalfDoughnut />
+              <EchartStarPort />
             </v-sheet>
           </v-col>
         </v-row>
@@ -48,7 +50,7 @@
           </v-col>
           <v-col cols="4">
             <v-sheet style="height: 50vh">
-              <EchartBar />
+              <OSMEchartDoughnutap />
             </v-sheet>
             <v-sheet style="height: 50vh">
               <EchartDrillDown />
@@ -69,14 +71,14 @@
 </template>
 
 <script setup>
-import WeatherCard from "../components/WeatherCard.vue";
-import CircularGauge from "../components/CircularGauge.vue";
-import DonutGraph from "../components/DonutGraph.vue";
+import OSMap from "../components/OSMap.vue";
 import ex1 from "../components/EchartGraph/ExChart1.vue";
 import SaillingAnimation from "../components/SaillingLottie.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
-import EchartBar from "../components/EchartGraph/EchartBar.vue";
+import EchartWind from "../components/EchartGraph/EchartWind.vue";
+import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
+import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
 
 const length = ref(3);

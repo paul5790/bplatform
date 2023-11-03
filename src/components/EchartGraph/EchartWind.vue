@@ -14,6 +14,8 @@ import {
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted } from "vue";
 
+const windspeed = ref(0);
+
 use([
   CanvasRenderer,
   GaugeChart, // GaugeChart로 변경
@@ -26,73 +28,84 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "타각",
     left: "center",
   },
   series: [
     {
-      max: 50,
-      min: -50,
+      type: "gauge",
+      startAngle: 90,
+      endAngle: 450,
       center: ["50%", "45%"],
+      radius: "70%",
+      splitNumber: 8,
+      min: 0,
+      max: 360,
       axisLine: {
         lineStyle: {
-          width: 20,
+          width: 6,
           color: [
-            [0.5, "#50d28a"],
-            [1, "#fd666d"],
+            [0.125, "#ca7060"],
+            [0.375, "#dada90"],
+            [0.625, "#78A9D9"],
+            [0.875, "#3CbF92"],
+            [1, "#ca7060"],
           ],
         },
       },
       pointer: {
+        icon: "path://M12.8,0.7l12,40.1H0.7L12.8,0.7z",
+        length: "14%",
+        width: 10,
+        offsetCenter: [0, "-60%"],
         itemStyle: {
           color: "auto",
         },
-        width: 5,
-        length: "60%",
       },
       axisTick: {
-        distance: -20,
-        length: 5,
+        length: 7,
         lineStyle: {
-          color: "#fff",
-          width: 1,
+          color: "auto",
+          width: 1.5,
         },
       },
       splitLine: {
-        distance: -20,
-        length: 30,
+        length: 12,
         lineStyle: {
-          color: "#fff",
-          width: 2,
+          color: "auto",
+          width: 3,
         },
-        interval: 10, // 수정: 눈금 간격을 10으로 설정
       },
       axisLabel: {
-        color: "inherit",
-        distance: 20,
-        fontSize: 10,
+        color: "#464646",
+        fontSize: 15,
+        distance: -35,
+        rotate: "tangential",
         formatter: function (value) {
-          if (value === -50) {
-            return 'PORT';
+          if (value === 90) {
+            return "E";
+          } else if (value === 180) {
+            return "S";
+          } else if (value === 270) {
+            return "W";
+          } else if (value === 360) {
+            return "N";
           }
-          if (value === 50) {
-            return 'STBD';
-          } 
-          if (value < 50 || value > -50) {
-            return value;
-          }
+          return '';
         },
       },
-      type: "gauge", // gauge 타입 사용
       detail: {
+        fontSize: 25,
+        formatter: function () {
+          return `${windspeed.value} m/s`;
+        },
+        offsetCenter: [0, "0%"],
         valueAnimation: true,
-        formatter: "{value}",
-        color: "inherit",
-        fontSize: 14,
+        color: "#464646",
       },
       data: [
         {
-          value: -10,
+          value: 0,
+          color: "inherit",
         },
       ],
     },
@@ -101,14 +114,14 @@ const option = ref({
 
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  option.value.series[0].data[0].value = Math.floor(Math.random() * 101) - 50;
+  option.value.series[0].data[0].value = Math.floor(Math.random() * 361);
+  windspeed.value = Math.floor(Math.random() * 101);
 };
 
 onMounted(() => {
   setInterval(updateValue, 1000);
   updateValue();
 });
-
 </script>
 
 <style scoped>

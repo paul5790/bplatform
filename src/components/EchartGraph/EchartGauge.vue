@@ -12,7 +12,7 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, provide } from 'vue';
+import { ref, provide , onMounted } from 'vue';
 
 use([
   CanvasRenderer,
@@ -36,27 +36,38 @@ const option = ref({
     {
       name: 'SPEEDLOG',
       type: 'gauge', // gauge 타입 사용
+      center: ["50%", "60%"],
       progress: {
         show: true,
       },
       detail: {
         valueAnimation: true,
         formatter: '{value} km/s',
+        fontSize: 14,
       },
       data: [
         {
           value: 50,
-          name: 'SPEEDK',
         },
       ],
     },
   ],
 });
+// 1초마다 랜덤값 생성
+const updateValue = () => {
+  option.value.series[0].data[0].value = Math.floor(Math.random() * 101);
+};
+
+onMounted(() => {
+  setInterval(updateValue, 1000);
+  updateValue();
+});
 </script>
 
 <style scoped>
 .chart {
-  height: 100vh;
+  height: 45vh;
+  padding: 5px;
 }
 body {
   margin: 0;
