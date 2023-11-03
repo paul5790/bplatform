@@ -152,7 +152,7 @@ const handleChartClick = (event) => {
             left: 50,
             top: 20,
             style: {
-              text: "Back",
+              text: "뒤로가기",
               fontSize: 18,
             },
             onclick: () => {

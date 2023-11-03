@@ -46,7 +46,7 @@ const option = ref({
       name: "Traffic Sources",
       type: "pie",
       radius: ["40%", "70%"],
-      center: ['35%', '50%'], // 이 부분을 수정하여 위치 조절
+      center: ['35%', '70%'], // 이 부분을 수정하여 위치 조절
       startAngle: 180,
       label: {
         show: false,

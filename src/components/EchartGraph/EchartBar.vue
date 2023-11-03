@@ -46,7 +46,7 @@ const option = ref({
     data: [
       "DGPS",
       "GYRO",
-      "ANEMO",
+      "ANEMOMETER",
       "RADAR",
       "AIS",
       "ECDIS",

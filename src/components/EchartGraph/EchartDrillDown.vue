@@ -1,6 +1,12 @@
 <template>
   <v-sheet :elevation="elevation">
-    <v-chart ref="chart" class="chart" :option="option" autoresize @click="handleChartClick" />
+    <v-chart
+      ref="chart"
+      class="chart"
+      :option="option"
+      autoresize
+      @click="handleChartClick"
+    />
   </v-sheet>
 </template>
 
@@ -35,7 +41,7 @@ const chart = ref(null);
 // 초기 그래프 옵션 설정
 const option = ref({
   title: {
-    text: "데이터 수집기능",
+    text: "데이터 소실빈도",
     left: "left",
     textStyle: {
       fontSize: 14,
@@ -50,7 +56,7 @@ const option = ref({
     data: [
       "DGPS",
       "GYRO",
-      "ANEMO",
+      "ANEMOMETER",
       "RADAR",
       "AIS",
       "ECDIS",
@@ -70,39 +76,43 @@ const option = ref({
     data: [
       {
         value: 48,
-        groupId: "animals",
+        groupId: "DGPS",
       },
       {
         value: 12,
-        groupId: "fruits",
+        groupId: "GYRO",
       },
       {
         value: 44,
-        groupId: "cars",
+        groupId: "ANEMOMETER",
       },
       {
         value: 48,
-        groupId: "animals1",
+        groupId: "RADAR",
       },
       {
         value: 25,
-        groupId: "fruits1",
+        groupId: "AIS",
       },
       {
         value: 45,
-        groupId: "cars1",
+        groupId: "ECDIS",
       },
       {
         value: 48,
-        groupId: "animals2",
+        groupId: "AUTOPILOT",
       },
       {
         value: 27,
-        groupId: "fruits2",
+        groupId: "SPEEDLOG",
       },
       {
         value: 48,
-        groupId: "cars2",
+        groupId: "NO.1ENGINE",
+      },
+      {
+        value: 48,
+        groupId: "NO.2ENGINE",
       },
       // 다른 데이터도 추가 가능
     ],
@@ -116,13 +126,109 @@ const option = ref({
 // 하위 그래프 데이터
 const drilldownData = [
   {
-    dataGroupId: "animals",
+    dataGroupId: "DGPS",
     data: [
-      ["Cats", 4],
-      ["Dogs", 2],
-      ["Cows", 1],
-      ["Sheep", 2],
-      ["Pigs", 1],
+      ["GLL", 4],
+      ["GGA", 2],
+      ["RMC", 1],
+      ["VTG", 2],
+      ["ZDA", 1],
+      ["GSV", 2],
+      ["GSA", 1],
+    ],
+  },
+    {
+    dataGroupId: "GYRO",
+    data: [
+      ["THS", 4],
+      ["HDT", 2],
+      ["ROT", 1],
+    ],
+  },
+    {
+    dataGroupId: "ANEMOMETER",
+    data: [
+      ["MWV", 4],
+      ["MTW", 2],
+    ],
+  },
+    {
+    dataGroupId: "RADAR",
+    data: [
+      ["GLL", 4],
+      ["GGA", 2],
+      ["RMC", 1],
+      ["VTG", 2],
+      ["ZDA", 1],
+      ["GSV", 2],
+      ["GSA", 1],
+    ],
+  },
+    {
+    dataGroupId: "AIS",
+    data: [
+      ["VDM", 4],
+      ["VDO", 2],
+    ],
+  },
+    {
+    dataGroupId: "ECDIS",
+    data: [
+      ["ROUTEINFO", 4],
+      ["WAYPOINTS", 2],
+    ],
+  },
+    {
+    dataGroupId: "AUTOPILOT",
+    data: [
+      ["RSA", 4],
+      ["HTD", 2],
+    ],
+  },
+    {
+    dataGroupId: "SPEEDLOG",
+    data: [
+      ["VBW", 4],
+      ["VHW", 2],
+      ["VLW", 1],
+    ],
+  },
+    {
+    dataGroupId: "NO.1ENGINE",
+    data: [
+      ["NO.1ENGINE_PANEL_61444", 4],
+      ["NO.1ENGINE_PANEL_65262", 2],
+      ["NO.1ENGINE_PANEL_65263", 1],
+      ["NO.1ENGINE_PANEL_65272", 2],
+      ["NO.1ENGINE_PANEL_65271", 1],
+      ["NO.1ENGINE_PANEL_65253", 2],
+      ["NO.1ENGINE_PANEL_65270", 1],
+      ["NO.1ENGINE_PANEL_65276", 4],
+      ["NO.1ENGINE_PANEL_65360", 2],
+      ["NO.1ENGINE_PANEL_65361_LAMP", 1],
+      ["NO.1ENGINE_PANEL_65361_STATUS", 2],
+      ["NO.1ENGINE_PANEL_65378", 1],
+      ["NO.1ENGINE_PANEL_65376", 2],
+      ["NO.1ENGINE_PANEL_65379", 1],
+    ],
+  },
+    {
+    dataGroupId: "NO.2ENGINE",
+    data: [
+      ["NO.1ENGINE_PANEL_61444", 4],
+      ["NO.1ENGINE_PANEL_65262", 2],
+      ["NO.1ENGINE_PANEL_65263", 1],
+      ["NO.1ENGINE_PANEL_65272", 2],
+      ["NO.1ENGINE_PANEL_65271", 1],
+      ["NO.1ENGINE_PANEL_65253", 2],
+      ["NO.1ENGINE_PANEL_65270", 1],
+      ["NO.1ENGINE_PANEL_65276", 4],
+      ["NO.1ENGINE_PANEL_65360", 2],
+      ["NO.1ENGINE_PANEL_65361_LAMP", 1],
+      ["NO.1ENGINE_PANEL_65361_STATUS", 2],
+      ["NO.1ENGINE_PANEL_65378", 1],
+      ["NO.1ENGINE_PANEL_65376", 2],
+      ["NO.1ENGINE_PANEL_65379", 1],
     ],
   },
   // 다른 drilldown 데이터도 추가
@@ -132,7 +238,9 @@ const drilldownData = [
 const handleChartClick = (event) => {
   if (event.data) {
     // 클릭된 데이터에 대한 하위 데이터 검색
-    const subData = drilldownData.find((data) => data.dataGroupId === event.data.groupId);
+    const subData = drilldownData.find(
+      (data) => data.dataGroupId === event.data.groupId
+    );
     if (subData) {
       const xAxisData = subData.data.map((item) => item[0]);
       const seriesData = subData.data.map((item) => item[1]);
@@ -168,7 +276,7 @@ const handleChartClick = (event) => {
                   data: [
                     "DGPS",
                     "GYRO",
-                    "ANEMO",
+                    "ANEMOMETER",
                     "RADAR",
                     "AIS",
                     "ECDIS",
@@ -185,39 +293,43 @@ const handleChartClick = (event) => {
                   data: [
                     {
                       value: 48,
-                      groupId: "animals",
+                      groupId: "DGPS",
                     },
                     {
                       value: 12,
-                      groupId: "fruits",
+                      groupId: "GYRO",
                     },
                     {
                       value: 44,
-                      groupId: "cars",
+                      groupId: "ANEMOMETER",
                     },
                     {
                       value: 48,
-                      groupId: "animals1",
+                      groupId: "RADAR",
                     },
                     {
                       value: 25,
-                      groupId: "fruits1",
+                      groupId: "AIS",
                     },
                     {
                       value: 45,
-                      groupId: "cars1",
+                      groupId: "ECDIS",
                     },
                     {
                       value: 48,
-                      groupId: "animals2",
+                      groupId: "AUTOPILOT",
                     },
                     {
                       value: 27,
-                      groupId: "fruits2",
+                      groupId: "SPEEDLOG",
                     },
                     {
                       value: 48,
-                      groupId: "cars2",
+                      groupId: "NO.1ENGINE",
+                    },
+                    {
+                      value: 48,
+                      groupId: "NO.2ENGINE",
                     },
                     // 다른 데이터도 추가 가능
                   ],
