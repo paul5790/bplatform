@@ -175,6 +175,9 @@ const logout = (newUserid) => {
   min-height: 100vh; /* 최소 높이를 화면 높이(100vh)로 설정합니다. */
   overflow-y: auto; /* 세로 스크롤 바를 표시합니다. */
 }
+.scroll {
+  overflow-y: auto;
+}
 </style>
 
 <style scoped>

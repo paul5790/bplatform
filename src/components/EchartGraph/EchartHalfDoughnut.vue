@@ -5,24 +5,26 @@
 <script setup>
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { PieChart } from "echarts/charts";
+import { GaugeChart } from "echarts/charts";
 import {
   TitleComponent,
   TooltipComponent,
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide } from "vue";
+import { ref, provide, onMounted } from "vue";
 
 use([
   CanvasRenderer,
-  PieChart,
+  GaugeChart,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
 ]);
 
 provide(THEME_KEY);
+
+const maxvalue = ref(1011);
 
 const option = ref({
   title: {
@@ -34,51 +36,77 @@ const option = ref({
   },
   tooltip: {
     trigger: "item",
-    formatter: "{a} <br/>{b} : {c} ({d}%)",
-  },
-    legend: {
-    orient: 'vertical',  // 수직 방향으로 표시
-    top: 'middle',       // 수직 정렬을 중앙으로 설정
-    right: '10%',  
+    formatter: "{b} : {c} MB",
   },
   series: [
     {
-      name: "Traffic Sources",
-      type: "pie",
-      radius: ["40%", "70%"],
-      center: ['35%', '70%'], // 이 부분을 수정하여 위치 조절
+      type: "gauge",
+      legend: {
+        data: ["사용중인 공간"], // 레전드에 표시할 항목 이름
+      },
+      radius: "90%",
+      center: ["35%", "80%"], // 이 부분을 수정하여 위치 조절
       startAngle: 180,
+      endAngle: 0,
+      min: 0,
+      max: maxvalue,
+      itemStyle: {
+        color: "#FFAB91",
+      },
       label: {
         show: false,
       },
-      emphasis: {
-        label: {
-          show: true,
-          fontSize: 12,
-          fontWeight: "bold",
+      progress: {
+        show: true,
+        width: 40,
+      },
+      pointer: {
+        show: false,
+      },
+      axisLine: {
+        lineStyle: {
+          width: 40,
         },
       },
+      splitLine: {
+        show: false,
+      },
+      axisTick: {
+        show: false,
+      },
+      axisLabel: {
+        show: false,
+      },
+
+      anchor: {
+        show: false,
+      },
+      title: {
+        show: false,
+      },
+      detail: {
+        valueAnimation: false,
+        width: "60%",
+        borderRadius: 8,
+        offsetCenter: [0, "-15%"],
+        fontSize: 30,
+        fontWeight: "bolder",
+        formatter: function (value) {
+          const percent = (value / maxvalue.value) * 100;
+          return `${percent.toFixed(1)} %`;
+        },
+        color: "inherit",
+      },
       data: [
-        { value: 1048, name: "저장된 공간" },
-        { value: 735, name: "저장 가능 공간" },
         {
-          // make an record to fill the bottom 50%
-          value: 1048 + 735,
-          itemStyle: {
-            // stop the chart from rendering this piece
-            color: "none",
-            decal: {
-              symbol: "none",
-            },
-          },
-          label: {
-            show: false,
-          },
+          value: 550,
+          name: "사용중인 공간",
         },
       ],
     },
   ],
 });
+
 </script>
 
 <style scoped>

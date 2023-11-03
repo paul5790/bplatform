@@ -3,12 +3,7 @@
     <v-window-item :key="1">
       <v-card height="100vh" class="d-flex justify-center align-center">
         <v-row>
-          <v-col cols="2">
-            <v-sheet style="height: 50vh">
-              <ex1 />
-            </v-sheet>
-          </v-col>
-          <v-col cols="4">
+          <v-col cols="3">
             <v-sheet style="height: 50vh">
               <div style="padding: 30px">
                 <OSMap />
@@ -20,7 +15,7 @@
           </v-col>
           <v-col cols="3">
             <v-sheet style="height: 50vh">
-              <ex1 />
+              <GyroComponent />
             </v-sheet>
             <v-sheet style="height: 50vh">
               <EchartWind />
@@ -32,6 +27,11 @@
             </v-sheet>
             <v-sheet style="height: 50vh">
               <EchartStarPort />
+            </v-sheet>
+          </v-col>
+          <v-col cols="3">
+            <v-sheet style="height: 100vh">
+              <SocketChecking :checkdata=checkdata />
             </v-sheet>
           </v-col>
         </v-row>
@@ -73,7 +73,8 @@
 <script setup>
 import OSMap from "../components/OSMap.vue";
 import ex1 from "../components/EchartGraph/ExChart1.vue";
-import SaillingAnimation from "../components/SaillingLottie.vue";
+import GyroComponent from "../components/GyroComponent.vue";
+import SocketChecking from "../components/SocketChecking.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartWind from "../components/EchartGraph/EchartWind.vue";
@@ -89,6 +90,70 @@ import { onMessage, onOpen, onClose, onError } from "vue3-websocket";
 
 const text = ref(""); // 보낼 데이터
 const responseMsg = ref(""); // 받아온 데이터
+
+var checkdata = {
+  GLL: 'ok',
+  GGA: 'ok',
+  RMC: 'no',
+  VTG: 'no',
+  ZDA: 'no',
+  DTM: 'no',
+  GSV: 'no',
+  GSA: 'no',
+  THS: 'no',
+  HDT: 'no',
+  ROT: 'no',
+  MWV: 'no',
+  MWD: 'no',
+  VWR: 'no',
+  MTW: 'no',
+  VWT: 'no',
+  TTM: 'no',
+  TLL: 'no',
+  RSCREEN: 'no',
+  VDM: 'no',
+  VDO: 'no',
+  ROUTEINFO: 'no',
+  WAYPOINTS: 'no',
+  ESCREEN: 'no',
+  RSA: 'no',
+  MODE: 'no',
+  HTD: 'no',
+  VBW: 'no',
+  VHW: 'no',
+  VLW: 'no',
+  NO1ENGINE_PANEL_61444: 'no',
+  NO1ENGINE_PANEL_65262: 'no',
+  NO1ENGINE_PANEL_65263: 'no',
+  NO1ENGINE_PANEL_65272: 'no',
+  NO1ENGINE_PANEL_65271: 'no',
+  NO1ENGINE_PANEL_65253: 'no',
+  NO1ENGINE_PANEL_65270: 'no',
+  NO1ENGINE_PANEL_65276: 'no',
+  NO1ENGINE_PANEL_65360: 'no',
+  NO1ENGINE_PANEL_65361_LAMP: 'no',
+  NO1ENGINE_PANEL_65361_STATUS: 'no',
+  NO1ENGINE_PANEL_65378: 'no',
+  NO1ENGINE_PANEL_65376: 'no',
+  NO1ENGINE_PANEL_65379: 'no',
+  NO2ENGINE_PANEL_61444: 'no',
+  NO2ENGINE_PANEL_65262: 'no',
+  NO2ENGINE_PANEL_65263: 'no',
+  NO2ENGINE_PANEL_65272: 'no',
+  NO2ENGINE_PANEL_65271: 'no',
+  NO2ENGINE_PANEL_65253: 'no',
+  NO2ENGINE_PANEL_65270: 'no',
+  NO2ENGINE_PANEL_65276: 'no',
+  NO2ENGINE_PANEL_65360: 'no',
+  NO2ENGINE_PANEL_65361_LAMP: 'no',
+  NO2ENGINE_PANEL_65361_STATUS: 'no',
+  NO2ENGINE_PANEL_65378: 'no',
+  NO2ENGINE_PANEL_65376: 'no',
+  NO2ENGINE_PANEL_65379: 'no',
+}
+console.log(checkdata.gll);
+console.log(checkdata.gga);
+console.log(checkdata.rmc);
 
 const socket = inject("socket");
 

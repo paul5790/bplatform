@@ -28,6 +28,21 @@ use([
 
 provide(THEME_KEY);
 
+var data1 = Math.round(Math.random() * 20);
+var data2 = Math.round(Math.random() * 20);
+var data3 = Math.round(Math.random() * 20);
+var data4 = Math.round(Math.random() * 20);
+var data5 = Math.round(Math.random() * 20);
+var data6 = Math.round(Math.random() * 20);
+var data7 = Math.round(Math.random() * 20);
+var data8 = Math.round(Math.random() * 20);
+var data9 = Math.round(Math.random() * 20);
+var data10 = Math.round(Math.random() * 20);
+
+
+
+const data = [data1, data2, data3, data4, data5, data6, data7, data8, data9, data10];
+
 const option = ref({
   title: {
     text: "데이터 수집기능",
@@ -41,7 +56,7 @@ const option = ref({
   },
   xAxis: {
     type: "category",
-    axisLabel: { interval: 0, rotate: 20, align: "center", margin: 30,},
+    axisLabel: { interval: 0, rotate: 20, align: "center", margin: 30 },
 
     data: [
       "DGPS",
@@ -59,12 +74,15 @@ const option = ref({
   yAxis: {},
   series: [
     {
+      realtimeSort: true,
       name: "바바",
       type: "bar", // bar 타입 사용
-      data: [30, 27, 44, 30, 27, 44, 30, 27, 44, 11],
+      data: data,
     },
   ],
 });
+
+
 </script>
 
 <style scoped>
