@@ -1,9 +1,12 @@
 <template>
-  <div style="padding-top: 30px;">
+  <div style="padding-top: 20px;">
     <v-row>
-      <v-col cols="1"> </v-col>
-      <v-col cols="11">
-        <v-card :color="primary" :variant="elevated"  style="flex: 1; max-height: 100vh; overflow-y: auto;">
+      <v-col cols="12">
+        <v-card
+          :color="primary"
+          :variant="elevated"
+          style="flex: 1; max-height: 95vh; overflow-y: auto"
+        >
           <v-card-item>
             <v-sheet v-for="item in data" :key="item.key">
               <v-icon
@@ -13,10 +16,9 @@
               ></v-icon>
               <span style="font-size: 14px"
                 >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-              ><br><br>
+              ><br /><br />
             </v-sheet>
-            ></v-card-item
-          >
+          </v-card-item>
         </v-card>
       </v-col>
     </v-row>
