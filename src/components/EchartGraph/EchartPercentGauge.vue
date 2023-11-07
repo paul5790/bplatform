@@ -28,7 +28,6 @@ const maxvalue = ref(1011);
 
 const option = ref({
   title: {
-    text: "저장 가능 공간 및 저장된 공간",
     left: "left",
     textStyle: {
       fontSize: 14, // 폰트 크기 설정
@@ -45,9 +44,9 @@ const option = ref({
         data: ["사용중인 공간"], // 레전드에 표시할 항목 이름
       },
       radius: "90%",
-      center: ["35%", "80%"], // 이 부분을 수정하여 위치 조절
-      startAngle: 180,
-      endAngle: 0,
+      center: ["50%", "50%"], // 이 부분을 수정하여 위치 조절
+      startAngle: 90,
+      endAngle: 450,
       min: 0,
       max: maxvalue,
       label: {
@@ -55,14 +54,14 @@ const option = ref({
       },
       progress: {
         show: true,
-        width: 40,
+        width: 7,
       },
       pointer: {
         show: false,
       },
       axisLine: {
         lineStyle: {
-          width: 40,
+          width: 7,
         },
       },
       splitLine: {
@@ -85,8 +84,8 @@ const option = ref({
         valueAnimation: false,
         width: "60%",
         borderRadius: 8,
-        offsetCenter: [0, "-15%"],
-        fontSize: 30,
+        offsetCenter: [0, 0],
+        fontSize: 18,
         fontWeight: "bolder",
         formatter: function (value) {
           const percent = (value / maxvalue.value) * 100;
@@ -118,7 +117,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 45vh;
+  height: 20vh;
 }
 body {
   margin: 0;

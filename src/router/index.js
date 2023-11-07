@@ -32,6 +32,26 @@ const routes = [
     name: "mapview",
     component: () => import("../views/MapView.vue"),
   },
+  {
+    path: "/datagraph",
+    name: "datagraph",
+    component: () => import("../views/DataGraph.vue"),
+  },
+  {
+    path: "/adminview",
+    name: "adminview",
+    component: () => import("../views/AdminView.vue"),
+  },
+  {
+    path: "/voyagedata",
+    name: "voyagedata",
+    component: () => import("../views/VoyageData.vue"),
+  },
+  {
+    path: "/authority",
+    name: "authority",
+    component: () => import("../views/AuthorityView.vue"),
+  },
 
   // components
   {

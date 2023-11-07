@@ -5,7 +5,7 @@
         <v-row>
           <v-col cols="4">
             <v-sheet style="height: 50vh">
-              <div style="padding-left: 30px; padding-top: 30px;">
+              <div style="padding-left: 30px; padding-top: 30px">
                 <OSMap />
               </div>
             </v-sheet>
@@ -42,28 +42,42 @@
     <v-window-item :key="2">
       <v-card height="100vh" class="d-flex justify-center align-center">
         <v-row>
-          <v-col cols="4">
+          <v-col cols="5">
             <v-sheet style="height: 50vh">
               <EchartGauge />
             </v-sheet>
-            <v-sheet style="height: 50vh">
-              <SaillingAnimation />
+            <v-sheet style="height: 25vh">
+              <v-row>
+                <v-col cols="6">
+                  <EchartGaugeVolt />
+                </v-col>
+                <v-col cols="6">
+                  <EchartGaugeVolt />
+                </v-col>
+              </v-row>
+            </v-sheet>
+            <v-sheet style="height: 25vh">
+              <v-row>
+                <v-col cols="6">
+                  <EchartPercentGauge />
+                </v-col>
+                <v-col cols="6">
+                  <EchartPercentGauge />
+                </v-col>
+              </v-row>
             </v-sheet>
           </v-col>
-          <v-col cols="4">
+          <v-col cols="5">
             <v-sheet style="height: 50vh">
-              <OSMEchartDoughnutap />
+              <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
             </v-sheet>
             <v-sheet style="height: 50vh">
-              <EchartDrillDown />
+              <EchartBarkPa :name="'Temperature(°C)'" :barWidth="30" />
             </v-sheet>
           </v-col>
-          <v-col cols="4">
-            <v-sheet style="height: 50vh">
-              <EchartDoughnut />
-            </v-sheet>
-            <v-sheet style="height: 50vh">
-              <EchartHalfDoughnut />
+          <v-col cols="2">
+            <v-sheet style="height: 100vh">
+              <EngineLampChecking :checkdata="checkdata2"/>
             </v-sheet>
           </v-col>
         </v-row>
@@ -78,10 +92,13 @@ import ex1 from "../components/EchartGraph/ExChart1.vue";
 import GyroComponent from "../components/GyroComponent.vue";
 import TableComponent from "../components/TableComponent.vue";
 import SocketChecking from "../components/SocketChecking.vue";
-import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut";
+import EngineLampChecking from "../components/EngineLampChecking.vue";
+import EchartPercentGauge from "../components/EchartGraph/EchartPercentGauge.vue";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartWind from "../components/EchartGraph/EchartWind.vue";
+import EchartBarkPa from "../components/EchartGraph/EchartBarkPa.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
+import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
 
@@ -153,6 +170,25 @@ var checkdata = {
   NO2ENGINE_PANEL_65378: "no",
   NO2ENGINE_PANEL_65376: "no",
   NO2ENGINE_PANEL_65379: "no",
+};
+var checkdata2 = {
+  1: "ok",
+  2: "ok",
+  3: "no",
+  4: "no",
+  5: "no",
+  6: "no",
+  7: "no",
+  8: "no",
+  9: "no",
+  10: "no",
+  11: "no",
+  12: "no",
+  13: "no",
+  14: "no",
+  15: "no",
+  16: "no",
+  
 };
 console.log(checkdata.gll);
 console.log(checkdata.gga);

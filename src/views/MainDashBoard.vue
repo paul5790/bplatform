@@ -47,6 +47,22 @@
             :title="`지도`"
             :value="`/mapview`"
           ></v-list-item>
+          <v-list-item
+            :key="3"
+            :to="`/datagraph`"
+            :exact="true"
+            :title="`데이터 그래프`"
+            :prepend-icon="`mdi-chart-line`"
+            :value="`/datagraph`"
+          ></v-list-item>
+          <v-list-item
+            :key="4"
+            :to="`/alldata`"
+            :exact="true"
+            :title="`전체 데이터`"
+            :prepend-icon="`mdi-database-search-outline`"
+            :value="`/alldata`"
+          ></v-list-item>
 
           <!-- <v-list-item
             :key="2"
@@ -57,7 +73,7 @@
             :value="`/trialrundata`"
           ></v-list-item> -->
 
-          <v-list-group value="trialrundata">
+          <!-- <v-list-group value="trialrundata">
             <template v-slot:activator="{ props }">
               <v-list-item
                 v-bind="props"
@@ -65,44 +81,63 @@
                 :prepend-icon="`mdi-database-search-outline`"
               ></v-list-item>
             </template>
-
             <v-list-item
+              :key="3"
+              :to="`/datagraph`"
+              :exact="true"
+              :title="`데이터 그래프`"
+              :prepend-icon="`mdi-chart-line`"
+              :value="`/datagraph`"
+            ></v-list-item> -->
+
+            <!-- <v-list-item
               :key="3"
               :to="`/trialrundata`"
               :exact="true"
               :title="`시운전 별 데이터`"
               :value="`/trialrundata`"
-            ></v-list-item>
-            <v-list-item
+            ></v-list-item> -->
+            <!-- <v-list-item
               :key="4"
               :to="`/alldata`"
               :exact="true"
               :title="`전체 데이터`"
+              :prepend-icon="`mdi-text-search`"
               :value="`/alldata`"
             ></v-list-item>
-          </v-list-group>
+          </v-list-group> -->
 
           <v-list-item
             v-if="isAdmin"
             :key="5"
-            :to="`/realtimeview`"
+            :to="`/voyagedata`"
             :exact="true"
-            :prepend-icon="`mdi-account`"
-            :title="`권한 제어`"
-            :value="`/realtimeview`"
-          ></v-list-item>
-          <v-list-item
-            v-if="isAdmin"
-            :key="6"
-            :to="`/realtimeview`"
-            :exact="true"
-            :prepend-icon="`mdi-file-search-outline`"
-            :title="`기록 조회`"
-            :value="`/realtimeview`"
+            :prepend-icon="`mdi mdi-ferry`"
+            :title="`항차 데이터`"
+            :value="`/voyagedata`"
           ></v-list-item>
 
           <v-list-item
+            v-if="isAdmin"
+            :key="6"
+            :to="`/authority`"
+            :exact="true"
+            :prepend-icon="`mdi-account`"
+            :title="`권한 제어`"
+            :value="`/authority`"
+          ></v-list-item>
+          <v-list-item
+            v-if="isAdmin"
             :key="7"
+            :to="`/adminview`"
+            :exact="true"
+            :prepend-icon="`mdi-file-search-outline`"
+            :title="`기록 조회`"
+            :value="`/adminview`"
+          ></v-list-item>
+
+          <v-list-item
+            :key="8"
             :to="`/usersetting`"
             :exact="true"
             :prepend-icon="`mdi-cog-outline`"
@@ -114,7 +149,7 @@
         <template v-slot:append>
           <v-list density="compact" nav>
             <v-list-item
-              :key="8"
+              :key="9"
               @click="confirmLogout"
               :exact="true"
               :prepend-icon="`mdi-logout`"

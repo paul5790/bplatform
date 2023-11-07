@@ -71,6 +71,22 @@ NO.2ENGINE_PANEL_65379
 
 
 
+Water Temperature Warning Lamp,
+Low Engine Oil Pressure Warning Lamp,
+Low Gearbox Oil Pressure Warning Lamp,
+Battery Charge Warning Lamp,
+Fuel Leak Warning Lamp,
+Over Speed Warning Lamp,
+Low Volt. Warning Lamp,
+Low Water Level Warning Lamp,
+Low Fuel Level Warning Lamp,
+Engine Oil Over Heat Warning Lamp,
+Main connector Removed Warning Lamp,
+High Exhaust Gas Temperature Warning Lamp,
+Low Boost Air Pressure Warning Lamp,
+High Boost Air Pressure Warning Lamp,
+Engine Shutdown Warning Lamp,
+Low Engine Speed Warning Lamp,
 
 
 

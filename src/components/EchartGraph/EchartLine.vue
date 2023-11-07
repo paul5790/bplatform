@@ -13,6 +13,7 @@ import {
   TooltipComponent,
   GridComponent,
   TransformComponent,
+  DataZoomComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide } from "vue";
@@ -26,22 +27,32 @@ use([
   LineChart,
   CanvasRenderer,
   UniversalTransition,
+  DataZoomComponent,
 ]);
 
 provide(THEME_KEY);
 
 const datasetRaw = ref([
-  ["Year", "Income"],
+  ["time", "value"],
 ]);
 
+const times = ref([]); // 시간 배열을 정의
+for (let i = 0; i <= 226; i++) {
+  // 원하는 시간 형식을 배열에 추가
+  const hours = Math.floor(i / 60); // 시간
+  const minutes = i % 60; // 분
+  times.value.push(`${hours}:${minutes}`);
+}
+
+
 const rand = ref([]);
-for (let i = 1; i<= 227; i++ ){
+for (let i = 0; i<= 226; i++ ){
   const randomIncome = Math.floor(Math.random() * 100) + 1;
   rand.value.push(randomIncome); // 랜덤값을 배열에 추가
 }
 console.log(rand);
 for (let i = 0; i <= 226; i++) { 
-  datasetRaw.value.push([i+1, rand.value[i]]);
+  datasetRaw.value.push([times.value[i], rand.value[i]]);
 }
 
 const option = ref({
@@ -49,19 +60,6 @@ const option = ref({
     {
       id: "dataset_raw",
       source: datasetRaw.value,
-    },
-    {
-      id: "dataset_since_1950_of_germany",
-      fromDatasetId: "dataset_raw",
-      transform: {
-        type: "filter",
-        config: {
-          and: [
-            { dimension: "Year", gte: 0 }, // 1950년 이상
-            { dimension: "Income", lte: 100 }, // 100 이하
-          ],
-        },
-      },
     },
   ],
   title: {
@@ -71,23 +69,33 @@ const option = ref({
   tooltip: {
     formatter: "{a} <br/>{b} : {c} mb",
   },
+  dataZoom: [
+    {
+      show: true,
+      realtime: true,
+      start: 0,
+      end: 100,
+      xAxisIndex: [0, 1],
+      height: '2%',
+    },
+  ],
   xAxis: {
     type: "category",
     nameLocation: "middle",
+    data: times.value, // x축 데이터를 times 배열로 설정
   },
   yAxis: {
-    name: "Income",
   },
   series: [
     {
       type: "line",
-      datasetId: "dataset_since_1950_of_germany",
+      datasetId: "dataset_raw",
       showSymbol: false,
       encode: {
-        x: "Year",
-        y: "Income",
-        itemName: "Year",
-        tooltip: ["Income"],
+        x: "time",
+        y: "value",
+        itemName: "time",
+        tooltip: ["value"],
       },
     },
   ],
