@@ -6,6 +6,7 @@
           :color="primary"
           :variant="elevated"
           style="flex: 1; max-height: 95vh; overflow-y: auto"
+          class="scrollable-card"
         >
           <v-card-item>
             <v-sheet v-for="item in data" :key="item.key">
@@ -213,3 +214,4 @@ const getIconColor = (key) =>
 const getIconIcon = (key) =>
   props.checkdata[key] === "ok" ? "mdi-check-circle" : "mdi-alert-circle";
 </script>
+

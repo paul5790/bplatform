@@ -2,7 +2,7 @@
   <v-chart class="chart" :option="option" autoresize />
 </template>
 
-<script setup>
+<script setup props="props">
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { GaugeChart } from 'echarts/charts'; // GaugeChart로 변경
@@ -12,7 +12,7 @@ import {
   LegendComponent,
 } from 'echarts/components';
 import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, provide , onMounted } from 'vue';
+import { ref, provide , onMounted, defineProps } from 'vue';
 
 use([
   CanvasRenderer,
@@ -24,10 +24,16 @@ use([
 
 provide(THEME_KEY);
 
+const props = defineProps({  // #2 props 정의
+  text: String,
+  left: String
+});
+
+
 const option = ref({
   title: {
-    text: 'SPEEDLOG',
-    left: 'center',
+    text: props.text,
+    left: props.left,
   },
   tooltip: {
     formatter: '{a} <br/>{b} : {c} km/s',

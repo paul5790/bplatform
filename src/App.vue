@@ -178,6 +178,18 @@ const logout = (newUserid) => {
 .scroll {
   overflow-y: auto;
 }
+.scrollable-card {
+  scrollbar-width: none; /* Firefox에 대한 스크롤바 숨김 */
+  -ms-overflow-style: none; /* IE에 대한 스크롤바 숨김 */
+}
+
+.scrollable-card::-webkit-scrollbar {
+  width: 0.2em; /* 스크롤바 너비 조절 */
+}
+
+.scrollable-card::-webkit-scrollbar-thumb {
+  background-color: transparent; /* 스크롤바 썸 네일 배경색 투명으로 설정하여 숨김 */
+}
 </style>
 
 <style scoped>

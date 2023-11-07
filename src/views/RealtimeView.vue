@@ -23,7 +23,7 @@
           </v-col>
           <v-col cols="3">
             <v-sheet style="height: 50vh">
-              <EchartGauge />
+              <EchartGauge :text="'Speed(knot)'" :left="'center'"/>
             </v-sheet>
             <v-sheet style="height: 50vh">
               <EchartStarPort />
@@ -44,7 +44,51 @@
         <v-row>
           <v-col cols="5">
             <v-sheet style="height: 50vh">
-              <EchartGauge />
+              <EchartGauge :text="'Engine 1'" :left="'left'"/>
+            </v-sheet>
+            <v-sheet style="height: 25vh">
+              <v-row>
+                <v-col cols="6">
+                  <EchartGaugeVolt />
+                </v-col>
+                <v-col cols="6">
+                  <EchartGaugeVolt />
+                </v-col>
+              </v-row>
+            </v-sheet>
+            <v-sheet style="height: 25vh">
+              <v-row>
+                <v-col cols="6">
+                  <EchartPercentGauge />
+                </v-col>
+                <v-col cols="6">
+                  <EchartPercentGauge />
+                </v-col>
+              </v-row>
+            </v-sheet>
+          </v-col>
+          <v-col cols="5">
+            <v-sheet style="height: 50vh">
+              <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
+            </v-sheet>
+            <v-sheet style="height: 50vh">
+              <EchartBarkPa :name="'Temperature(°C)'" :barWidth="30" />
+            </v-sheet>
+          </v-col>
+          <v-col cols="2">
+            <v-sheet style="height: 100vh">
+              <EngineLampChecking :checkdata="checkdata2"/>
+            </v-sheet>
+          </v-col>
+        </v-row>
+      </v-card>
+    </v-window-item>
+    <v-window-item :key="3">
+      <v-card height="100vh" class="d-flex justify-center align-center">
+        <v-row>
+          <v-col cols="5">
+            <v-sheet style="height: 50vh">
+              <EchartGauge :text="'Engine 2'" :left="'left'"/>
             </v-sheet>
             <v-sheet style="height: 25vh">
               <v-row>

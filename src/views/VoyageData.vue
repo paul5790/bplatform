@@ -1,199 +1,422 @@
 <template>
-  <!-- <v-row>
-    <v-col cols="1">
-
-    </v-col>
-        <v-col cols="10">
-            <v-sheet
-        style="
-          height: 15vh;
-          padding-top: 30px;
-          display: flex;
-        "
-      >
-    <v-card :color="primary" :variant="elevated" style="flex: 1">
-          <v-card-item>
-            <div>
-              
-</div
-          ></v-card-item>
-        </v-card>
-    
-    </v-sheet>
-    </v-col>
-        <v-col cols="1">
-      
-    </v-col>
-  </v-row> -->
   <v-row>
     <v-col cols="3">
-      <v-sheet
-        style="
-          height: 100vh;
-          padding: 30px;
-          display: flex;
-        "
-      >
-      
+      <v-sheet style="height: 100vh; padding: 30px; display: flex">
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
-            <div>
-                <v-card
-    class="mx-auto"
-    max-width="300"
-  >
-    <v-list :items="items"></v-list>
-  </v-card>
-              
-              </div
-          ></v-card-item>
+            <div style="height: 71vh">
+              <v-card
+                class="mx-auto scrollable-card"
+                max-width="300"
+                style="
+                  flex: 1;
+                  max-height: 68vh;
+                  overflow-y: auto;
+                  margin-top: 25px;
+                "
+              >
+                <v-list>
+                  <v-list-item
+                    v-for="(item, index) in items"
+                    :key="index"
+                    @click="selectItem(item)"
+                  >
+                    {{ item.title }}
+                  </v-list-item>
+                </v-list>
+              </v-card>
+            </div>
+            <div style="height: 6vh; display: flex; justify-content: center">
+              <v-btn width="300" height="40">시작하기</v-btn>
+            </div>
+            <div style="height: 6vh; display: flex; justify-content: center">
+              <v-btn width="300" height="40">추가하기</v-btn>
+            </div>
+            <div style="height: 17vh; display: flex; justify-content: center">
+              <v-btn width="300" height="40">삭제하기</v-btn>
+            </div>
+          </v-card-item>
         </v-card>
       </v-sheet>
     </v-col>
     <v-col cols="9">
       <v-sheet
-        style="
-          height: 85vh;
-          padding: 1px;
-          margin-top: 30px;
-          padding-right: 30px;
-          display: flex;
-          flex-direction: column;
-          overflow-y: auto;
-          align-items: end;
-        "
+        style="height: 100vh; padding: 30px; padding-left: 0; display: flex"
       >
-        <v-sheet style="display: flex; flex-direction: row">
-          <v-col cols="6">
-            <v-data-table
-              style="margin: 20px"
-              v-model:page="page"
-              class="elevation-1"
-              :headers="headers"
-              :items="desserts"
-              :items-per-page="itemsPerPage"
-              hide-default-footer
-              item-value="name"
-            >
-              <template v-slot:bottom>
-                <div class="text-center pt-2">
-                  <v-pagination
-                    v-model="page"
-                    :length="pageCount"
-                  ></v-pagination>
-                </div>
-              </template>
-            </v-data-table>
-          </v-col>
-          <v-col cols="6">
-            <v-data-table
-              style="margin: 20px"
-              v-model:page="page"
-              class="elevation-1"
-              :headers="headers"
-              :items="desserts"
-              :items-per-page="itemsPerPage"
-              hide-default-footer
-              item-value="name"
-            >
-              <template v-slot:bottom>
-                <div class="text-center pt-2">
-                  <v-pagination
-                    v-model="page"
-                    :length="pageCount"
-                  ></v-pagination>
-                </div>
-              </template>
-            </v-data-table>
-          </v-col>
-        </v-sheet>
+        <v-card
+          :color="primary"
+          :variant="elevated"
+          style="flex: 1; padding: 50px"
+        >
+          <v-card-item>
+            <v-container fluid>
+              <v-row>
+                <v-col cols="4" style="margin-top: 5px">
+                  <v-list-subheader
+                    >Enter vessel navigation information</v-list-subheader
+                  >
+                </v-col>
 
-        <v-data-table
-          v-model:page="page"
-          class="elevation-1"
-          :headers="headers"
-          :items="desserts"
-          :items-per-page="itemsPerPage"
-          hide-default-footer
-          item-value="name"
-        >
-          <template v-slot:bottom>
-            <div class="text-center pt-2">
-              <v-pagination v-model="page" :length="pageCount"></v-pagination>
+                <v-col cols="8">
+                  <v-text-field
+                    variant="outlined"
+                    v-model="title"
+                    type="text"
+                    :readonly="!isEditing"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col cols="4" style="margin-top: 8px">
+                  <v-list-subheader>Ship voyage start time</v-list-subheader>
+                </v-col>
+
+                <v-col cols="8">
+                  <!-- 날짜 설정 -->
+
+                  <VueDatePicker
+                    style="--dp-input-padding: 15px"
+                    v-model="startdate"
+                    text-input
+                    :readonly="!isEditing"
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col cols="4" style="margin-top: 28px">
+                  <v-list-subheader>Ship voyage end time</v-list-subheader>
+                </v-col>
+
+                <v-col cols="8">
+                  <VueDatePicker
+                    style="margin-top: 20px; --dp-input-padding: 15px"
+                    v-model="enddate"
+                    text-input
+                    :readonly="!isEditing"
+                  />
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col cols="4" style="margin-top: 28px">
+                  <v-list-subheader>Explanation on sailing</v-list-subheader>
+                </v-col>
+
+                <v-col cols="8">
+                  <v-text-field
+                    style="margin-top: 20px"
+                    variant="outlined"
+                    v-model="description"
+                    type="text"
+                    :readonly="!isEditing"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+
+              <v-row>
+                <v-col cols="4" style="margin-top: 10px">
+                  <v-list-subheader>Last modified user</v-list-subheader>
+                </v-col>
+
+                <v-col cols="8">
+                  <v-text-field
+                    variant="outlined"
+                    v-model="modifieduser"
+                    type="text"
+                    :readonly="!isEditing"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+            <div
+              style="
+                margin-top: 100px;
+                height: auto;
+                padding: 15px;
+                display: flex;
+                align-items: start;
+                justify-content: end;
+              "
+            >
+              <v-btn
+                @click="editData()"
+                style="width: 180px; height: 40px; margin-right: 20px"
+                >항차 수정</v-btn
+              >
+              <v-btn @click="saveData()" style="width: 180px; height: 40px"
+                >항차 저장</v-btn
+              >
             </div>
-          </template>
-        </v-data-table>
-        <v-data-table
-          style="margin-left: 10px"
-          v-model:page="page1"
-          class="elevation-1"
-          :headers="headers"
-          :items="desserts"
-          :items-per-page="itemsPerPage"
-          hide-default-footer
-          item-value="name"
-        >
-          <template v-slot:bottom>
-            <div class="text-center pt-2">
-              <v-pagination v-model="page1" :length="pageCount1"></v-pagination>
-            </div>
-          </template>
-        </v-data-table>
-      </v-sheet>
-      <v-sheet
-        style="
-          height: auto;
-          padding: 10px;
-          padding-right: 30px;
-          display: flex;
-          align-items: start;
-          justify-content: end;
-        "
-      >
-        <v-btn @click="exportToExcel()">엑셀 다운</v-btn>
+          </v-card-item>
+        </v-card>
       </v-sheet>
     </v-col>
   </v-row>
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 
-// 왼쪽 셀렉바 설정
-const trialrun = ref(["시운전1", "시운전2", "시운전3", "시운전4"]);
-const runitem = ref(null);
+let selectedData = ref(null);
+let title = ref("");
+let startdate = ref("");
+let enddate = ref("");
+let description = ref("");
+let modifieduser = ref("");
+let isEditing = ref(false); // 수정 모드인지 여부
+
+const username = ref("홍길동");
+
+const selectItem = (item) => {
+  alert(item.title);
+  selectedData.value = item;
+  title.value = item.title;
+  startdate.value = item.startdate;
+  enddate.value = item.enddate;
+  description.value = item.description;
+  modifieduser.value = item.username;
+};
+
+const editData = () => {
+  isEditing.value = true;
+};
+
+const saveData = () => {
+  // 수정한 데이터를 저장하거나 다른 작업 수행
+  // ...
+
+  isEditing.value = false; // 수정 모드를 비활성화
+};
 
 const items = ref([
   {
-    title: '시운전 #1',
-    value: '1'
+    title: "시운전 #1",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
   },
-    {
-    title: '시운전 #2',
-    value: '2'
+  {
+    title: "시운전 #2",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
   },
-    {
-    title: '시운전 #3',
-    value: '4'
+  {
+    title: "시운전 #3",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
   },
-    {
-    title: '시운전 #4',
-    value: '4'
+  {
+    title: "시운전 #4",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
   },
-])
-
-
-
-// 데이터 테이블 하단 바 설정
-const page = ref(1);
-const itemsPerPage = ref(10);
-
-const pageCount = computed(() => {
-  return Math.ceil(itemsPerPage.value);
-});
-
+  {
+    title: "시운전 #5",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #6",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #7",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #8",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #9",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #10",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #11",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #12",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #13",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #14",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #3",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #4",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #1",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #2",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #3",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #4",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #1",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #2",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #3",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #4",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #1",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #2",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #3",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #4",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #1",
+    startdate: "2023-08-29T08:28:43",
+    enddate: "2023-08-31T01:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #2",
+    startdate: "2023-09-27T08:28:43",
+    enddate: "2023-09-30T08:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #3",
+    startdate: "2023-10-20T04:28:43",
+    enddate: "2023-10-21T06:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+  {
+    title: "시운전 #4",
+    startdate: "2023-10-29T18:28:43",
+    enddate: "2023-10-29T20:24:33",
+    description: "##테스트 시운전",
+    username: username.value,
+  },
+]);
 
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
