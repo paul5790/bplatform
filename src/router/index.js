@@ -8,6 +8,11 @@ const routes = [
     component: () => import("../views/DashBoard.vue"),
   },
   {
+    path: "/signup",
+    name: "signup",
+    component: () => import("../views/SignUpView.vue"),
+  },
+  {
     path: "/realtimeview",
     name: "realtimeview",
     component: () => import("../views/RealtimeView.vue"),
@@ -52,6 +57,7 @@ const routes = [
     name: "authority",
     component: () => import("../views/AuthorityView.vue"),
   },
+  
 
   // components
   {

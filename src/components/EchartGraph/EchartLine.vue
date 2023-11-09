@@ -62,10 +62,6 @@ const option = ref({
       source: datasetRaw.value,
     },
   ],
-  title: {
-    text: "시계열 그래프",
-    left: "center",
-  },
   tooltip: {
     formatter: "{a} <br/>{b} : {c} mb",
   },

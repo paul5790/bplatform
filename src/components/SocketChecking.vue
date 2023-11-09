@@ -1,29 +1,26 @@
 <template>
-  <div style="padding-top: 20px;">
-    <v-row>
-      <v-col cols="12">
-        <v-card
-          :color="primary"
-          :variant="elevated"
-          style="flex: 1; max-height: 95vh; overflow-y: auto"
-          class="scrollable-card"
-        >
-          <v-card-item>
-            <v-sheet v-for="item in data" :key="item.key">
-              <v-icon
-                :color="getIconColor(item.key)"
-                :icon="getIconIcon(item.key)"
-                size="small"
-              ></v-icon>
-              <span style="font-size: 14px"
-                >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-              ><br /><br />
-            </v-sheet>
-          </v-card-item>
-        </v-card>
-      </v-col>
-    </v-row>
-  </div>
+  <v-row>
+    <v-col cols="12">
+      <v-card
+        :color="primary"
+        :variant="elevated"
+        style="flex: 1; max-height: 95vh; overflow-y: auto"
+        class="scrollable-card"
+      >
+        <v-card-item>
+          <v-sheet v-for="item in data" :key="item.key">
+            <v-icon
+              :color="getIconColor(item.key)"
+              :icon="getIconIcon(item.key)"
+              size="small"
+            ></v-icon>
+            <span style="font-size: 14px">&nbsp;&nbsp;&nbsp;{{ item.key }}</span
+            ><br /><br />
+          </v-sheet>
+        </v-card-item>
+      </v-card>
+    </v-col>
+  </v-row>
 </template>
 
 <script setup props>
@@ -214,4 +211,3 @@ const getIconColor = (key) =>
 const getIconIcon = (key) =>
   props.checkdata[key] === "ok" ? "mdi-check-circle" : "mdi-alert-circle";
 </script>
-

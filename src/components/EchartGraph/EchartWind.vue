@@ -28,7 +28,11 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    left: "center",
+    text: "풍향 및 풍속",
+    left: "left",
+    textStyle: {
+      fontSize: 14, // 폰트 크기 설정
+    },
   },
   series: [
     {

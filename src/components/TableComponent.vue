@@ -1,7 +1,7 @@
 <template>
   <div>
     <v-data-table
-      style="margin: 20px"
+      style="margin-top: 20px"
       v-model:page="page"
       class="elevation-1"
       :headers="headers"

@@ -3,37 +3,116 @@
     <v-window-item :key="1">
       <v-card height="100vh" class="d-flex justify-center align-center">
         <v-row>
-          <v-col cols="4">
-            <v-sheet style="height: 50vh">
-              <div style="padding-left: 30px; padding-top: 30px">
-                <OSMap />
-              </div>
+          <v-col cols="4" sm="12" md="6" lg="4">
+            <v-sheet
+              style="
+                height: 50vh;
+                padding: 10px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <OSMap />
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 50vh">
-              <TableComponent />
+
+            <v-sheet
+              style="
+                height: 50vh;
+                padding: 10px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <TableComponent />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="3">
-            <v-sheet style="height: 50vh">
-              <GyroComponent />
+            <v-sheet
+              style="
+                height: 50vh;
+                padding: 10px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <GyroComponent />
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 50vh">
-              <EchartWind />
+            <v-sheet
+              style="
+                height: 50vh;
+                padding: 10px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartWind />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="3">
-            <v-sheet style="height: 50vh">
-              <EchartGauge :text="'Speed(knot)'" :left="'center'"/>
+            <v-sheet
+              style="
+                height: 50vh;
+                padding: 10px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartGauge :text="'선박 속도'" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 50vh">
-              <EchartStarPort />
+            <v-sheet
+              style="
+                height: 50vh;
+                padding: 10px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartStarPort />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="2">
-            <v-sheet>
-              <div>
-                <SocketChecking :checkdata="checkdata" />
-              </div>
+            <v-sheet
+              style="
+              
+                height: 100vh;
+                padding: 10px;
+                padding-left: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <SocketChecking :checkdata="checkdata" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
         </v-row>
@@ -44,7 +123,7 @@
         <v-row>
           <v-col cols="5">
             <v-sheet style="height: 50vh">
-              <EchartGauge :text="'Engine 1'" :left="'left'"/>
+              <EchartGauge :text="'Engine 1'" :left="'left'" />
             </v-sheet>
             <v-sheet style="height: 25vh">
               <v-row>
@@ -77,7 +156,7 @@
           </v-col>
           <v-col cols="2">
             <v-sheet style="height: 100vh">
-              <EngineLampChecking :checkdata="checkdata2"/>
+              <EngineLampChecking :checkdata="checkdata2" />
             </v-sheet>
           </v-col>
         </v-row>
@@ -88,7 +167,7 @@
         <v-row>
           <v-col cols="5">
             <v-sheet style="height: 50vh">
-              <EchartGauge :text="'Engine 2'" :left="'left'"/>
+              <EchartGauge :text="'Engine 2'" :left="'left'" />
             </v-sheet>
             <v-sheet style="height: 25vh">
               <v-row>
@@ -121,7 +200,7 @@
           </v-col>
           <v-col cols="2">
             <v-sheet style="height: 100vh">
-              <EngineLampChecking :checkdata="checkdata2"/>
+              <EngineLampChecking :checkdata="checkdata2" />
             </v-sheet>
           </v-col>
         </v-row>
@@ -132,19 +211,16 @@
 
 <script setup>
 import OSMap from "../components/OSMap.vue";
-import ex1 from "../components/EchartGraph/ExChart1.vue";
 import GyroComponent from "../components/GyroComponent.vue";
 import TableComponent from "../components/TableComponent.vue";
 import SocketChecking from "../components/SocketChecking.vue";
 import EngineLampChecking from "../components/EngineLampChecking.vue";
 import EchartPercentGauge from "../components/EchartGraph/EchartPercentGauge.vue";
-import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartWind from "../components/EchartGraph/EchartWind.vue";
 import EchartBarkPa from "../components/EchartGraph/EchartBarkPa.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
-import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
 
 const length = ref(3);
 const window = ref(0);
@@ -232,7 +308,6 @@ var checkdata2 = {
   14: "no",
   15: "no",
   16: "no",
-  
 };
 console.log(checkdata.gll);
 console.log(checkdata.gga);

@@ -1,9 +1,12 @@
 <template>
+      <v-card-title style="height: 5vh;">
+    <span class="text-h5">User Profile</span>
+  </v-card-title>
   <v-row>
     <v-col cols="3">
       <v-sheet
         style="
-          height: 100vh;
+          height: 95vh;
           padding: 30px;
           display: flex;
         "
@@ -28,7 +31,7 @@
                 variant="outlined"
               ></v-select>
               
-              <v-btn width="500px" color="blue" :variant="elevated" style="margin-top: 20px;">
+              <v-btn mt-xcxcbzxb width="500px" color="blue" :variant="elevated">
                 조회하기
               </v-btn>
               
@@ -40,7 +43,7 @@
     <v-col cols="9">
       <v-sheet
         style="
-          height: 95vh;
+          height: 85vh;
           padding: 1px;
           margin-top: 30px;
           padding-right: 30px;

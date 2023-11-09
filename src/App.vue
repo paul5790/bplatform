@@ -4,6 +4,93 @@
     <div v-if="showDashboard">
       <Dashboard :username="userid" @logout="logout" />
     </div>
+
+    <!-- 회원가입 기능  -->
+    <div v-else-if="showSignup">
+      <div class="form-signup">
+        <img
+          src="https://kassproject.org/include/download_img.php?idx=9b1c034190fcb2798286ff057bde5b56"
+          alt=""
+          width="112"
+          height="87"
+        />
+        <v-row>
+          <v-col cols="9">
+            <v-text-field
+              variant="outlined"
+              v-model="newid"
+              :rules="rules.ID"
+              label="아이디"
+            ></v-text-field>
+          </v-col>
+          <v-col cols="3">
+            <v-btn @click="checkid()" style="height: 55px"> 중복확인 </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-text-field
+          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="visible ? 'text' : 'password'"
+          variant="outlined"
+          v-model="newpassword"
+          :rules="rules.Password"
+          label="비밀번호"
+          @click:append-inner="visible = !visible"
+        ></v-text-field>
+
+        <v-text-field
+          :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+          :type="visible ? 'text' : 'password'"
+          variant="outlined"
+          v-model="checknewpassword"
+          :rules="rules.PasswordConfirmation"
+          label="비밀번호 확인"
+          @click:append-inner="visible = !visible"
+        ></v-text-field>
+
+        <v-text-field
+          variant="outlined"
+          v-model="newemail"
+          :rules="rules.Email"
+          label="이메일"
+        ></v-text-field>
+
+        <v-text-field
+          variant="outlined"
+          v-model="newname"
+          :rules="rules.Basic"
+          label="이름"
+        ></v-text-field>
+
+        <v-text-field
+          variant="outlined"
+          v-model="newaffiliation"
+          :rules="rules.Basic"
+          label="소속"
+        ></v-text-field>
+
+        <v-row>
+          <v-col cols="6">
+            <v-btn
+              color="blue"
+              class="halfbtn"
+              @click="signfinish()"
+              to="/"
+            >
+              돌아가기
+            </v-btn>
+          </v-col>
+          <v-col cols="6">
+            <v-btn color="blue" class="halfbtn" @click="checkid()" to="/">
+              가입하기
+            </v-btn>
+          </v-col>
+        </v-row>
+
+        <v-btn @click="signfinish()" to="/">돌아가기</v-btn>
+      </div>
+    </div>
+
     <!-- 사용자 이름이 'a'가 아닐 때 로그인 양식 표시 -->
     <div v-else>
       <div class="form-signin">
@@ -33,15 +120,6 @@
             class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
           >
             Password
-
-            <a
-              class="text-caption text-decoration-none text-blue"
-              href="#"
-              rel="noopener noreferrer"
-              target="_blank"
-            >
-              Forgot login password?</a
-            >
           </div>
 
           <v-text-field
@@ -77,40 +155,15 @@
           </v-btn>
 
           <v-card-text class="text-center">
-            <a
+            <router-link
+              to="/signup"
+              @click="signupBtn()"
               class="text-blue text-decoration-none"
-              href="#"
-              rel="noopener noreferrer"
-              target="_blank"
             >
               Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
-            </a>
+            </router-link>
           </v-card-text>
         </v-form>
-
-        <!-- <hr />
-        <v-sheet width="400" class="mx-auto">
-          <v-form fast-fail @submit="login">
-            <v-text-field
-              type="text"
-              v-model="userid"
-              label="ID"
-              :rules="IDRules"
-            ></v-text-field>
-
-            <v-text-field
-              type="password"
-              v-model="password"
-              label="Password"
-              :rules="PasswordRules"
-            ></v-text-field>
-
-            <v-btn type="submit" block class="btn-skyblue">Submit</v-btn>
-          </v-form>
-          <a id="forget" href="#">비밀번호가 기억나지 않으세요?</a>
-          <hr />
-          <v-btn type="button" class="btn-skyblue btn-width">Sign up</v-btn>
-        </v-sheet> -->
       </div>
     </div>
   </div>
@@ -129,18 +182,51 @@ const showDashboard = ref(
 );
 const userid = ref(sessionStorage.getItem("userid") || "");
 const password = ref("");
-const IDRules = [
-  (value) => {
-    if (value?.length > 0) return true;
-    return "First name must be at least 3 characters.";
-  },
-];
-const PasswordRules = [
-  (value) => {
-    if (/[^0-9]/.test(value)) return true;
-    return "Last name cannot contain digits.";
-  },
-];
+const email = ref("");
+
+// 회원 정보
+let newid = ref("");
+let newpassword = ref("");
+let checknewpassword = ref("");
+let newemail = ref("");
+let newname = ref("");
+let newaffiliation = ref("");
+
+// Rules
+const rules = ref({
+  Basic: [
+    (value) => {
+      if (value?.length > 0) return true;
+      return "Must be at least 1 character.";
+    },
+  ],
+  ID: [
+    (value) => {
+      if (value?.length > 3) return true;
+      return "ID must be at least 4 characters.";
+    },
+  ],
+  Password: [
+    (value) => {
+      if (value?.length >= 6 && /[0-9]/.test(value) && /[a-zA-Z]/.test(value))
+        return true;
+      return "Password must be at least 6 characters and contain numbers and letters..";
+    },
+  ],
+  PasswordConfirmation: [
+    () => {
+      if (newpassword.value === checknewpassword.value) return true;
+      return "Passwords do not match.";
+    },
+  ],
+  Email: [
+    (value) => {
+      const pattern =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      return pattern.test(value) || "Invalid e-mail.";
+    },
+  ],
+});
 
 // 페이지가 처음 로드될 때 사용자 로그인 상태를 확인합니다.
 onMounted(() => {
@@ -168,6 +254,26 @@ const logout = (newUserid) => {
   sessionStorage.setItem("userid", userid.value);
   sessionStorage.setItem("isAdmin", userid.value);
 };
+
+// 회원 가입 관리
+const showSignup = ref(
+  sessionStorage.getItem("showSignup") === "true" || false
+);
+
+const signupBtn = () => {
+  showSignup.value = true;
+  sessionStorage.setItem("showSignup", showSignup.value.toString());
+};
+
+const signfinish = () => {
+  showSignup.value = false;
+  sessionStorage.setItem("showSignup", showSignup.value.toString());
+};
+
+const checkid = () => {
+  alert("중복확인");
+};
+
 </script>
 
 <style>
@@ -200,6 +306,13 @@ const logout = (newUserid) => {
   margin-top: 100px;
 }
 
+.form-signup {
+  text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
+  margin-top: 100px;
+}
+
 #logintext {
   font-size: 14px;
 }
@@ -225,8 +338,8 @@ hr {
   border-color: #5badee; /* 하늘색의 hover 상태 HEX 코드 */
 }
 
-.btn-width {
+.halfbtn {
   width: 400px;
-  color: white;
+  height: 40px;
 }
 </style>

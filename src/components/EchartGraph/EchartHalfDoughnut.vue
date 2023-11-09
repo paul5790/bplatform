@@ -45,7 +45,7 @@ const option = ref({
         data: ["사용중인 공간"], // 레전드에 표시할 항목 이름
       },
       radius: "90%",
-      center: ["35%", "80%"], // 이 부분을 수정하여 위치 조절
+      center: ["45%", "80%"], // 이 부분을 수정하여 위치 조절
       startAngle: 180,
       endAngle: 0,
       min: 0,
@@ -85,7 +85,7 @@ const option = ref({
         valueAnimation: false,
         width: "60%",
         borderRadius: 8,
-        offsetCenter: [0, "-15%"],
+        offsetCenter: [0, "-5%"],
         fontSize: 30,
         fontWeight: "bolder",
         formatter: function (value) {

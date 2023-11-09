@@ -57,8 +57,8 @@ const option = ref({
         },
       },
       axisLabel: {
-distance: 10,
-fontSize: 10,
+        distance: 10,
+        fontSize: 10,
       },
       detail: {
         valueAnimation: true,

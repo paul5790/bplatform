@@ -1,16 +1,19 @@
 <template>
+    <v-card-title style="height: 5vh;">
+    <span class="text-h5">User Profile</span>
+  </v-card-title>
   <v-row>
     <v-col cols="3">
-      <v-sheet style="height: 100vh; padding: 30px; display: flex">
+      <v-sheet style="height: 95vh; padding: 30px; display: flex">
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
-            <div style="height: 71vh">
+            <div style="height: 66vh">
               <v-card
                 class="mx-auto scrollable-card"
                 max-width="300"
                 style="
                   flex: 1;
-                  max-height: 68vh;
+                  max-height: 63vh;
                   overflow-y: auto;
                   margin-top: 25px;
                 "
@@ -21,7 +24,7 @@
                     :key="index"
                     @click="selectItem(item)"
                   >
-                    {{ item.title }}
+                    {{ item.name }}
                   </v-list-item>
                 </v-list>
               </v-card>
@@ -41,7 +44,7 @@
     </v-col>
     <v-col cols="9">
       <v-sheet
-        style="height: 100vh; padding: 30px; padding-left: 0; display: flex"
+        style="height: 95vh; padding: 30px; padding-left: 0; display: flex"
       >
         <v-card
           :color="primary"
@@ -60,7 +63,7 @@
                 <v-col cols="8">
                   <v-text-field
                     variant="outlined"
-                    v-model="title"
+                    v-model="name"
                     type="text"
                     :readonly="!isEditing"
                   ></v-text-field>
@@ -160,7 +163,7 @@
 import { ref } from "vue";
 
 let selectedData = ref(null);
-let title = ref("");
+let name = ref("");
 let startdate = ref("");
 let enddate = ref("");
 let description = ref("");
@@ -170,9 +173,9 @@ let isEditing = ref(false); // 수정 모드인지 여부
 const username = ref("홍길동");
 
 const selectItem = (item) => {
-  alert(item.title);
+  alert(item.name);
   selectedData.value = item;
-  title.value = item.title;
+  name.value = item.name;
   startdate.value = item.startdate;
   enddate.value = item.enddate;
   description.value = item.description;
@@ -192,226 +195,149 @@ const saveData = () => {
 
 const items = ref([
   {
-    title: "시운전 #1",
+    name: "시운전 #1",
     startdate: "2023-08-29T08:28:43",
     enddate: "2023-08-31T01:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #2",
+    name: "시운전 #2",
     startdate: "2023-09-27T08:28:43",
     enddate: "2023-09-30T08:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #3",
+    name: "시운전 #3",
     startdate: "2023-10-20T04:28:43",
     enddate: "2023-10-21T06:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #4",
+    name: "시운전 #4",
     startdate: "2023-10-29T18:28:43",
     enddate: "2023-10-29T20:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #5",
+    name: "시운전 #5",
     startdate: "2023-08-29T08:28:43",
     enddate: "2023-08-31T01:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #6",
+    name: "시운전 #6",
     startdate: "2023-09-27T08:28:43",
     enddate: "2023-09-30T08:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #7",
+    name: "시운전 #7",
     startdate: "2023-10-20T04:28:43",
     enddate: "2023-10-21T06:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #8",
+    name: "시운전 #8",
     startdate: "2023-10-29T18:28:43",
     enddate: "2023-10-29T20:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #9",
+    name: "시운전 #9",
     startdate: "2023-08-29T08:28:43",
     enddate: "2023-08-31T01:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #10",
+    name: "시운전 #10",
     startdate: "2023-09-27T08:28:43",
     enddate: "2023-09-30T08:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #11",
+    name: "시운전 #11",
     startdate: "2023-10-20T04:28:43",
     enddate: "2023-10-21T06:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #12",
+    name: "시운전 #12",
     startdate: "2023-10-29T18:28:43",
     enddate: "2023-10-29T20:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #13",
+    name: "시운전 #13",
     startdate: "2023-08-29T08:28:43",
     enddate: "2023-08-31T01:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #14",
+    name: "시운전 #14",
     startdate: "2023-09-27T08:28:43",
     enddate: "2023-09-30T08:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #3",
+    name: "시운전 #15",
     startdate: "2023-10-20T04:28:43",
     enddate: "2023-10-21T06:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #4",
+    name: "시운전 #16",
     startdate: "2023-10-29T18:28:43",
     enddate: "2023-10-29T20:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #1",
+    name: "시운전 #17",
     startdate: "2023-08-29T08:28:43",
     enddate: "2023-08-31T01:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #2",
+    name: "시운전 #18",
     startdate: "2023-09-27T08:28:43",
     enddate: "2023-09-30T08:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #3",
+    name: "시운전 #19",
     startdate: "2023-10-20T04:28:43",
     enddate: "2023-10-21T06:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #4",
+    name: "시운전 #20",
     startdate: "2023-10-29T18:28:43",
     enddate: "2023-10-29T20:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },
   {
-    title: "시운전 #1",
+    name: "시운전 #21",
     startdate: "2023-08-29T08:28:43",
     enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #2",
-    startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #3",
-    startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #4",
-    startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #1",
-    startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #2",
-    startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #3",
-    startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #4",
-    startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #1",
-    startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #2",
-    startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #3",
-    startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    title: "시운전 #4",
-    startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
     description: "##테스트 시운전",
     username: username.value,
   },

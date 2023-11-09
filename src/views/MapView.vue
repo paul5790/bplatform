@@ -1,35 +1,44 @@
 <template>
   <div>
-    <v-card :variant="elevated" style="flex: 1; height: 8vh">
-      <v-card-item>
-        <v-row>
-          <v-col cols="3">
-            <v-select
-              style="margin-top: 5px"
-              v-model="sailingselect"
-              :items="items1"
-              density="comfortable"
-              label="Comfortable"
-              variant="underlined"
-            ></v-select>
-          </v-col>
-          <v-col cols="3">
-            <v-select
-              style="margin-top: 5px"
-              v-model="sailingselect"
-              :items="items1"
-              density="comfortable"
-              label="Default"
-              variant="underlined"
-            ></v-select>
-          </v-col>
-          <v-col cols="2">
-            <v-btn style="width: 100px" class="ma-2">조회하기</v-btn>
-          </v-col>
-        </v-row>
-      </v-card-item>
-    </v-card>
-    <div id="map" style="height: 92vh; padding: 10px;"></div>
+    <v-sheet
+      style="height: 8vh; padding-left: 50; padding-right: 50; display: flex"
+    >
+      <v-card :color="primary" :variant="elevated" style="flex: 1">
+        <v-card-item>
+          <v-row>
+            <v-col cols="5">
+              <v-card-title>
+                <span class="text-h5">User Profile</span>
+              </v-card-title>
+            </v-col>
+            <v-col cols="3">
+              <v-select
+                style="margin-top: 5px"
+                v-model="sailingselect"
+                :items="items1"
+                density="comfortable"
+                label="Comfortable"
+                variant="underlined"
+              ></v-select>
+            </v-col>
+            <v-col cols="3">
+              <v-select
+                style="margin-top: 5px"
+                v-model="sailingselect"
+                :items="items1"
+                density="comfortable"
+                label="Default"
+                variant="underlined"
+              ></v-select>
+            </v-col>
+            <v-col cols="1">
+              <v-btn style="width: 100px; margin-top: 15px">조회하기</v-btn>
+            </v-col>
+          </v-row>
+        </v-card-item>
+      </v-card>
+    </v-sheet>
+    <div id="map" style="height: 92vh"></div>
   </div>
 </template>
 

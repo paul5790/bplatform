@@ -123,7 +123,7 @@
             :to="`/authority`"
             :exact="true"
             :prepend-icon="`mdi-account`"
-            :title="`권한 제어`"
+            :title="`사용자 관리`"
             :value="`/authority`"
           ></v-list-item>
           <v-list-item

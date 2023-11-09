@@ -1,5 +1,8 @@
 <template>
   <!-- 전체화면 패딩100px -->
+    <v-card-title style="height: vh;">
+    <span class="text-h5">User Profile</span>
+  </v-card-title>
   <div class="my-app">
     <v-data-iterator
       v-model:items-per-page="itemsPerPage"
@@ -423,6 +426,8 @@ const showTable = (data) => {
 
 <style scoped>
 .my-app {
-  padding: 100px;
+  padding: 50px;
+  padding-left: 100px;
+  padding-right: 100px;
 }
 </style>

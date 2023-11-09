@@ -26,8 +26,11 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "타각",
-    left: "center",
+    text: "타각 위치",
+    left: "left",
+    textStyle: {
+      fontSize: 14, // 폰트 크기 설정
+    },
   },
   series: [
     {

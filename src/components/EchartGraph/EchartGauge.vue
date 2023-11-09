@@ -33,7 +33,10 @@ const props = defineProps({  // #2 props 정의
 const option = ref({
   title: {
     text: props.text,
-    left: props.left,
+    left: "left",
+        textStyle: {
+      fontSize: 14, // 폰트 크기 설정
+    },
   },
   tooltip: {
     formatter: '{a} <br/>{b} : {c} km/s',
