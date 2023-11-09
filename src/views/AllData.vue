@@ -1,6 +1,6 @@
 <template>
   <!-- 전체화면 패딩100px -->
-    <v-card-title style="height: vh;">
+  <v-card-title style="height: 5vh">
     <span class="text-h5">User Profile</span>
   </v-card-title>
   <div class="my-app">
@@ -12,130 +12,162 @@
     >
       <!-- 검색창 구현 -->
       <template v-slot:header>
-        <v-text-field
-          style="width: 50%"
-          v-model="searchQuery"
-          clearable
-          hide-details
-          prepend-inner-icon="mdi-magnify"
-          placeholder="Search"
-          variant="outlined"
-          density="comfortable"
-        ></v-text-field>
+        <v-sheet style="height: 25vh; margin-bottom: 30px; display: flex">
+          <v-card
+            :color="primary"
+            :variant="elevated"
+            style="flex: 1; padding: 10px;"
+          >
+            <v-card-item style=" margin: 10px;">
+              <div class="d-flex flex-column mt-3">
+                <v-row>
+                <v-col cols="6">
+                  <v-text-field
+                    v-model="searchQuery"
+                    clearable
+                    hide-details
+                    prepend-inner-icon="mdi-magnify"
+                    placeholder="Search"
+                    variant="outlined"
+                    density="comfortable"
+                  ></v-text-field>
+                </v-col>
+                <v-col cols="3"> 
+                  <v-select
+                      v-model="selectedvoyage"
+                      :items="voyage"
+                      label="voyage"
+                      variant="outlined"
+                    >
 
-        <div class="d-flex flex-column mt-5">
-          <v-row>
-            <!-- 첫번째 선택박스 -->
-            <v-col cols="3">
-              <v-select
-                v-model="firstSelectedItems"
-                :items="firstSelect"
-                label="fisrt"
-                variant="outlined"
-                multiple
-              >
-                <template v-slot:selection="{ item, index }">
-                  <div v-if="index < 2">
-                    <span>{{ item.title }}</span>
-                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                    <span
-                      v-if="
-                        firstSelectedItems.length > 1 &&
-                        index !== firstSelectedItems.length - 1
-                      "
-                      >,
-                    </span>
-                    <span v-else-if="firstSelectedItems.length >= 3"> </span>
-                  </div>
-                  <span
-                    v-if="index === 2"
-                    class="text-grey text-caption align-self-center"
-                  >
-                    (+{{ firstSelectedItems.length - 2 }} others)
-                  </span>
-                </template>
-                <template v-slot:prepend-item>
-                  <v-list-item title="Select All" @click="selectAllItem1">
-                    <template v-slot:prepend>
-                      <v-checkbox-btn
-                        :color="likesSomeData1 ? 'indigo-darken-4' : undefined"
-                        :indeterminate="likesSomeData1 && !likesAllData1"
-                        :model-value="likesSomeData1"
-                      ></v-checkbox-btn>
-                    </template>
-                  </v-list-item>
+                    </v-select>
 
-                  <v-divider class="mt-2"></v-divider>
-                </template>
-              </v-select>
-            </v-col>
+                </v-col>
+              </v-row>
 
-            <!-- 두번째 선택박스 -->
-            <v-col cols="3">
-              <v-select
-                v-model="secondSelectedItems"
-                :items="secondSelect"
-                label="second"
-                variant="outlined"
-                multiple
-              >
-                <template v-slot:selection="{ item, index }">
-                  <div v-if="index < 2">
-                    <span>{{ item.title }}</span>
-                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                    <span
-                      v-if="
-                        secondSelectedItems.length > 1 &&
-                        index !== secondSelectedItems.length - 1
-                      "
-                      >,
-                    </span>
-                    <span v-else-if="secondSelectedItems.length >= 3"> </span>
-                  </div>
-                  <span
-                    v-if="index === 2"
-                    class="text-grey text-caption align-self-center"
-                  >
-                    (+{{ secondSelectedItems.length - 2 }} others)
-                  </span>
-                </template>
-                <template v-slot:prepend-item>
-                  <v-list-item title="Select All" @click="selectAllItem2">
-                    <template v-slot:prepend>
-                      <v-checkbox-btn
-                        :color="likesSomeData2 ? 'indigo-darken-4' : undefined"
-                        :indeterminate="likesSomeData2 && !likesAllData2"
-                        :model-value="likesSomeData2"
-                      ></v-checkbox-btn>
-                    </template>
-                  </v-list-item>
+              </div>
+              <div class="d-flex flex-column mt-3">
+                <v-row>
+                  <!-- 첫번째 선택박스 -->
+                  <v-col cols="3">
+                    <v-select
+                      v-model="firstSelectedItems"
+                      :items="firstSelect"
+                      label="fisrt"
+                      variant="outlined"
+                      multiple
+                    >
+                      <template v-slot:selection="{ item, index }">
+                        <div v-if="index < 2">
+                          <span>{{ item.title }}</span>
+                          <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                          <span
+                            v-if="
+                              firstSelectedItems.length > 1 &&
+                              index !== firstSelectedItems.length - 1
+                            "
+                            >,
+                          </span>
+                          <span v-else-if="firstSelectedItems.length >= 3">
+                          </span>
+                        </div>
+                        <span
+                          v-if="index === 2"
+                          class="text-grey text-caption align-self-center"
+                        >
+                          (+{{ firstSelectedItems.length - 2 }} others)
+                        </span>
+                      </template>
+                      <template v-slot:prepend-item>
+                        <v-list-item title="Select All" @click="selectAllItem1">
+                          <template v-slot:prepend>
+                            <v-checkbox-btn
+                              :color="
+                                likesSomeData1 ? 'indigo-darken-4' : undefined
+                              "
+                              :indeterminate="likesSomeData1 && !likesAllData1"
+                              :model-value="likesSomeData1"
+                            ></v-checkbox-btn>
+                          </template>
+                        </v-list-item>
 
-                  <v-divider class="mt-2"></v-divider>
-                </template>
-              </v-select>
-            </v-col>
+                        <v-divider class="mt-2"></v-divider>
+                      </template>
+                    </v-select>
+                  </v-col>
 
-            <!-- 날짜 설정 -->
-            <v-col cols="3">
-              <VueDatePicker
-                style="--dp-input-padding: 15px"
-                v-model="date"
-                range
-              />
-            </v-col>
+                  <!-- 두번째 선택박스 -->
+                  <v-col cols="3">
+                    <v-select
+                      v-model="secondSelectedItems"
+                      :items="secondSelect"
+                      label="second"
+                      variant="outlined"
+                      multiple
+                    >
+                      <template v-slot:selection="{ item, index }">
+                        <div v-if="index < 2">
+                          <span>{{ item.title }}</span>
+                          <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                          <span
+                            v-if="
+                              secondSelectedItems.length > 1 &&
+                              index !== secondSelectedItems.length - 1
+                            "
+                            >,
+                          </span>
+                          <span v-else-if="secondSelectedItems.length >= 3">
+                          </span>
+                        </div>
+                        <span
+                          v-if="index === 2"
+                          class="text-grey text-caption align-self-center"
+                        >
+                          (+{{ secondSelectedItems.length - 2 }} others)
+                        </span>
+                      </template>
+                      <template v-slot:prepend-item>
+                        <v-list-item title="Select All" @click="selectAllItem2">
+                          <template v-slot:prepend>
+                            <v-checkbox-btn
+                              :color="
+                                likesSomeData2 ? 'indigo-darken-4' : undefined
+                              "
+                              :indeterminate="likesSomeData2 && !likesAllData2"
+                              :model-value="likesSomeData2"
+                            ></v-checkbox-btn>
+                          </template>
+                        </v-list-item>
 
-            <!-- 검색 버튼 -->
-            <v-col cols="1">
-              <v-btn
-                class=""
-                color="blue"
-                style="display: flex; height: 50px; width: 100px"
-                @click="searchData"
-                >검색</v-btn
-              >
-            </v-col>
-          </v-row>
-        </div>
+                        <v-divider class="mt-2"></v-divider>
+                      </template>
+                    </v-select>
+                  </v-col>
+
+                  <!-- 날짜 설정 -->
+                  <v-col cols="3">
+                    <VueDatePicker
+                      style="--dp-input-padding: 15px"
+                      v-model="date"
+                      range
+                    />
+                  </v-col>
+
+                  <!-- 검색 버튼 -->
+                  <v-col cols="1">
+                    <v-btn
+                      class=""
+                      color="blue"
+                      style="display: flex; height: 50px; width: 100px"
+                      @click="searchData"
+                      >검색</v-btn
+                    >
+                  </v-col>
+                </v-row>
+              </div>
+            </v-card-item>
+          </v-card>
+        </v-sheet>
       </template>
 
       <!-- 결과 없을 때 -->
@@ -270,6 +302,20 @@ const searchFilteredData = computed(() => {
   // 검색어 배열을 사용하여 데이터를 필터링합니다.
   return allData.value.filter((item) => anyTermsIncluded(searchTerms, item));
 });
+
+// 항차 선택
+const voyage = ref([
+  "시운전1",
+  "시운전2",
+  "시운전3",
+  "시운전4",
+  "시운전5",
+  "시운전6",
+  "시운전7",
+])
+
+const selectedvoyage = ref();
+
 
 // 셀렉바 메뉴
 const firstSelect = ref([
@@ -411,18 +457,14 @@ onMounted(() => {
 
 // 데이터 다운로드
 const dataDownload = () => {
-  alert("다운로드 시작")
-}
+  alert("다운로드 시작");
+};
 
 // 테이블 보이기
 const showTable = (data) => {
   alert(data);
-}
-
-
+};
 </script>
-
-
 
 <style scoped>
 .my-app {

@@ -42,30 +42,20 @@
     </v-col>
     <v-col cols="9">
       <v-sheet
-        style="
-          height: 85vh;
-          padding: 1px;
-          margin-top: 30px;
-          padding-right: 30px;
-          display: flex;
-          flex-direction: column;
-          overflow-y: auto;
-          align-items: end;
-        "
-      >
-      <EchartLine/>
-      </v-sheet>
-      <v-sheet
-        style="
-          height: auto;
-          padding: 10px;
-          padding-right: 30px;
-          display: flex;
-          align-items: start;
-          justify-content: end;
-        "
-      >
-      </v-sheet>
+              style="
+                height: 95vh;
+                padding: 30px;
+                padding-left: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartLine/>
+                </v-card-item>
+              </v-card>
+            </v-sheet>
+
     </v-col>
   </v-row>
 </template>

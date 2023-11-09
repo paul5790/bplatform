@@ -24,7 +24,7 @@
             ></v-text-field>
           </v-col>
           <v-col cols="3">
-            <v-btn @click="checkid()" style="height: 55px"> 중복확인 </v-btn>
+            <v-btn color="blue" @click="checkid()" style="height: 55px"> 중복확인 </v-btn>
           </v-col>
         </v-row>
 
@@ -86,8 +86,6 @@
             </v-btn>
           </v-col>
         </v-row>
-
-        <v-btn @click="signfinish()" to="/">돌아가기</v-btn>
       </div>
     </div>
 
@@ -182,8 +180,6 @@ const showDashboard = ref(
 );
 const userid = ref(sessionStorage.getItem("userid") || "");
 const password = ref("");
-const email = ref("");
-
 // 회원 정보
 let newid = ref("");
 let newpassword = ref("");

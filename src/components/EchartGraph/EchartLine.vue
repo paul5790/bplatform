@@ -101,7 +101,7 @@ const option = ref({
 
 <style scoped>
 .chart {
-  height: 100vh;
+  height: 87vh;
 }
 body {
   margin: 0;

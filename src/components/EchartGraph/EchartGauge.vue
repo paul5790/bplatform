@@ -25,15 +25,17 @@ use([
 provide(THEME_KEY);
 
 const props = defineProps({  // #2 props 정의
-  text: String,
-  left: String
+  name: String,
+  left: String,
+  unit: String,
+  center_y: String,
 });
 
 
 const option = ref({
   title: {
-    text: props.text,
-    left: "left",
+    text: props.name,
+    left: props.left,
         textStyle: {
       fontSize: 14, // 폰트 크기 설정
     },
@@ -45,13 +47,13 @@ const option = ref({
     {
       name: 'SPEEDLOG',
       type: 'gauge', // gauge 타입 사용
-      center: ["50%", "60%"],
+      center: ["50%", `${props.center_y}`],
       progress: {
         show: true,
       },
       detail: {
         valueAnimation: true,
-        formatter: '{value} km/s',
+        formatter: `{value} ${props.unit}`,
         fontSize: 14,
       },
       data: [

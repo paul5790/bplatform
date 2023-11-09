@@ -2,7 +2,7 @@
   <v-chart class="chart" :option="option" autoresize />
 </template>
 
-<script setup>
+<script setup props="props">
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { GaugeChart } from "echarts/charts";
@@ -12,7 +12,7 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted } from "vue";
+import { ref, provide, onMounted, defineProps } from "vue";
 
 use([
   CanvasRenderer,
@@ -24,11 +24,16 @@ use([
 
 provide(THEME_KEY);
 
+const props = defineProps({  // #2 props 정의
+  name: String,
+});
+
 const maxvalue = ref(1011);
 
 const option = ref({
   title: {
-    left: "left",
+    text: props.name,
+    left: 'right',
     textStyle: {
       fontSize: 14, // 폰트 크기 설정
     },
@@ -43,8 +48,8 @@ const option = ref({
       legend: {
         data: ["사용중인 공간"], // 레전드에 표시할 항목 이름
       },
-      radius: "90%",
-      center: ["50%", "50%"], // 이 부분을 수정하여 위치 조절
+      radius: "100%",
+      center: ["45%", "50%"], // 이 부분을 수정하여 위치 조절
       startAngle: 90,
       endAngle: 450,
       min: 0,

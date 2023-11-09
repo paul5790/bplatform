@@ -4,9 +4,10 @@
       <v-card height="100vh" class="d-flex justify-center align-center">
         <v-row>
           <v-col cols="4" sm="12" md="6" lg="4">
+            <!-- 실시간 위치(지도) -->
             <v-sheet
               style="
-                height: 50vh;
+                height: 60vh;
                 padding: 10px;
                 padding-right: 0;
                 display: flex;
@@ -19,9 +20,10 @@
               </v-card>
             </v-sheet>
 
+            <!-- DGPS 정보 (수정필요) -->
             <v-sheet
               style="
-                height: 50vh;
+                height: 40vh;
                 padding: 10px;
                 padding-right: 0;
                 display: flex;
@@ -29,12 +31,13 @@
             >
               <v-card :color="primary" :variant="elevated" style="flex: 1">
                 <v-card-item>
-                  <TableComponent />
+                  <DgpsInfo />
                 </v-card-item>
               </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="3">
+            <!-- 자이로 센서  -->
             <v-sheet
               style="
                 height: 50vh;
@@ -50,6 +53,8 @@
                 </v-card-item>
               </v-card>
             </v-sheet>
+
+            <!-- 바람 게이지 -->
             <v-sheet
               style="
                 height: 50vh;
@@ -67,6 +72,7 @@
             </v-sheet>
           </v-col>
           <v-col cols="3">
+            <!-- 선박 속도(SPEEDK) -->
             <v-sheet
               style="
                 height: 50vh;
@@ -78,10 +84,17 @@
             >
               <v-card :color="primary" :variant="elevated" style="flex: 1">
                 <v-card-item>
-                  <EchartGauge :text="'선박 속도'" />
+                  <EchartGauge
+                    :name="'선박 속도'"
+                    :left="'left'"
+                    :unit="'kt'"
+                    :center_y="'60%'"
+                  />
                 </v-card-item>
               </v-card>
             </v-sheet>
+
+            <!-- 러더 위치 -->
             <v-sheet
               style="
                 height: 50vh;
@@ -99,9 +112,9 @@
             </v-sheet>
           </v-col>
           <v-col cols="2">
+            <!-- 소켓 데이터 체크 -->
             <v-sheet
               style="
-              
                 height: 100vh;
                 padding: 10px;
                 padding-left: 0;
@@ -119,88 +132,246 @@
       </v-card>
     </v-window-item>
     <v-window-item :key="2">
-      <v-card height="100vh" class="d-flex justify-center align-center">
+      <v-card-title style="height: 5vh">
+        <span class="text-h5">Engine NO.1</span>
+      </v-card-title>
+      <v-card class="d-flex justify-center align-center">
         <v-row>
           <v-col cols="5">
-            <v-sheet style="height: 50vh">
-              <EchartGauge :text="'Engine 1'" :left="'left'" />
+            <v-sheet
+              style="
+                height: 45vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartGauge
+                    :name="'Engine Speed'"
+                    :unit="'rpm'"
+                    :left="'right'"
+                    :center_y="'50%'"
+                  />
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 25vh">
-              <v-row>
-                <v-col cols="6">
-                  <EchartGaugeVolt />
-                </v-col>
-                <v-col cols="6">
-                  <EchartGaugeVolt />
-                </v-col>
-              </v-row>
+
+            <v-sheet
+              style="
+                height: 25vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <v-row>
+                    <v-col cols="6">
+                      <EchartGaugeVolt :name="'Battery Potential'" />
+                    </v-col>
+                    <v-col cols="6">
+                      <EchartGaugeVolt :name="'charging System'" />
+                    </v-col>
+                  </v-row>
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 25vh">
-              <v-row>
-                <v-col cols="6">
-                  <EchartPercentGauge />
-                </v-col>
-                <v-col cols="6">
-                  <EchartPercentGauge />
-                </v-col>
-              </v-row>
+
+            <v-sheet
+              style="
+                height: 25vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <v-row>
+                    <v-col cols="6">
+                      <EchartPercentGauge :name="'Coolant Level'" />
+                    </v-col>
+                    <v-col cols="6">
+                      <EchartPercentGauge :name="'Fuel Level'" />
+                    </v-col>
+                  </v-row>
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="5">
-            <v-sheet style="height: 50vh">
-              <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
+            <v-sheet
+              style="
+                height: 47.5vh;
+                padding: 5px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 50vh">
-              <EchartBarkPa :name="'Temperature(°C)'" :barWidth="30" />
+
+            <v-sheet
+              style="
+                height: 47.5vh;
+                padding: 5px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartBarkPa :name="'Temperature(°C)'" :barWidth="40" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="2">
-            <v-sheet style="height: 100vh">
-              <EngineLampChecking :checkdata="checkdata2" />
+            <v-sheet
+              style="
+                height: 95vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EngineLampChecking :checkdata="checkdata2" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
         </v-row>
       </v-card>
     </v-window-item>
     <v-window-item :key="3">
-      <v-card height="100vh" class="d-flex justify-center align-center">
+      <v-card-title style="height: 5vh">
+        <span class="text-h5">Engine NO.2</span>
+      </v-card-title>
+      <v-card class="d-flex justify-center align-center">
         <v-row>
           <v-col cols="5">
-            <v-sheet style="height: 50vh">
-              <EchartGauge :text="'Engine 2'" :left="'left'" />
+            <v-sheet
+              style="
+                height: 45vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartGauge
+                    :name="'Engine Speed'"
+                    :unit="'rpm'"
+                    :left="'right'"
+                    :center_y="'50%'"
+                  />
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 25vh">
-              <v-row>
-                <v-col cols="6">
-                  <EchartGaugeVolt />
-                </v-col>
-                <v-col cols="6">
-                  <EchartGaugeVolt />
-                </v-col>
-              </v-row>
+
+            <v-sheet
+              style="
+                height: 25vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <v-row>
+                    <v-col cols="6">
+                      <EchartGaugeVolt :name="'Battery Potential'" />
+                    </v-col>
+                    <v-col cols="6">
+                      <EchartGaugeVolt :name="'charging System'" />
+                    </v-col>
+                  </v-row>
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 25vh">
-              <v-row>
-                <v-col cols="6">
-                  <EchartPercentGauge />
-                </v-col>
-                <v-col cols="6">
-                  <EchartPercentGauge />
-                </v-col>
-              </v-row>
+
+            <v-sheet
+              style="
+                height: 25vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <v-row>
+                    <v-col cols="6">
+                      <EchartPercentGauge :name="'Coolant Level'" />
+                    </v-col>
+                    <v-col cols="6">
+                      <EchartPercentGauge :name="'Fuel Level'" />
+                    </v-col>
+                  </v-row>
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="5">
-            <v-sheet style="height: 50vh">
-              <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
+            <v-sheet
+              style="
+                height: 47.5vh;
+                padding: 5px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
-            <v-sheet style="height: 50vh">
-              <EchartBarkPa :name="'Temperature(°C)'" :barWidth="30" />
+
+            <v-sheet
+              style="
+                height: 47.5vh;
+                padding: 5px;
+                padding-left: 0;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EchartBarkPa :name="'Temperature(°C)'" :barWidth="40" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
           <v-col cols="2">
-            <v-sheet style="height: 100vh">
-              <EngineLampChecking :checkdata="checkdata2" />
+            <v-sheet
+              style="
+                height: 95vh;
+                padding: 5px;
+                padding-right: 0;
+                display: flex;
+              "
+            >
+              <v-card :color="primary" :variant="elevated" style="flex: 1">
+                <v-card-item>
+                  <EngineLampChecking :checkdata="checkdata2" />
+                </v-card-item>
+              </v-card>
             </v-sheet>
           </v-col>
         </v-row>
@@ -211,6 +382,7 @@
 
 <script setup>
 import OSMap from "../components/OSMap.vue";
+import DgpsInfo from "../components/DgpsInfo.vue";
 import GyroComponent from "../components/GyroComponent.vue";
 import TableComponent from "../components/TableComponent.vue";
 import SocketChecking from "../components/SocketChecking.vue";

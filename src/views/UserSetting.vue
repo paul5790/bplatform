@@ -37,13 +37,7 @@
     <v-list lines="three" select-strategy="classic">
       <v-list-subheader>General</v-list-subheader>
 
-      <v-list-item value="notifications">
-        <template v-slot:prepend="{ isActive }">
-
-          <v-list-item-action start>
-            <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-          </v-list-item-action>
-        </template>
+      <v-list-item @click="a()">
 
         <v-list-item-title>Notifications</v-list-item-title>
 
@@ -52,12 +46,7 @@
         </v-list-item-subtitle>
       </v-list-item>
 
-      <v-list-item value="sound">
-        <template v-slot:prepend="{ isActive }">
-          <v-list-item-action start>
-            <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-          </v-list-item-action>
-        </template>
+      <v-list-item @click="b()">
 
         <v-list-item-title>Sound</v-list-item-title>
 
@@ -66,12 +55,7 @@
         </v-list-item-subtitle>
       </v-list-item>
 
-      <v-list-item value="widgets">
-        <template v-slot:prepend="{ isActive }">
-          <v-list-item-action start>
-            <v-checkbox-btn :model-value="isActive"></v-checkbox-btn>
-          </v-list-item-action>
-        </template>
+      <v-list-item @click="c()">
 
         <v-list-item-title>Auto-add widgets</v-list-item-title>
 
@@ -160,6 +144,15 @@ import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 
 const dialog = ref(false);
 
+const a = () => {
+  alert("a")
+}
+const b = () => {
+  alert("b")
+}
+const c = () => {
+  alert("c")
+}
 
 </script>
 

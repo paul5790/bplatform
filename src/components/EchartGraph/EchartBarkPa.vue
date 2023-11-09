@@ -92,7 +92,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 50vh;
+  height: 47.5vh;
   padding: 10px;
 }
 body {
