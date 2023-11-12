@@ -90,14 +90,14 @@
               :value="`/datagraph`"
             ></v-list-item> -->
 
-            <!-- <v-list-item
+          <!-- <v-list-item
               :key="3"
               :to="`/trialrundata`"
               :exact="true"
               :title="`시운전 별 데이터`"
               :value="`/trialrundata`"
             ></v-list-item> -->
-            <!-- <v-list-item
+          <!-- <v-list-item
               :key="4"
               :to="`/alldata`"
               :exact="true"
@@ -158,14 +158,37 @@
           </v-list>
         </template>
       </v-navigation-drawer>
-
       <v-main>
+        <v-app-bar app hide-on-scroll color="white" style="height: 7vh">
+          
+          <v-app-bar-nav-icon
+            @click="toggleDrawer()"
+            v-if="iconshow"
+          ></v-app-bar-nav-icon>
+          <v-toolbar-title>My App</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon>
+            <v-icon>mdi-bell</v-icon>
+          </v-btn>
+          <v-btn icon>
+            <v-icon>mdi-account</v-icon>
+          </v-btn>
+        </v-app-bar>
+        <!-- <v-toolbar color="white" style="height: 7vh;">
+          <v-toolbar-title>{{ dynamicTitle }}</v-toolbar-title>
+          <v-spacer></v-spacer>
+          <v-btn icon @click="confirmLogout">
+            <v-icon>mdi-logout</v-icon>
+          </v-btn>
+          <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
+        </v-toolbar> -->
         <router-view></router-view>
       </v-main>
     </v-layout>
     <!-- 로그아웃 확인 모달 -->
     <v-dialog v-model="logoutDialog" max-width="300">
-      <v-card>
+      <v-card
+        >t
         <v-card-title>로그아웃</v-card-title>
         <v-card-text>로그아웃 하시겠습니까?</v-card-text>
         <v-card-actions>
@@ -178,14 +201,11 @@
 </template>
 
 <script setup>
-import { ref, defineEmits } from "vue";
+import { ref, defineEmits, onMounted, onBeforeUnmount } from "vue";
 
 const dynamicTitle = ref("초기 제목");
-
 const isAdmin = ref(true);
-
 const emits = defineEmits(["logout"]);
-
 const logoutDialog = ref(false);
 
 const confirmLogout = () => {
@@ -200,6 +220,25 @@ const logout = () => {
 
 const cancelLogout = () => {
   logoutDialog.value = false;
+};
+
+const iconshow = ref(true);
+
+const checkScreenSize = () => {
+  iconshow.value = window.innerWidth <= 1280; // 여기서 1280은 lg 사이즈의 임계값입니다.
+};
+
+onMounted(() => {
+  checkScreenSize();
+  window.addEventListener("resize", checkScreenSize);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", checkScreenSize);
+});
+
+const toggleDrawer = () => {
+  // 드로어를 열거나 닫는 로직
 };
 </script>
 

@@ -4,13 +4,6 @@
     <v-card
     class="mx-auto"
   >
-    <v-toolbar color="white">
-
-      <v-toolbar-title>Settings</v-toolbar-title>
-
-      <v-spacer></v-spacer>
-
-    </v-toolbar>
 
     <v-list lines="three">
       <v-list-subheader>User Controls</v-list-subheader>
@@ -139,7 +132,7 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 
 const dialog = ref(false);

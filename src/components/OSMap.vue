@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div id="map" style="height: 55vh"></div>
+    <div id="map" style="height: 49vh">
+      <v-btn color="primary">버튼 1</v-btn>
+    </div>
   </div>
 </template>
 

@@ -1,8 +1,7 @@
 <template>
-    <v-card-title style="height: 10vh;">
-    <span class="text-h5">User Profile</span>
-  </v-card-title>
-  <v-sheet style="height: 90vh; padding: 80px; padding-top: 20px; display: flex">
+  <v-sheet
+    style="height: 93vh; padding: 80px; padding-top: 40px; display: flex"
+  >
     <v-card :color="primary" :variant="elevated" style="flex: 1">
       <v-card-item>
         <v-row>
@@ -11,7 +10,7 @@
             <!-- <v-btn color="blue" @click="update()">수정하기</v-btn> -->
             <v-dialog v-model="dialog" persistent width="1024">
               <template v-slot:activator="{ props }">
-                <v-btn color="blue" v-bind="props" @click="openDialog()">
+                <v-btn color="blue" v-bind="props" @click="openDialog(), check()">
                   수정하기
                 </v-btn>
               </template>
@@ -26,7 +25,7 @@
                         <v-text-field
                           label="User ID"
                           required
-                          v-model="selected"
+                          v-model="selectedItems"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6">
@@ -34,16 +33,22 @@
                           label="User Name"
                           hint="example of persistent helper text"
                           persistent-hint
+                          v-model="selectedusername"
                           required
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12">
-                        <v-text-field label="User Email" required></v-text-field>
+                        <v-text-field
+                          v-model="selectedemail"
+                          label="User Email"
+                          required
+                        ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6">
                         <v-text-field
                           label="Affiliation"
                           type="text"
+                          v-model="selectedaffiliation"
                           required
                         ></v-text-field>
                       </v-col>
@@ -51,6 +56,7 @@
                         <v-select
                           :items="['Admin', 'User', 'Guest']"
                           label="Permission*"
+                          v-model="selectedpermission"
                           required
                         ></v-select>
                       </v-col>
@@ -59,6 +65,7 @@
                           label="description"
                           type="text"
                           maxlength="120"
+                          v-model="selecteddescription"
                           multi-line
                         ></v-textarea>
                       </v-col>
@@ -109,7 +116,6 @@
       </v-card-item>
     </v-card>
   </v-sheet>
-  <v-btn @click="check()">확인</v-btn>
 </template>
 
 <script setup>
@@ -120,6 +126,11 @@ const page = ref(1);
 const itemsPerPage = ref(10);
 
 const selectedItems = ref([]);
+const selectedusername = ref();
+const selectedaffiliation = ref();
+const selectedemail = ref();
+const selectedpermission = ref();
+const selecteddescription = ref();
 
 const username = ref("홍길동");
 
@@ -132,8 +143,28 @@ const openDialog = () => {
 };
 
 const check = () => {
-  console.log(selectedItems.value);
-}
+  if (selectedItems.value.length > 0) {
+    const User = selectedItems.value[0]; // Assuming single select
+    const Data = items.value.find((item) => item.name === User);
+
+    if (Data) {
+      console.log("Selected User Data:", Data);
+      selectedaffiliation.value = Data.affiliation;
+      selectedusername.value = Data.username;
+      selectedpermission.value = Data.permission;
+      selectedemail.value = Data.email;
+      selecteddescription.value = Data.description;
+    } else {
+      console.log("User data not found for the selected user");
+    }
+  } else {
+    console.log("No user selected");
+  }
+  console.log(selectedaffiliation.value);
+  console.log(selectedusername.value);
+  console.log(selectedpermission.value);
+  console.log(selectedemail.value);
+};
 
 const pageCount = computed(() => {
   return Math.ceil(items.value.length / itemsPerPage.value);
@@ -143,7 +174,7 @@ const headers = ref([
   { title: "User ID", key: "name" },
   { title: "Name", key: "username" },
   { title: "Affiliation", key: "affiliation" },
-  { title: "E-mail", key: "enddate" },
+  { title: "E-mail", key: "email" },
   { title: "Permission", key: "permission" },
   { title: "description", key: "description" },
 ]);
@@ -153,7 +184,7 @@ const items = ref([
   {
     name: "유저 #1",
     startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "admin",
     affiliation: "지노스",
@@ -162,7 +193,7 @@ const items = ref([
   {
     name: "유저 #2",
     startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "admin",
     affiliation: "지노스",
@@ -171,7 +202,7 @@ const items = ref([
   {
     name: "유저 #3",
     startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "admin",
     affiliation: "지노스",
@@ -180,7 +211,7 @@ const items = ref([
   {
     name: "유저 #4",
     startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "admin",
     affiliation: "지노스",
@@ -189,7 +220,7 @@ const items = ref([
   {
     name: "유저 #5",
     startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "admin",
     affiliation: "지노스",
@@ -198,7 +229,7 @@ const items = ref([
   {
     name: "유저 #6",
     startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -207,7 +238,7 @@ const items = ref([
   {
     name: "유저 #7",
     startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -216,7 +247,7 @@ const items = ref([
   {
     name: "유저 #8",
     startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -225,7 +256,7 @@ const items = ref([
   {
     name: "유저 #9",
     startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -234,7 +265,7 @@ const items = ref([
   {
     name: "유저 #10",
     startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -243,7 +274,7 @@ const items = ref([
   {
     name: "유저 #11",
     startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -252,7 +283,7 @@ const items = ref([
   {
     name: "유저 #12",
     startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -261,7 +292,7 @@ const items = ref([
   {
     name: "유저 #13",
     startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -270,7 +301,7 @@ const items = ref([
   {
     name: "유저 #14",
     startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -279,7 +310,7 @@ const items = ref([
   {
     name: "유저 #15",
     startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -288,7 +319,7 @@ const items = ref([
   {
     name: "유저 #16",
     startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     permission: "user",
     affiliation: "지노스",
@@ -297,35 +328,35 @@ const items = ref([
   {
     name: "유저 #17",
     startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     username: username.value,
   },
   {
     name: "유저 #18",
     startdate: "2023-09-27T08:28:43",
-    enddate: "2023-09-30T08:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     username: username.value,
   },
   {
     name: "유저 #19",
     startdate: "2023-10-20T04:28:43",
-    enddate: "2023-10-21T06:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     username: username.value,
   },
   {
     name: "유저 #20",
     startdate: "2023-10-29T18:28:43",
-    enddate: "2023-10-29T20:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     username: username.value,
   },
   {
     name: "유저 #21",
     startdate: "2023-08-29T08:28:43",
-    enddate: "2023-08-31T01:24:33",
+    email: "a@xinnos.com",
     description: "##테스트 유저",
     username: username.value,
   },

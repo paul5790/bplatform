@@ -1,16 +1,18 @@
 <template>
-      <v-card-title style="height: 5vh;">
-    <span class="text-h5">User Profile</span>
-  </v-card-title>
   <v-row>
-    <v-col cols="3">
+    <v-col cols="9">
       <v-sheet
-        style="
-          height: 95vh;
-          padding: 30px;
-          display: flex;
-        "
+        style=" padding: 30px; padding-right: 0; display: flex"
       >
+        <v-card :color="primary" :variant="elevated" style="flex: 1">
+          <v-card-item>
+            <EchartLine />
+          </v-card-item>
+        </v-card>
+      </v-sheet>
+    </v-col>
+    <v-col cols="3">
+      <v-sheet style="height: 43vh; padding: 30px; display: flex">
         <v-card :variant="elevated" style="flex: 1">
           <v-card-item>
             <div>
@@ -20,7 +22,7 @@
                 density="compact"
                 label="Compact"
                 variant="outlined"
-                style="margin-top: 30vh"
+                style="margin-top: 10vh"
               ></v-select>
 
               <v-select
@@ -30,39 +32,31 @@
                 label="Compact"
                 variant="outlined"
               ></v-select>
-              
+
               <v-btn mt-xcxcbzxb width="500px" color="blue" :variant="elevated">
                 조회하기
               </v-btn>
-              
-              </div
-          ></v-card-item>
+            </div></v-card-item
+          >
         </v-card>
       </v-sheet>
-    </v-col>
-    <v-col cols="9">
-      <v-sheet
-              style="
-                height: 95vh;
-                padding: 30px;
-                padding-left: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartLine/>
-                </v-card-item>
-              </v-card>
-            </v-sheet>
+      <v-sheet style="height: 50vh; padding: 30px; display: flex">
+        <v-card :variant="elevated" style="flex: 1">
+          <v-card-item>
+            <div>
+              date : 11-11
 
+            </div></v-card-item
+          >
+        </v-card>
+      </v-sheet>
     </v-col>
   </v-row>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import EchartLine from "../components/EchartGraph/EchartLine.vue";
+import EchartLine from "../components/EchartGraph/EchartLines.vue";
 // 왼쪽 셀렉바 설정
 const trialrun = ref(["시운전1", "시운전2", "시운전3", "시운전4"]);
 const runitem = ref(null);
@@ -74,9 +68,6 @@ const items1 = ref([
   "Engine2/EngineSpeed",
 ]);
 const selectedItem = ref(null);
-
-
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

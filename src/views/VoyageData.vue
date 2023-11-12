@@ -1,10 +1,7 @@
 <template>
-    <v-card-title style="height: 5vh;">
-    <span class="text-h5">User Profile</span>
-  </v-card-title>
   <v-row>
     <v-col cols="3">
-      <v-sheet style="height: 95vh; padding: 30px; display: flex">
+      <v-sheet style="height: 93vh; padding: 30px; display: flex">
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
             <div style="height: 66vh">
@@ -44,7 +41,7 @@
     </v-col>
     <v-col cols="9">
       <v-sheet
-        style="height: 95vh; padding: 30px; padding-left: 0; display: flex"
+        style="height: 93vh; padding: 30px; padding-left: 0; display: flex"
       >
         <v-card
           :color="primary"

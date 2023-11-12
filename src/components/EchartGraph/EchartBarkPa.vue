@@ -84,13 +84,13 @@ onMounted(() => {
 
   setInterval(() => {
     run();
-  }, 200);
+  }, 20000);
 
   run();
 });
 </script>
 
-<style scoped>
+<style scoped> 
 .chart {
   height: 47.5vh;
   padding: 10px;

@@ -1,19 +1,14 @@
 <template>
-  <div>
+  <div style="padding: 28px; padding-top: 0px;">
     <v-sheet
-      style="height: 8vh; padding-left: 50; padding-right: 50; display: flex"
+      style="height: 7vh; padding-left: 50; padding-right: 50; display: flex"
     >
       <v-card :color="primary" :variant="elevated" style="flex: 1">
         <v-card-item>
           <v-row>
-            <v-col cols="5">
-              <v-card-title>
-                <span class="text-h5">User Profile</span>
-              </v-card-title>
-            </v-col>
             <v-col cols="3">
               <v-select
-                style="margin-top: 5px"
+                style="margin-top: 1px"
                 v-model="sailingselect"
                 :items="items1"
                 density="comfortable"
@@ -23,7 +18,7 @@
             </v-col>
             <v-col cols="3">
               <v-select
-                style="margin-top: 5px"
+                style="margin-top: 1px"
                 v-model="sailingselect"
                 :items="items1"
                 density="comfortable"
@@ -32,13 +27,13 @@
               ></v-select>
             </v-col>
             <v-col cols="1">
-              <v-btn style="width: 100px; margin-top: 15px">조회하기</v-btn>
+              <v-btn style="width: 100px; margin-top: 10px">조회하기</v-btn>
             </v-col>
           </v-row>
         </v-card-item>
       </v-card>
     </v-sheet>
-    <div id="map" style="height: 92vh"></div>
+    <div id="map" style="height: 83vh"></div>
   </div>
 </template>
 

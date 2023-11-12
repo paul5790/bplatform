@@ -1,13 +1,13 @@
 <template>
   <v-window v-model="window" show-arrows>
     <v-window-item :key="1">
-      <v-card height="100vh" class="d-flex justify-center align-center">
+      <v-card height="93vh" class="d-flex justify-center align-center">
         <v-row>
           <v-col cols="4" sm="12" md="6" lg="4">
             <!-- 실시간 위치(지도) -->
             <v-sheet
               style="
-                height: 60vh;
+                height: 53vh;
                 padding: 10px;
                 padding-right: 0;
                 display: flex;
@@ -40,7 +40,7 @@
             <!-- 자이로 센서  -->
             <v-sheet
               style="
-                height: 50vh;
+                height: 46.5vh;
                 padding: 10px;
                 padding-left: 0;
                 padding-right: 0;
@@ -57,7 +57,7 @@
             <!-- 바람 게이지 -->
             <v-sheet
               style="
-                height: 50vh;
+                height: 46.5vh;
                 padding: 10px;
                 padding-left: 0;
                 padding-right: 0;
@@ -75,7 +75,7 @@
             <!-- 선박 속도(SPEEDK) -->
             <v-sheet
               style="
-                height: 50vh;
+                height: 46.5vh;
                 padding: 10px;
                 padding-left: 0;
                 padding-right: 0;
@@ -97,7 +97,7 @@
             <!-- 러더 위치 -->
             <v-sheet
               style="
-                height: 50vh;
+                height: 46.5vh;
                 padding: 10px;
                 padding-left: 0;
                 padding-right: 0;
@@ -115,7 +115,7 @@
             <!-- 소켓 데이터 체크 -->
             <v-sheet
               style="
-                height: 100vh;
+                height: 93vh;
                 padding: 10px;
                 padding-left: 0;
                 display: flex;
@@ -132,15 +132,12 @@
       </v-card>
     </v-window-item>
     <v-window-item :key="2">
-      <v-card-title style="height: 5vh">
-        <span class="text-h5">Engine NO.1</span>
-      </v-card-title>
       <v-card class="d-flex justify-center align-center">
         <v-row>
           <v-col cols="5">
             <v-sheet
               style="
-                height: 45vh;
+                height: 43vh;
                 padding: 5px;
                 padding-right: 0;
                 display: flex;
@@ -205,7 +202,7 @@
           <v-col cols="5">
             <v-sheet
               style="
-                height: 47.5vh;
+                height: 46.5vh;
                 padding: 5px;
                 padding-left: 0;
                 padding-right: 0;
@@ -221,7 +218,7 @@
 
             <v-sheet
               style="
-                height: 47.5vh;
+                height: 46.5vh;
                 padding: 5px;
                 padding-left: 0;
                 padding-right: 0;
@@ -238,7 +235,7 @@
           <v-col cols="2">
             <v-sheet
               style="
-                height: 95vh;
+                height: 93vh;
                 padding: 5px;
                 padding-right: 0;
                 display: flex;
@@ -255,15 +252,12 @@
       </v-card>
     </v-window-item>
     <v-window-item :key="3">
-      <v-card-title style="height: 5vh">
-        <span class="text-h5">Engine NO.2</span>
-      </v-card-title>
-      <v-card class="d-flex justify-center align-center">
+          <v-card class="d-flex justify-center align-center">
         <v-row>
           <v-col cols="5">
             <v-sheet
               style="
-                height: 45vh;
+                height: 43vh;
                 padding: 5px;
                 padding-right: 0;
                 display: flex;
@@ -328,7 +322,7 @@
           <v-col cols="5">
             <v-sheet
               style="
-                height: 47.5vh;
+                height: 46.5vh;
                 padding: 5px;
                 padding-left: 0;
                 padding-right: 0;
@@ -344,7 +338,7 @@
 
             <v-sheet
               style="
-                height: 47.5vh;
+                height: 46.5vh;
                 padding: 5px;
                 padding-left: 0;
                 padding-right: 0;
@@ -361,7 +355,7 @@
           <v-col cols="2">
             <v-sheet
               style="
-                height: 95vh;
+                height: 93vh;
                 padding: 5px;
                 padding-right: 0;
                 display: flex;

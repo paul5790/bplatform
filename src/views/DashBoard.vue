@@ -5,7 +5,7 @@
         <ex1 />
       </v-sheet> -->
       <v-sheet
-        style="height: 50vh; padding: 10px; padding-right: 0; display: flex"
+        style="height: 46.5vh; padding: 10px; padding-right: 0; display: flex"
       >
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
@@ -14,11 +14,11 @@
         </v-card>
       </v-sheet>
       <v-sheet
-        style="height: 50vh; padding: 10px; padding-right: 0; display: flex"
+        style="height: 46.5vh; padding: 10px; padding-right: 0; display: flex"
       >
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
-            <SaillingAnimation />
+            <!-- <SaillingAnimation /> -->
           </v-card-item>
         </v-card>
       </v-sheet>
@@ -26,7 +26,7 @@
     <v-col cols="4" sm="12" md="6" lg="4">
       <v-sheet
         style="
-          height: 50vh;
+          height: 46.5vh;
           padding: 10px;
           padding-right: 0;
           padding-left: 0;
@@ -35,13 +35,13 @@
       >
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
-            <EchartBar />
+            <!-- <EchartBar /> -->
           </v-card-item>
         </v-card>
       </v-sheet>
       <v-sheet
         style="
-          height: 50vh;
+          height: 46.5vh;
           padding: 10px;
           padding-right: 0;
           padding-left: 0;
@@ -57,7 +57,7 @@
     </v-col>
     <v-col cols="4" sm="12" md="6" lg="4">
       <v-sheet
-        style="height: 50vh; padding: 10px; padding-left: 0; display: flex"
+        style="height: 46.5vh; padding: 10px; padding-left: 0; display: flex"
       >
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
@@ -66,7 +66,7 @@
         </v-card>
       </v-sheet>
       <v-sheet
-        style="height: 50vh; padding: 10px; padding-left: 0; display: flex"
+        style="height: 46.5vh; padding: 10px; padding-left: 0; display: flex"
       >
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>

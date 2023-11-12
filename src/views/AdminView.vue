@@ -1,8 +1,5 @@
 <template>
-  <v-card-title style="height: 10vh;">
-    <span class="text-h5">User Profile</span>
-  </v-card-title>
-  <v-sheet style="height: 90vh; padding: 80px; padding-top: 20px; display: flex">
+  <v-sheet style="height: 93vh; padding: 80px; padding-top: 40px; display: flex">
     <v-card :color="primary" :variant="elevated" style="flex: 1">
       <v-card-item>
         <v-data-table
