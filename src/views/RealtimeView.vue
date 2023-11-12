@@ -2,11 +2,12 @@
   <v-window v-model="window" show-arrows>
     <v-window-item :key="1">
       <v-card height="100vh" class="d-flex justify-center align-center">
-        <v-row>
+        <v-row style="background-color: #f7f7f7;">
           <v-col cols="4" sm="12" md="6" lg="4">
             <!-- 실시간 위치(지도) -->
             <v-sheet
               style="
+              background-color: #f7f7f7;
                 height: 60vh;
                 padding: 10px;
                 padding-right: 0;
@@ -23,6 +24,7 @@
             <!-- DGPS 정보 (수정필요) -->
             <v-sheet
               style="
+              background-color: #f7f7f7;
                 height: 40vh;
                 padding: 10px;
                 padding-right: 0;
@@ -40,6 +42,7 @@
             <!-- 자이로 센서  -->
             <v-sheet
               style="
+              background-color: #f7f7f7;
                 height: 50vh;
                 padding: 10px;
                 padding-left: 0;
@@ -57,6 +60,7 @@
             <!-- 바람 게이지 -->
             <v-sheet
               style="
+              background-color: #f7f7f7;
                 height: 50vh;
                 padding: 10px;
                 padding-left: 0;
@@ -75,6 +79,7 @@
             <!-- 선박 속도(SPEEDK) -->
             <v-sheet
               style="
+              background-color: #f7f7f7;
                 height: 50vh;
                 padding: 10px;
                 padding-left: 0;
@@ -97,6 +102,7 @@
             <!-- 러더 위치 -->
             <v-sheet
               style="
+              background-color: #f7f7f7;
                 height: 50vh;
                 padding: 10px;
                 padding-left: 0;
@@ -115,6 +121,7 @@
             <!-- 소켓 데이터 체크 -->
             <v-sheet
               style="
+              background-color: #f7f7f7;
                 height: 100vh;
                 padding: 10px;
                 padding-left: 0;
