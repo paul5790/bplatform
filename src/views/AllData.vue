@@ -154,17 +154,12 @@
       </template>
 
       <!-- 결과 컴포넌트 -->
-      <template v-slot:default="props">
-        <v-card
+      <template v-slot:default>
+        <!-- <v-card
           v-for="item in props.items"
           :key="item.name"
           style="border: 1px solid #aaa"
         >
-          <!-- <v-card-title class="subheading font-weight-bold">
-                {{ item.raw.name }}
-              </v-card-title>
-              <v-divider></v-divider> -->
-
           <v-list density="compact">
             <v-list-item
               v-for="(key, index) in filteredKeys"
@@ -175,7 +170,8 @@
               @click="showTable(subtitle)"
             ></v-list-item>
           </v-list>
-        </v-card>
+        </v-card> -->
+        <ViewDataTable/>
       </template>
 
       <template v-slot:footer>
@@ -199,6 +195,8 @@
 
 <script setup>
 import { ref, computed, watchEffect, onMounted } from "vue";
+
+import ViewDataTable from "../components/ViewDataTable.vue";
 
 const itemsPerPage = ref(3);
 const page = ref(1);

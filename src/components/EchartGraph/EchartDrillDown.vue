@@ -353,7 +353,7 @@ const handleChartClick = (event) => {
 
 <style scoped>
 .chart {
-  height: 45vh;
+  height: 40vh;
   padding: 5px;
 }
 body {

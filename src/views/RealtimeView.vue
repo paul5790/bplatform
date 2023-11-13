@@ -479,26 +479,26 @@ console.log(checkdata.gll);
 console.log(checkdata.gga);
 console.log(checkdata.rmc);
 
-const socket = inject("socket");
+// const socket = inject("socket");
 
-const sendMessage = () => socket.value.send(text.value);
+// const sendMessage = () => socket.value.send(text.value);
 
-onOpen(() => {
-  console.log("WS connection is stable! ~uWu~");
-});
+// onOpen(() => {
+//   console.log("WS connection is stable! ~uWu~");
+// });
 
-onMessage((message) => {
-  responseMsg.value = message.data;
-  console.log("Got a message from the WS: ", message);
-});
+// onMessage((message) => {
+//   responseMsg.value = message.data;
+//   console.log("Got a message from the WS: ", message);
+// });
 
-onClose(() => {
-  console.log("No way, connection has been closed 😥");
-});
+// onClose(() => {
+//   console.log("No way, connection has been closed 😥");
+// });
 
-onError((error) => {
-  console.error("Error: ", error);
-});
+// onError((error) => {
+//   console.error("Error: ", error);
+// });
 </script>
 
 <style scoped></style>
