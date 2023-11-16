@@ -1,294 +1,259 @@
 <template>
   <!-- 전체화면 패딩100px -->
   <div class="my-app">
-        <v-sheet style="height: 7vh; display: flex; margin-bottom: 20px">
-          <v-row>
-            <v-col cols="2">
-              <v-select
-                v-model="selectedvoyage"
-                :items="voyage"
-                label="voyage"
-                variant="outlined"
+    <!-- 데이터 선택창 -->
+    <v-sheet style="height: 8vh; display: flex">
+      <v-row>
+        <v-col cols="2">
+          <v-select
+            v-model="selectedvoyage"
+            :items="voyage"
+            label="voyage"
+            variant="outlined"
+          >
+          </v-select>
+        </v-col>
+        <!-- 첫번째 선택박스 -->
+        <v-col cols="2">
+          <v-select
+            v-model="firstSelectedItems"
+            :items="firstSelect"
+            label="Sub Components"
+            variant="outlined"
+            multiple
+          >
+            <template v-slot:selection="{ item, index }">
+              <div v-if="index < 2">
+                <span>{{ item.title }}</span>
+                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                <span
+                  v-if="
+                    firstSelectedItems.length > 1 &&
+                    index !== firstSelectedItems.length - 1
+                  "
+                  >,
+                </span>
+                <span v-else-if="firstSelectedItems.length >= 3"> </span>
+              </div>
+              <span
+                v-if="index === 2"
+                class="text-grey text-caption align-self-center"
               >
-              </v-select>
-            </v-col>
-            <!-- 첫번째 선택박스 -->
-            <v-col cols="2">
-              <v-select
-                v-model="firstSelectedItems"
-                :items="firstSelect"
-                label="Sub Components"
-                variant="outlined"
-                multiple
+                (+{{ firstSelectedItems.length - 2 }} others)
+              </span>
+            </template>
+            <template v-slot:prepend-item>
+              <v-list-item title="Select All" @click="selectAllItem1">
+                <template v-slot:prepend>
+                  <v-checkbox-btn
+                    :color="likesSomeData1 ? 'indigo-darken-4' : undefined"
+                    :indeterminate="likesSomeData1 && !likesAllData1"
+                    :model-value="likesSomeData1"
+                  ></v-checkbox-btn>
+                </template>
+              </v-list-item>
+
+              <v-divider class="mt-2"></v-divider>
+            </template>
+          </v-select>
+        </v-col>
+
+        <!-- 두번째 선택박스 -->
+        <v-col cols="2">
+          <v-select
+            v-model="contentsSelectedItems"
+            :items="secondSelect"
+            label="Contents"
+            variant="outlined"
+            multiple
+          >
+            <template v-slot:selection="{ item, index }">
+              <div v-if="index < 2">
+                <span>{{ item.title }}</span>
+                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                <span
+                  v-if="
+                    contentsSelectedItems.length > 1 &&
+                    index !== contentsSelectedItems.length - 1
+                  "
+                  >,
+                </span>
+                <span v-else-if="contentsSelectedItems.length >= 3"> </span>
+              </div>
+              <span
+                v-if="index === 2"
+                class="text-grey text-caption align-self-center"
               >
-                <template v-slot:selection="{ item, index }">
-                  <div v-if="index < 2">
-                    <span>{{ item.title }}</span>
-                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                    <span
-                      v-if="
-                        firstSelectedItems.length > 1 &&
-                        index !== firstSelectedItems.length - 1
-                      "
-                      >,
-                    </span>
-                    <span v-else-if="firstSelectedItems.length >= 3"> </span>
-                  </div>
-                  <span
-                    v-if="index === 2"
-                    class="text-grey text-caption align-self-center"
-                  >
-                    (+{{ firstSelectedItems.length - 2 }} others)
-                  </span>
+                (+{{ contentsSelectedItems.length - 2 }} others)
+              </span>
+            </template>
+            <template v-slot:prepend-item>
+              <v-list-item title="Select All" @click="selectAllItem2">
+                <template v-slot:prepend>
+                  <v-checkbox-btn
+                    :color="likesSomeData2 ? 'indigo-darken-4' : undefined"
+                    :indeterminate="likesSomeData2 && !likesAllData2"
+                    :model-value="likesSomeData2"
+                  ></v-checkbox-btn>
                 </template>
-                <template v-slot:prepend-item>
-                  <v-list-item title="Select All" @click="selectAllItem1">
-                    <template v-slot:prepend>
-                      <v-checkbox-btn
-                        :color="likesSomeData1 ? 'indigo-darken-4' : undefined"
-                        :indeterminate="likesSomeData1 && !likesAllData1"
-                        :model-value="likesSomeData1"
-                      ></v-checkbox-btn>
-                    </template>
-                  </v-list-item>
+              </v-list-item>
 
-                  <v-divider class="mt-2"></v-divider>
-                </template>
-              </v-select>
-            </v-col>
+              <v-divider class="mt-2"></v-divider>
+            </template>
+          </v-select>
+        </v-col>
 
-            <!-- 두번째 선택박스 -->
-            <v-col cols="2">
-              <v-select
-                v-model="secondSelectedItems"
-                :items="secondSelect"
-                label="Contents"
-                variant="outlined"
-                multiple
-              >
-                <template v-slot:selection="{ item, index }">
-                  <div v-if="index < 2">
-                    <span>{{ item.title }}</span>
-                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                    <span
-                      v-if="
-                        secondSelectedItems.length > 1 &&
-                        index !== secondSelectedItems.length - 1
-                      "
-                      >,
-                    </span>
-                    <span v-else-if="secondSelectedItems.length >= 3"> </span>
-                  </div>
-                  <span
-                    v-if="index === 2"
-                    class="text-grey text-caption align-self-center"
-                  >
-                    (+{{ secondSelectedItems.length - 2 }} others)
-                  </span>
-                </template>
-                <template v-slot:prepend-item>
-                  <v-list-item title="Select All" @click="selectAllItem2">
-                    <template v-slot:prepend>
-                      <v-checkbox-btn
-                        :color="likesSomeData2 ? 'indigo-darken-4' : undefined"
-                        :indeterminate="likesSomeData2 && !likesAllData2"
-                        :model-value="likesSomeData2"
-                      ></v-checkbox-btn>
-                    </template>
-                  </v-list-item>
+        <!-- 날짜 설정 -->
+        <v-col cols="3">
+          <VueDatePicker
+            style="--dp-input-padding: 15px"
+            v-model="date"
+            range
+          />
+        </v-col>
 
-                  <v-divider class="mt-2"></v-divider>
-                </template>
-              </v-select>
-            </v-col>
+        <!-- 검색 버튼 -->
+        <v-col cols="2">
+          <v-btn
+            class=""
+            color="blue"
+            style="display: flex; margin-top: 2px; height: 50px; width: 130px"
+            @click="searchData"
+            >검색</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-sheet>
 
-            <!-- 날짜 설정 -->
-            <v-col cols="3">
-              <VueDatePicker
-                style="--dp-input-padding: 15px"
-                v-model="date"
-                range
-              />
-            </v-col>
-
-            <!-- 검색 버튼 -->
-            <v-col cols="2">
-              <v-btn
-                class=""
-                color="blue"
-                style="
-                  display: flex;
-                  margin-top: 2px;
-                  height: 50px;
-                  width: 130px;
-                "
-                @click="searchData"
-                >검색</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-sheet>
-
-        <!-- 검색창
-        <div class="d-flex flex-column mt-3">
-          <v-row>
-            <v-col cols="9"> </v-col>
-            <v-col cols="3">
-              <v-text-field
-                v-model="searchData"
-                clearable
-                hide-details
-                prepend-inner-icon="mdi-magnify"
-                placeholder="Search"
-                variant="underlined"
-                density="comfortable"
-              ></v-text-field>
-            </v-col>
-          </v-row>
-        </div> -->
-
-
-
-        <v-tabs
-          style="height: 5vh; margin-left: 15px"
-          v-model="tab"
-          color="#009dff"
-          align-tabs="start"
-        >
-          <v-tab :value="1">항차 설정</v-tab>
-          <v-tab :value="2">사용자 설정</v-tab>
-          <v-tab :value="3">로그 관리</v-tab>
-        </v-tabs>
-        <v-window
-          v-model="tab"
-          style="
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            margin-top: 8px;
-          "
-        >
-          <v-window-item v-for="n in 3" :key="n" :value="n">
-            <v-card :color="primary" :variant="elevated" style="flex: 1">
-              <v-card-item>
-                <div v-if="tab === 1">
-                  <!-- Move v-if here -->
-                  <v-sheet style="height: 34vh; display: flex">
-                    <v-card
-                      :color="primary"
-                      :variant="elevated"
-                      style="flex: 1"
+    <v-tabs
+      style="height: 5vh; margin-left: 15px"
+      v-model="tab"
+      color="#009dff"
+      align-tabs="start"
+    >
+      <!-- for문 사용해서 탭 늘리기 -->
+      <v-tab :value="1">{{}}</v-tab>
+      <v-tab :value="2">{{}}</v-tab>
+      <v-tab :value="3">{{}}</v-tab>
+    </v-tabs>
+    <v-window
+      v-model="tab"
+      style="
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        margin-top: 8px;
+      "
+    >
+      <v-window-item v-for="n in 3" :key="n" :value="n">
+        <v-card :color="primary" :variant="elevated" style="flex: 1">
+          <v-card-item>
+            <div v-if="tab === 1">
+              <!-- Move v-if here -->
+              <v-sheet style="height: 34vh; display: flex">
+                <v-card :color="primary" :variant="elevated" style="flex: 1">
+                  <v-card-item>
+                    <v-data-table
+                      v-model="selected"
+                      v-model:page="page"
+                      :items-per-page="itemsPerPage"
+                      density="compact"
+                      class="elevation-1"
+                      :headers="headerName"
+                      :items="dataSet"
+                      :search="searchData"
+                      item-value="name"
+                      return-object
+                      style="margin-top: 20px"
                     >
-                      <v-card-item>
-                        <v-data-table
-                          v-model="selected"
-                          v-model:page="page"
-                          :items-per-page="itemsPerPage"
-                          density="compact"
-                          class="elevation-1"
-                          :headers="headerName"
-                          :items="dataSet"
-                          :search="searchData"
-                          item-value="name"
-                          return-object
-                          style="margin-top: 20px"
-                        >
-                          <template v-slot:bottom>
-                            <div class="text-center pt-2">
-                              <v-pagination
-                                v-model="page"
-                                :length="pageCount"
-                              ></v-pagination>
-                            </div>
-                          </template>
-                        </v-data-table>
-                      </v-card-item>
-                    </v-card>
-                  </v-sheet>
-                </div>
-                <div v-if="tab === 2">
-                  <!-- Move v-if here -->
-                  <v-sheet style="height: 34vh; display: flex">
-                    <v-card
-                      :color="primary"
-                      :variant="elevated"
-                      style="flex: 1"
+                      <template v-slot:bottom>
+                        <div class="text-center pt-2">
+                          <v-pagination
+                            v-model="page"
+                            :length="pageCount"
+                          ></v-pagination>
+                        </div>
+                      </template>
+                    </v-data-table>
+                  </v-card-item>
+                </v-card>
+              </v-sheet>
+            </div>
+            <div v-if="tab === 2">
+              <!-- Move v-if here -->
+              <v-sheet style="height: 34vh; display: flex">
+                <v-card :color="primary" :variant="elevated" style="flex: 1">
+                  <v-card-item>
+                    <v-data-table
+                      v-model="selected"
+                      v-model:page="page"
+                      :items-per-page="itemsPerPage"
+                      density="compact"
+                      class="elevation-1"
+                      :headers="headerName"
+                      :items="dataSet"
+                      :search="searchData"
+                      item-value="name"
+                      return-object
+                      style="margin-top: 20px"
                     >
-                      <v-card-item>
-                        <v-data-table
-                          v-model="selected"
-                          v-model:page="page"
-                          :items-per-page="itemsPerPage"
-                          density="compact"
-                          class="elevation-1"
-                          :headers="headerName"
-                          :items="dataSet"
-                          :search="searchData"
-                          item-value="name"
-                          return-object
-                          style="margin-top: 20px"
-                        >
-                          <template v-slot:bottom>
-                            <div class="text-center pt-2">
-                              <v-pagination
-                                v-model="page"
-                                :length="pageCount"
-                              ></v-pagination>
-                            </div>
-                          </template>
-                        </v-data-table>
-                      </v-card-item>
-                    </v-card>
-                  </v-sheet>
-                </div>
-                <div v-if="tab === 3">
-                  <!-- Move v-if here -->
-                  <div class="component-container">
-                    <v-sheet style="height: 34vh; display: flex">
-                      <v-card
-                        :color="primary"
-                        :variant="elevated"
-                        style="flex: 1"
+                      <template v-slot:bottom>
+                        <div class="text-center pt-2">
+                          <v-pagination
+                            v-model="page"
+                            :length="pageCount"
+                          ></v-pagination>
+                        </div>
+                      </template>
+                    </v-data-table>
+                  </v-card-item>
+                </v-card>
+              </v-sheet>
+            </div>
+            <div v-if="tab === 3">
+              <!-- Move v-if here -->
+              <div class="component-container">
+                <v-sheet style="height: 34vh; display: flex">
+                  <v-card :color="primary" :variant="elevated" style="flex: 1">
+                    <v-card-item>
+                      <v-data-table
+                        v-model="selected"
+                        v-model:page="page"
+                        :items-per-page="itemsPerPage"
+                        density="compact"
+                        class="elevation-1"
+                        :headers="headerName"
+                        :items="dataSet"
+                        :search="searchData"
+                        item-value="name"
+                        return-object
+                        style="margin-top: 20px"
                       >
-                        <v-card-item>
-                          <v-data-table
-                            v-model="selected"
-                            v-model:page="page"
-                            :items-per-page="itemsPerPage"
-                            density="compact"
-                            class="elevation-1"
-                            :headers="headerName"
-                            :items="dataSet"
-                            :search="searchData"
-                            item-value="name"
-                            return-object
-                            style="margin-top: 20px"
-                          >
-                            <template v-slot:bottom>
-                              <div class="text-center pt-2">
-                                <v-pagination
-                                  v-model="page"
-                                  :length="pageCount"
-                                ></v-pagination>
-                              </div>
-                            </template>
-                          </v-data-table>
-                        </v-card-item>
-                      </v-card>
-                    </v-sheet>
-                  </div>
-                </div>
-              </v-card-item>
-            </v-card>
-          </v-window-item>
-        </v-window>
- 
-        <div
-          class="d-flex align-center justify-space-around pa-4"
-          style="justify-content: flex-end"
-        >
-          <v-btn color="blue" @click="dataDownload">데이터 다운로드</v-btn>
-        </div>
-</div>
+                        <template v-slot:bottom>
+                          <div class="text-center pt-2">
+                            <v-pagination
+                              v-model="page"
+                              :length="pageCount"
+                            ></v-pagination>
+                          </div>
+                        </template>
+                      </v-data-table>
+                    </v-card-item>
+                  </v-card>
+                </v-sheet>
+              </div>
+            </div>
+          </v-card-item>
+        </v-card>
+      </v-window-item>
+    </v-window>
+
+    <div
+      class="d-flex align-center justify-space-around pa-4"
+      style="justify-content: flex-end"
+    >
+      <v-btn color="blue" @click="dataDownload">데이터 다운로드</v-btn>
+    </div>
+  </div>
 </template>
 
 <script setup>
@@ -299,9 +264,6 @@ const tab = ref(null);
 
 const itemsPerPage = ref(10);
 const page = ref(1);
-const searchQuery = ref("");
-const sortKey = ref("name");
-const sortOrder = ref("asc");
 const searchData = ref();
 
 const headerName = ref([]); // 빈 배열로 초기화
@@ -355,18 +317,6 @@ const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
 });
 
-// 데이터 검색
-// const searchData = () => {
-//   // alert(secondSelectedItems.value);
-//   searchQuery.value = secondSelectedItems.value.join(", ");
-//   console.log(date.value);
-//   const startDateFormatted = date.value[0].toISOString().slice(0, 19); // ISO 기준 시간
-//   const endDateFormatted = date.value[1].toISOString().slice(0, 19);
-//   console.log(startDateFormatted); //
-//   console.log(endDateFormatted); //
-// };
-
-const keys = ref(["Name", "Top", "Info"]);
 const allData = ref([
   {
     name: "GLL",
@@ -392,46 +342,6 @@ const allData = ref([
 
 console.log(dataSet);
 console.log(allData);
-
-const filteredKeys = computed(() => {
-  return keys.value;
-});
-
-const sortBy = computed(() => {
-  return [
-    {
-      key: sortKey.value,
-      order: sortOrder.value,
-    },
-  ];
-});
-
-const searchFilteredData = computed(() => {
-  const query = searchQuery.value.toLowerCase().trim();
-  // 검색어를 콤마로 분리하여 배열로 만듭니다
-  const searchTerms = query.split(",").map((term) => term.trim());
-
-  // 검색어 배열이 비어있을 경우 모든 데이터를 반환합니다
-  if (searchTerms.length === 0) {
-    return allData.value;
-  }
-
-  // 검색어 배열의 모든 검색어가 데이터 항목에 포함되어 있는지 확인하는 함수
-  const anyTermsIncluded = (terms, item) => {
-    return terms.some((term) => {
-      return (
-        item.name.toLowerCase().includes(term) ||
-        item.top.toLowerCase().includes(term) ||
-        item.info.toLowerCase().includes(term)
-      );
-    });
-  };
-  console.log(
-    allData.value.filter((item) => anyTermsIncluded(searchTerms, item))
-  );
-  // 검색어 배열을 사용하여 데이터를 필터링합니다.
-  return allData.value.filter((item) => anyTermsIncluded(searchTerms, item));
-});
 
 // 항차 선택
 const voyage = ref([
@@ -461,7 +371,7 @@ const firstSelect = ref([
 ]);
 const secondSelect = ref([]);
 const firstSelectedItems = ref([]);
-const secondSelectedItems = ref([]);
+const contentsSelectedItems = ref([]);
 
 //전체 선택
 const likesAllData1 = computed(
@@ -470,9 +380,9 @@ const likesAllData1 = computed(
 const likesSomeData1 = computed(() => firstSelectedItems.value.length > 0);
 
 const likesAllData2 = computed(
-  () => secondSelectedItems.value.length === secondSelect.value.length
+  () => contentsSelectedItems.value.length === secondSelect.value.length
 );
-const likesSomeData2 = computed(() => secondSelectedItems.value.length > 0);
+const likesSomeData2 = computed(() => contentsSelectedItems.value.length > 0);
 
 // 전체 선택
 const selectAllItem1 = () => {
@@ -486,17 +396,17 @@ const selectAllItem1 = () => {
 
 const selectAllItem2 = () => {
   if (likesAllData2.value) {
-    console.log(`선택 : ${secondSelectedItems.value[0]}`);
-    secondSelectedItems.value = [];
+    console.log(`선택 : ${contentsSelectedItems.value[0]}`);
+    contentsSelectedItems.value = [];
   } else {
-    secondSelectedItems.value = [...secondSelect.value];
+    contentsSelectedItems.value = [...secondSelect.value];
   }
 };
 
 // select1이 변경될 때 second 배열 업데이트
 watchEffect(() => {
   secondSelect.value = []; // 기존 secondSelect 초기화
-  secondSelectedItems.value = [];
+  contentsSelectedItems.value = [];
   if (firstSelectedItems.value.includes("DGPS")) {
     secondSelect.value.push("GLL", "GGA", "RMC", "VTG", "ZDA", "GSV", "GSA");
   }
@@ -559,22 +469,6 @@ watchEffect(() => {
   }
 });
 
-const numberOfPages = computed(() => {
-  return Math.ceil(allData.value.length / itemsPerPage.value);
-});
-
-const nextPage = () => {
-  if (page.value + 1 <= numberOfPages.value) {
-    page.value += 1;
-  }
-};
-
-const prevPage = () => {
-  if (page.value - 1 >= 1) {
-    page.value -= 1;
-  }
-};
-
 // 데이트 피커
 const date = ref();
 
@@ -588,11 +482,6 @@ onMounted(() => {
 const dataDownload = () => {
   alert("다운로드 시작");
 };
-
-// 테이블 보이기
-const showTable = (data) => {
-  alert(data);
-};
 </script>
 
 <style scoped>
@@ -601,13 +490,5 @@ const showTable = (data) => {
   padding-left: 50px;
   padding-right: 50px;
   height: 93vh;
-}
-
-.table-container {
-  height: 60vh; /* Set the height to 500px */
-  overflow-y: auto; /* 테이블 바디가 넘치는 경우 스크롤 생성 */
-  border: 1px solid #ccc; /* Add border to create a box around the component */
-  border-radius: 4px; /* Optional: Add border radius to round the corners */
-  padding: 10px; /* Optional: Add padding to create some space between the component and the border */
 }
 </style>
