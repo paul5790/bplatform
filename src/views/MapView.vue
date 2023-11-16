@@ -1,46 +1,40 @@
 <template>
-  <div style="padding: 28px; padding-top: 0px">
-    <v-sheet
-      style="height: 7vh; padding-left: 50; padding-right: 50; display: flex"
-    >
-      <v-card :color="primary" :variant="elevated" style="flex: 1">
-        <v-card-item>
-          <v-row>
-            <v-col cols="3">
-              <v-select
-                style="margin-top: 1px"
-                v-model="sailingselect"
-                :items="items1"
-                density="comfortable"
-                label="Comfortable"
-                variant="underlined"
-              ></v-select>
-            </v-col>
-            <v-col cols="3">
-              <v-select
-                style="margin-top: 1px"
-                v-model="sailingselect"
-                :items="items1"
-                density="comfortable"
-                label="Default"
-                variant="underlined"
-              ></v-select>
-            </v-col>
-            <v-col cols="1">
-              <v-btn @click="test()" style="width: 100px; margin-top: 10px"
-                >조회하기</v-btn
-              >
-            </v-col>
-            <v-col cols="1">
-                            <v-btn @click="marker()" style="width: 100px; margin-top: 10px"
-                >마커추가</v-btn
-              >
-            </v-col>
-          </v-row>
-        </v-card-item>
-      </v-card>
-    </v-sheet>
-    <div id="map" style="height: 83vh"></div>
+  <div style="padding: 0px; padding-top: 0px">
+    <!-- <v-sheet style="height: 7vh; display: flex">
+      <v-row>
+        <v-col cols="3">
+          <v-select
+            style="margin-top: 1px"
+            v-model="sailingselect"
+            :items="items1"
+            density="comfortable"
+            label="Comfortable"
+            variant="underlined"
+          ></v-select>
+        </v-col>
+        <v-col cols="3">
+          <v-select
+            style="margin-top: 1px"
+            v-model="sailingselect"
+            :items="items1"
+            density="comfortable"
+            label="Default"
+            variant="underlined"
+          ></v-select>
+        </v-col>
+        <v-col cols="1">
+          <v-btn @click="test()" style="width: 100px; margin-top: 10px"
+            >조회하기</v-btn
+          >
+        </v-col>
+        <v-col cols="1">
+          <v-btn @click="marker()" style="width: 100px; margin-top: 10px"
+            >마커추가</v-btn
+          >
+        </v-col>
+      </v-row>
+    </v-sheet> -->
+    <div id="map" style="height: 68vh"></div>
   </div>
 </template>
 

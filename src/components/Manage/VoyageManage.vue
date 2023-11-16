@@ -587,6 +587,8 @@ const items = ref([
     username: username.value,
   },
 ]);
+
+console.log(items)
 </script>
 
 <style scoped></style>

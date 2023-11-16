@@ -14,12 +14,12 @@ import {
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted, defineProps } from "vue";
 
-const props = defineProps({  // #2 props 정의
+const props = defineProps({
+  // #2 props 정의
   name: String,
   value: Number,
   unit: String,
 });
-
 
 use([
   CanvasRenderer,
@@ -35,7 +35,7 @@ const option = ref({
   title: {
     text: props.name,
     left: "center",
-        textStyle: {
+    textStyle: {
       fontSize: 10, // 폰트 크기 설정
     },
   },
@@ -54,6 +54,10 @@ const option = ref({
       axisLine: {
         lineStyle: {
           width: 7,
+          color: [
+            [0.875, "#00609a20"],
+            [1, "#ca706040"],
+          ],
         },
       },
       progress: {
@@ -64,8 +68,8 @@ const option = ref({
         length: "45%",
         width: 3,
       },
-            axisTick: {
-        show: false
+      axisTick: {
+        show: false,
       },
       splitLine: {
         length: 8,
@@ -96,15 +100,11 @@ const updateValue = () => {
   option.value.series[0].data[0].value = props.value;
 };
 
-const test= () => {
-  console.log(props.value);
-}
+
 
 onMounted(() => {
   setInterval(updateValue, 1000);
   updateValue();
-  setInterval(test, 1000);
-  test();
 });
 </script>
 

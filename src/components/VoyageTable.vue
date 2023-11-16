@@ -42,9 +42,31 @@
       </template>
     </v-data-table>
   </v-sheet>
+  <v-dialog v-model="dialog">
+    <v-card>
+      <v-card-title>지도</v-card-title>
+      <v-card-text>
+        <v-sheet style="display: flex">
+          <v-container fluid>
+            <MapView />
+          </v-container>
+        </v-sheet>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="blue-darken-1" variant="text" @click="close()">
+          Close
+        </v-btn>
+        <v-btn color="blue-darken-1" variant="text" @click="close()">
+          Save
+        </v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
+import MapView from "../views/MapView.vue";
 import { ref, computed, watch } from "vue";
 
 const page = ref(1);
@@ -315,8 +337,7 @@ const initialize = () => {
 };
 
 const map = (item) => {
-  editedIndex.value = items.value.indexOf(item);
-  editedItem.value = { ...item };
+  console.log(item.name + "아이템");
   dialog.value = true;
 };
 
@@ -333,8 +354,6 @@ const deleteItemConfirm = () => {
 
 const close = () => {
   dialog.value = false;
-  editedItem.value = { ...defaultItem };
-  editedIndex.value = -1;
 };
 
 const closeDelete = () => {

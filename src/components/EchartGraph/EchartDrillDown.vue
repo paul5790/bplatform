@@ -3,9 +3,6 @@
     :elevation="elevation"
     style="display: flex; flex-direction: column; align-items: center"
   >
-    <v-card-title>
-      <span class="text-h5">데이터 소실 빈도</span>
-    </v-card-title>
     <v-chart
       ref="chart"
       class="chart"
@@ -47,6 +44,14 @@ let isBackButtonActive = false;
 
 // 초기 그래프 옵션 설정
 const option = ref({
+  title: {
+    text: "데이터 소실 빈도",
+    left: "center",
+    textStyle: {
+      fontSize: 19, // 폰트 크기 설정
+      fontWeight: 550,
+    },
+  },
   tooltip: {
     formatter: "{a} <br/>{b} : {c} mb",
   },
@@ -364,7 +369,7 @@ const handleChartClick = (event) => {
 
 <style scoped>
 .chart {
-  height: 37vh;
+  height: 40vh;
   padding: 5px;
 }
 body {

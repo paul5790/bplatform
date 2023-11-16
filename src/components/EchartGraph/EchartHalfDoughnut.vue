@@ -13,6 +13,28 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted } from "vue";
+import axios from "axios";
+
+const maxsize = ref();
+const usesize = ref();
+// 데이터 받아오기
+const fetchData = async () => {
+  try {
+    const response = await axios.post(
+      "http://192.168.0.73:8080/info/storage/db"
+    );
+    console.log(`${response.data} serversize`);
+
+    maxsize.value = response.data.serverMaximumSize;
+    usesize.value = response.data.serverInUsedSize;
+    console.log(`${maxsize.value} maxsize.value`);
+    console.log(`${usesize.value} usesize.value`);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+fetchData();
 
 use([
   CanvasRenderer,
@@ -24,45 +46,42 @@ use([
 
 provide(THEME_KEY);
 
-const maxvalue = ref(1011);
-
 const option = ref({
   title: {
     text: "저장 가능 공간 및 저장된 공간",
-    left: "left",
+    left: "center",
     textStyle: {
-      fontSize: 14, // 폰트 크기 설정
+      fontSize: 19, // 폰트 크기 설정
+      fontWeight: 550,
     },
   },
   tooltip: {
     trigger: "item",
     formatter: "{b} : {c} MB",
   },
+
   series: [
     {
       type: "gauge",
-      legend: {
-        data: ["사용중인 공간"], // 레전드에 표시할 항목 이름
-      },
-      radius: "90%",
-      center: ["45%", "80%"], // 이 부분을 수정하여 위치 조절
+      radius: "110%",
+      center: ["50%", "80%"], // 이 부분을 수정하여 위치 조절
       startAngle: 180,
       endAngle: 0,
       min: 0,
-      max: maxvalue,
+      max: maxsize,
       label: {
         show: false,
       },
       progress: {
         show: true,
-        width: 40,
+        width: 50,
       },
       pointer: {
         show: false,
       },
       axisLine: {
         lineStyle: {
-          width: 40,
+          width: 50,
         },
       },
       splitLine: {
@@ -86,17 +105,17 @@ const option = ref({
         width: "60%",
         borderRadius: 8,
         offsetCenter: [0, "-5%"],
-        fontSize: 30,
+        fontSize: 35,
         fontWeight: "bolder",
         formatter: function (value) {
-          const percent = (value / maxvalue.value) * 100;
+          const percent = (value / maxsize.value) * 100;
           return `${percent.toFixed(1)} %`;
         },
         color: "inherit",
       },
       data: [
         {
-          value: 550,
+          value: usesize,
           name: "사용중인 공간",
         },
       ],
@@ -105,15 +124,14 @@ const option = ref({
 });
 
 // 1초마다 랜덤값 생성
-const updateValue = () => {
-  option.value.series[0].data[0].value = Math.floor(Math.random() * 1001);
-};
+// const updateValue = () => {
+//   option.value.series[0].data[0].value = Math.floor(Math.random() * 1001);
+// };
 
-onMounted(() => {
-  setInterval(updateValue, 1000);
-  updateValue();
-});
-
+// onMounted(() => {
+//   setInterval(updateValue, 1000);
+//   updateValue();
+// });
 </script>
 
 <style scoped>

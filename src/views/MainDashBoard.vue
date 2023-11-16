@@ -1,10 +1,7 @@
 <template>
   <v-card>
     <v-layout>
-      <v-navigation-drawer 
-      v-model="drawer" app
-      expand-on-hover 
-      rail  >
+      <v-navigation-drawer v-model="drawer" app expand-on-hover rail>
         <v-list>
           <v-list-item
             prepend-avatar="S"
@@ -42,14 +39,14 @@
             :title="`모니터링`"
             :value="`/realtimeview`"
           ></v-list-item>
-          <v-list-item
+          <!-- <v-list-item
             :key="2"
             :to="`/mapview`"
             :exact="true"
             :prepend-icon="`mdi-map-outline`"
             :title="`지도`"
             :value="`/mapview`"
-          ></v-list-item>
+          ></v-list-item> -->
           <v-list-item
             :key="3"
             :to="`/datagraph`"
@@ -76,7 +73,7 @@
             :value="`/trialrundata`"
           ></v-list-item> -->
 
-          <v-list-group value="trialrundata">
+          <!-- <v-list-group value="trialrundata">
             <template v-slot:activator="{ props }">
               <v-list-item
                 v-bind="props"
@@ -146,9 +143,9 @@
             :prepend-icon="`mdi-cog-outline`"
             :title="`환경 설정`"
             :value="`/usersetting`"
-          ></v-list-item>
+          ></v-list-item> -->
 
-                    <v-list-item
+          <v-list-item
             :key="9"
             :to="`/manager`"
             :exact="true"
@@ -158,21 +155,20 @@
           ></v-list-item>
         </v-list>
         <!-- 항상 맨 아래에 붙어있는 리스트 -->
-        <!-- <template v-slot:append>
+        <template v-slot:append>
           <v-list density="compact" nav>
             <v-list-item
               :key="9"
-              @click="confirmLogout"
+              @click="confirmLogout()"
               :exact="true"
               :prepend-icon="`mdi-logout`"
               :title="`로그아웃`"
             ></v-list-item>
           </v-list>
-        </template> -->
+        </template>
       </v-navigation-drawer>
       <v-main>
         <v-app-bar app hide-on-scroll color="white" style="height: 7vh">
-          
           <v-app-bar-nav-icon
             @click="toggleDrawer()"
             v-if="iconshow"
@@ -182,9 +178,25 @@
           <v-btn icon>
             <v-icon>mdi-bell</v-icon>
           </v-btn>
-          <v-btn icon>
+          <v-menu>
+            <template v-slot:activator="{ props }">
+              <v-btn icon="mdi-account" v-bind="props"></v-btn>
+            </template>
+
+            <v-list>
+              <v-list-item
+                v-for="(item, index) in list_item"
+                :key="index"
+                :value="index"
+                @click="handleListItemClick(item.title)"
+              >
+                <v-list-item-title>{{ item.title }}</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
+          <!-- <v-btn @click="userinfo()" icon>
             <v-icon>mdi-account</v-icon>
-          </v-btn>
+          </v-btn> -->
         </v-app-bar>
         <!-- <v-toolbar color="white" style="height: 7vh;">
           <v-toolbar-title>{{ dynamicTitle }}</v-toolbar-title>
@@ -200,7 +212,7 @@
     <!-- 로그아웃 확인 모달 -->
     <v-dialog v-model="logoutDialog" max-width="300">
       <v-card
-        >t
+        >
         <v-card-title>로그아웃</v-card-title>
         <v-card-text>로그아웃 하시겠습니까?</v-card-text>
         <v-card-actions>
@@ -238,7 +250,7 @@ const cancelLogout = () => {
 };
 
 const toggleDrawer = () => {
-  drawer.value = !drawer.value
+  drawer.value = !drawer.value;
   console.log(drawer.value);
 };
 
@@ -255,4 +267,20 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", checkScreenSize);
 });
 
+// 툴바 사용자 설정
+const list_item = ref([{ title: "개인정보 변경" }, { title: "로그 아웃" }]);
+const handleListItemClick = (title) => {
+
+  if (title === "로그 아웃") {
+    logoutDialog.value = true;
+  }
+  else if (title === "개인정보 변경") {
+    logoutDialog.value = false;
+  }
+  else{
+    logoutDialog.value = false;
+  }
+  
+
+}
 </script>

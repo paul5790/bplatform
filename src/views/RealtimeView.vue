@@ -7,7 +7,7 @@
           <!-- (최) 지도 뷰 -->
           <v-col cols="3" no-gutters style="padding: 3px">
             <v-sheet style="height: 34vh; display: flex">
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
+              <v-card style="flex: 1">
                 <v-card-item>
                   <!-- <OSMap /> -->
                 </v-card-item>
@@ -17,7 +17,7 @@
           <!-- (최) 헤딩 그래프 -->
           <v-col cols="3" no-gutters style="padding: 3px">
             <v-sheet style="height: 34vh; display: flex">
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
+              <v-card style="flex: 1">
                 <v-card-item>
                   <EchartHeading />
                 </v-card-item>
@@ -27,14 +27,14 @@
           <!-- (최) 속도 그래프 -->
           <v-col cols="3" no-gutters style="padding: 3px">
             <v-sheet style="height: 34vh; display: flex">
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
+              <v-card style="flex: 1">
                 <v-card-item>
                   <EchartGauge
-                    :name="'선박 속도'"
+                    :name="'Speed (SPEEDLOG)'"
                     :left="'left'"
                     :unit="'kt'"
                     :center_y="'45%'"
-                    :max_speed="100"
+                    :max_speed="200"
                   />
                 </v-card-item>
               </v-card>
@@ -43,7 +43,7 @@
           <!-- (최) 러더 그래프 -->
           <v-col cols="3" no-gutters style="padding: 3px">
             <v-sheet style="height: 34vh; display: flex">
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
+              <v-card style="flex: 1">
                 <v-card-item>
                   <EchartStarPort />
                 </v-card-item>
@@ -55,7 +55,7 @@
         <v-row>
           <!-- 엔진1 -->
           <v-col cols="6" no-gutters style="padding: 3px">
-            <v-card :color="primary" :variant="elevated" style="flex: 1">
+            <v-card style="flex: 1">
               <v-card-item>
                 <v-row>
                   <!-- (최) 엔진 rpm -->
@@ -128,7 +128,7 @@
             <v-row>
               <v-col cols="12" no-gutters style="padding-top: 15px">
                 <v-sheet style="height: 20vh; display: flex">
-                  <v-card :color="primary" :variant="elevated" style="flex: 1">
+                  <v-card style="flex: 1">
                     <v-card-item>
                       <EngineLampChecking :checkdata="checkdata2" />
                     </v-card-item>
@@ -139,7 +139,7 @@
           </v-col>
           <!-- 엔진2 -->
           <v-col cols="6" no-gutters style="padding: 3px">
-            <v-card :color="primary" :variant="elevated" style="flex: 1">
+            <v-card style="flex: 1">
               <v-card-item>
                 <v-row>
                   <!-- (최) 엔진 rpm -->
@@ -212,7 +212,7 @@
             <v-row>
               <v-col cols="12" no-gutters style="padding-top: 15px">
                 <v-sheet style="height: 20vh; display: flex">
-                  <v-card :color="primary" :variant="elevated" style="flex: 1">
+                  <v-card style="flex: 1">
                     <v-card-item>
                       <EngineLampChecking :checkdata="checkdata2" />
                     </v-card-item>
@@ -229,7 +229,7 @@
         <v-sheet
           style="height: 92vh; padding: 5px; padding-right: 0; display: flex"
         >
-          <v-card :color="primary" :variant="elevated" style="flex: 1">
+          <v-card style="flex: 1">
             <v-card-item>
               <SocketChecking :checkdata="checkdata" />
             </v-card-item>
@@ -242,20 +242,13 @@
 
 <script setup>
 import OSMap from "../components/OSMap.vue";
-import DgpsInfo from "../components/DgpsInfo.vue";
-import GyroComponent from "../components/GyroComponent.vue";
-import TableComponent from "../components/TableComponent.vue";
 import SocketChecking from "../components/SocketChecking.vue";
 import EngineLampChecking from "../components/EngineLampChecking.vue";
-import EchartPercentGauge from "../components/EchartGraph/EchartPercentGauge.vue";
 import EchartHeading from "../components/EchartGraph/EchartHeading.vue";
-import EchartBarkPa from "../components/EchartGraph/EchartBarkPa.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 
-const length = ref(3);
-const window = ref(0);
 // 웹소켓 관련, Web Socket
 import { ref, inject, onMounted } from "vue";
 import { onMessage, onOpen, onClose, onError } from "vue3-websocket";

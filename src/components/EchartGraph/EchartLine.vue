@@ -1,4 +1,7 @@
 <template>
+  <v-card-title>
+    <span class="text-h6">데이터 소실 빈도</span>
+  </v-card-title>
   <v-chart class="chart" :option="option" autoresize />
 </template>
 
@@ -32,9 +35,7 @@ use([
 
 provide(THEME_KEY);
 
-const datasetRaw = ref([
-  ["time", "value"],
-]);
+const datasetRaw = ref([["time", "value"]]);
 
 const times = ref([]); // 시간 배열을 정의
 for (let i = 0; i <= 226; i++) {
@@ -44,14 +45,13 @@ for (let i = 0; i <= 226; i++) {
   times.value.push(`${hours}:${minutes}`);
 }
 
-
 const rand = ref([]);
-for (let i = 0; i<= 226; i++ ){
+for (let i = 0; i <= 226; i++) {
   const randomIncome = Math.floor(Math.random() * 100) + 1;
   rand.value.push(randomIncome); // 랜덤값을 배열에 추가
 }
 console.log(rand);
-for (let i = 0; i <= 226; i++) { 
+for (let i = 0; i <= 226; i++) {
   datasetRaw.value.push([times.value[i], rand.value[i]]);
 }
 
@@ -72,7 +72,7 @@ const option = ref({
       start: 0,
       end: 100,
       xAxisIndex: [0, 1],
-      height: '2%',
+      height: "2%",
     },
   ],
   xAxis: {
@@ -80,8 +80,7 @@ const option = ref({
     nameLocation: "middle",
     data: times.value, // x축 데이터를 times 배열로 설정
   },
-  yAxis: {
-  },
+  yAxis: {},
   series: [
     {
       type: "line",
@@ -96,12 +95,11 @@ const option = ref({
     },
   ],
 });
-
 </script>
 
 <style scoped>
 .chart {
-  height: 87vh;
+  height: 65vh;
 }
 body {
   margin: 0;
