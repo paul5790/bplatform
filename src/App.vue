@@ -292,6 +292,29 @@ const checkid = () => {
 .scrollable-card::-webkit-scrollbar-thumb {
   background-color: transparent; /* 스크롤바 썸 네일 배경색 투명으로 설정하여 숨김 */
 }
+
+.scrollable-card-1 {
+  scrollbar-width: thin; /* Firefox에 대한 스크롤바 조절 */
+  -ms-overflow-style: none; /* IE에 대한 스크롤바 숨김 */
+}
+
+.scrollable-card-1::-webkit-scrollbar {
+  width: 3px; /* 스크롤바 너비 5px로 조절 */
+}
+
+.scrollable-card-1::-webkit-scrollbar-thumb {
+  background-color: #ccc; /* 스크롤바 썸 네일 배경색 설정 (원하는 색상으로 변경 가능) */
+  border-radius: 3px; /* 스크롤바 썸 네일의 모서리를 둥글게 조절 */
+}
+
+.dialog-row {
+  justify-content: flex-end; 
+  height: 6vh;
+}
+.dialog-div {
+  display: flex; 
+  margin: 15px;
+}
 </style>
 
 <style scoped>

@@ -1,28 +1,9 @@
 <template>
   <!-- 전체화면 패딩100px -->
   <div class="my-app">
-    <v-data-iterator
-      v-model:items-per-page="itemsPerPage"
-      v-model:page="page"
-      :items="searchFilteredData"
-      :sort-by="sortBy"
-    >
-      <!-- 검색창 구현 -->
-      <template v-slot:header>
-        <div class="d-flex flex-column mt-3">
+        <v-sheet style="height: 7vh; display: flex; margin-bottom: 20px">
           <v-row>
-            <v-col cols="6">
-              <v-text-field
-                v-model="searchQuery"
-                clearable
-                hide-details
-                prepend-inner-icon="mdi-magnify"
-                placeholder="Search"
-                variant="outlined"
-                density="comfortable"
-              ></v-text-field>
-            </v-col>
-            <v-col cols="3">
+            <v-col cols="2">
               <v-select
                 v-model="selectedvoyage"
                 :items="voyage"
@@ -31,16 +12,12 @@
               >
               </v-select>
             </v-col>
-          </v-row>
-        </div>
-        <div class="d-flex flex-column mt-3">
-          <v-row>
             <!-- 첫번째 선택박스 -->
-            <v-col cols="3">
+            <v-col cols="2">
               <v-select
                 v-model="firstSelectedItems"
                 :items="firstSelect"
-                label="fisrt"
+                label="Sub Components"
                 variant="outlined"
                 multiple
               >
@@ -81,11 +58,11 @@
             </v-col>
 
             <!-- 두번째 선택박스 -->
-            <v-col cols="3">
+            <v-col cols="2">
               <v-select
                 v-model="secondSelectedItems"
                 :items="secondSelect"
-                label="second"
+                label="Contents"
                 variant="outlined"
                 multiple
               >
@@ -135,85 +112,259 @@
             </v-col>
 
             <!-- 검색 버튼 -->
-            <v-col cols="1">
+            <v-col cols="2">
               <v-btn
                 class=""
                 color="blue"
-                style="display: flex; height: 50px; width: 100px"
+                style="
+                  display: flex;
+                  margin-top: 2px;
+                  height: 50px;
+                  width: 130px;
+                "
                 @click="searchData"
                 >검색</v-btn
               >
             </v-col>
           </v-row>
-        </div>
-      </template>
+        </v-sheet>
 
-      <!-- 결과 없을 때 -->
-      <template v-slot:no-data>
-        <v-alert class="ma-2" type="warning">No results</v-alert>
-      </template>
+        <!-- 검색창
+        <div class="d-flex flex-column mt-3">
+          <v-row>
+            <v-col cols="9"> </v-col>
+            <v-col cols="3">
+              <v-text-field
+                v-model="searchData"
+                clearable
+                hide-details
+                prepend-inner-icon="mdi-magnify"
+                placeholder="Search"
+                variant="underlined"
+                density="comfortable"
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </div> -->
 
-      <!-- 결과 컴포넌트 -->
-      <template v-slot:default>
-        <!-- <v-card
-          v-for="item in props.items"
-          :key="item.name"
-          style="border: 1px solid #aaa"
+
+
+        <v-tabs
+          style="height: 5vh; margin-left: 15px"
+          v-model="tab"
+          color="#009dff"
+          align-tabs="start"
         >
-          <v-list density="compact">
-            <v-list-item
-              v-for="(key, index) in filteredKeys"
-              :key="index"
-              :title="key"
-              :subtitle="String(item.raw[key.toLowerCase()])"
-              :class="{ 'text-blue': sortKey === key.toLowerCase() }"
-              @click="showTable(subtitle)"
-            ></v-list-item>
-          </v-list>
-        </v-card> -->
-        <ViewDataTable/>
-      </template>
-
-      <template v-slot:footer>
-        <div class="d-flex align-center justify-space-around pa-4">
+          <v-tab :value="1">항차 설정</v-tab>
+          <v-tab :value="2">사용자 설정</v-tab>
+          <v-tab :value="3">로그 관리</v-tab>
+        </v-tabs>
+        <v-window
+          v-model="tab"
+          style="
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            margin-top: 8px;
+          "
+        >
+          <v-window-item v-for="n in 3" :key="n" :value="n">
+            <v-card :color="primary" :variant="elevated" style="flex: 1">
+              <v-card-item>
+                <div v-if="tab === 1">
+                  <!-- Move v-if here -->
+                  <v-sheet style="height: 34vh; display: flex">
+                    <v-card
+                      :color="primary"
+                      :variant="elevated"
+                      style="flex: 1"
+                    >
+                      <v-card-item>
+                        <v-data-table
+                          v-model="selected"
+                          v-model:page="page"
+                          :items-per-page="itemsPerPage"
+                          density="compact"
+                          class="elevation-1"
+                          :headers="headerName"
+                          :items="dataSet"
+                          :search="searchData"
+                          item-value="name"
+                          return-object
+                          style="margin-top: 20px"
+                        >
+                          <template v-slot:bottom>
+                            <div class="text-center pt-2">
+                              <v-pagination
+                                v-model="page"
+                                :length="pageCount"
+                              ></v-pagination>
+                            </div>
+                          </template>
+                        </v-data-table>
+                      </v-card-item>
+                    </v-card>
+                  </v-sheet>
+                </div>
+                <div v-if="tab === 2">
+                  <!-- Move v-if here -->
+                  <v-sheet style="height: 34vh; display: flex">
+                    <v-card
+                      :color="primary"
+                      :variant="elevated"
+                      style="flex: 1"
+                    >
+                      <v-card-item>
+                        <v-data-table
+                          v-model="selected"
+                          v-model:page="page"
+                          :items-per-page="itemsPerPage"
+                          density="compact"
+                          class="elevation-1"
+                          :headers="headerName"
+                          :items="dataSet"
+                          :search="searchData"
+                          item-value="name"
+                          return-object
+                          style="margin-top: 20px"
+                        >
+                          <template v-slot:bottom>
+                            <div class="text-center pt-2">
+                              <v-pagination
+                                v-model="page"
+                                :length="pageCount"
+                              ></v-pagination>
+                            </div>
+                          </template>
+                        </v-data-table>
+                      </v-card-item>
+                    </v-card>
+                  </v-sheet>
+                </div>
+                <div v-if="tab === 3">
+                  <!-- Move v-if here -->
+                  <div class="component-container">
+                    <v-sheet style="height: 34vh; display: flex">
+                      <v-card
+                        :color="primary"
+                        :variant="elevated"
+                        style="flex: 1"
+                      >
+                        <v-card-item>
+                          <v-data-table
+                            v-model="selected"
+                            v-model:page="page"
+                            :items-per-page="itemsPerPage"
+                            density="compact"
+                            class="elevation-1"
+                            :headers="headerName"
+                            :items="dataSet"
+                            :search="searchData"
+                            item-value="name"
+                            return-object
+                            style="margin-top: 20px"
+                          >
+                            <template v-slot:bottom>
+                              <div class="text-center pt-2">
+                                <v-pagination
+                                  v-model="page"
+                                  :length="pageCount"
+                                ></v-pagination>
+                              </div>
+                            </template>
+                          </v-data-table>
+                        </v-card-item>
+                      </v-card>
+                    </v-sheet>
+                  </div>
+                </div>
+              </v-card-item>
+            </v-card>
+          </v-window-item>
+        </v-window>
+ 
+        <div
+          class="d-flex align-center justify-space-around pa-4"
+          style="justify-content: flex-end"
+        >
           <v-btn color="blue" @click="dataDownload">데이터 다운로드</v-btn>
-          <v-spacer></v-spacer>
-          <span class="mr-4 grey--text">
-            Page {{ page }} of {{ numberOfPages }}
-          </span>
-          <v-btn icon size="small" @click="prevPage">
-            <v-icon>mdi-chevron-left</v-icon>
-          </v-btn>
-          <v-btn icon size="small" class="ml-2" @click="nextPage">
-            <v-icon>mdi-chevron-right</v-icon>
-          </v-btn>
         </div>
-      </template>
-    </v-data-iterator>
-  </div>
+</div>
 </template>
 
 <script setup>
 import { ref, computed, watchEffect, onMounted } from "vue";
+import axios from "axios";
 
-import ViewDataTable from "../components/ViewDataTable.vue";
+const tab = ref(null);
 
-const itemsPerPage = ref(3);
+const itemsPerPage = ref(10);
 const page = ref(1);
 const searchQuery = ref("");
 const sortKey = ref("name");
 const sortOrder = ref("asc");
+const searchData = ref();
+
+const headerName = ref([]); // 빈 배열로 초기화
+const dataSet = ref([]); // 빈 배열로 초기화
+const selectedData = ref([]);
+
+const handleRowClick = (item) => {
+  console.log("룰루");
+  // 클릭된 행의 데이터 가져오기
+  selectedData.value[0] = item.no;
+  selectedData.value[1] = item.name;
+  selectedData.value[2] = item.value;
+  console.log("선택된 행 정보:", selectedData);
+  alert(selectedData.value);
+  alert(selectedData.value[0]);
+};
+
+const fetchData = () => {
+  axios
+    .post("http://192.168.0.24:8080/shipinfo/api/dgps/gll")
+    .then((response) => {
+      console.log(response.data);
+
+      const dataheader = ref(
+        Object.keys(response.data[0]).map((key) => ({
+          title: key,
+          align: "start",
+          key,
+        }))
+      );
+
+      if (dataheader.value == null) {
+        console.log("null");
+      } else {
+        console.log(dataheader.value);
+        headerName.value = dataheader.value;
+      }
+
+      // headerName.value = response.data.headers;
+      dataSet.value = response.data;
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+// 초기 데이터 요청 및 주기적 데이터 업데이트 설정
+fetchData(); // 초기 데이터 요청
+
+const pageCount = computed(() => {
+  return Math.ceil(dataSet.value.length / itemsPerPage.value);
+});
 
 // 데이터 검색
-const searchData = () => {
-  // alert(secondSelectedItems.value);
-  searchQuery.value = secondSelectedItems.value.join(", ");
-  console.log(date.value);
-  const startDateFormatted = date.value[0].toISOString().slice(0, 19); // ISO 기준 시간
-  const endDateFormatted = date.value[1].toISOString().slice(0, 19);
-  console.log(startDateFormatted); //
-  console.log(endDateFormatted); //
-};
+// const searchData = () => {
+//   // alert(secondSelectedItems.value);
+//   searchQuery.value = secondSelectedItems.value.join(", ");
+//   console.log(date.value);
+//   const startDateFormatted = date.value[0].toISOString().slice(0, 19); // ISO 기준 시간
+//   const endDateFormatted = date.value[1].toISOString().slice(0, 19);
+//   console.log(startDateFormatted); //
+//   console.log(endDateFormatted); //
+// };
 
 const keys = ref(["Name", "Top", "Info"]);
 const allData = ref([
@@ -238,6 +389,9 @@ const allData = ref([
     info: "현재 이동 방향과 지상 속도를 나타냅니다.",
   },
 ]);
+
+console.log(dataSet);
+console.log(allData);
 
 const filteredKeys = computed(() => {
   return keys.value;
@@ -443,8 +597,17 @@ const showTable = (data) => {
 
 <style scoped>
 .my-app {
-  padding: 50px;
-  padding-left: 100px;
-  padding-right: 100px;
+  padding: 30px;
+  padding-left: 50px;
+  padding-right: 50px;
+  height: 93vh;
+}
+
+.table-container {
+  height: 60vh; /* Set the height to 500px */
+  overflow-y: auto; /* 테이블 바디가 넘치는 경우 스크롤 생성 */
+  border: 1px solid #ccc; /* Add border to create a box around the component */
+  border-radius: 4px; /* Optional: Add border radius to round the corners */
+  padding: 10px; /* Optional: Add padding to create some space between the component and the border */
 }
 </style>

@@ -22,7 +22,8 @@
                 density="compact"
                 label="Compact"
                 variant="outlined"
-                style="margin-top: 10vh"
+                class="custom-select"
+                style="margin-top: 10vh; width: 130px; height: 50%px;"
               ></v-select>
 
               <v-select
@@ -58,7 +59,7 @@
 import { ref } from "vue";
 import EchartLine from "../components/EchartGraph/EchartLines.vue";
 // 왼쪽 셀렉바 설정
-const trialrun = ref(["시운전1", "시운전2", "시운전3", "시운전4"]);
+const trialrun = ref(["풍속", "시운전2", "시운전3", "시운전4"]);
 const runitem = ref(null);
 
 const items1 = ref([
@@ -70,4 +71,7 @@ const items1 = ref([
 const selectedItem = ref(null);
 </script>
 
-<style scoped></style>
+<style scoped>
+.custom-select {
+  --v-select-menu-font-size: 10px;
+}</style>

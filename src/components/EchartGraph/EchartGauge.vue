@@ -29,6 +29,9 @@ const props = defineProps({  // #2 props 정의
   left: String,
   unit: String,
   center_y: String,
+  max_speed: Number,
+  
+
 });
 
 
@@ -46,6 +49,8 @@ const option = ref({
   series: [
     {
       name: 'SPEEDLOG',
+      min: 0,
+      max: props.max_speed,
       type: 'gauge', // gauge 타입 사용
       center: ["50%", `${props.center_y}`],
       progress: {
@@ -66,7 +71,7 @@ const option = ref({
 });
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  option.value.series[0].data[0].value = Math.floor(Math.random() * 101);
+  option.value.series[0].data[0].value = Math.floor(Math.random() * 201);
 };
 
 onMounted(() => {
@@ -77,8 +82,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 45vh;
-  padding: 5px;
+  height: 40vh;
 }
 body {
   margin: 0;

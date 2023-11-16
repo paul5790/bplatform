@@ -16,6 +16,8 @@ import { ref, provide, onMounted, defineProps } from "vue";
 
 const props = defineProps({  // #2 props 정의
   name: String,
+  value: Number,
+  unit: String,
 });
 
 
@@ -32,9 +34,9 @@ provide(THEME_KEY);
 const option = ref({
   title: {
     text: props.name,
-    left: "right",
+    left: "center",
         textStyle: {
-      fontSize: 14, // 폰트 크기 설정
+      fontSize: 10, // 폰트 크기 설정
     },
   },
   tooltip: {
@@ -45,7 +47,7 @@ const option = ref({
       name: props.name,
       type: "gauge", // gauge 타입 사용
       radius: "90%",
-      center: ["45%", "45%"],
+      center: ["45%", "65%"],
       splitNumber: 5,
       min: 8,
       max: 18,
@@ -77,13 +79,13 @@ const option = ref({
       },
       detail: {
         valueAnimation: true,
-        formatter: "{value} v",
-        fontSize: 14,
+        formatter: `{value} ${props.unit}`,
+        fontSize: 12,
         offsetCenter: [0, "70%"],
       },
       data: [
         {
-          value: 8,
+          value: props.value,
         },
       ],
     },
@@ -91,18 +93,24 @@ const option = ref({
 });
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  option.value.series[0].data[0].value = Math.floor(Math.random() * 10) + 8;
+  option.value.series[0].data[0].value = props.value;
 };
+
+const test= () => {
+  console.log(props.value);
+}
 
 onMounted(() => {
   setInterval(updateValue, 1000);
   updateValue();
+  setInterval(test, 1000);
+  test();
 });
 </script>
 
 <style scoped>
 .chart {
-  height: 25vh;
+  height: 17vh;
   padding: 5px;
 }
 body {

@@ -26,7 +26,7 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "타각 위치",
+    text: "Rudder(AUTOPILOT)",
     left: "left",
     textStyle: {
       fontSize: 14, // 폰트 크기 설정
@@ -104,7 +104,7 @@ const option = ref({
 
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  option.value.series[0].data[0].value = Math.floor(Math.random() * 101) - 50;
+  option.value.series[0].data[0].value = Math.floor(Math.random() * 91) - 45;
 };
 
 onMounted(() => {
@@ -116,7 +116,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 55vh;
+  height: 40vh;
   padding: 0px;
 }
 body {

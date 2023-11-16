@@ -1,109 +1,48 @@
 <template>
-  <v-window v-model="window" show-arrows>
-    <v-window-item :key="1">
-      <v-card height="93vh" class="d-flex justify-center align-center">
+  <v-card height="93vh" class="pa-1 d-flex justify-center align-center">
+    <v-row>
+      <!-- 왼쪽 큰 박스 -->
+      <v-col cols="10" style="padding: 30px; padding-right: 5px">
         <v-row>
-          <v-col cols="4" sm="12" md="6" lg="4">
-            <!-- 실시간 위치(지도) -->
-            <v-sheet
-              style="
-                height: 53vh;
-                padding: 10px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
+          <!-- (최) 지도 뷰 -->
+          <v-col cols="3" no-gutters style="padding: 3px">
+            <v-sheet style="height: 34vh; display: flex">
               <v-card :color="primary" :variant="elevated" style="flex: 1">
                 <v-card-item>
-                  <OSMap />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <!-- DGPS 정보 (수정필요) -->
-            <v-sheet
-              style="
-                height: 40vh;
-                padding: 10px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <DgpsInfo />
+                  <!-- <OSMap /> -->
                 </v-card-item>
               </v-card>
             </v-sheet>
           </v-col>
-          <v-col cols="3">
-            <!-- 자이로 센서  -->
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 10px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
+          <!-- (최) 헤딩 그래프 -->
+          <v-col cols="3" no-gutters style="padding: 3px">
+            <v-sheet style="height: 34vh; display: flex">
               <v-card :color="primary" :variant="elevated" style="flex: 1">
                 <v-card-item>
-                  <GyroComponent />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <!-- 바람 게이지 -->
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 10px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartWind />
+                  <EchartHeading />
                 </v-card-item>
               </v-card>
             </v-sheet>
           </v-col>
-          <v-col cols="3">
-            <!-- 선박 속도(SPEEDK) -->
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 10px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
+          <!-- (최) 속도 그래프 -->
+          <v-col cols="3" no-gutters style="padding: 3px">
+            <v-sheet style="height: 34vh; display: flex">
               <v-card :color="primary" :variant="elevated" style="flex: 1">
                 <v-card-item>
                   <EchartGauge
                     :name="'선박 속도'"
                     :left="'left'"
                     :unit="'kt'"
-                    :center_y="'60%'"
+                    :center_y="'45%'"
+                    :max_speed="100"
                   />
                 </v-card-item>
               </v-card>
             </v-sheet>
-
-            <!-- 러더 위치 -->
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 10px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
+          </v-col>
+          <!-- (최) 러더 그래프 -->
+          <v-col cols="3" no-gutters style="padding: 3px">
+            <v-sheet style="height: 34vh; display: flex">
               <v-card :color="primary" :variant="elevated" style="flex: 1">
                 <v-card-item>
                   <EchartStarPort />
@@ -111,267 +50,194 @@
               </v-card>
             </v-sheet>
           </v-col>
-          <v-col cols="2">
-            <!-- 소켓 데이터 체크 -->
-            <v-sheet
-              style="
-                height: 93vh;
-                padding: 10px;
-                padding-left: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <SocketChecking :checkdata="checkdata" />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col>
         </v-row>
-      </v-card>
-    </v-window-item>
-    <v-window-item :key="2">
-      <v-card class="d-flex justify-center align-center">
+
         <v-row>
-          <v-col cols="5">
-            <v-sheet
-              style="
-                height: 43vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartGauge
-                    :name="'Engine Speed'"
-                    :unit="'rpm'"
-                    :left="'right'"
-                    :center_y="'50%'"
-                  />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <v-sheet
-              style="
-                height: 25vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <v-row>
-                    <v-col cols="6">
-                      <EchartGaugeVolt :name="'Battery Potential'" />
-                    </v-col>
-                    <v-col cols="6">
-                      <EchartGaugeVolt :name="'charging System'" />
-                    </v-col>
-                  </v-row>
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <v-sheet
-              style="
-                height: 25vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <v-row>
-                    <v-col cols="6">
-                      <EchartPercentGauge :name="'Coolant Level'" />
-                    </v-col>
-                    <v-col cols="6">
-                      <EchartPercentGauge :name="'Fuel Level'" />
-                    </v-col>
-                  </v-row>
-                </v-card-item>
-              </v-card>
-            </v-sheet>
+          <!-- 엔진1 -->
+          <v-col cols="6" no-gutters style="padding: 3px">
+            <v-card :color="primary" :variant="elevated" style="flex: 1">
+              <v-card-item>
+                <v-row>
+                  <!-- (최) 엔진 rpm -->
+                  <v-col cols="6" no-gutters style="padding: 3px">
+                    <v-sheet style="height: 34vh; padding: 5px; display: flex">
+                      <EchartGauge
+                        :name="'Engine Speed'"
+                        :left="'center'"
+                        :unit="'rpm'"
+                        :center_y="'50%'"
+                        :max_speed="200"
+                      />
+                    </v-sheet>
+                  </v-col>
+                  <v-col cols="3" no-gutters style="padding: 3px">
+                    <!-- (최) 엔진오일 압력 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-bottom: 0px">
+                        <v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'OilPressure'"
+                            :value="engine1_OilPressure"
+                            :unit="'kPa'"
+                          />
+                        </v-sheet>
+                      </v-col>
+                    </v-row>
+                    <!-- (최) 엔진오일 온도 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-top: 0px"
+                        ><v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'OilTemperature'"
+                            :value="engine1_OilTemperature"
+                            :unit="'°C'"
+                          /> </v-sheet
+                      ></v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col cols="3" no-gutters style="padding: 3px">
+                    <!-- (최) 변속기오일 압력 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-bottom: 0px">
+                        <v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'TransmissionPressure'"
+                            :value="engine1_TransmissionPressure"
+                            :unit="'kPa'"
+                          />
+                        </v-sheet>
+                      </v-col>
+                    </v-row>
+                    <!-- (최) 배기가스 온도 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-top: 0px">
+                        <v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'ExhaustGasTemperature'"
+                            :value="engine1_ExhaustGasTemperature"
+                            :unit="'°C'"
+                          />
+                        </v-sheet>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
+              </v-card-item>
+            </v-card>
+            <!-- (최) Lamp뷰 -->
+            <v-row>
+              <v-col cols="12" no-gutters style="padding-top: 15px">
+                <v-sheet style="height: 20vh; display: flex">
+                  <v-card :color="primary" :variant="elevated" style="flex: 1">
+                    <v-card-item>
+                      <EngineLampChecking :checkdata="checkdata2" />
+                    </v-card-item>
+                  </v-card>
+                </v-sheet>
+              </v-col>
+            </v-row>
           </v-col>
-          <v-col cols="5">
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 5px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 5px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartBarkPa :name="'Temperature(°C)'" :barWidth="40" />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col>
-          <v-col cols="2">
-            <v-sheet
-              style="
-                height: 93vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EngineLampChecking :checkdata="checkdata2" />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col>
-        </v-row>
-      </v-card>
-    </v-window-item>
-    <v-window-item :key="3">
-          <v-card class="d-flex justify-center align-center">
-        <v-row>
-          <v-col cols="5">
-            <v-sheet
-              style="
-                height: 43vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartGauge
-                    :name="'Engine Speed'"
-                    :unit="'rpm'"
-                    :left="'right'"
-                    :center_y="'50%'"
-                  />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <v-sheet
-              style="
-                height: 25vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <v-row>
-                    <v-col cols="6">
-                      <EchartGaugeVolt :name="'Battery Potential'" />
-                    </v-col>
-                    <v-col cols="6">
-                      <EchartGaugeVolt :name="'charging System'" />
-                    </v-col>
-                  </v-row>
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <v-sheet
-              style="
-                height: 25vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <v-row>
-                    <v-col cols="6">
-                      <EchartPercentGauge :name="'Coolant Level'" />
-                    </v-col>
-                    <v-col cols="6">
-                      <EchartPercentGauge :name="'Fuel Level'" />
-                    </v-col>
-                  </v-row>
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col>
-          <v-col cols="5">
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 5px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartBarkPa :name="'Pressure(kPa)'" :barWidth="40" />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-
-            <v-sheet
-              style="
-                height: 46.5vh;
-                padding: 5px;
-                padding-left: 0;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EchartBarkPa :name="'Temperature(°C)'" :barWidth="40" />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col>
-          <v-col cols="2">
-            <v-sheet
-              style="
-                height: 93vh;
-                padding: 5px;
-                padding-right: 0;
-                display: flex;
-              "
-            >
-              <v-card :color="primary" :variant="elevated" style="flex: 1">
-                <v-card-item>
-                  <EngineLampChecking :checkdata="checkdata2" />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
+          <!-- 엔진2 -->
+          <v-col cols="6" no-gutters style="padding: 3px">
+            <v-card :color="primary" :variant="elevated" style="flex: 1">
+              <v-card-item>
+                <v-row>
+                  <!-- (최) 엔진 rpm -->
+                  <v-col cols="6" no-gutters style="padding: 3px">
+                    <v-sheet style="height: 34vh; padding: 5px; display: flex">
+                      <EchartGauge
+                        :name="'Engine Speed'"
+                        :left="'center'"
+                        :unit="'rpm'"
+                        :center_y="'50%'"
+                        :max_speed="200"
+                      />
+                    </v-sheet>
+                  </v-col>
+                  <v-col cols="3" no-gutters style="padding: 3px">
+                    <!-- (최) 엔진오일 압력 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-bottom: 0px">
+                        <v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'OilPressure'"
+                            :value="engine2_OilPressure"
+                            :unit="'kPa'"
+                          />
+                        </v-sheet>
+                      </v-col>
+                    </v-row>
+                    <!-- (최) 엔진오일 온도 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-top: 0px"
+                        ><v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'OilTemperature'"
+                            :value="engine2_OilTemperature"
+                            :unit="'°C'"
+                          /> </v-sheet
+                      ></v-col>
+                    </v-row>
+                  </v-col>
+                  <v-col cols="3" no-gutters style="padding: 3px">
+                    <!-- (최) 변속기오일 압력 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-bottom: 0px">
+                        <v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'TransmissionPressure'"
+                            :value="engine2_TransmissionPressure"
+                            :unit="'kPa'"
+                          />
+                        </v-sheet>
+                      </v-col>
+                    </v-row>
+                    <!-- (최) 배기가스 온도 -->
+                    <v-row>
+                      <v-col cols="12" no-gutters style="padding-top: 0px">
+                        <v-sheet style="height: 18vh; display: flex">
+                          <EchartGaugeVolt
+                            :name="'ExhaustGasTemperature'"
+                            :value="engine2_ExhaustGasTemperature"
+                            :unit="'°C'"
+                          />
+                        </v-sheet>
+                      </v-col>
+                    </v-row>
+                  </v-col>
+                </v-row>
+              </v-card-item>
+            </v-card>
+            <!-- (최) Lamp뷰 -->
+            <v-row>
+              <v-col cols="12" no-gutters style="padding-top: 15px">
+                <v-sheet style="height: 20vh; display: flex">
+                  <v-card :color="primary" :variant="elevated" style="flex: 1">
+                    <v-card-item>
+                      <EngineLampChecking :checkdata="checkdata2" />
+                    </v-card-item>
+                  </v-card>
+                </v-sheet>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
-      </v-card>
-    </v-window-item>
-  </v-window>
+      </v-col>
+
+      <!-- (최)데이터 확인 박스 -->
+      <v-col cols="2">
+        <v-sheet
+          style="height: 92vh; padding: 5px; padding-right: 0; display: flex"
+        >
+          <v-card :color="primary" :variant="elevated" style="flex: 1">
+            <v-card-item>
+              <SocketChecking :checkdata="checkdata" />
+            </v-card-item>
+          </v-card>
+        </v-sheet>
+      </v-col>
+    </v-row>
+  </v-card>
 </template>
 
 <script setup>
@@ -382,7 +248,7 @@ import TableComponent from "../components/TableComponent.vue";
 import SocketChecking from "../components/SocketChecking.vue";
 import EngineLampChecking from "../components/EngineLampChecking.vue";
 import EchartPercentGauge from "../components/EchartGraph/EchartPercentGauge.vue";
-import EchartWind from "../components/EchartGraph/EchartWind.vue";
+import EchartHeading from "../components/EchartGraph/EchartHeading.vue";
 import EchartBarkPa from "../components/EchartGraph/EchartBarkPa.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
@@ -391,11 +257,38 @@ import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 const length = ref(3);
 const window = ref(0);
 // 웹소켓 관련, Web Socket
-import { ref, inject } from "vue";
+import { ref, inject, onMounted } from "vue";
 import { onMessage, onOpen, onClose, onError } from "vue3-websocket";
 
 const text = ref(""); // 보낼 데이터
 const responseMsg = ref(""); // 받아온 데이터
+
+// Props Value 데이터
+let engine1_OilTemperature = ref();
+let engine1_OilPressure = ref();
+let engine1_TransmissionPressure = ref();
+let engine1_ExhaustGasTemperature = ref();
+let engine2_OilTemperature = ref();
+let engine2_OilPressure = ref();
+let engine2_TransmissionPressure = ref();
+let engine2_ExhaustGasTemperature = ref();
+
+const updateValue = () => {
+  engine1_OilTemperature.value = Math.floor(Math.random() * 10 + 8);
+  engine1_OilTemperature.value = Math.floor(Math.random() * 10 + 8);
+  engine1_OilPressure.value = Math.floor(Math.random() * 10 + 8);
+  engine1_TransmissionPressure.value = Math.floor(Math.random() * 10 + 8);
+  engine1_ExhaustGasTemperature.value = Math.floor(Math.random() * 10 + 8);
+  engine2_OilTemperature.value = Math.floor(Math.random() * 10 + 8);
+  engine2_OilPressure.value = Math.floor(Math.random() * 10 + 8);
+  engine2_TransmissionPressure.value = Math.floor(Math.random() * 10 + 8);
+  engine2_ExhaustGasTemperature.value = Math.floor(Math.random() * 10 + 8);
+};
+
+onMounted(() => {
+  setInterval(updateValue, 1000);
+  updateValue();
+});
 
 var checkdata = {
   GLL: "ok",

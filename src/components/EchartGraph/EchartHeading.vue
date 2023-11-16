@@ -28,7 +28,7 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "풍향 및 풍속",
+    text: "Heading(GYRO)",
     left: "left",
     textStyle: {
       fontSize: 14, // 폰트 크기 설정
@@ -39,8 +39,8 @@ const option = ref({
       type: "gauge",
       startAngle: 90,
       endAngle: 450,
-      center: ["50%", "45%"],
-      radius: "70%",
+      center: ["50%", "40%"],
+      radius: "68%",
       splitNumber: 8,
       min: 0,
       max: 360,
@@ -57,10 +57,9 @@ const option = ref({
         },
       },
       pointer: {
-        icon: "path://M12.8,0.7l12,40.1H0.7L12.8,0.7z",
-        length: "14%",
-        width: 10,
-        offsetCenter: [0, "-60%"],
+        length: "70%",
+        width: 7,
+        offsetCenter: [0, 0],
         itemStyle: {
           color: "auto",
         },
@@ -92,17 +91,20 @@ const option = ref({
           } else if (value === 270) {
             return "W";
           } else if (value === 360) {
-            return "N";
+            return "  N (0°)";
           }
-          return '';
+          return "";
         },
       },
       detail: {
-        fontSize: 25,
-        formatter: function () {
-          return `${windspeed.value} m/s`;
+        fontSize: 15,
+        // formatter: function () {
+        //   return `${windspeed.value} m/s`;
+        // },
+        formatter: function (value) {
+          return `degree: ${value} °`;
         },
-        offsetCenter: [0, "0%"],
+        offsetCenter: ["100%", "100%"],
         valueAnimation: true,
         color: "#464646",
       },
@@ -130,7 +132,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 55vh;
+  height: 40vh;
   padding: 0px;
 }
 body {

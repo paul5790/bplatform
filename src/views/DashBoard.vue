@@ -79,7 +79,6 @@
 <script setup>
 import ex1 from "../components/EchartGraph/ExChart1.vue";
 import VoyageTable from "../components/VoyageTable.vue";
-import SaillingAnimation from "../components/SaillingLottie.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartBar from "../components/EchartGraph/EchartBar.vue";

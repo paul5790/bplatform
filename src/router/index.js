@@ -57,7 +57,11 @@ const routes = [
     name: "authority",
     component: () => import("../views/AuthorityView.vue"),
   },
-  
+  {
+    path: "/manager",
+    name: "manager",
+    component: () => import("../views/ManagerAll.vue"),
+  },
 
   // components
   {

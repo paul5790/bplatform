@@ -124,6 +124,7 @@ const test = () => {
     .post("http://192.168.0.24:8080/info/ais/11")
     .then((response) => {
       // 유효한 값을 필터링하여 state.trialdata에 할당
+      console.log(response.data);
       state.trialdata = response.data
         .filter(
           (item) =>
@@ -151,6 +152,37 @@ const test = () => {
     });
 };
 </script>
+
+<!-- <script setup>
+import L from "leaflet";
+import { ref, onMounted } from "vue";
+const items1 = ref([
+  "Ship Information",
+  "Kass Information",
+  "SYS Information",
+  "Control Data",
+]);
+const sailingselect = ref(null);
+onMounted(() => {
+  const map = L.map("map").setView([35.46, 129.38], 12);
+  // OSM 타일 레이어 추가
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+  // 경로 좌표 배열 (예제 경로)
+  const pathCoordinates = [
+    [35.50458908081055, 129.3654022216797],
+    [35.50455856323242, 129.36538696289062],
+    [35.50459671020508, 129.36541748046875],
+    // ... 다른 경로 좌표
+  ];
+  // 폴리라인(선)을 그려서 지도에 추가
+  L.polyline(pathCoordinates, { color: "blue" }).addTo(map);
+  // 마커 추가 (예제 마커)
+  L.marker([35.46, 129.38])
+    .addTo(map)
+    .bindPopup("A pretty CSS popup.<br> Easily customizable.")
+    .openPopup();
+});
+</script> -->
 
 <style scoped>
 /* 추가: 마커의 스타일을 지정하는 CSS */

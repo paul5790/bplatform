@@ -1,20 +1,13 @@
 <template>
-  <v-sheet
-    style="height: 93vh; padding: 80px; padding-top: 40px; display: flex"
-  >
+  <v-sheet class="manager-sheet">
     <v-card :color="primary" :variant="elevated" style="flex: 1">
       <v-card-item>
-        <v-row>
-          <v-col cols="11"></v-col>
-          <v-col cols="1">
+        <v-row class="dialog-row">
+          <div class="dialog-div">
             <!-- <v-btn color="blue" @click="update()">수정하기</v-btn> -->
             <v-dialog v-model="dialog" persistent width="1024">
               <template v-slot:activator="{ props }">
-                <v-btn
-                  color="blue"
-                  v-bind="props"
-                  @click="openDialog(), check()"
-                >
+                <v-btn v-bind="props" @click="openDialog(), check()">
                   수정하기
                 </v-btn>
               </template>
@@ -96,7 +89,7 @@
                 </v-card-actions>
               </v-card>
             </v-dialog>
-          </v-col>
+          </div>
         </v-row>
         <v-data-table
           style="margin-top: 20px"
@@ -106,6 +99,7 @@
           :headers="headers"
           :items="items"
           :items-per-page="itemsPerPage"
+          density="compact"
           hide-default-footer
           item-value="name"
           select-strategy="single"
@@ -113,7 +107,13 @@
         >
           <template v-slot:bottom>
             <div class="text-center pt-2">
-              <v-pagination v-model="page" :length="pageCount"></v-pagination>
+              <v-pagination
+                v-model="page"
+                :length="pageCount"
+                :size="small"
+                :total-visible="6"
+                rounded="circle"
+              ></v-pagination>
             </div>
           </template>
         </v-data-table>
@@ -127,7 +127,7 @@ import { computed, ref } from "vue";
 
 const dialog = ref(false);
 const page = ref(1);
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(12);
 
 const selectedItems = ref([]);
 const selectedusername = ref();

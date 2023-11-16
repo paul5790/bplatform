@@ -1,7 +1,10 @@
 <template>
   <v-card>
     <v-layout>
-      <v-navigation-drawer expand-on-hover rail>
+      <v-navigation-drawer 
+      v-model="drawer" app
+      expand-on-hover 
+      rail  >
         <v-list>
           <v-list-item
             prepend-avatar="S"
@@ -51,7 +54,7 @@
             :key="3"
             :to="`/datagraph`"
             :exact="true"
-            :title="`데이터 그래프`"
+            :title="`데이터 분석`"
             :prepend-icon="`mdi-chart-line`"
             :value="`/datagraph`"
           ></v-list-item>
@@ -59,7 +62,7 @@
             :key="4"
             :to="`/alldata`"
             :exact="true"
-            :title="`전체 데이터`"
+            :title="`데이터 조회`"
             :prepend-icon="`mdi-database-search-outline`"
             :value="`/alldata`"
           ></v-list-item>
@@ -73,7 +76,7 @@
             :value="`/trialrundata`"
           ></v-list-item> -->
 
-          <!-- <v-list-group value="trialrundata">
+          <v-list-group value="trialrundata">
             <template v-slot:activator="{ props }">
               <v-list-item
                 v-bind="props"
@@ -88,16 +91,16 @@
               :title="`데이터 그래프`"
               :prepend-icon="`mdi-chart-line`"
               :value="`/datagraph`"
-            ></v-list-item> -->
+            ></v-list-item>
 
-          <!-- <v-list-item
+          <v-list-item
               :key="3"
               :to="`/trialrundata`"
               :exact="true"
               :title="`시운전 별 데이터`"
               :value="`/trialrundata`"
-            ></v-list-item> -->
-          <!-- <v-list-item
+            ></v-list-item>
+          <v-list-item
               :key="4"
               :to="`/alldata`"
               :exact="true"
@@ -105,7 +108,7 @@
               :prepend-icon="`mdi-text-search`"
               :value="`/alldata`"
             ></v-list-item>
-          </v-list-group> -->
+          </v-list-group>
 
           <v-list-item
             v-if="isAdmin"
@@ -144,9 +147,18 @@
             :title="`환경 설정`"
             :value="`/usersetting`"
           ></v-list-item>
+
+                    <v-list-item
+            :key="9"
+            :to="`/manager`"
+            :exact="true"
+            :prepend-icon="`mdi-cog-outline`"
+            :title="`관리자 설정`"
+            :value="`/manager`"
+          ></v-list-item>
         </v-list>
         <!-- 항상 맨 아래에 붙어있는 리스트 -->
-        <template v-slot:append>
+        <!-- <template v-slot:append>
           <v-list density="compact" nav>
             <v-list-item
               :key="9"
@@ -156,7 +168,7 @@
               :title="`로그아웃`"
             ></v-list-item>
           </v-list>
-        </template>
+        </template> -->
       </v-navigation-drawer>
       <v-main>
         <v-app-bar app hide-on-scroll color="white" style="height: 7vh">
@@ -203,6 +215,9 @@
 <script setup>
 import { ref, defineEmits, onMounted, onBeforeUnmount } from "vue";
 
+const isMiniVariant = ref(true);
+const drawer = ref(true);
+const iconshow = ref(true);
 const dynamicTitle = ref("초기 제목");
 const isAdmin = ref(true);
 const emits = defineEmits(["logout"]);
@@ -222,7 +237,10 @@ const cancelLogout = () => {
   logoutDialog.value = false;
 };
 
-const iconshow = ref(true);
+const toggleDrawer = () => {
+  drawer.value = !drawer.value
+  console.log(drawer.value);
+};
 
 const checkScreenSize = () => {
   iconshow.value = window.innerWidth <= 1280; // 여기서 1280은 lg 사이즈의 임계값입니다.
@@ -237,9 +255,4 @@ onBeforeUnmount(() => {
   window.removeEventListener("resize", checkScreenSize);
 });
 
-const toggleDrawer = () => {
-  // 드로어를 열거나 닫는 로직
-};
 </script>
-
-<style scoped></style>

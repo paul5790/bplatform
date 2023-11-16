@@ -1,7 +1,7 @@
 <template>
   <v-row>
     <v-col cols="3">
-      <v-sheet style="height: 93vh; padding: 30px; display: flex">
+      <v-sheet style="height: 80vh; padding: 30px; display: flex">
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
             <div style="height: 66vh">

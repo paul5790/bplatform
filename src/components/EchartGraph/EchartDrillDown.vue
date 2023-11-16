@@ -1,5 +1,11 @@
 <template>
-  <v-sheet :elevation="elevation">
+  <v-sheet
+    :elevation="elevation"
+    style="display: flex; flex-direction: column; align-items: center"
+  >
+    <v-card-title>
+      <span class="text-h5">데이터 소실 빈도</span>
+    </v-card-title>
     <v-chart
       ref="chart"
       class="chart"
@@ -37,16 +43,10 @@ use([
 provide(THEME_KEY);
 
 const chart = ref(null);
+let isBackButtonActive = false;
 
 // 초기 그래프 옵션 설정
 const option = ref({
-  title: {
-    text: "데이터 소실빈도",
-    left: "left",
-    textStyle: {
-      fontSize: 14,
-    },
-  },
   tooltip: {
     formatter: "{a} <br/>{b} : {c} mb",
   },
@@ -137,7 +137,7 @@ const drilldownData = [
       ["GSA", 1],
     ],
   },
-    {
+  {
     dataGroupId: "GYRO",
     data: [
       ["THS", 4],
@@ -145,14 +145,14 @@ const drilldownData = [
       ["ROT", 1],
     ],
   },
-    {
+  {
     dataGroupId: "ANEMOMETER",
     data: [
       ["MWV", 4],
       ["MTW", 2],
     ],
   },
-    {
+  {
     dataGroupId: "RADAR",
     data: [
       ["GLL", 4],
@@ -164,28 +164,28 @@ const drilldownData = [
       ["GSA", 1],
     ],
   },
-    {
+  {
     dataGroupId: "AIS",
     data: [
       ["VDM", 4],
       ["VDO", 2],
     ],
   },
-    {
+  {
     dataGroupId: "ECDIS",
     data: [
       ["ROUTEINFO", 4],
       ["WAYPOINTS", 2],
     ],
   },
-    {
+  {
     dataGroupId: "AUTOPILOT",
     data: [
       ["RSA", 4],
       ["HTD", 2],
     ],
   },
-    {
+  {
     dataGroupId: "SPEEDLOG",
     data: [
       ["VBW", 4],
@@ -193,7 +193,7 @@ const drilldownData = [
       ["VLW", 1],
     ],
   },
-    {
+  {
     dataGroupId: "NO.1ENGINE",
     data: [
       ["NO.1ENGINE_PANEL_61444", 4],
@@ -212,7 +212,7 @@ const drilldownData = [
       ["NO.1ENGINE_PANEL_65379", 1],
     ],
   },
-    {
+  {
     dataGroupId: "NO.2ENGINE",
     data: [
       ["NO.1ENGINE_PANEL_61444", 4],
@@ -263,7 +263,7 @@ const handleChartClick = (event) => {
         graphic: [
           {
             type: "text",
-            left: 50,
+            right: 50,
             top: 20,
             style: {
               text: "Back",
@@ -340,6 +340,17 @@ const handleChartClick = (event) => {
                 },
               };
               chart.value.setOption(backToTopOption);
+              chart.value.setOption({
+                graphic: [
+                  {
+                    type: "text",
+                    style: {
+                      text: "", // 빈 문자열로 할당
+                    },
+                  },
+                ],
+              });
+              // graphic의 style의 text를 ""값으로 할당
             },
           },
         ],
@@ -353,7 +364,7 @@ const handleChartClick = (event) => {
 
 <style scoped>
 .chart {
-  height: 40vh;
+  height: 37vh;
   padding: 5px;
 }
 body {
