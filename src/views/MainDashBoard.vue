@@ -4,10 +4,14 @@
       <v-navigation-drawer v-model="drawer" app expand-on-hover rail>
         <v-list>
           <v-list-item
-            prepend-avatar="S"
-            :title="dynamicTitle"
-            subtitle="sandra_a88@gmailcom"
+            
           >
+          <img
+          src="http://portal.xinnos.com/SiteAssets/xinnos_logo.gif"
+          alt=""
+          style="margin-left: 56px;"
+          width="94"
+        />
           </v-list-item>
         </v-list>
 
@@ -155,7 +159,7 @@
           ></v-list-item>
         </v-list>
         <!-- 항상 맨 아래에 붙어있는 리스트 -->
-        <template v-slot:append>
+        <!-- <template v-slot:append>
           <v-list density="compact" nav>
             <v-list-item
               :key="9"
@@ -165,7 +169,7 @@
               :title="`로그아웃`"
             ></v-list-item>
           </v-list>
-        </template>
+        </template> -->
       </v-navigation-drawer>
       <v-main>
         <v-app-bar app hide-on-scroll color="white" style="height: 7vh">
@@ -175,9 +179,9 @@
           ></v-app-bar-nav-icon>
           <v-toolbar-title>My App</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn icon>
+          <!-- <v-btn icon>
             <v-icon>mdi-bell</v-icon>
-          </v-btn>
+          </v-btn> -->
           <v-menu>
             <template v-slot:activator="{ props }">
               <v-btn icon="mdi-account" v-bind="props"></v-btn>

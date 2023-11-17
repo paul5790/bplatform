@@ -57,8 +57,8 @@ const option = ref({
         },
       },
       pointer: {
-        length: "70%",
-        width: 7,
+        length: "40%",
+        width: 10,
         offsetCenter: [0, 0],
         itemStyle: {
           color: "auto",

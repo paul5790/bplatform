@@ -1,190 +1,198 @@
 <template>
   <!-- 전체화면 패딩100px -->
-  <div class="my-app">
-    <!-- 데이터 선택창 -->
-    <v-sheet style="height: 7vh; display: flex">
-      <v-row>
-        <v-col cols="2">
-          <v-select
-            v-model="selectedvoyage"
-            :items="voyage"
-            label="voyage"
-            variant="outlined"
-          >
-          </v-select>
-        </v-col>
-        <!-- 첫번째 선택박스 -->
-        <v-col cols="2">
-          <v-select
-            v-model="firstSelectedItems"
-            :items="firstSelect"
-            label="Sub Components"
-            variant="outlined"
-            multiple
-          >
-            <template v-slot:selection="{ item, index }">
-              <div v-if="index < 2">
-                <span>{{ item.title }}</span>
-                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                <span
-                  v-if="
-                    firstSelectedItems.length > 1 &&
-                    index !== firstSelectedItems.length - 1
-                  "
-                  >,
-                </span>
-                <span v-else-if="firstSelectedItems.length >= 3"> </span>
-              </div>
-              <span
-                v-if="index === 2"
-                class="text-grey text-caption align-self-center"
-              >
-                (+{{ firstSelectedItems.length - 2 }} others)
-              </span>
-            </template>
-            <template v-slot:prepend-item>
-              <v-list-item title="Select All" @click="selectAllItem1">
-                <template v-slot:prepend>
-                  <v-checkbox-btn
-                    :color="likesSomeData1 ? 'indigo-darken-4' : undefined"
-                    :indeterminate="likesSomeData1 && !likesAllData1"
-                    :model-value="likesSomeData1"
-                  ></v-checkbox-btn>
-                </template>
-              </v-list-item>
-
-              <v-divider class="mt-2"></v-divider>
-            </template>
-          </v-select>
-        </v-col>
-
-        <!-- 두번째 선택박스 -->
-        <v-col cols="3">
-          <v-select
-            v-model="contentsSelectedItems"
-            :items="secondSelect"
-            label="Contents"
-            variant="outlined"
-            multiple
-          >
-            <template v-slot:selection="{ item, index }">
-              <div v-if="index < 2">
-                <span>{{ item.title }}</span>
-                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                <span
-                  v-if="
-                    contentsSelectedItems.length > 1 &&
-                    index !== contentsSelectedItems.length - 1
-                  "
-                  >,
-                </span>
-                <span v-else-if="contentsSelectedItems.length >= 3"> </span>
-              </div>
-              <span
-                v-if="index === 2"
-                class="text-grey text-caption align-self-center"
-              >
-                (+{{ contentsSelectedItems.length - 2 }} others)
-              </span>
-            </template>
-            <template v-slot:prepend-item>
-              <v-list-item title="Select All" @click="selectAllItem2">
-                <template v-slot:prepend>
-                  <v-checkbox-btn
-                    :color="likesSomeData2 ? 'indigo-darken-4' : undefined"
-                    :indeterminate="likesSomeData2 && !likesAllData2"
-                    :model-value="likesSomeData2"
-                  ></v-checkbox-btn>
-                </template>
-              </v-list-item>
-
-              <v-divider class="mt-2"></v-divider>
-            </template>
-          </v-select>
-        </v-col>
-
-        <!-- 날짜 설정 -->
-        <v-col cols="3">
-          <VueDatePicker
-            style="--dp-input-padding: 15px"
-            v-model="date"
-            range
-          />
-        </v-col>
-
-        <!-- 검색 버튼 -->
-        <v-col cols="2">
-          <v-btn
-            class=""
-            color="blue"
-            style="display: flex; margin-top: 2px; height: 50px; width: 130px"
-            @click="searchData()"
-            >검색</v-btn
-          >
-        </v-col>
-      </v-row>
-    </v-sheet>
-
-    <!-- 탭 기능 구현 -->
-    <v-tabs
-      style="height: 5vh; margin-left: 15px"
-      v-model="tab"
-      color="#009dff"
-      align-tabs="start"
-    >
-      <!-- for문 사용해서 탭 늘리기 -->
-      <v-tab :value="index" v-for="(item, index) in selectedData" :key="index">
-        {{ item }}
-      </v-tab>
-    </v-tabs>
-    <v-window
-      v-model="tab"
-      style="
-        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        height: 72vh;
-      "
-    >
-      <v-window-item
-        v-for="(item, index) in selectedData"
-        :key="index"
-        :value="index"
-      >
-        <v-card style="flex: 1">
-          <v-card-item>
-            <v-data-table
-              v-model="selectedData"
-              v-model:page="page"
-              :items-per-page="itemsPerPage"
-              density="compact"
-              class="elevation-1"
-              :headers="headerName"
-              :items="dataSet"
-              :search="searchData"
-              item-value="name"
-              return-object
-              style="height: 70vh"
+  <div style="height: 93vh">
+    <div class="my-app">
+      <!-- 데이터 선택창 -->
+      <v-sheet style="height: 7vh; display: flex">
+        <v-row>
+          <v-col cols="2">
+            <v-select
+              v-model="selectedvoyage"
+              :items="voyage"
+              label="voyage"
+              variant="outlined"
             >
-              <template v-slot:bottom>
-                <div class="text-center pt-2">
-                  <v-pagination
-                    v-model="page"
-                    :length="pageCount"
-                    :total-visible="8"
-                  ></v-pagination>
+            </v-select>
+          </v-col>
+          <!-- 첫번째 선택박스 -->
+          <v-col cols="2">
+            <v-select
+              v-model="firstSelectedItems"
+              :items="firstSelect"
+              label="Sub Components"
+              variant="outlined"
+              multiple
+            >
+              <template v-slot:selection="{ item, index }">
+                <div v-if="index < 2">
+                  <span>{{ item.title }}</span>
+                  <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                  <span
+                    v-if="
+                      firstSelectedItems.length > 1 &&
+                      index !== firstSelectedItems.length - 1
+                    "
+                    >,
+                  </span>
+                  <span v-else-if="firstSelectedItems.length >= 3"> </span>
                 </div>
+                <span
+                  v-if="index === 2"
+                  class="text-grey text-caption align-self-center"
+                >
+                  (+{{ firstSelectedItems.length - 2 }} others)
+                </span>
               </template>
-            </v-data-table>
-          </v-card-item>
-        </v-card>
-      </v-window-item>
-    </v-window>
+              <template v-slot:prepend-item>
+                <v-list-item title="Select All" @click="selectAllItem1">
+                  <template v-slot:prepend>
+                    <v-checkbox-btn
+                      :color="likesSomeData1 ? 'indigo-darken-4' : undefined"
+                      :indeterminate="likesSomeData1 && !likesAllData1"
+                      :model-value="likesSomeData1"
+                    ></v-checkbox-btn>
+                  </template>
+                </v-list-item>
 
-    <div
-      class="d-flex align-center justify-space-around pa-4"
-      style="justify-content: flex-end"
-    >
-      <v-btn color="blue" @click="dataDownload">데이터 다운로드</v-btn>
+                <v-divider class="mt-2"></v-divider>
+              </template>
+            </v-select>
+          </v-col>
+
+          <!-- 두번째 선택박스 -->
+          <v-col cols="3">
+            <v-select
+              v-model="contentsSelectedItems"
+              :items="secondSelect"
+              label="Contents"
+              variant="outlined"
+              multiple
+            >
+              <template v-slot:selection="{ item, index }">
+                <div v-if="index < 2">
+                  <span>{{ item.title }}</span>
+                  <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                  <span
+                    v-if="
+                      contentsSelectedItems.length > 1 &&
+                      index !== contentsSelectedItems.length - 1
+                    "
+                    >,
+                  </span>
+                  <span v-else-if="contentsSelectedItems.length >= 3"> </span>
+                </div>
+                <span
+                  v-if="index === 2"
+                  class="text-grey text-caption align-self-center"
+                >
+                  (+{{ contentsSelectedItems.length - 2 }} others)
+                </span>
+              </template>
+              <template v-slot:prepend-item>
+                <v-list-item title="Select All" @click="selectAllItem2">
+                  <template v-slot:prepend>
+                    <v-checkbox-btn
+                      :color="likesSomeData2 ? 'indigo-darken-4' : undefined"
+                      :indeterminate="likesSomeData2 && !likesAllData2"
+                      :model-value="likesSomeData2"
+                    ></v-checkbox-btn>
+                  </template>
+                </v-list-item>
+
+                <v-divider class="mt-2"></v-divider>
+              </template>
+            </v-select>
+          </v-col>
+
+          <!-- 날짜 설정 -->
+          <v-col cols="3">
+            <VueDatePicker
+              style="--dp-input-padding: 15px"
+              v-model="date"
+              range
+            />
+          </v-col>
+
+          <!-- 검색 버튼 -->
+          <v-col cols="2">
+            <v-btn
+              class=""
+              color="blue"
+              style="display: flex; margin-top: 2px; height: 50px; width: 130px"
+              @click="searchData()"
+              >검색</v-btn
+            >
+          </v-col>
+        </v-row>
+      </v-sheet>
+
+      <!-- 탭 기능 구현 -->
+      <v-tabs
+        style="height: 5vh; margin-left: 15px"
+        v-model="tab"
+        color="#009dff"
+        align-tabs="start"
+      >
+        <!-- for문 사용해서 탭 늘리기 -->
+        <v-tab
+          :value="index"
+          v-for="(item, index) in selectedData"
+          :key="index"
+        >
+          {{ item }}
+        </v-tab>
+      </v-tabs>
+      <v-window
+        v-model="tab"
+        style="
+          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+          border-radius: 8px;
+          height: 72vh;
+        "
+      >
+        <v-window-item
+          v-for="(item, index) in selectedData"
+          :key="index"
+          :value="index"
+        >
+          <v-card style="flex: 1">
+            <v-card-item>
+              <v-data-table
+                v-model="selectedData"
+                v-model:page="page"
+                :items-per-page="itemsPerPage"
+                density="dense"
+                class="elevation-1"
+                :headers="headerName"
+                :items="dataSet"
+                :search="searchData"
+                item-value="name"
+                return-object
+                style="height: 70vh"
+              >
+                <template v-slot:bottom>
+                  <div class="text-center pt-2">
+                    <v-pagination
+                      v-model="page"
+                      :length="pageCount"
+                      :total-visible="8"
+                    ></v-pagination>
+                  </div>
+                </template>
+              </v-data-table>
+            </v-card-item>
+          </v-card>
+        </v-window-item>
+      </v-window>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="white"
+          style="background-color: #009dff"
+          @click="dataDownload()"
+          >데이터 다운로드</v-btn
+        >
+      </v-card-actions>
     </div>
   </div>
 </template>
@@ -192,6 +200,7 @@
 <script setup>
 import { ref, computed, watchEffect, onMounted } from "vue";
 import axios from "axios";
+import * as XLSX from "xlsx";
 
 const tab = ref(0);
 // const initializeData = () => {
@@ -375,7 +384,15 @@ onMounted(() => {
 
 // 데이터 다운로드
 const dataDownload = () => {
-  alert("다운로드 시작");
+  if (selectedData.value == 0) {
+    alert("선택안됌");
+  } else {
+    alert(`${selectedData.value} 다운로드 시작`);
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(selectedData.value);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    XLSX.writeFile(workbook, `${selectedData.value}_datatable.xlsx`);
+  }
 };
 
 // 데이터 조회
@@ -384,44 +401,376 @@ const headerName = ref([]); // 빈 배열로 초기화
 const dataSet = ref([]); // 빈 배열로 초기화
 const selectedData = ref([]); //
 
+// const fetchData = async () => {
+//   try {
+//     const response = await axios.post(
+//       "http://192.168.0.73:8080/data/dgps/gll/1"
+//     );
+//     console.log(response.data);
+
+//     const dataheader = ref(
+//       Object.keys(response.data[0]).map((key) => ({
+//         title: key,
+//         align: "start",
+//         key,
+//       }))
+//     );
+
+//     if (dataheader.value == null) {
+//       console.log("null");
+//     } else {
+//       console.log(dataheader.value);
+//       GLLheader.value = dataheader.value;
+//     }
+
+//     GLL.value = response.data;
+//     console.log(`${response.data[0]} dataheaderdata!!`);
+//     console.log(`${response.data} responsedata!!`);
+//   } catch (error) {
+//     console.error(error);
+//   }
+// };
+
 const fetchData = async () => {
-  try {
-    const response = await axios.post(
-      "http://192.168.0.73:8080/data/dgps/gll/1"
-    );
-    console.log(response.data);
+  for (const axiosItem of axioslist.value) {
+    try {
+      const response = await axios.post(
+        `http://192.168.0.73:8080/data/${axiosItem}/1`
+      );
 
-    const dataheader = ref(
-      Object.keys(response.data[0]).map((key) => ({
-        title: key,
-        align: "start",
-        key,
-      }))
-    );
+      const dataheader = ref(
+        Object.keys(response.data[0]).map((key) => ({
+          title: key,
+          align: "start",
+          key,
+        }))
+      );
 
-    if (dataheader.value == null) {
-      console.log("null");
-    } else {
-      console.log(dataheader.value);
-      GLLheader.value = dataheader.value;
+      if (dataheader.value == null) {
+        console.log("null");
+      } else {
+        console.log(response.data);
+        switch (axiosItem) {
+          case "dgps/gll":
+            GLLheader.value = dataheader.value;
+            GLL.value = response.data;
+            break;
+          case "dgps/gga":
+            GGAheader.value = dataheader.value;
+            GGA.value = response.data;
+            break;
+          case "dgps/rmc":
+            RMCheader.value = dataheader.value;
+            RMC.value = response.data;
+            break;
+          case "dgps/vtg":
+            VTGheader.value = dataheader.value;
+            VTG.value = response.data;
+            break;
+          case "dgps/zda":
+            ZDAheader.value = dataheader.value;
+            ZDA.value = response.data;
+            break;
+          case "dgps/dtm":
+            DTMheader.value = dataheader.value;
+            DTM.value = response.data;
+            break;
+          case "dgps/gsv":
+            GSVheader.value = dataheader.value;
+            GSV.value = response.data;
+            break;
+          case "dgps/gsa":
+            GSAheader.value = dataheader.value;
+            GSA.value = response.data;
+            break;
+          case "gyro/ths":
+            THSheader.value = dataheader.value;
+            THS.value = response.data;
+            break;
+          case "gyro/hdt":
+            HDTheader.value = dataheader.value;
+            HDT.value = response.data;
+            break;
+          case "gyro/rot":
+            ROTheader.value = dataheader.value;
+            ROT.value = response.data;
+            break;
+          case "anemometer/mwv":
+            MWVheader.value = dataheader.value;
+            MWV.value = response.data;
+            break;
+          case "anemometer/mwd":
+            MWDheader.value = dataheader.value;
+            MWD.value = response.data;
+            break;
+          case "anemometer/vwr":
+            VWRheader.value = dataheader.value;
+            VWR.value = response.data;
+            break;
+          case "anemometer/mtw":
+            MTWheader.value = dataheader.value;
+            MTW.value = response.data;
+            break;
+          case "anemometer/vwt":
+            VWTheader.value = dataheader.value;
+            VWT.value = response.data;
+            break;
+          case "radar/ttm":
+            TTMheader.value = dataheader.value;
+
+            TTM.value = response.data;
+            break;
+          case "radar/tll":
+            TLLheader.value = dataheader.value;
+
+            TLL.value = response.data;
+            break;
+          case "radar/screen":
+            RSCREENheader.value = dataheader.value;
+
+            RSCREEN.value = response.data;
+            break;
+          case "ais/vdm":
+            VDMheader.value = dataheader.value;
+            VDM.value = response.data;
+            break;
+          case "ais/vdo":
+            VDOheader.value = dataheader.value;
+            VDO.value = response.data;
+            break;
+          case "ecdis/routeinfo":
+            ROUTEINFOheader.value = dataheader.value;
+            ROUTEINFO.value = response.data;
+            break;
+          case "ecdis/waypoints":
+            WAYPOINTSheader.value = dataheader.value;
+            WAYPOINTS.value = response.data;
+            break;
+          case "ecdis/screen":
+            ESCREENheader.value = dataheader.value;
+            ESCREEN.value = response.data;
+            break;
+          case "autopilot/rsa":
+            RSAheader.value = dataheader.value;
+            RSA.value = response.data;
+            break;
+          case "autopilot/mode":
+            MODEheader.value = dataheader.value;
+            MODE.value = response.data;
+            break;
+          case "autopilot/htd":
+            HTDheader.value = dataheader.value;
+            HTD.value = response.data;
+            break;
+          case "speedlog/vbw":
+            VBWheader.value = dataheader.value;
+            VBW.value = response.data;
+            break;
+          case "speedlog/vhw":
+            VHWheader.value = dataheader.value;
+            VHW.value = response.data;
+            break;
+          case "speedlog/vlw":
+            VLWheader.value = dataheader.value;
+            VLW.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_61444":
+            NO1ENGINE_PANEL_61444header.value = dataheader.value;
+            NO1ENGINE_PANEL_61444.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65262":
+            NO1ENGINE_PANEL_65262header.value = dataheader.value;
+            NO1ENGINE_PANEL_65262.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65263":
+            NO1ENGINE_PANEL_65263header.value = dataheader.value;
+            NO1ENGINE_PANEL_65263.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65272":
+            NO1ENGINE_PANEL_65272header.value = dataheader.value;
+            NO1ENGINE_PANEL_65272.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65271":
+            NO1ENGINE_PANEL_65271header.value = dataheader.value;
+            NO1ENGINE_PANEL_65271.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65253":
+            NO1ENGINE_PANEL_65253header.value = dataheader.value;
+            NO1ENGINE_PANEL_65253.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65270":
+            NO1ENGINE_PANEL_65270header.value = dataheader.value;
+            NO1ENGINE_PANEL_65270.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65276":
+            NO1ENGINE_PANEL_65276header.value = dataheader.value;
+            NO1ENGINE_PANEL_65276.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65360":
+            NO1ENGINE_PANEL_65360header.value = dataheader.value;
+            NO1ENGINE_PANEL_65360.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65361_lamp":
+            NO1ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
+            NO1ENGINE_PANEL_65361_LAMP.value = response.data;
+            console.log("en1lamp");
+            break;
+          case "no1enginepanel/no1engine_panel_65361_status":
+            NO1ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
+            NO1ENGINE_PANEL_65361_STATUS.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65378":
+            NO1ENGINE_PANEL_65378header.value = dataheader.value;
+            NO1ENGINE_PANEL_65378.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65376":
+            NO1ENGINE_PANEL_65376header.value = dataheader.value;
+            NO1ENGINE_PANEL_65376.value = response.data;
+            break;
+          case "no1enginepanel/no1engine_panel_65379":
+            NO1ENGINE_PANEL_65379header.value = dataheader.value;
+            NO1ENGINE_PANEL_65379.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_61444":
+            NO2ENGINE_PANEL_61444header.value = dataheader.value;
+            NO2ENGINE_PANEL_61444.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65262":
+            NO2ENGINE_PANEL_65262header.value = dataheader.value;
+            NO2ENGINE_PANEL_65262.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65263":
+            NO2ENGINE_PANEL_65263header.value = dataheader.value;
+            NO2ENGINE_PANEL_65263.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65272":
+            NO2ENGINE_PANEL_65272header.value = dataheader.value;
+            NO2ENGINE_PANEL_65272.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65271":
+            NO2ENGINE_PANEL_65271header.value = dataheader.value;
+            NO2ENGINE_PANEL_65271.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65253":
+            NO2ENGINE_PANEL_65253header.value = dataheader.value;
+            NO2ENGINE_PANEL_65253.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65270":
+            NO2ENGINE_PANEL_65270header.value = dataheader.value;
+            NO2ENGINE_PANEL_65270.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65276":
+            NO2ENGINE_PANEL_65276header.value = dataheader.value;
+            NO2ENGINE_PANEL_65276.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65360":
+            NO2ENGINE_PANEL_65360header.value = dataheader.value;
+            NO2ENGINE_PANEL_65360.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65361_lamp":
+            NO2ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
+            NO2ENGINE_PANEL_65361_LAMP.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65361_status":
+            NO2ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
+            NO2ENGINE_PANEL_65361_STATUS.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65378":
+            NO2ENGINE_PANEL_65378header.value = dataheader.value;
+            NO2ENGINE_PANEL_65378.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65376":
+            NO2ENGINE_PANEL_65376header.value = dataheader.value;
+            NO2ENGINE_PANEL_65376.value = response.data;
+            break;
+          case "no2enginepanel/no2engine_panel_65379":
+            NO2ENGINE_PANEL_65379header.value = dataheader.value;
+            NO2ENGINE_PANEL_65379.value = response.data;
+            break;
+
+          default:
+            console.error("Unknown axiosItem:", axiosItem);
+        }
+      }
+
+      // console.log(`${response.data[0]} dataheaderdata!!`);
+      // console.log(`${response.data} responsedata!!`);
+    } catch (error) {
+      console.error(error);
     }
-
-    GLL.value = response.data;
-    console.log(`${response.data[0]} dataheaderdata!!`);
-    console.log(`${response.data} responsedata!!`);
-  } catch (error) {
-    console.error(error);
   }
 };
+
+const axioslist = ref([
+  "dgps/gll",
+  "dgps/gga",
+  "dgps/rmc",
+  "dgps/vtg",
+  "dgps/zda",
+  "dgps/dtm",
+  "dgps/gsv",
+  "dgps/gsa",
+  "gyro/ths",
+  "gyro/hdt",
+  "gyro/rot",
+  "anemometer/mwv",
+  "anemometer/mwd",
+  "anemometer/vwr",
+  "anemometer/mtw",
+  "anemometer/vwt",
+  "radar/ttm",
+  "radar/tll",
+  "radar/screen",
+  "ais/vdm",
+  "ais/vdo",
+  "ecdis/routeinfo",
+  "ecdis/waypoints",
+  "ecdis/screen",
+  "autopilot/rsa",
+  "autopilot/mode",
+  "autopilot/htd",
+  "speedlog/vbw",
+  "speedlog/vhw",
+  "speedlog/vlw",
+  "no1enginepanel/no1engine_panel_61444",
+  "no1enginepanel/no1engine_panel_65262",
+  "no1enginepanel/no1engine_panel_65263",
+  "no1enginepanel/no1engine_panel_65272",
+  "no1enginepanel/no1engine_panel_65271",
+  "no1enginepanel/no1engine_panel_65253",
+  "no1enginepanel/no1engine_panel_65270",
+  "no1enginepanel/no1engine_panel_65276",
+  "no1enginepanel/no1engine_panel_65360",
+  "no1enginepanel/no1engine_panel_65361_lamp",
+  "no1enginepanel/no1engine_panel_65361_status",
+  "no1enginepanel/no1engine_panel_65378",
+  "no1enginepanel/no1engine_panel_65376",
+  "no1enginepanel/no1engine_panel_65379",
+  "no2enginepanel/no2engine_panel_61444",
+  "no2enginepanel/no2engine_panel_65262",
+  "no2enginepanel/no2engine_panel_65263",
+  "no2enginepanel/no2engine_panel_65272",
+  "no2enginepanel/no2engine_panel_65271",
+  "no2enginepanel/no2engine_panel_65253",
+  "no2enginepanel/no2engine_panel_65270",
+  "no2enginepanel/no2engine_panel_65276",
+  "no2enginepanel/no2engine_panel_65360",
+  "no2enginepanel/no2engine_panel_65361_lamp",
+  "no2enginepanel/no2engine_panel_65361_status",
+  "no2enginepanel/no2engine_panel_65378",
+  "no2enginepanel/no2engine_panel_65376",
+  "no2enginepanel/no2engine_panel_65379",
+]);
 
 // 초기 데이터 요청 및 주기적 데이터 업데이트 설정
 fetchData(); // 초기 데이터 요청
 
+// 데이터 셋에 저장된 데이터 넣기
 const ftchData = () => {
   // console.log(`${contentsSelectedItems.value[`${tab.value}`]}`);
   // console.log(GLL.value);
   // dataSet.value = GLL.value;
-  const selectedTab = contentsSelectedItems.value[tab.value];
+  const selectedTab = selectedData.value[tab.value];
 
   // Find the selected data based on the tab value
   switch (selectedTab) {
@@ -666,16 +1015,16 @@ const initializeData = () => {
   // dataSet.value = []; // dataSet 초기화
 };
 watchEffect(() => {
-  // ftchData(); // Fetch data when selected items change
+  ftchData();
   initializeData();
 });
 
 // 검색 이벤트
 const searchData = () => {
-  selectedData.value = [];
   selectedData.value = contentsSelectedItems.value;
   // fetchData(); // 초기 데이터 요청
   ftchData(); // Fetch data when selected items change
+  console.log(selectedData);
 };
 
 const GLLheader = ref([]);
@@ -802,6 +1151,8 @@ const NO2ENGINE_PANEL_65379 = ref([]);
   padding: 30px;
   padding-left: 50px;
   padding-right: 50px;
-  height: 93vh;
+}
+.d-flex {
+  display: flex;
 }
 </style>

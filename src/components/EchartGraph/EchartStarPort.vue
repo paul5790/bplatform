@@ -39,10 +39,10 @@ const option = ref({
       center: ["50%", "45%"],
       axisLine: {
         lineStyle: {
-          width: 20,
+          width: 12,
           color: [
-            [0.5, "#50d28a"],
-            [1, "#fd666d"],
+            [0.5, "#20d25a"],
+            [1, "#ed060d"],
           ],
         },
       },
@@ -54,7 +54,7 @@ const option = ref({
         length: "60%",
       },
       axisTick: {
-        distance: -20,
+        distance: -12,
         length: 5,
         lineStyle: {
           color: "#fff",
@@ -62,8 +62,8 @@ const option = ref({
         },
       },
       splitLine: {
-        distance: -20,
-        length: 30,
+        distance: -10,
+        length: 10,
         lineStyle: {
           color: "#fff",
           width: 2,

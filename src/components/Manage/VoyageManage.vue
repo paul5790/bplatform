@@ -11,7 +11,7 @@
               </template>
               <v-card>
                 <v-card-title>
-                  <span class="text-h5">User Profile</span>
+                  <span class="text-h5">항차 시작</span>
                 </v-card-title>
                 <v-card-text>
                   <v-sheet style="display: flex">
@@ -25,7 +25,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
-                                >선박 항해 정보 입력</v-list-subheader
+                                >항차 정보 입력</v-list-subheader
                               >
                             </v-col>
 
@@ -34,7 +34,6 @@
                                 variant="outlined"
                                 v-model="name"
                                 type="text"
-                                :readonly="!isEditing"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -42,7 +41,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
-                                >Ship voyage start time</v-list-subheader
+                                >항차 시작 시간</v-list-subheader
                               >
                             </v-col>
 
@@ -51,7 +50,7 @@
 
                               <VueDatePicker
                                 style="--dp-input-padding: 15px"
-                                v-model="start_startdate"
+                                v-model="date"
                                 text-input
                                 :readonly="true"
                               />
@@ -61,7 +60,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
-                                >Explanation on sailing</v-list-subheader
+                                >항차 목적 입력</v-list-subheader
                               >
                             </v-col>
 
@@ -69,26 +68,39 @@
                               <v-text-field
                                 style="margin-top: 20px"
                                 variant="outlined"
-                                v-model="description"
+                                v-model="purpose"
                                 type="text"
-                                :readonly="!isEditing"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+
+                          <v-row>
+                            <v-col cols="4" style="margin-top: 28px">
+                              <v-list-subheader
+                                >항해 해역 위치</v-list-subheader
+                              >
+                            </v-col>
+
+                            <v-col cols="8">
+                              <v-text-field
+                                style="margin-top: 20px"
+                                variant="outlined"
+                                v-model="location"
+                                type="text"
                               ></v-text-field>
                             </v-col>
                           </v-row>
 
                           <v-row>
                             <v-col cols="4" style="margin-top: 10px">
-                              <v-list-subheader
-                                >Last modified user</v-list-subheader
-                              >
+                              <v-list-subheader>설명</v-list-subheader>
                             </v-col>
 
                             <v-col cols="8">
                               <v-text-field
                                 variant="outlined"
-                                v-model="modifieduser"
+                                v-model="description"
                                 type="text"
-                                :readonly="!isEditing"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -119,14 +131,14 @@
             </v-dialog>
           </div>
           <!-- 추가하기 -->
-          <div style="display: flex; margin: 15px; margin-left: 0;">
+          <div style="display: flex; margin: 15px; margin-left: 0">
             <v-dialog v-model="dialog2" persistent width="800">
               <template v-slot:activator="{ props }">
                 <v-btn v-bind="props" @click="openDialog2()"> 추가하기 </v-btn>
               </template>
               <v-card>
                 <v-card-title>
-                  <span class="text-h5">User Profile</span>
+                  <span class="text-h5">항차 추가</span>
                 </v-card-title>
                 <v-card-text>
                   <v-sheet style="display: flex">
@@ -140,7 +152,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
-                                >선박 항해 정보 입력</v-list-subheader
+                                >항차 정보 입력</v-list-subheader
                               >
                             </v-col>
 
@@ -149,7 +161,6 @@
                                 variant="outlined"
                                 v-model="name"
                                 type="text"
-                                :readonly="!isEditing"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -157,7 +168,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
-                                >Ship voyage start time</v-list-subheader
+                                >항차 시작 시간</v-list-subheader
                               >
                             </v-col>
 
@@ -168,7 +179,6 @@
                                 style="--dp-input-padding: 15px"
                                 v-model="edit_startdate"
                                 text-input
-                                :readonly="!isEditing"
                               />
                             </v-col>
                           </v-row>
@@ -176,7 +186,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
-                                >Ship voyage end time</v-list-subheader
+                                >항차 종료 시간</v-list-subheader
                               >
                             </v-col>
 
@@ -188,7 +198,6 @@
                                 "
                                 v-model="enddate"
                                 text-input
-                                :readonly="!isEditing"
                               />
                             </v-col>
                           </v-row>
@@ -196,7 +205,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
-                                >Explanation on sailing</v-list-subheader
+                                >항차 목적 입력</v-list-subheader
                               >
                             </v-col>
 
@@ -204,26 +213,40 @@
                               <v-text-field
                                 style="margin-top: 20px"
                                 variant="outlined"
-                                v-model="description"
+                                v-model="purpose"
                                 type="text"
-                                :readonly="!isEditing"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+
+                          <v-row>
+                            <v-col cols="4" style="margin-top: 28px">
+                              <v-list-subheader
+                                >항해 해역 위치</v-list-subheader
+                              >
+                            </v-col>
+
+                            <v-col cols="8">
+                              <v-text-field
+                                style="margin-top: 20px"
+                                variant="outlined"
+                                v-model="location"
+                                type="text"
                               ></v-text-field>
                             </v-col>
                           </v-row>
 
                           <v-row>
                             <v-col cols="4" style="margin-top: 10px">
-                              <v-list-subheader
-                                >Last modified user</v-list-subheader
-                              >
+                              <v-list-subheader>설명</v-list-subheader>
                             </v-col>
 
                             <v-col cols="8">
                               <v-text-field
                                 variant="outlined"
-                                v-model="modifieduser"
+                                v-model="description"
                                 type="text"
-                                :readonly="!isEditing"
+                                style="margin-bottom: 15px;"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -262,7 +285,7 @@
           :headers="headers"
           :items="items"
           :items-per-page="itemsPerPage"
-          density="compact"
+          density="extra-dense"
           hide-default-footer
           item-value="name"
           select-strategy="single"
@@ -286,11 +309,11 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 
 // 데이터 테이블 하단 바 설정
 const page = ref(1);
-const itemsPerPage = ref(12);
+const itemsPerPage = ref(13);
 const dialog1 = ref(false);
 const dialog2 = ref(false);
 
@@ -304,7 +327,14 @@ let startdate = ref("");
 let enddate = ref("");
 let description = ref("");
 let modifieduser = ref("");
+let purpose = ref("");
+let location = ref("");
+
 let isEditing = ref(false); // 수정 모드인지 여부
+
+// 데이트 피커
+const date = new Date();
+
 
 const openDialog1 = () => {
   dialog1.value = true;
@@ -588,7 +618,7 @@ const items = ref([
   },
 ]);
 
-console.log(items)
+console.log(items);
 </script>
 
 <style scoped></style>

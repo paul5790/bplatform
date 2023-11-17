@@ -3,16 +3,16 @@
 </template>
 
 <script setup props="props">
-import { use } from 'echarts/core';
-import { CanvasRenderer } from 'echarts/renderers';
-import { GaugeChart } from 'echarts/charts'; // GaugeChart로 변경
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { GaugeChart } from "echarts/charts"; // GaugeChart로 변경
 import {
   TitleComponent,
   TooltipComponent,
   LegendComponent,
-} from 'echarts/components';
-import VChart, { THEME_KEY } from 'vue-echarts';
-import { ref, provide , onMounted, defineProps } from 'vue';
+} from "echarts/components";
+import VChart, { THEME_KEY } from "vue-echarts";
+import { ref, provide, onMounted, defineProps } from "vue";
 
 use([
   CanvasRenderer,
@@ -24,35 +24,38 @@ use([
 
 provide(THEME_KEY);
 
-const props = defineProps({  // #2 props 정의
+const props = defineProps({
+  // #2 props 정의
   name: String,
   left: String,
   unit: String,
   center_y: String,
   max_speed: Number,
-  
-
 });
-
 
 const option = ref({
   title: {
     text: props.name,
     left: props.left,
-        textStyle: {
+    textStyle: {
       fontSize: 14, // 폰트 크기 설정
     },
   },
   tooltip: {
-    formatter: '{a} <br/>{b} : {c} km/s',
+    formatter: "{a} <br/>{b} : {c} km/s",
   },
   series: [
     {
-      name: 'SPEEDLOG',
+      name: "SPEEDLOG",
       min: 0,
       max: props.max_speed,
-      type: 'gauge', // gauge 타입 사용
+      type: "gauge", // gauge 타입 사용
       center: ["50%", `${props.center_y}`],
+      pointer: {
+        offsetCenter: [0, "0%"],
+        length: "50%",
+        width: 5,
+      },
       progress: {
         show: true,
       },

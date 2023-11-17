@@ -91,6 +91,7 @@
                       style="--dp-input-padding: 15px"
                       v-model="date"
                       range
+                      :readonly="true"
                     />
 
                     <v-btn

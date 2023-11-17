@@ -99,7 +99,7 @@
           :headers="headers"
           :items="items"
           :items-per-page="itemsPerPage"
-          density="compact"
+          density="extra-dense"
           hide-default-footer
           item-value="name"
           select-strategy="single"
@@ -127,7 +127,7 @@ import { computed, ref } from "vue";
 
 const dialog = ref(false);
 const page = ref(1);
-const itemsPerPage = ref(12);
+const itemsPerPage = ref(13);
 
 const selectedItems = ref([]);
 const selectedusername = ref();

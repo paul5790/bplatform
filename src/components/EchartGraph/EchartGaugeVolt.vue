@@ -54,10 +54,10 @@ const option = ref({
       axisLine: {
         lineStyle: {
           width: 7,
-          color: [
-            [0.875, "#00609a20"],
-            [1, "#ca706040"],
-          ],
+          // color: [
+          //   [0.875, "#00609a20"],
+          //   [1, "#ca706040"],
+          // ],
         },
       },
       progress: {

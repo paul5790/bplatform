@@ -9,10 +9,10 @@
     <div v-else-if="showSignup">
       <div class="form-signup">
         <img
-          src="https://kassproject.org/include/download_img.php?idx=9b1c034190fcb2798286ff057bde5b56"
+          src="http://portal.xinnos.com/SiteAssets/xinnos_logo.gif"
           alt=""
-          width="112"
-          height="87"
+          width="140"
+          style="margin-bottom: 50px;"
         />
         <v-row>
           <v-col cols="9">
@@ -24,7 +24,9 @@
             ></v-text-field>
           </v-col>
           <v-col cols="3">
-            <v-btn color="blue" @click="checkid()" style="height: 55px"> 중복확인 </v-btn>
+            <v-btn color="blue" block
+            size="large"
+            variant="tonal" @click="checkid()" style="height: 55px"> 중복확인 </v-btn>
           </v-col>
         </v-row>
 
@@ -72,7 +74,10 @@
         <v-row>
           <v-col cols="6">
             <v-btn
-              color="blue"
+                       block
+            color="blue"
+            size="large"
+            variant="tonal"
               class="halfbtn"
               @click="signfinish()"
               to="/"
@@ -81,7 +86,9 @@
             </v-btn>
           </v-col>
           <v-col cols="6">
-            <v-btn color="blue" class="halfbtn" @click="checkid()" to="/">
+            <v-btn color="blue"
+            size="large"
+            variant="tonal" class="halfbtn" @click="checkid()" to="/">
               가입하기
             </v-btn>
           </v-col>
@@ -93,19 +100,17 @@
     <div v-else>
       <div class="form-signin">
         <img
-          src="https://kassproject.org/include/download_img.php?idx=9b1c034190fcb2798286ff057bde5b56"
+          src="http://portal.xinnos.com/SiteAssets/xinnos_logo.gif"
           alt=""
-          width="172"
-          height="137"
+          width="200"
         />
 
-        <v-form fast-fail @submit="login">
+        <v-form fast-fail @submit="login" style="margin-top: 20px;">
           <div class="text-subtitle-1 text-medium-emphasis d-flex justify-left">
-            Account
+            아이디
           </div>
 
           <v-text-field
-            density="compact"
             placeholder="Email address"
             prepend-inner-icon="mdi-email-outline"
             variant="outlined"
@@ -117,7 +122,7 @@
           <div
             class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between"
           >
-            Password
+            비밀번호
           </div>
 
           <v-text-field
@@ -125,13 +130,12 @@
             :type="visible ? 'text' : 'password'"
             v-model="password"
             :rules="PasswordRules"
-            density="compact"
             placeholder="Enter your password"
             prepend-inner-icon="mdi-lock-outline"
             variant="outlined"
             @click:append-inner="visible = !visible"
           ></v-text-field>
-
+<!-- 
           <v-card class="mb-12" color="surface-variant" variant="tonal">
             <v-card-text class="text-medium-emphasis text-caption">
               Warning: After 3 consecutive failed login attempts, you account
@@ -139,15 +143,15 @@
               you can also click "Forgot login password?" below to reset the
               login password.
             </v-card-text>
-          </v-card>
+          </v-card> -->
 
           <v-btn
             type="submit"
             block
-            class="mb-8"
             color="blue"
             size="large"
             variant="tonal"
+            class="mb-8"
           >
             Log In
           </v-btn>
@@ -158,7 +162,7 @@
               @click="signupBtn()"
               class="text-blue text-decoration-none"
             >
-              Sign up now <v-icon icon="mdi-chevron-right"></v-icon>
+              회원가입 <v-icon icon="mdi-chevron-right"></v-icon>
             </router-link>
           </v-card-text>
         </v-form>
@@ -322,7 +326,7 @@ const checkid = () => {
   text-align: center;
   max-width: 400px;
   margin: 0 auto;
-  margin-top: 100px;
+  margin-top: 150px;
 }
 
 .form-signup {

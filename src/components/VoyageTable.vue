@@ -10,7 +10,7 @@
     class="scrollable-card"
   >
     <v-card-title>
-      <span class="text-h5">항차 테이블</span>
+      <span style="font-size: 19; font-weight: 550;">항차 테이블</span>
     </v-card-title>
     <v-data-table
       v-model:page="page"
@@ -18,7 +18,7 @@
       :headers="headers"
       :items="items"
       :items-per-page="itemsPerPage"
-      density="compact"
+      density="extra-dense"
       hide-default-footer
       item-value="name"
     >
@@ -44,7 +44,7 @@
   </v-sheet>
   <v-dialog v-model="dialog">
     <v-card>
-      <v-card-title>지도</v-card-title>
+      <v-card-title>{{ maptitle }}</v-card-title>
       <v-card-text>
         <v-sheet style="display: flex">
           <v-container fluid>
@@ -70,7 +70,7 @@ import MapView from "../views/MapView.vue";
 import { ref, computed, watch } from "vue";
 
 const page = ref(1);
-const itemsPerPage = 8;
+const itemsPerPage = 9;
 
 const headers = [
   {
@@ -336,8 +336,10 @@ const initialize = () => {
   ];
 };
 
+const maptitle = ref();
 const map = (item) => {
   console.log(item.name + "아이템");
+  maptitle.value = `${item.name}의 지도`
   dialog.value = true;
 };
 

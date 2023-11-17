@@ -1,5 +1,5 @@
 <template>
-  <div style="height: 93vh; background-color: #f7f7f7; padding: 60px;">
+  <div style="height: 93vh; background-color: #f7f7f7; padding: 60px ;padding-top: 40px;">
     <v-tabs style="height: 5vh; margin-left: 15px;" v-model="tab" color="#009dff" align-tabs="start">
       <v-tab :value="1">항차 설정</v-tab>
       <v-tab :value="2">사용자 설정</v-tab>
