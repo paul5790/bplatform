@@ -25,7 +25,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
-                                >항차 정보 입력</v-list-subheader
+                                ><p style="font-size: 17px;">항차 정보 입력</p></v-list-subheader
                               >
                             </v-col>
 
@@ -41,7 +41,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
-                                >항차 시작 시간</v-list-subheader
+                                ><p style="font-size: 17px;">항차 시작 시간</p></v-list-subheader
                               >
                             </v-col>
 
@@ -60,7 +60,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
-                                >항차 목적 입력</v-list-subheader
+                                ><p style="font-size: 17px;">항차 목적 입력</p></v-list-subheader
                               >
                             </v-col>
 
@@ -75,15 +75,14 @@
                           </v-row>
 
                           <v-row>
-                            <v-col cols="4" style="margin-top: 28px">
+                            <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
-                                >항해 해역 위치</v-list-subheader
+                                ><p style="font-size: 17px;">항해 해역 위치</p></v-list-subheader
                               >
                             </v-col>
 
                             <v-col cols="8">
                               <v-text-field
-                                style="margin-top: 20px"
                                 variant="outlined"
                                 v-model="location"
                                 type="text"
@@ -93,7 +92,7 @@
 
                           <v-row>
                             <v-col cols="4" style="margin-top: 10px">
-                              <v-list-subheader>설명</v-list-subheader>
+                              <v-list-subheader><p style="font-size: 17px;">설명</p></v-list-subheader>
                             </v-col>
 
                             <v-col cols="8">
@@ -108,7 +107,7 @@
                       </v-card-item>
                     </v-card>
                   </v-sheet>
-                  <small>*indicates required field</small>
+                  <small></small>
                 </v-card-text>
                 <v-card-actions style="margin-top: 50px">
                   <v-spacer></v-spacer>
@@ -152,7 +151,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
-                                >항차 정보 입력</v-list-subheader
+                                ><p style="font-size: 17px;">항차 정보 입력</p></v-list-subheader
                               >
                             </v-col>
 
@@ -168,7 +167,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
-                                >항차 시작 시간</v-list-subheader
+                                ><p style="font-size: 17px;">항차 시작 시간</p></v-list-subheader
                               >
                             </v-col>
 
@@ -186,7 +185,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
-                                >항차 종료 시간</v-list-subheader
+                                ><p style="font-size: 17px;">항차 종료 시간</p></v-list-subheader
                               >
                             </v-col>
 
@@ -205,7 +204,7 @@
                           <v-row>
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
-                                >항차 목적 입력</v-list-subheader
+                                ><p style="font-size: 17px;">항차 목적 입력</p></v-list-subheader
                               >
                             </v-col>
 
@@ -220,15 +219,15 @@
                           </v-row>
 
                           <v-row>
-                            <v-col cols="4" style="margin-top: 28px">
+                            <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
-                                >항해 해역 위치</v-list-subheader
+                                ><p style="font-size: 17px;">항해 해역 위치</p></v-list-subheader
                               >
                             </v-col>
 
                             <v-col cols="8">
                               <v-text-field
-                                style="margin-top: 20px"
+                                style="margin-top: 0px"
                                 variant="outlined"
                                 v-model="location"
                                 type="text"
@@ -238,7 +237,7 @@
 
                           <v-row>
                             <v-col cols="4" style="margin-top: 10px">
-                              <v-list-subheader>설명</v-list-subheader>
+                              <v-list-subheader><p style="font-size: 17px;">설명</p></v-list-subheader>
                             </v-col>
 
                             <v-col cols="8">
@@ -254,7 +253,7 @@
                       </v-card-item>
                     </v-card>
                   </v-sheet>
-                  <small>*indicates required field</small>
+                  <small></small>
                 </v-card-text>
                 <v-card-actions style="margin-top: 50px">
                   <v-spacer></v-spacer>
@@ -310,6 +309,7 @@
 
 <script setup>
 import { computed, ref, onMounted } from "vue";
+import axios from "axios";
 
 // 데이터 테이블 하단 바 설정
 const page = ref(1);
@@ -369,11 +369,8 @@ const saveData = () => {
 
 // 데이터 테이블 헤더
 const headers = ref([
-  {
-    title: "항차",
-    align: "start",
-    key: "name",
-  },
+  { title: "항차", align: "start", key: "name",},
+  { title: "Ship ID", align: "start", key: "shipid" },
   { title: "시작시간", align: "end", key: "startdate" },
   { title: "끝시간", align: "end", key: "enddate" },
   { title: "목적", align: "end", key: "purpose" },
@@ -383,240 +380,35 @@ const headers = ref([
   { title: "입력자", align: "end", key: "user" },
 ]);
 
-// 데이터 테이블 바디
-const items = ref([
-  {
-    name: "시운전 #1",
-    startdate: "2023-08-29T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #2",
-    startdate: "2023-09-27T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #3",
-    startdate: "2023-10-20T04:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #4",
-    startdate: "2023-10-29T18:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-29T20:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #5",
-    startdate: "2023-08-29T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #6",
-    startdate: "2023-09-27T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #7",
-    startdate: "2023-10-20T04:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #8",
-    startdate: "2023-10-29T18:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-29T20:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #9",
-    startdate: "2023-08-29T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #10",
-    startdate: "2023-09-27T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #11",
-    startdate: "2023-10-20T04:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #12",
-    startdate: "2023-10-29T18:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-29T20:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #13",
-    startdate: "2023-08-29T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #14",
-    startdate: "2023-09-27T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #15",
-    startdate: "2023-10-20T04:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #16",
-    startdate: "2023-10-29T18:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-29T20:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #17",
-    startdate: "2023-08-29T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #18",
-    startdate: "2023-09-27T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-09-30T08:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #19",
-    startdate: "2023-10-20T04:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-21T06:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #20",
-    startdate: "2023-10-29T18:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-10-29T20:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-  {
-    name: "시운전 #21",
-    startdate: "2023-08-29T08:28:43",
-    purpose: "%%테스트",
-    location: "울산 실증센터",
-    storage: "26MB",
-    map: "",
-    enddate: "2023-08-31T01:24:33",
-    description: "##테스트 시운전",
-    username: username.value,
-  },
-]);
+
+const items = ref([]);
+
+// 데이터 받아오기
+const fetchData = async () => {
+  try {
+    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
+    for (let i = 0; i < response.data.length; i++) {
+
+      items.value.push({
+        name: `${response.data[i].seatrialid}`,
+        shipid: `${response.data[i].shipid.shipid}`,
+        startdate: `${response.data[i].start_TIME_UTC}`,
+        purpose: `${response.data[i].test_PURPOSE}`,
+        location: `${response.data[i].navigation_AREA}`,
+        storage: `${response.data[i].seatrialid}`,
+        enddate: `${response.data[i].end_TIME_UTC}`,
+        description: `${response.data[i].description}`,
+      });
+
+      console.log(`${response.data[i].seatrialid} here!!!!!!!!!!!!`);
+      console.log(`${response.data[i].test_PURPOSE} here!!!!!!!!!!!!`);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+fetchData();
 
 console.log(items);
 </script>

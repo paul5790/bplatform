@@ -1,6 +1,6 @@
 <template>
   <v-card-title>
-    <span class="text-h6">데이터 소실 빈도</span>
+    <span class="text-h6">Contents/Item</span>
   </v-card-title>
   <v-chart class="chart" :option="option" autoresize />
 </template>

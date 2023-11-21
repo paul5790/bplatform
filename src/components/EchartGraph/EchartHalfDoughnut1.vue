@@ -74,13 +74,13 @@ const option = ref({
   },
   legend: {
     orient: "vertical", // 수직 방향으로 표시
-    top: "20%", // 수직 정렬을 중앙으로 설정
+    top: "15%", // 수직 정렬을 중앙으로 설정
     right: "0%",
   },
   series: [
     {
       type: "pie",
-      radius: ["60%", "90%"],
+      radius: ["55%", "85%"],
       center: ["40%", "70%"], // 이 부분을 수정하여 위치 조절
       startAngle: 180,
       label: {
@@ -142,7 +142,7 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
       label: {
         show: false,
       },
-      name: `전체 용량: ${totalSize.value}GB`,
+      name: `전체 용량: ${totalSize.value.toFixed(2)}GB`,
     },
   ];
 });

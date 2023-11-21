@@ -397,36 +397,36 @@ const toggleGroup = (group) => {
 
 // 총 58개 데이터
 const data = [
-  { key: "  GLL" }, //DGPS
-  { key: "  GGA" },
-  { key: "  RMC" },
-  { key: "  VTG" },
-  { key: "  ZDA" },
-  { key: "  DTM" },
-  { key: "  GSV" },
-  { key: "  GSA" },
-  { key: "  THS" }, //GYRO
-  { key: "  HDT" },
-  { key: "  ROT" },
-  { key: "  MWV" }, //ANEMOMETER
-  { key: "  MWD" },
-  { key: "  VWR" },
-  { key: "  MTW" },
-  { key: "  VWT" },
-  { key: "  TTM" }, //RADAR
-  { key: "  TLL" },
-  { key: "  RSCREEN" },
-  { key: "  VDM" }, //AIS
-  { key: "  VDO" },
-  { key: "  ROUTEINFO" }, //ECDIS
-  { key: "  WAYPOINTS" },
-  { key: "  ESCREEN" },
-  { key: "  RSA" }, //AUTOPILOT
-  { key: "  MODE" },
-  { key: "  HTD" },
-  { key: "  VBW" }, //SPEEDLOG
-  { key: "  VHW" },
-  { key: "  VLW" },
+  { key: "GLL" }, //DGPS
+  { key: "GGA" },
+  { key: "RMC" },
+  { key: "VTG" },
+  { key: "ZDA" },
+  { key: "DTM" },
+  { key: "GSV" },
+  { key: "GSA" },
+  { key: "THS" }, //GYRO
+  { key: "HDT" },
+  { key: "ROT" },
+  { key: "MWV" }, //ANEMOMETER
+  { key: "MWD" },
+  { key: "VWR" },
+  { key: "MTW" },
+  { key: "VWT" },
+  { key: "TTM" }, //RADAR
+  { key: "TLL" },
+  { key: "RSCREEN" },
+  { key: "VDM" }, //AIS
+  { key: "VDO" },
+  { key: "ROUTEINFO" }, //ECDIS
+  { key: "WAYPOINTS" },
+  { key: "ESCREEN" },
+  { key: "RSA" }, //AUTOPILOT
+  { key: "MODE" },
+  { key: "HTD" },
+  { key: "VBW" }, //SPEEDLOG
+  { key: "VHW" },
+  { key: "VLW" },
   { key: "NO1ENGINE_PANEL_61444" }, //NO.1
   { key: "NO1ENGINE_PANEL_65262" },
   { key: "NO1ENGINE_PANEL_65263" },
@@ -464,6 +464,7 @@ const getIconIcon = (key) =>
 
 <style>
 .item-wrapper {
+  width: 100%;
   display: flex;
   align-items: center; /* 교차 축 정렬: 세로 중앙 정렬 */
   justify-content: flex-start; /* 주 축 정렬: 가로 왼쪽 정렬 */

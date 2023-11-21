@@ -227,7 +227,7 @@
       <!-- (최)데이터 확인 박스 -->
       <v-col cols="2">
         <v-sheet
-          style="height: 92vh; padding: 5px; padding-right: 0; display: flex"
+          style="height: 92vh; padding-right: 0; display: flex"
         >
           <v-card style="flex: 1">
             <v-card-item>

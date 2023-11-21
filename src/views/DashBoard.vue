@@ -91,7 +91,7 @@
 </template>
 
 <script setup>
-import VoyageTable from "../components/VoyageTable.vue";
+import VoyageTable from "../components/VoyageTable1.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut1";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";

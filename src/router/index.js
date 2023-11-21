@@ -62,6 +62,11 @@ const routes = [
     name: "manager",
     component: () => import("../views/ManagerAll.vue"),
   },
+  {
+    path: "/guest",
+    name: "guest",
+    component: () => import("../views/GuestPage.vue"),
+  },
 
   // components
   {

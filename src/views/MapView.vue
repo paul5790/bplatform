@@ -65,22 +65,42 @@ const initializeMap = () => {
   state.pathCoordinates = state.trialdata;
 
   // 맵 객체 생성 및 저장
-  state.map = L.map("map").setView([35.46, 129.38], 12);
+  state.map = L.map("map").setView([35.46, 129.38], 14);
 
   // OSM 타일 레이어 추가
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
     state.map
   );
+    const pathCoordinates = [
+      [35.46, 129.38],
+    [35.461764,	129.382251],
+    [35.462171,	129.388250],
+    [35.462779,	129.389245],
+    [35.463789,	129.389246],
+    [35.465093,	129.389249],
+    [35.464589,	129.390246],
+    [35.464689,	129.391046],
+    [35.464789,	129.395246],
+    [35.460089,	129.395446],
+    [35.455589,	129.388246],
+    [35.454589,	129.384246],
+    [35.453589,	129.382146],
+    [35.458589,	129.383246],
+    [35.459,	129.381],
+    // ... 다른 경로 좌표
+  ];
+  // 폴리라인(선)을 그려서 지도에 추가
+  L.polyline(pathCoordinates, { color: "blue", weight: 2 }).addTo(state.map);
 
   // pathCoordinates가 정의되어 있고, 길이가 2 이상인 경우에만 폴리라인(선)을 그려서 지도에 추가
-  if (state.pathCoordinates && state.pathCoordinates.length >= 2) {
-    L.polyline(state.pathCoordinates, { color: "blue" }).addTo(state.map);
-  }
+  // if (state.pathCoordinates && state.pathCoordinates.length >= 2) {
+  //   L.polyline(state.pathCoordinates, { color: "blue" }).addTo(state.map);
+  // }
 
   // 마커 추가 (예제 마커)
   L.marker([35.46, 129.38])
     .addTo(state.map)
-    .bindPopup("A pretty CSS popup.<br> Easily customizable.")
+    .bindPopup("start")
     .openPopup();
 };
 
@@ -109,7 +129,7 @@ const marker = () => {
       .bindPopup("Marker.")
       .openPopup();
   } else {
-    console.warn("Map is not initialized. Please load data first.");
+    console.warn("waypoint");
   }
 };
 

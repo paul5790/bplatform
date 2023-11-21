@@ -81,7 +81,7 @@
                     ></v-select>
 
                     <v-select
-                      v-model="selectedItem"
+                      v-model="selectedItem1"
                       :items="trialrun"
                       label="항차 선택"
                       variant="outlined"
@@ -148,6 +148,8 @@ const items1 = ref([
   "Engine2/EngineSpeed",
 ]);
 const selectedItem = ref(null);
+const selectedItem1 = ref(null);
+
 
 // 데이터 테이블 헤더
 const headers = ref([

@@ -3,173 +3,82 @@
     <v-layout>
       <v-navigation-drawer v-model="drawer" app expand-on-hover rail>
         <v-list>
-          <v-list-item
-            
-          >
-          <img
-          src="http://portal.xinnos.com/SiteAssets/xinnos_logo.gif"
-          alt=""
-          style="margin-left: 56px;"
-          width="94"
-        />
+          <v-list-item>
+            <img
+              :src="require('../../public/image/kriso.png')"
+              alt=""
+              style="margin-left: 56px"
+              width="115"
+            />
           </v-list-item>
         </v-list>
 
         <v-divider></v-divider>
 
         <v-list density="compact" nav>
-          <!-- <v-list-item
-            v-for="(item, index) in menuItems"
-            :key="index"
-            :to="item.route"
-            :exact="true"
-            :prepend-icon="item.icon"
-            :title="item.title"
-            :value="item.route"
-          ></v-list-item> -->
           <v-list-item
+            v-if="permission === 'Admin' || permission === 'User'"
             :key="0"
             :to="`/`"
             :exact="true"
             :prepend-icon="`mdi-view-dashboard`"
             :title="`대시보드`"
             :value="`/`"
+            @click="handleListItemClick(`대시보드`)"
           ></v-list-item>
           <v-list-item
+            v-if="permission === 'Admin' || permission === 'User'"
             :key="1"
             :to="`/realtimeview`"
             :exact="true"
             :prepend-icon="`mdi-television`"
-            :title="`모니터링`"
+            :title="`실시간 모니터링`"
             :value="`/realtimeview`"
+            @click="handleListItemClick(`실시간 모니터링`)"
           ></v-list-item>
-          <!-- <v-list-item
-            :key="2"
-            :to="`/mapview`"
-            :exact="true"
-            :prepend-icon="`mdi-map-outline`"
-            :title="`지도`"
-            :value="`/mapview`"
-          ></v-list-item> -->
+
           <v-list-item
+            v-if="permission === 'Admin' || permission === 'User'"
             :key="3"
             :to="`/datagraph`"
             :exact="true"
             :title="`데이터 분석`"
             :prepend-icon="`mdi-chart-line`"
             :value="`/datagraph`"
+            @click="handleListItemClick(`데이터 분석`)"
           ></v-list-item>
           <v-list-item
+            v-if="permission === 'Admin' || permission === 'User'"
             :key="4"
             :to="`/alldata`"
             :exact="true"
             :title="`데이터 조회`"
             :prepend-icon="`mdi-database-search-outline`"
             :value="`/alldata`"
+            @click="handleListItemClick(`데이터 조회`)"
           ></v-list-item>
 
-          <!-- <v-list-item
-            :key="2"
-            :to="`/trialrundata`"
-            :exact="true"
-            :prepend-icon="`mdi-database-search-outline`"
-            :title="`데이터 열람`"
-            :value="`/trialrundata`"
-          ></v-list-item> -->
-
-          <!-- <v-list-group value="trialrundata">
-            <template v-slot:activator="{ props }">
-              <v-list-item
-                v-bind="props"
-                title="데이터 열람"
-                :prepend-icon="`mdi-database-search-outline`"
-              ></v-list-item>
-            </template>
-            <v-list-item
-              :key="3"
-              :to="`/datagraph`"
-              :exact="true"
-              :title="`데이터 그래프`"
-              :prepend-icon="`mdi-chart-line`"
-              :value="`/datagraph`"
-            ></v-list-item>
-
           <v-list-item
-              :key="3"
-              :to="`/trialrundata`"
-              :exact="true"
-              :title="`시운전 별 데이터`"
-              :value="`/trialrundata`"
-            ></v-list-item>
-          <v-list-item
-              :key="4"
-              :to="`/alldata`"
-              :exact="true"
-              :title="`전체 데이터`"
-              :prepend-icon="`mdi-text-search`"
-              :value="`/alldata`"
-            ></v-list-item>
-          </v-list-group>
-
-          <v-list-item
-            v-if="isAdmin"
+            v-if="permission === 'Guest'"
             :key="5"
-            :to="`/voyagedata`"
+            :to="`/guest`"
             :exact="true"
-            :prepend-icon="`mdi mdi-ferry`"
-            :title="`항차 데이터`"
-            :value="`/voyagedata`"
+            :title="`이용 가이드`"
+            :value="`/guest`"
+            @click="handleListItemClick(`이용 가이드`)"
           ></v-list-item>
 
           <v-list-item
-            v-if="isAdmin"
-            :key="6"
-            :to="`/authority`"
-            :exact="true"
-            :prepend-icon="`mdi-account`"
-            :title="`사용자 관리`"
-            :value="`/authority`"
-          ></v-list-item>
-          <v-list-item
-            v-if="isAdmin"
-            :key="7"
-            :to="`/adminview`"
-            :exact="true"
-            :prepend-icon="`mdi-file-search-outline`"
-            :title="`기록 조회`"
-            :value="`/adminview`"
-          ></v-list-item>
-
-          <v-list-item
-            :key="8"
-            :to="`/usersetting`"
-            :exact="true"
-            :prepend-icon="`mdi-cog-outline`"
-            :title="`환경 설정`"
-            :value="`/usersetting`"
-          ></v-list-item> -->
-
-          <v-list-item
+            v-if="permission === 'Admin'"
             :key="9"
             :to="`/manager`"
             :exact="true"
             :prepend-icon="`mdi-cog-outline`"
             :title="`관리자 설정`"
             :value="`/manager`"
+            @click="handleListItemClick(`관리자 설정`)"
           ></v-list-item>
         </v-list>
-        <!-- 항상 맨 아래에 붙어있는 리스트 -->
-        <!-- <template v-slot:append>
-          <v-list density="compact" nav>
-            <v-list-item
-              :key="9"
-              @click="confirmLogout()"
-              :exact="true"
-              :prepend-icon="`mdi-logout`"
-              :title="`로그아웃`"
-            ></v-list-item>
-          </v-list>
-        </template> -->
       </v-navigation-drawer>
       <v-main>
         <v-app-bar app hide-on-scroll color="white" style="height: 7vh">
@@ -177,8 +86,13 @@
             @click="toggleDrawer()"
             v-if="iconshow"
           ></v-app-bar-nav-icon>
-          <v-toolbar-title>My App</v-toolbar-title>
+          <v-toolbar-title>
+            <p style="font-size: 23px; margin-top: 5px">
+              {{ selected_item }}
+            </p></v-toolbar-title
+          >
           <v-spacer></v-spacer>
+          <p>{{ toolbarname }}</p>
           <!-- <v-btn icon>
             <v-icon>mdi-bell</v-icon>
           </v-btn> -->
@@ -198,29 +112,17 @@
               </v-list-item>
             </v-list>
           </v-menu>
-          <!-- <v-btn @click="userinfo()" icon>
-            <v-icon>mdi-account</v-icon>
-          </v-btn> -->
         </v-app-bar>
-        <!-- <v-toolbar color="white" style="height: 7vh;">
-          <v-toolbar-title>{{ dynamicTitle }}</v-toolbar-title>
-          <v-spacer></v-spacer>
-          <v-btn icon @click="confirmLogout">
-            <v-icon>mdi-logout</v-icon>
-          </v-btn>
-          <v-app-bar-nav-icon @click="toggleDrawer"></v-app-bar-nav-icon>
-        </v-toolbar> -->
         <router-view></router-view>
       </v-main>
     </v-layout>
     <!-- 로그아웃 확인 모달 -->
     <v-dialog v-model="logoutDialog" max-width="300">
-      <v-card
-        >
+      <v-card>
         <v-card-title>로그아웃</v-card-title>
         <v-card-text>로그아웃 하시겠습니까?</v-card-text>
         <v-card-actions>
-          <v-btn @click="logout">예</v-btn>
+          <v-btn @click="logout" to="/">예</v-btn>
           <v-btn @click="cancelLogout">아니오</v-btn>
         </v-card-actions>
       </v-card>
@@ -245,7 +147,7 @@ const confirmLogout = () => {
 
 const logout = () => {
   // 로그아웃 로직을 구현
-  emits("logout", "b");
+  emits("logout");
   logoutDialog.value = false;
 };
 
@@ -273,18 +175,23 @@ onBeforeUnmount(() => {
 
 // 툴바 사용자 설정
 const list_item = ref([{ title: "개인정보 변경" }, { title: "로그 아웃" }]);
+const selected_item = ref(`대시보드`); // Add this line to create a ref for the selected item
+
 const handleListItemClick = (title) => {
+  selected_item.value = title; // Update selected_item when a v-list-item is clicked
+  console.log(selected_item.value);
 
   if (title === "로그 아웃") {
     logoutDialog.value = true;
-  }
-  else if (title === "개인정보 변경") {
+  } else if (title === "개인정보 변경") {
+    logoutDialog.value = false;
+  } else {
     logoutDialog.value = false;
   }
-  else{
-    logoutDialog.value = false;
-  }
-  
+};
 
-}
+// 권한별 메뉴
+const permission = ref("Admin");
+const userid = ref(sessionStorage.getItem("userid"));
+const toolbarname = ref(`${userid.value}(${permission.value})`)
 </script>

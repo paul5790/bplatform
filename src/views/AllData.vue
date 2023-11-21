@@ -3,17 +3,8 @@
   <div style="height: 93vh">
     <div class="my-app">
       <!-- 데이터 선택창 -->
-      <v-sheet style="height: 7vh; display: flex">
+      <v-sheet style="display: flex">
         <v-row>
-          <v-col cols="2">
-            <v-select
-              v-model="selectedvoyage"
-              :items="voyage"
-              label="voyage"
-              variant="outlined"
-            >
-            </v-select>
-          </v-col>
           <!-- 첫번째 선택박스 -->
           <v-col cols="2">
             <v-select
@@ -104,12 +95,23 @@
             </v-select>
           </v-col>
 
+          <v-col cols="2">
+            <v-select
+              v-model="selectedvoyage"
+              :items="voyage"
+              label="voyage"
+              variant="outlined"
+            >
+            </v-select>
+          </v-col>
+
           <!-- 날짜 설정 -->
           <v-col cols="3">
             <VueDatePicker
               style="--dp-input-padding: 15px"
-              v-model="date"
+              v-model="dateRange"
               range
+              :readonly="date_readonly"
             />
           </v-col>
 
@@ -208,48 +210,14 @@ const tab = ref(0);
 //   fetchData();
 // };
 
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(11);
 const page = ref(1);
 
 const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
 });
 
-const allData = ref([
-  {
-    name: "GLL",
-    top: "DGPS",
-    info: "GPS 수신기의 현재 위치를 위도와 경도로 표현하는 역할을 합니다.",
-  },
-  {
-    name: "GGA",
-    top: "DGPS",
-    info: "현재 위치, 위성 신호 품질, 해발고도 등의 정보를 제공하는 역할을 합니다.",
-  },
-  {
-    name: "RMC",
-    top: "DGPS",
-    info: "GPS 수신기의 권장 최소 탐색 정보를 제공합니다.",
-  },
-  {
-    name: "VTG",
-    top: "DGPS",
-    info: "현재 이동 방향과 지상 속도를 나타냅니다.",
-  },
-]);
 
-// 항차 선택
-const voyage = ref([
-  "시운전1",
-  "시운전2",
-  "시운전3",
-  "시운전4",
-  "시운전5",
-  "시운전6",
-  "시운전7",
-]);
-
-const selectedvoyage = ref();
 
 // 셀렉바 메뉴
 const firstSelect = ref([
@@ -373,13 +341,51 @@ watchEffect(() => {
   }
 });
 
-// 데이트 피커
-const date = ref();
+// 항차 선택
+const voyage = ref(["직접 선택"]);
 
-const startDate = new Date();
-const endDate = new Date();
-onMounted(() => {
-  date.value = [startDate, endDate];
+// 데이트 피커
+const setStartTime = ref([]);
+const setEndTime = ref([]);
+
+const getTrialDate = async () => {
+  try {
+    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
+    for (let i = 0; i < response.data.length; i++) {
+      setStartTime.value.push(`${response.data[i].start_TIME_UTC}`);
+      setEndTime.value.push(`${response.data[i].end_TIME_UTC}`);
+
+      console.log(setStartTime.value);
+      console.log(setEndTime.value);
+      console.log(`항차 ${i + 1}번`);
+      voyage.value.push([`항차 ${i + 1}번`]);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+onMounted(getTrialDate);
+const selectedvoyage = ref();
+
+// 시운전 시간 받아오기
+const date_readonly = ref(true);
+const dateRange = ref([]);
+watchEffect(() => {
+  if (selectedvoyage.value === "직접 선택") {
+    date_readonly.value = false;
+  } else {
+    const index = voyage.value.indexOf(selectedvoyage.value);
+    console.log(index);
+  }
+  const date1 = ref(setStartTime.value[0]);
+  const date2 = ref(setEndTime.value[0]);
+
+  // Date 객체로 변환
+  const startDate = new Date(date1.value);
+  const endDate = new Date(date2.value);
+
+  // 시간 범위 설정
+  dateRange.value = [startDate, endDate];
 });
 
 // 데이터 다운로드
@@ -389,8 +395,13 @@ const dataDownload = () => {
   } else {
     alert(`${selectedData.value} 다운로드 시작`);
     const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet(selectedData.value);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+
+    // for (const sheet  of selectedData.value) {
+    //   const worksheet = XLSX.utils.json_to_sheet(sheet.value);
+    //   XLSX.utils.book_append_sheet(workbook, worksheet, `${sheet}`);
+    // }
+    const worksheet = XLSX.utils.json_to_sheet(GLL.value);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet 1");
     XLSX.writeFile(workbook, `${selectedData.value}_datatable.xlsx`);
   }
 };
@@ -401,41 +412,11 @@ const headerName = ref([]); // 빈 배열로 초기화
 const dataSet = ref([]); // 빈 배열로 초기화
 const selectedData = ref([]); //
 
-// const fetchData = async () => {
-//   try {
-//     const response = await axios.post(
-//       "http://192.168.0.73:8080/data/dgps/gll/1"
-//     );
-//     console.log(response.data);
-
-//     const dataheader = ref(
-//       Object.keys(response.data[0]).map((key) => ({
-//         title: key,
-//         align: "start",
-//         key,
-//       }))
-//     );
-
-//     if (dataheader.value == null) {
-//       console.log("null");
-//     } else {
-//       console.log(dataheader.value);
-//       GLLheader.value = dataheader.value;
-//     }
-
-//     GLL.value = response.data;
-//     console.log(`${response.data[0]} dataheaderdata!!`);
-//     console.log(`${response.data} responsedata!!`);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// };
-
 const fetchData = async () => {
   for (const axiosItem of axioslist.value) {
     try {
       const response = await axios.post(
-        `http://192.168.0.73:8080/data/${axiosItem}/1`
+        `http://192.168.0.73:8080/data2/${axiosItem}/1`
       );
 
       const dataheader = ref(
@@ -763,7 +744,7 @@ const axioslist = ref([
 ]);
 
 // 초기 데이터 요청 및 주기적 데이터 업데이트 설정
-fetchData(); // 초기 데이터 요청
+// onMounted(fetchData); // 초기 데이터 요청
 
 // 데이터 셋에 저장된 데이터 넣기
 const ftchData = () => {

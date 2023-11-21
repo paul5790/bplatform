@@ -9,10 +9,10 @@
     <div v-else-if="showSignup">
       <div class="form-signup">
         <img
-          src="http://portal.xinnos.com/SiteAssets/xinnos_logo.gif"
+          :src="require('../public/image/kriso.png')"
           alt=""
-          width="140"
-          style="margin-bottom: 50px;"
+          width="200"
+          style="margin-bottom: 30px"
         />
         <v-row>
           <v-col cols="9">
@@ -24,9 +24,16 @@
             ></v-text-field>
           </v-col>
           <v-col cols="3">
-            <v-btn color="blue" block
-            size="large"
-            variant="tonal" @click="checkid()" style="height: 55px"> 중복확인 </v-btn>
+            <v-btn
+              color="blue"
+              block
+              size="large"
+              variant="tonal"
+              @click="checkid()"
+              style="height: 55px"
+            >
+              중복확인
+            </v-btn>
           </v-col>
         </v-row>
 
@@ -60,24 +67,24 @@
         <v-text-field
           variant="outlined"
           v-model="newname"
-          :rules="rules.Basic"
+          :rules="rules.Name"
           label="이름"
         ></v-text-field>
 
         <v-text-field
           variant="outlined"
           v-model="newaffiliation"
-          :rules="rules.Basic"
+          :rules="rules.Affiliation"
           label="소속"
         ></v-text-field>
 
         <v-row>
           <v-col cols="6">
             <v-btn
-                       block
-            color="blue"
-            size="large"
-            variant="tonal"
+              block
+              color="blue"
+              size="large"
+              variant="tonal"
               class="halfbtn"
               @click="signfinish()"
               to="/"
@@ -86,9 +93,13 @@
             </v-btn>
           </v-col>
           <v-col cols="6">
-            <v-btn color="blue"
-            size="large"
-            variant="tonal" class="halfbtn" @click="checkid()" to="/">
+            <v-btn
+              color="blue"
+              size="large"
+              variant="tonal"
+              class="halfbtn"
+              @click="signupBtn()"
+            >
               가입하기
             </v-btn>
           </v-col>
@@ -99,13 +110,9 @@
     <!-- 사용자 이름이 'a'가 아닐 때 로그인 양식 표시 -->
     <div v-else>
       <div class="form-signin">
-        <img
-          src="http://portal.xinnos.com/SiteAssets/xinnos_logo.gif"
-          alt=""
-          width="200"
-        />
+        <img :src="require('../public/image/kriso.png')" alt="" width="200" />
 
-        <v-form fast-fail @submit="login" style="margin-top: 20px;">
+        <v-form fast-fail style="margin-top: 30px">
           <div class="text-subtitle-1 text-medium-emphasis d-flex justify-left">
             아이디
           </div>
@@ -135,7 +142,7 @@
             variant="outlined"
             @click:append-inner="visible = !visible"
           ></v-text-field>
-<!-- 
+          <!-- 
           <v-card class="mb-12" color="surface-variant" variant="tonal">
             <v-card-text class="text-medium-emphasis text-caption">
               Warning: After 3 consecutive failed login attempts, you account
@@ -146,7 +153,7 @@
           </v-card> -->
 
           <v-btn
-            type="submit"
+            @click="login()"
             block
             color="blue"
             size="large"
@@ -159,7 +166,7 @@
           <v-card-text class="text-center">
             <router-link
               to="/signup"
-              @click="signupBtn()"
+              @click="movesignup()"
               class="text-blue text-decoration-none"
             >
               회원가입 <v-icon icon="mdi-chevron-right"></v-icon>
@@ -172,7 +179,8 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, router } from "vue";
+import axios from "axios";
 import Dashboard from "../src/views/MainDashBoard.vue";
 
 const visible = ref(false);
@@ -185,45 +193,168 @@ const showDashboard = ref(
 const userid = ref(sessionStorage.getItem("userid") || "");
 const password = ref("");
 // 회원 정보
-let newid = ref("");
-let newpassword = ref("");
-let checknewpassword = ref("");
-let newemail = ref("");
-let newname = ref("");
-let newaffiliation = ref("");
+const newid = ref("");
+const newpassword = ref("");
+const checknewpassword = ref("");
+const newemail = ref("");
+const newname = ref("");
+const newaffiliation = ref("");
+
+const rulesid = ref(false);
+const rulespw = ref(false);
+const rulescpw = ref(false);
+const rulesemail = ref(false);
+const rulesname = ref(false);
+const rulesaf = ref(false);
+
+// 회원 가입 관리
+const showSignup = ref(
+  sessionStorage.getItem("showSignup") === "true" || false
+);
+
+const movesignup = () => {
+  showSignup.value = true;
+  sessionStorage.setItem("showSignup", showSignup.value.toString());
+};
+
+const signupBtn = () => {
+  console.log(newid.value);
+
+  if (
+    `${
+      rulesid.value &&
+      rulespw.value &&
+      rulescpw.value &&
+      rulesemail.value &&
+      rulesname.value &&
+      rulesaf.value
+    }` === "true"
+  ) {
+    // 유효성 검사를 모두 통과한 경우
+
+    const data = {
+      userName: `${newid.value}`,
+      password: `${newpassword.value}`,
+    };
+    // 회원가입 기능
+
+    axios
+      .post("http://192.168.0.73:8080/api/v1/users/join", data, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      .then((response) => {
+        console.log(response.data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+
+    showSignup.value = false;
+    sessionStorage.setItem("showSignup", showSignup.value.toString());
+  } else {
+    // 유효성 검사를 통과하지 못한 경우
+    alert(
+      "입력을 하지 않았거나 유효성 검사를 통과하지 못한 항목이 있습니다.\n다시 확인해주세요."
+    );
+    // showSignup을 true로 유지
+  }
+};
+
+const signfinish = () => {
+  showSignup.value = false;
+  sessionStorage.setItem("showSignup", showSignup.value.toString());
+};
+
+const checkid = () => {
+  alert("중복확인");
+  const fetchData = async () => {
+    try {
+      const response = await axios.post(
+        "http://192.168.0.73:8080/info/seatrial"
+      );
+      for (let i = 0; i < response.data.length; i++) {
+        console.log(`${response.data[i].seatrialid} here!!!!!!!!!!!!`);
+        console.log(`${response.data[i].test_PURPOSE} here!!!!!!!!!!!!`);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  fetchData();
+};
 
 // Rules
 const rules = ref({
-  Basic: [
+  Name: [
     (value) => {
-      if (value?.length > 0) return true;
-      return "Must be at least 1 character.";
+      if (value?.length > 0) {
+        rulesname.value = true;
+        return true;
+      } else {
+        rulesname.value = false;
+        return "Must be at least 1 character.";
+      }
+    },
+  ],
+  Affiliation: [
+    (value) => {
+      if (value?.length > 0) {
+        rulesaf.value = true;
+        return true;
+      } else {
+        rulesname.value = false;
+        return "Must be at least 1 character.";
+      }
     },
   ],
   ID: [
     (value) => {
-      if (value?.length > 3) return true;
-      return "ID must be at least 4 characters.";
+      if (value?.length > 3) {
+        rulesid.value = true;
+        return true;
+      } else {
+        rulesname.value = false;
+        return "ID must be at least 4 characters.";
+      }
     },
   ],
   Password: [
     (value) => {
-      if (value?.length >= 6 && /[0-9]/.test(value) && /[a-zA-Z]/.test(value))
+      if (value?.length >= 6 && /[0-9]/.test(value) && /[a-zA-Z]/.test(value)) {
+        rulespw.value = true;
         return true;
-      return "Password must be at least 6 characters and contain numbers and letters..";
+      } else {
+        rulesname.value = false;
+        return "Password must be at least 6 characters and contain numbers and letters..";
+      }
     },
   ],
   PasswordConfirmation: [
     () => {
-      if (newpassword.value === checknewpassword.value) return true;
-      return "Passwords do not match.";
+      if (newpassword.value === checknewpassword.value) {
+        rulescpw.value = true;
+        return true;
+      } else {
+        rulesname.value = false;
+        return "Passwords do not match.";
+      }
     },
   ],
   Email: [
     (value) => {
       const pattern =
         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-      return pattern.test(value) || "Invalid e-mail.";
+      // return pattern.test(value) || "Invalid e-mail.";
+      if (pattern.test(value)) {
+        rulesemail.value = true;
+        return true;
+      } else {
+        rulesemail.value = false;
+        return "Invalid e-mail.";
+      }
     },
   ],
 });
@@ -240,38 +371,42 @@ const login = () => {
   if (userid.value === "a") {
     showDashboard.value = true;
   }
+  const data = {
+    userName: `${userid.value}`,
+    password: `${password.value}`,
+  };
+
+  axios
+    .post("http://192.168.0.73:8080/api/v1/users/login", data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+    .then((response) => {
+      console.log(response.data);
+      showDashboard.value = true;
+      sessionStorage.setItem("showDashboard", true);
+      userid.value = '';
+      password.value = '';
+    })
+    .catch((error) => {
+      console.error(error.response.data);
+      alert(error.response.data);
+    });
+
   // 세션 스토리지에 사용자 로그인 상태를 저장합니다.
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);
   sessionStorage.setItem("isAdmin", userid.value);
 };
 
-const logout = (newUserid) => {
-  userid.value = newUserid;
+const logout = () => {
+  userid.value = "";
   showDashboard.value = false;
   // 세션 스토리지에서 사용자 로그인 상태를 저장합니다.
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);
   sessionStorage.setItem("isAdmin", userid.value);
-};
-
-// 회원 가입 관리
-const showSignup = ref(
-  sessionStorage.getItem("showSignup") === "true" || false
-);
-
-const signupBtn = () => {
-  showSignup.value = true;
-  sessionStorage.setItem("showSignup", showSignup.value.toString());
-};
-
-const signfinish = () => {
-  showSignup.value = false;
-  sessionStorage.setItem("showSignup", showSignup.value.toString());
-};
-
-const checkid = () => {
-  alert("중복확인");
 };
 
 </script>
@@ -312,11 +447,11 @@ const checkid = () => {
 }
 
 .dialog-row {
-  justify-content: flex-end; 
+  justify-content: flex-end;
   height: 6vh;
 }
 .dialog-div {
-  display: flex; 
+  display: flex;
   margin: 15px;
 }
 </style>
