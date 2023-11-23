@@ -1,14 +1,15 @@
 <template>
+  <v-btn @click="hi()">ㅎㅇ</v-btn>
   <v-card-title>
     <span class="text-h6">Contents/Item</span>
   </v-card-title>
   <v-chart class="chart" :option="option" autoresize />
 </template>
 
-<script setup>
+<script setup props="props">
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { LineChart } from "echarts/charts"; // BarChart로 변경
+import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
 import {
   DatasetComponent,
@@ -19,7 +20,13 @@ import {
   DataZoomComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide } from "vue";
+import { ref, provide, defineProps } from "vue";
+
+const props = defineProps({  // #2 props 정의
+  name: String,
+  data: Object,
+  time: Object,
+});
 
 use([
   DatasetComponent,
@@ -35,24 +42,20 @@ use([
 
 provide(THEME_KEY);
 
+
 const datasetRaw = ref([["time", "value"]]);
 
-const times = ref([]); // 시간 배열을 정의
-for (let i = 0; i <= 226; i++) {
-  // 원하는 시간 형식을 배열에 추가
-  const hours = Math.floor(i / 60); // 시간
-  const minutes = i % 60; // 분
-  times.value.push(`${hours}:${minutes}`);
+const times = ref(props.time); // 시간 배열을 정의
+const datas = ref(props.data);
+
+
+for (let i = 0; i < datas.value.length; i++) {
+  datasetRaw.value.push([times.value[i], datas.value[i]]);
 }
 
-const rand = ref([]);
-for (let i = 0; i <= 226; i++) {
-  const randomIncome = Math.floor(Math.random() * 100) + 1;
-  rand.value.push(randomIncome); // 랜덤값을 배열에 추가
-}
-console.log(rand);
-for (let i = 0; i <= 226; i++) {
-  datasetRaw.value.push([times.value[i], rand.value[i]]);
+const hi = () => {
+  console.log(times.value);
+console.log(datas.value.length);
 }
 
 const option = ref({
@@ -105,3 +108,7 @@ body {
   margin: 0;
 }
 </style>
+
+
+
+

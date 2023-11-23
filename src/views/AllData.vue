@@ -744,7 +744,7 @@ const axioslist = ref([
 ]);
 
 // 초기 데이터 요청 및 주기적 데이터 업데이트 설정
-// onMounted(fetchData); // 초기 데이터 요청
+onMounted(fetchData); // 초기 데이터 요청
 
 // 데이터 셋에 저장된 데이터 넣기
 const ftchData = () => {

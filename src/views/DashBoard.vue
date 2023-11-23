@@ -79,7 +79,7 @@
   </v-row>
   <v-row>
     <v-col style="background-color: #f7f7f7">
-      <v-sheet style="height: 51vh; padding: 10px; background-color: #f7f7f7">
+      <v-sheet style="height: 51vh; padding-right: 10px; padding-left: 10px; background-color: #f7f7f7">
         <v-card :color="primary" :variant="elevated" style="flex: 1">
           <v-card-item>
             <VoyageTable />

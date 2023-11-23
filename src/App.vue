@@ -380,10 +380,11 @@ const login = () => {
     .post("http://192.168.0.73:8080/api/v1/users/login", data, {
       headers: {
         "Content-Type": "application/json",
+        // "Authorization": "Bearer "
       },
     })
     .then((response) => {
-      console.log(response.data);
+      alert(response.data);
       showDashboard.value = true;
       sessionStorage.setItem("showDashboard", true);
       userid.value = '';

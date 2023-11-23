@@ -31,6 +31,7 @@ const props = defineProps({
   unit: String,
   center_y: String,
   max_speed: Number,
+  value: String,
 });
 
 const option = ref({
@@ -74,7 +75,7 @@ const option = ref({
 });
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  option.value.series[0].data[0].value = Math.floor(Math.random() * 201);
+  option.value.series[0].data[0].value = props.value;
 };
 
 onMounted(() => {

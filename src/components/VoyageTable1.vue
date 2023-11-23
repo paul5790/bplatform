@@ -1,7 +1,7 @@
 <template>
   <v-sheet
     style="
-      height: 47vh;
+      height: 48vh;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -71,7 +71,7 @@ import { ref, computed, watch } from "vue";
 import axios from "axios";
 
 const page = ref(1);
-const itemsPerPage = 9;
+const itemsPerPage = 10;
 
 const headers = [
   { title: "항차", align: "start", key: "name",},

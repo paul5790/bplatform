@@ -17,8 +17,9 @@ import { ref, provide, onMounted, defineProps } from "vue";
 const props = defineProps({
   // #2 props 정의
   name: String,
-  value: Number,
+  value: String,
   unit: String,
+  max_value: Number,
 });
 
 use([
@@ -49,8 +50,8 @@ const option = ref({
       radius: "90%",
       center: ["45%", "65%"],
       splitNumber: 5,
-      min: 8,
-      max: 18,
+      min: 0,
+      max: props.max_value,
       axisLine: {
         lineStyle: {
           width: 7,
@@ -65,21 +66,21 @@ const option = ref({
         width: 7,
       },
       pointer: {
-        length: "45%",
-        width: 3,
+        length: "40%",
+        width: 2,
       },
       axisTick: {
         show: false,
       },
       splitLine: {
-        length: 8,
+        length: 6,
         lineStyle: {
           width: 2,
         },
       },
       axisLabel: {
         distance: 10,
-        fontSize: 10,
+        fontSize: 9,
       },
       detail: {
         valueAnimation: true,
