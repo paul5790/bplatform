@@ -1,6 +1,12 @@
 <template>
   <v-sheet :elevation="elevation">
-    <v-chart ref="chart" class="chart" :option="option" autoresize @click="handleChartClick" />
+    <v-chart
+      ref="chart"
+      class="chart"
+      :option="option"
+      autoresize
+      @click="handleChartClick"
+    />
   </v-sheet>
 </template>
 
@@ -127,7 +133,9 @@ const drilldownData = [
 
 const handleChartClick = (event) => {
   if (event.data) {
-    const subData = drilldownData.find((data) => data.dataGroupId === event.data.groupId);
+    const subData = drilldownData.find(
+      (data) => data.dataGroupId === event.data.groupId
+    );
     if (subData) {
       const xAxisData = subData.data.map((item) => item[0]);
       const seriesData = subData.data.map((item) => item[1]);
@@ -229,6 +237,8 @@ const handleChartClick = (event) => {
     }
   }
 };
+
+const aa = ref();
 </script>
 
 <style scoped>

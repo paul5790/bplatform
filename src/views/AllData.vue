@@ -217,8 +217,6 @@ const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
 });
 
-
-
 // 셀렉바 메뉴
 const firstSelect = ref([
   "DGPS",
@@ -419,259 +417,263 @@ const fetchData = async () => {
         `http://192.168.0.73:8080/data2/${axiosItem}/1`
       );
 
-      const dataheader = ref(
-        Object.keys(response.data[0]).map((key) => ({
-          title: key,
-          align: "start",
-          key,
-        }))
-      );
+      if (response.data && response.data.length > 0) {
+        const dataheader = ref(
+          Object.keys(response.data[0]).map((key) => ({
+            title: key,
+            align: "start",
+            key,
+          }))
+        );
 
-      if (dataheader.value == null) {
-        console.log("null");
-      } else {
-        console.log(response.data);
-        switch (axiosItem) {
-          case "dgps/gll":
-            GLLheader.value = dataheader.value;
-            GLL.value = response.data;
-            break;
-          case "dgps/gga":
-            GGAheader.value = dataheader.value;
-            GGA.value = response.data;
-            break;
-          case "dgps/rmc":
-            RMCheader.value = dataheader.value;
-            RMC.value = response.data;
-            break;
-          case "dgps/vtg":
-            VTGheader.value = dataheader.value;
-            VTG.value = response.data;
-            break;
-          case "dgps/zda":
-            ZDAheader.value = dataheader.value;
-            ZDA.value = response.data;
-            break;
-          case "dgps/dtm":
-            DTMheader.value = dataheader.value;
-            DTM.value = response.data;
-            break;
-          case "dgps/gsv":
-            GSVheader.value = dataheader.value;
-            GSV.value = response.data;
-            break;
-          case "dgps/gsa":
-            GSAheader.value = dataheader.value;
-            GSA.value = response.data;
-            break;
-          case "gyro/ths":
-            THSheader.value = dataheader.value;
-            THS.value = response.data;
-            break;
-          case "gyro/hdt":
-            HDTheader.value = dataheader.value;
-            HDT.value = response.data;
-            break;
-          case "gyro/rot":
-            ROTheader.value = dataheader.value;
-            ROT.value = response.data;
-            break;
-          case "anemometer/mwv":
-            MWVheader.value = dataheader.value;
-            MWV.value = response.data;
-            break;
-          case "anemometer/mwd":
-            MWDheader.value = dataheader.value;
-            MWD.value = response.data;
-            break;
-          case "anemometer/vwr":
-            VWRheader.value = dataheader.value;
-            VWR.value = response.data;
-            break;
-          case "anemometer/mtw":
-            MTWheader.value = dataheader.value;
-            MTW.value = response.data;
-            break;
-          case "anemometer/vwt":
-            VWTheader.value = dataheader.value;
-            VWT.value = response.data;
-            break;
-          case "radar/ttm":
-            TTMheader.value = dataheader.value;
+        if (dataheader.value == null) {
+          console.log("null");
+        } else {
+          console.log(response.data);
+          switch (axiosItem) {
+            case "dgps/gll":
+              GLLheader.value = dataheader.value;
+              GLL.value = response.data;
+              break;
+            case "dgps/gga":
+              GGAheader.value = dataheader.value;
+              GGA.value = response.data;
+              break;
+            case "dgps/rmc":
+              RMCheader.value = dataheader.value;
+              RMC.value = response.data;
+              break;
+            case "dgps/vtg":
+              VTGheader.value = dataheader.value;
+              VTG.value = response.data;
+              break;
+            case "dgps/zda":
+              ZDAheader.value = dataheader.value;
+              ZDA.value = response.data;
+              break;
+            case "dgps/dtm":
+              DTMheader.value = dataheader.value;
+              DTM.value = response.data;
+              break;
+            case "dgps/gsv":
+              GSVheader.value = dataheader.value;
+              GSV.value = response.data;
+              break;
+            case "dgps/gsa":
+              GSAheader.value = dataheader.value;
+              GSA.value = response.data;
+              break;
+            case "gyro/ths":
+              THSheader.value = dataheader.value;
+              THS.value = response.data;
+              break;
+            case "gyro/hdt":
+              HDTheader.value = dataheader.value;
+              HDT.value = response.data;
+              break;
+            case "gyro/rot":
+              ROTheader.value = dataheader.value;
+              ROT.value = response.data;
+              break;
+            case "anemometer/mwv":
+              MWVheader.value = dataheader.value;
+              MWV.value = response.data;
+              break;
+            case "anemometer/mwd":
+              MWDheader.value = dataheader.value;
+              MWD.value = response.data;
+              break;
+            case "anemometer/vwr":
+              VWRheader.value = dataheader.value;
+              VWR.value = response.data;
+              break;
+            case "anemometer/mtw":
+              MTWheader.value = dataheader.value;
+              MTW.value = response.data;
+              break;
+            case "anemometer/vwt":
+              VWTheader.value = dataheader.value;
+              VWT.value = response.data;
+              break;
+            case "radar/ttm":
+              TTMheader.value = dataheader.value;
 
-            TTM.value = response.data;
-            break;
-          case "radar/tll":
-            TLLheader.value = dataheader.value;
+              TTM.value = response.data;
+              break;
+            case "radar/tll":
+              TLLheader.value = dataheader.value;
 
-            TLL.value = response.data;
-            break;
-          case "radar/screen":
-            RSCREENheader.value = dataheader.value;
+              TLL.value = response.data;
+              break;
+            case "radar/screen":
+              RSCREENheader.value = dataheader.value;
 
-            RSCREEN.value = response.data;
-            break;
-          case "ais/vdm":
-            VDMheader.value = dataheader.value;
-            VDM.value = response.data;
-            break;
-          case "ais/vdo":
-            VDOheader.value = dataheader.value;
-            VDO.value = response.data;
-            break;
-          case "ecdis/routeinfo":
-            ROUTEINFOheader.value = dataheader.value;
-            ROUTEINFO.value = response.data;
-            break;
-          case "ecdis/waypoints":
-            WAYPOINTSheader.value = dataheader.value;
-            WAYPOINTS.value = response.data;
-            break;
-          case "ecdis/screen":
-            ESCREENheader.value = dataheader.value;
-            ESCREEN.value = response.data;
-            break;
-          case "autopilot/rsa":
-            RSAheader.value = dataheader.value;
-            RSA.value = response.data;
-            break;
-          case "autopilot/mode":
-            MODEheader.value = dataheader.value;
-            MODE.value = response.data;
-            break;
-          case "autopilot/htd":
-            HTDheader.value = dataheader.value;
-            HTD.value = response.data;
-            break;
-          case "speedlog/vbw":
-            VBWheader.value = dataheader.value;
-            VBW.value = response.data;
-            break;
-          case "speedlog/vhw":
-            VHWheader.value = dataheader.value;
-            VHW.value = response.data;
-            break;
-          case "speedlog/vlw":
-            VLWheader.value = dataheader.value;
-            VLW.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_61444":
-            NO1ENGINE_PANEL_61444header.value = dataheader.value;
-            NO1ENGINE_PANEL_61444.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65262":
-            NO1ENGINE_PANEL_65262header.value = dataheader.value;
-            NO1ENGINE_PANEL_65262.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65263":
-            NO1ENGINE_PANEL_65263header.value = dataheader.value;
-            NO1ENGINE_PANEL_65263.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65272":
-            NO1ENGINE_PANEL_65272header.value = dataheader.value;
-            NO1ENGINE_PANEL_65272.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65271":
-            NO1ENGINE_PANEL_65271header.value = dataheader.value;
-            NO1ENGINE_PANEL_65271.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65253":
-            NO1ENGINE_PANEL_65253header.value = dataheader.value;
-            NO1ENGINE_PANEL_65253.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65270":
-            NO1ENGINE_PANEL_65270header.value = dataheader.value;
-            NO1ENGINE_PANEL_65270.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65276":
-            NO1ENGINE_PANEL_65276header.value = dataheader.value;
-            NO1ENGINE_PANEL_65276.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65360":
-            NO1ENGINE_PANEL_65360header.value = dataheader.value;
-            NO1ENGINE_PANEL_65360.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65361_lamp":
-            NO1ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-            NO1ENGINE_PANEL_65361_LAMP.value = response.data;
-            console.log("en1lamp");
-            break;
-          case "no1enginepanel/no1engine_panel_65361_status":
-            NO1ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-            NO1ENGINE_PANEL_65361_STATUS.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65378":
-            NO1ENGINE_PANEL_65378header.value = dataheader.value;
-            NO1ENGINE_PANEL_65378.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65376":
-            NO1ENGINE_PANEL_65376header.value = dataheader.value;
-            NO1ENGINE_PANEL_65376.value = response.data;
-            break;
-          case "no1enginepanel/no1engine_panel_65379":
-            NO1ENGINE_PANEL_65379header.value = dataheader.value;
-            NO1ENGINE_PANEL_65379.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_61444":
-            NO2ENGINE_PANEL_61444header.value = dataheader.value;
-            NO2ENGINE_PANEL_61444.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65262":
-            NO2ENGINE_PANEL_65262header.value = dataheader.value;
-            NO2ENGINE_PANEL_65262.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65263":
-            NO2ENGINE_PANEL_65263header.value = dataheader.value;
-            NO2ENGINE_PANEL_65263.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65272":
-            NO2ENGINE_PANEL_65272header.value = dataheader.value;
-            NO2ENGINE_PANEL_65272.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65271":
-            NO2ENGINE_PANEL_65271header.value = dataheader.value;
-            NO2ENGINE_PANEL_65271.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65253":
-            NO2ENGINE_PANEL_65253header.value = dataheader.value;
-            NO2ENGINE_PANEL_65253.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65270":
-            NO2ENGINE_PANEL_65270header.value = dataheader.value;
-            NO2ENGINE_PANEL_65270.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65276":
-            NO2ENGINE_PANEL_65276header.value = dataheader.value;
-            NO2ENGINE_PANEL_65276.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65360":
-            NO2ENGINE_PANEL_65360header.value = dataheader.value;
-            NO2ENGINE_PANEL_65360.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65361_lamp":
-            NO2ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-            NO2ENGINE_PANEL_65361_LAMP.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65361_status":
-            NO2ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-            NO2ENGINE_PANEL_65361_STATUS.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65378":
-            NO2ENGINE_PANEL_65378header.value = dataheader.value;
-            NO2ENGINE_PANEL_65378.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65376":
-            NO2ENGINE_PANEL_65376header.value = dataheader.value;
-            NO2ENGINE_PANEL_65376.value = response.data;
-            break;
-          case "no2enginepanel/no2engine_panel_65379":
-            NO2ENGINE_PANEL_65379header.value = dataheader.value;
-            NO2ENGINE_PANEL_65379.value = response.data;
-            break;
+              RSCREEN.value = response.data;
+              break;
+            case "ais/vdm":
+              VDMheader.value = dataheader.value;
+              VDM.value = response.data;
+              break;
+            case "ais/vdo":
+              VDOheader.value = dataheader.value;
+              VDO.value = response.data;
+              break;
+            case "ecdis/routeinfo":
+              ROUTEINFOheader.value = dataheader.value;
+              ROUTEINFO.value = response.data;
+              break;
+            case "ecdis/waypoints":
+              WAYPOINTSheader.value = dataheader.value;
+              WAYPOINTS.value = response.data;
+              break;
+            case "ecdis/screen":
+              ESCREENheader.value = dataheader.value;
+              ESCREEN.value = response.data;
+              break;
+            case "autopilot/rsa":
+              RSAheader.value = dataheader.value;
+              RSA.value = response.data;
+              break;
+            case "autopilot/mode":
+              MODEheader.value = dataheader.value;
+              MODE.value = response.data;
+              break;
+            case "autopilot/htd":
+              HTDheader.value = dataheader.value;
+              HTD.value = response.data;
+              break;
+            case "speedlog/vbw":
+              VBWheader.value = dataheader.value;
+              VBW.value = response.data;
+              break;
+            case "speedlog/vhw":
+              VHWheader.value = dataheader.value;
+              VHW.value = response.data;
+              break;
+            case "speedlog/vlw":
+              VLWheader.value = dataheader.value;
+              VLW.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_61444":
+              NO1ENGINE_PANEL_61444header.value = dataheader.value;
+              NO1ENGINE_PANEL_61444.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65262":
+              NO1ENGINE_PANEL_65262header.value = dataheader.value;
+              NO1ENGINE_PANEL_65262.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65263":
+              NO1ENGINE_PANEL_65263header.value = dataheader.value;
+              NO1ENGINE_PANEL_65263.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65272":
+              NO1ENGINE_PANEL_65272header.value = dataheader.value;
+              NO1ENGINE_PANEL_65272.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65271":
+              NO1ENGINE_PANEL_65271header.value = dataheader.value;
+              NO1ENGINE_PANEL_65271.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65253":
+              NO1ENGINE_PANEL_65253header.value = dataheader.value;
+              NO1ENGINE_PANEL_65253.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65270":
+              NO1ENGINE_PANEL_65270header.value = dataheader.value;
+              NO1ENGINE_PANEL_65270.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65276":
+              NO1ENGINE_PANEL_65276header.value = dataheader.value;
+              NO1ENGINE_PANEL_65276.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65360":
+              NO1ENGINE_PANEL_65360header.value = dataheader.value;
+              NO1ENGINE_PANEL_65360.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65361_lamp":
+              NO1ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
+              NO1ENGINE_PANEL_65361_LAMP.value = response.data;
+              console.log("en1lamp");
+              break;
+            case "no1enginepanel/no1engine_panel_65361_status":
+              NO1ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
+              NO1ENGINE_PANEL_65361_STATUS.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65378":
+              NO1ENGINE_PANEL_65378header.value = dataheader.value;
+              NO1ENGINE_PANEL_65378.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65376":
+              NO1ENGINE_PANEL_65376header.value = dataheader.value;
+              NO1ENGINE_PANEL_65376.value = response.data;
+              break;
+            case "no1enginepanel/no1engine_panel_65379":
+              NO1ENGINE_PANEL_65379header.value = dataheader.value;
+              NO1ENGINE_PANEL_65379.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_61444":
+              NO2ENGINE_PANEL_61444header.value = dataheader.value;
+              NO2ENGINE_PANEL_61444.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65262":
+              NO2ENGINE_PANEL_65262header.value = dataheader.value;
+              NO2ENGINE_PANEL_65262.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65263":
+              NO2ENGINE_PANEL_65263header.value = dataheader.value;
+              NO2ENGINE_PANEL_65263.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65272":
+              NO2ENGINE_PANEL_65272header.value = dataheader.value;
+              NO2ENGINE_PANEL_65272.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65271":
+              NO2ENGINE_PANEL_65271header.value = dataheader.value;
+              NO2ENGINE_PANEL_65271.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65253":
+              NO2ENGINE_PANEL_65253header.value = dataheader.value;
+              NO2ENGINE_PANEL_65253.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65270":
+              NO2ENGINE_PANEL_65270header.value = dataheader.value;
+              NO2ENGINE_PANEL_65270.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65276":
+              NO2ENGINE_PANEL_65276header.value = dataheader.value;
+              NO2ENGINE_PANEL_65276.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65360":
+              NO2ENGINE_PANEL_65360header.value = dataheader.value;
+              NO2ENGINE_PANEL_65360.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65361_lamp":
+              NO2ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
+              NO2ENGINE_PANEL_65361_LAMP.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65361_status":
+              NO2ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
+              NO2ENGINE_PANEL_65361_STATUS.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65378":
+              NO2ENGINE_PANEL_65378header.value = dataheader.value;
+              NO2ENGINE_PANEL_65378.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65376":
+              NO2ENGINE_PANEL_65376header.value = dataheader.value;
+              NO2ENGINE_PANEL_65376.value = response.data;
+              break;
+            case "no2enginepanel/no2engine_panel_65379":
+              NO2ENGINE_PANEL_65379header.value = dataheader.value;
+              NO2ENGINE_PANEL_65379.value = response.data;
+              break;
 
-          default:
-            console.error("Unknown axiosItem:", axiosItem);
+            default:
+              console.error("Unknown axiosItem:", axiosItem);
+          }
         }
+      } else {
+        console.log("Response data is empty or undefined");
       }
 
       // console.log(`${response.data[0]} dataheaderdata!!`);

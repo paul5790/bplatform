@@ -109,3 +109,6 @@ onMounted(() => {
   color: #555555;
 }
 </style>
+
+
+analysis.value[0].name = "heading";

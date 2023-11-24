@@ -220,22 +220,30 @@ const axioslist = ref([
 const settingTime = ref(5);
 
 const fetchData = async () => {
-  for (let i = 0; i < axioslist.value.length; i++) {
-    try {
-      const response = await axios.post(
-        `http://192.168.0.73:8080/info/lossdata/${axioslist.value[i]}/1/${settingTime.value}`
-      );
-      dataRefs[i].value += Number(response.data.countDelay);
-    } catch (error) {
-      // 만약 어떤 요청이라도 409 에러가 발생하면 "데이터가 없음"을 출력합니다.
-      if (error.response && error.response.status === 409) {
-        console.log(`${axioslist.value[i]}데이터가 없음`);
-      } else {
-        console.error(error);
+  try {
+    const axiosPromises = axioslist.value.map(async (endpoint, i) => {
+      try {
+        const response = await axios.post(
+          `http://192.168.0.73:8080/info/lossdata/${endpoint}/1/${settingTime.value}`
+        );
+        dataRefs[i].value += Number(response.data.countDelay);
+      } catch (error) {
+        if (error.response && error.response.status === 409) {
+          console.log(`${endpoint} 데이터가 없음`);
+        } else {
+          console.error(error);
+        }
       }
-    }
+    });
+
+    // 모든 axios 호출이 완료될 때까지 기다림
+    await Promise.all(axiosPromises);
+
+    // 데이터를 모두 받아온 후에 차트 업데이트
+    updateChart();
+  } catch (error) {
+    console.error('Error during fetchData:', error);
   }
-  updateChart();
 };
 onMounted(() => {
   fetchData();
@@ -331,7 +339,7 @@ const option = ref({
     },
   },
 });
-let drilldownData = []
+let drilldownData = [];
 // 그래프 클릭 이벤트 핸들러
 const handleChartClick = (event) => {
   if (event.data) {
@@ -478,17 +486,19 @@ const handleChartClick = (event) => {
                   },
                 },
               };
-              chart.value.setOption(backToTopOption);
-              chart.value.setOption({
-                graphic: [
-                  {
-                    type: "text",
-                    style: {
-                      text: "", // 빈 문자열로 할당
+              if (chart.value) {
+                chart.value.setOption(backToTopOption);
+                chart.value.setOption({
+                  graphic: [
+                    {
+                      type: "text",
+                      style: {
+                        text: "", // 빈 문자열로 할당
+                      },
                     },
-                  },
-                ],
-              });
+                  ],
+                });
+              }
               // graphic의 style의 text를 ""값으로 할당
             },
           },

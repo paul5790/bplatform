@@ -344,7 +344,7 @@ const searchData = async () => {
             analysisData.value = [];
             analysisTime.value = [];
             for (let i = 0; i < gga.data.length; i++) {
-              analysisData.value.push(gga.data[i].latitude);
+              analysisData.value.push((gga.data[i].latitude/100));
 
               analysisTime.value.push(
                 gga.data[i].timestamp_DATACONF.slice(11, 19)
@@ -358,7 +358,7 @@ const searchData = async () => {
             analysisData.value = [];
             analysisTime.value = [];
             for (let i = 0; i < gga.data.length; i++) {
-              analysisData.value.push(gga.data[i].longitude);
+              analysisData.value.push((gga.data[i].longitude/100));
 
               analysisTime.value.push(
                 gga.data[i].timestamp_DATACONF.slice(11, 19)

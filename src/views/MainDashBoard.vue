@@ -131,7 +131,8 @@
 </template>
 
 <script setup>
-import { ref, defineEmits, onMounted, onBeforeUnmount } from "vue";
+import { ref, watch, watchEffect, defineEmits, onMounted, onBeforeUnmount } from "vue";
+import { useRoute } from "vue-router";
 
 const isMiniVariant = ref(true);
 const drawer = ref(true);
@@ -140,6 +141,28 @@ const dynamicTitle = ref("초기 제목");
 const isAdmin = ref(true);
 const emits = defineEmits(["logout"]);
 const logoutDialog = ref(false);
+const selected_item = ref(sessionStorage.getItem("page") || "대시보드");
+watchEffect(() => {
+  //
+})
+
+const getSelectedMenuItemFromURL = () => {
+  return useRoute().name;
+};
+
+const handleListItemClick = (itemTitle) => {
+  if (itemTitle === "로그 아웃") {
+    logoutDialog.value = true;
+  } else {
+    selected_item.value = itemTitle;
+    sessionStorage.setItem("page", itemTitle.toString());
+    if (itemTitle === "개인정보 변경") {
+      logoutDialog.value = false;
+    } else {
+      logoutDialog.value = false;
+    }
+  }
+};
 
 const confirmLogout = () => {
   logoutDialog.value = true;
@@ -175,23 +198,26 @@ onBeforeUnmount(() => {
 
 // 툴바 사용자 설정
 const list_item = ref([{ title: "개인정보 변경" }, { title: "로그 아웃" }]);
-const selected_item = ref(`대시보드`); // Add this line to create a ref for the selected item
 
-const handleListItemClick = (title) => {
-  selected_item.value = title; // Update selected_item when a v-list-item is clicked
-  console.log(selected_item.value);
+// const handleListItemClick = (title) => {
+//   selected_item.value = title; // Update selected_item when a v-list-item is clicked
+//   console.log(selected_item.value);
 
-  if (title === "로그 아웃") {
-    logoutDialog.value = true;
-  } else if (title === "개인정보 변경") {
-    logoutDialog.value = false;
-  } else {
-    logoutDialog.value = false;
-  }
-};
+//   if (title === "로그 아웃") {
+//     logoutDialog.value = true;
+//   } else if (title === "개인정보 변경") {
+//     logoutDialog.value = false;
+//   } else {
+//     logoutDialog.value = false;
+//   }
+// };
+
+watch(useRoute, () => {
+  selected_item.value = getSelectedMenuItemFromURL();
+});
 
 // 권한별 메뉴
 const permission = ref("Admin");
 const userid = ref(sessionStorage.getItem("userid"));
-const toolbarname = ref(`${userid.value}(${permission.value})`)
+const toolbarname = ref(`${userid.value}(${permission.value})`);
 </script>
