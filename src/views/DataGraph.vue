@@ -297,31 +297,6 @@ const endDate = new Date();
 onMounted(() => {
   date.value = [startDate, endDate];
 });
-const formattedAnalysisTime = ref([]);
-// Contents 리스트
-const axioslist = ref([
-  "dgps/gga",
-  "gyro/hdt",
-  "anemometer/mwv",
-  "autopilot/rsa",
-  "speedlog/vhw",
-  "no1enginepanel/no1engine_panel_61444",
-  "no1enginepanel/no1engine_panel_65262",
-  "no1enginepanel/no1engine_panel_65263",
-  "no1enginepanel/no1engine_panel_65272",
-  "no1enginepanel/no1engine_panel_65271",
-  "no1enginepanel/no1engine_panel_65253",
-  "no1enginepanel/no1engine_panel_65270",
-  "no1enginepanel/no1engine_panel_65276",
-  "no2enginepanel/no2engine_panel_61444",
-  "no2enginepanel/no2engine_panel_65262",
-  "no2enginepanel/no2engine_panel_65263",
-  "no2enginepanel/no2engine_panel_65272",
-  "no2enginepanel/no2engine_panel_65271",
-  "no2enginepanel/no2engine_panel_65253",
-  "no2enginepanel/no2engine_panel_65270",
-  "no2enginepanel/no2engine_panel_65276",
-]);
 
 const searchData = async () => {
   analysisData.value = [];

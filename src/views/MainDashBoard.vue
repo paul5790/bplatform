@@ -1,11 +1,17 @@
 <template>
   <v-card>
-    <v-layout>
+    <v-layout style="
+      height: 100vh;
+      display: flex;
+      overflow-y: auto;
+    "
+    class="scrollable-card">
       <v-navigation-drawer v-model="drawer" app expand-on-hover rail>
         <v-list>
           <v-list-item>
             <img
-              :src="require('../../public/image/kriso.png')"
+              img
+              src="/image/kriso.png"
               alt=""
               style="margin-left: 56px"
               width="115"
@@ -127,11 +133,96 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <!-- 개인정보 변경 -->
+    <v-dialog v-model="privacyDialog" max-width="1024">
+      <v-card>
+        <v-card-title>개인정보 변경</v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12"><p style="font-size: 13px">기본정보</p></v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  label="User ID"
+                  variant="solo"
+                  required
+                  v-model="cuserid"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  label="User Name"
+                  variant="solo"
+                  hint="example of persistent helper text"
+                  persistent-hint
+                  v-model="cname"
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  label="Affiliation"
+                  variant="solo"
+                  type="text"
+                  v-model="caffiliation"
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  :readonly="true"
+                  label="Permission"
+                  variant="solo"
+                  v-model="permission"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12"><p style="font-size: 13px">연락처 정보</p></v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="cemail"
+                  label="User Email"
+                  variant="solo"
+                  required
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="cnumber"
+                  label="Phone Number"
+                  variant="solo"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+          <small>*indicates required field</small>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue-darken-1"
+            variant="text"
+            @click="privacychange"
+            to="/"
+            >수정하기</v-btn
+          >
+          <v-btn color="blue-darken-1" variant="text" @click="privacyout"
+            >완료</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-card>
 </template>
 
 <script setup>
-import { ref, watch, watchEffect, defineEmits, onMounted, onBeforeUnmount } from "vue";
+import {
+  ref,
+  watch,
+  watchEffect,
+  defineEmits,
+  onMounted,
+  onBeforeUnmount,
+} from "vue";
 import { useRoute } from "vue-router";
 
 const isMiniVariant = ref(true);
@@ -141,10 +232,11 @@ const dynamicTitle = ref("초기 제목");
 const isAdmin = ref(true);
 const emits = defineEmits(["logout"]);
 const logoutDialog = ref(false);
+const privacyDialog = ref(false);
 const selected_item = ref(sessionStorage.getItem("page") || "대시보드");
 watchEffect(() => {
   //
-})
+});
 
 const getSelectedMenuItemFromURL = () => {
   return useRoute().name;
@@ -158,8 +250,10 @@ const handleListItemClick = (itemTitle) => {
     sessionStorage.setItem("page", itemTitle.toString());
     if (itemTitle === "개인정보 변경") {
       logoutDialog.value = false;
+      privacyDialog.value = true;
     } else {
       logoutDialog.value = false;
+      privacyDialog.value = false;
     }
   }
 };
@@ -176,6 +270,20 @@ const logout = () => {
 
 const cancelLogout = () => {
   logoutDialog.value = false;
+};
+
+// 개인 정보 변경
+const cuserid = ref();
+const cname = ref();
+const cemail = ref();
+const caffiliation = ref();
+const cnumber = ref();
+const privacyout = () => {
+  privacyDialog.value = false;
+};
+
+const privacychange = () => {
+  privacyDialog.value = false;
 };
 
 const toggleDrawer = () => {

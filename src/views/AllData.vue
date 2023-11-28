@@ -6,7 +6,7 @@
       <v-sheet style="display: flex">
         <v-row>
           <!-- 첫번째 선택박스 -->
-          <v-col cols="2">
+          <v-col cols="3">
             <v-select
               v-model="firstSelectedItems"
               :items="firstSelect"
@@ -116,7 +116,7 @@
           </v-col>
 
           <!-- 검색 버튼 -->
-          <v-col cols="2">
+          <v-col cols="1">
             <v-btn
               class=""
               color="blue"
@@ -167,7 +167,6 @@
                 class="elevation-1"
                 :headers="headerName"
                 :items="dataSet"
-                :search="searchData"
                 item-value="name"
                 return-object
                 style="height: 70vh"
@@ -212,6 +211,9 @@ const tab = ref(0);
 
 const itemsPerPage = ref(11);
 const page = ref(1);
+const headerName = ref([]); // 빈 배열로 초기화
+const dataSet = ref([]); // 빈 배열로 초기화
+const selectedData = ref([]); //
 
 const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
@@ -345,6 +347,7 @@ const voyage = ref(["직접 선택"]);
 // 데이트 피커
 const setStartTime = ref([]);
 const setEndTime = ref([]);
+const selectedtrialNum = ref();
 
 const getTrialDate = async () => {
   try {
@@ -352,11 +355,7 @@ const getTrialDate = async () => {
     for (let i = 0; i < response.data.length; i++) {
       setStartTime.value.push(`${response.data[i].start_TIME_UTC}`);
       setEndTime.value.push(`${response.data[i].end_TIME_UTC}`);
-
-      console.log(setStartTime.value);
-      console.log(setEndTime.value);
-      console.log(`항차 ${i + 1}번`);
-      voyage.value.push([`항차 ${i + 1}번`]);
+      voyage.value.push(`항차 ${i + 1}번`);
     }
   } catch (error) {
     console.error(error);
@@ -367,319 +366,262 @@ const selectedvoyage = ref();
 
 // 시운전 시간 받아오기
 const date_readonly = ref(true);
-const dateRange = ref([]);
+const dateRange = ref([]); // 반응적인(ref) 배열로 초기화
+
+const startDate = ref(); // 반응적인(ref) 변수로 선언
+const endDate = ref(); // 반응적인(ref) 변수로 선언
+
+const voyagesearch = ref(false);
+
 watchEffect(() => {
+  const index = voyage.value.indexOf(selectedvoyage.value);
+  selectedtrialNum.value = index;
+
   if (selectedvoyage.value === "직접 선택") {
     date_readonly.value = false;
+    voyagesearch.value = false;
+
+    const start = new Date(dateRange.value[0]);
+    const end = new Date(dateRange.value[1]);
+
+    if (!isNaN(start) && !isNaN(end)) {
+      // 유효한 날짜인 경우에만 ISO 문자열로 변환
+      startDate.value = start.toISOString();
+      endDate.value = end.toISOString();
+      console.log("start.toISOString():", start.toISOString());
+      console.log("end.toISOString():", end.toISOString());
+    } else {
+      console.error("Invalid date values in dateRange.value");
+    }
   } else {
     const index = voyage.value.indexOf(selectedvoyage.value);
     console.log(index);
+    date_readonly.value = true;
+    voyagesearch.value = true;
+
+    const date1 = ref(setStartTime.value[index]);
+    const date2 = ref(setEndTime.value[index]);
+
+    // Date 객체로 변환
+    startDate.value = new Date(date1.value);
+    endDate.value = new Date(date2.value);
+
+    // 시간 범위 설정
+    dateRange.value = [startDate.value, endDate.value];
   }
-  const date1 = ref(setStartTime.value[0]);
-  const date2 = ref(setEndTime.value[0]);
-
-  // Date 객체로 변환
-  const startDate = new Date(date1.value);
-  const endDate = new Date(date2.value);
-
-  // 시간 범위 설정
-  dateRange.value = [startDate, endDate];
 });
-
+let dataValues1 = [];
 // 데이터 다운로드
 const dataDownload = () => {
-  if (selectedData.value == 0) {
+  if (!selectedData.value || selectedData.value.length === 0) {
     alert("선택안됌");
   } else {
-    alert(`${selectedData.value} 다운로드 시작`);
     const workbook = XLSX.utils.book_new();
 
-    // for (const sheet  of selectedData.value) {
-    //   const worksheet = XLSX.utils.json_to_sheet(sheet.value);
-    //   XLSX.utils.book_append_sheet(workbook, worksheet, `${sheet}`);
-    // }
-    const worksheet = XLSX.utils.json_to_sheet(GLL.value);
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet 1");
-    XLSX.writeFile(workbook, `${selectedData.value}_datatable.xlsx`);
+    const dataValues = Object.values(selectedData.value);
+    console.log(dataValues1);
+    for (let i = 0; i < downloadData.length; i++) {
+      const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+      XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+    }
+    XLSX.writeFile(workbook, `${dataValues1}_datatable.xlsx`);
   }
 };
 
 // 데이터 조회
 
-const headerName = ref([]); // 빈 배열로 초기화
-const dataSet = ref([]); // 빈 배열로 초기화
-const selectedData = ref([]); //
+// 검색 이벤트
+const searchData = () => {
+  console.log(selectedData.value);
+  headerVariables.forEach((variable) => (variable.value = []));
+  dataVariables.forEach((variable) => (variable.value = []));
+  downloadData = [];
+  dataValues1 = [];
+  console.log(startDate.value);
+  console.log(endDate.value);
+  selectedData.value = contentsSelectedItems.value;
+  console.log(selectedData.value[0]);
+  let variableName = getVariableName(selectedData.value).value;
+  console.log(variableName);
+  fetchData(variableName); // 초기 데이터 요청
+  console.log("fetch");
 
-const fetchData = async () => {
-  for (const axiosItem of axioslist.value) {
-    try {
-      const response = await axios.post(
-        `http://192.168.0.73:8080/data2/${axiosItem}/1`
-      );
+  // console.log(GLL.value);
+  // console.log(dataSet.value);
+  tabAction();
+  console.log("ftch");
+  // Fetch data when selected items change
+};
 
-      if (response.data && response.data.length > 0) {
-        const dataheader = ref(
-          Object.keys(response.data[0]).map((key) => ({
-            title: key,
-            align: "start",
-            key,
-          }))
+const getVariableName = (item) => {
+  const nameMappings = {
+    GLL: "dgps/gll",
+    GGA: "dgps/gga",
+    RMC: "dgps/rmc",
+    VTG: "dgps/vtg",
+    ZDA: "dgps/zda",
+    DTM: "dgps/dtm",
+    GSV: "dgps/gsv",
+    GSA: "dgps/gsa",
+
+    THS: "gyro/ths",
+    HDT: "gyro/hdt",
+    ROT: "gyro/rot",
+
+    MWV: "anemometer/mwv",
+    MWD: "anemometer/mwd",
+    VWR: "anemometer/vwr",
+    MTW: "anemometer/mtw",
+    VWT: "anemometer/vwt",
+
+    TTM: "radar/ttm",
+    TLL: "radar/tll",
+    RSCREEN: "radar/screen",
+
+    VDM: "ais/vdm",
+    VDO: "ais/vdo",
+
+    ROUTEINFO: "ecdis/routeinfo",
+    WAYPOINTS: "ecdis/waypoints",
+    ESCREEN: "ecdis/screen",
+
+    RSA: "autopilot/rsa",
+    MODE: "autopilot/mode",
+    HTD: "autopilot/htd",
+
+    VBW: "speedlog/vbw",
+    VHW: "speedlog/vhw",
+    VLW: "speedlog/vlw",
+
+    "NO.1ENGINE_PANEL_61444": "no1enginepanel/no1engine_panel_61444",
+    "NO.1ENGINE_PANEL_65262": "no1enginepanel/no1engine_panel_65262",
+    "NO.1ENGINE_PANEL_65263": "no1enginepanel/no1engine_panel_65263",
+    "NO.1ENGINE_PANEL_65272": "no1enginepanel/no1engine_panel_65272",
+    "NO.1ENGINE_PANEL_65271": "no1enginepanel/no1engine_panel_65271",
+    "NO.1ENGINE_PANEL_65253": "no1enginepanel/no1engine_panel_65253",
+    "NO.1ENGINE_PANEL_65270": "no1enginepanel/no1engine_panel_65270",
+    "NO.1ENGINE_PANEL_65276": "no1enginepanel/no1engine_panel_65276",
+    "NO.1ENGINE_PANEL_65360": "no1enginepanel/no1engine_panel_65360",
+    "NO.1ENGINE_PANEL_65361_LAMP": "no1enginepanel/no1engine_panel_65361_lamp",
+    "NO.1ENGINE_PANEL_65361_STATUS":
+      "no1enginepanel/no1engine_panel_65361_status",
+
+    "NO.1ENGINE_PANEL_65378": "no1enginepanel/no1engine_panel_65378",
+    "NO.1ENGINE_PANEL_65376": "no1enginepanel/no1engine_panel_65376",
+    "NO.1ENGINE_PANEL_65379": "no1enginepanel/no1engine_panel_65379",
+    "NO.2ENGINE_PANEL_61444": "no2enginepanel/no2engine_panel_61444",
+    "NO.2ENGINE_PANEL_65262": "no2enginepanel/no2engine_panel_65262",
+    "NO.2ENGINE_PANEL_65263": "no2enginepanel/no2engine_panel_65263",
+    "NO.2ENGINE_PANEL_65272": "no2enginepanel/no2engine_panel_65272",
+    "NO.2ENGINE_PANEL_65271": "no2enginepanel/no2engine_panel_65271",
+    "NO.2ENGINE_PANEL_65253": "no2enginepanel/no2engine_panel_65253",
+    "NO.2ENGINE_PANEL_65270": "no2enginepanel/no2engine_panel_65270",
+    "NO.2ENGINE_PANEL_65276": "no2enginepanel/no2engine_panel_65276",
+    "NO.2ENGINE_PANEL_65360": "no2enginepanel/no2engine_panel_65360",
+    "NO.2ENGINE_PANEL_65361_LAMP": "no2enginepanel/no2engine_panel_65361_lamp",
+    "NO.2ENGINE_PANEL_65361_STATUS":
+      "no2enginepanel/no2engine_panel_65361_status",
+
+    "NO.2ENGINE_PANEL_65378": "no2enginepanel/no2engine_panel_65378",
+    "NO.2ENGINE_PANEL_65376": "no2enginepanel/no2engine_panel_65376",
+    "NO.2ENGINE_PANEL_65379": "no2enginepanel/no2engine_panel_65379",
+    // 다른 headerName에 대한 매핑 추가
+  };
+
+  if (Array.isArray(item)) {
+    // 만약 item이 배열이면 각 요소에 대해 매핑된 값을 가져와 새로운 배열 생성
+    return ref(item.map((element) => nameMappings[element]));
+  } else {
+    // item이 배열이 아니면 단일 값에 대한 매핑 찾아 반환
+    return ref(nameMappings[item]);
+  }
+};
+
+const fetchData = async (data) => {
+  console.log(data);
+  if (voyagesearch.value) {
+    for (let i = 0; i < data.length; i++) {
+      try {
+        const response = await axios.post(
+          `http://192.168.0.73:8080/data2/${data[i]}/${selectedtrialNum.value}`
         );
+        dataSet.value = response.data;
+        if (response.data && response.data.length > 0) {
+          const dataheader = ref(
+            Object.keys(response.data[0]).map((key) => ({
+              title: key,
+              align: "start",
+              key,
+            }))
+          );
 
-        if (dataheader.value == null) {
-          console.log("null");
-        } else {
-          console.log(response.data);
-          switch (axiosItem) {
-            case "dgps/gll":
-              GLLheader.value = dataheader.value;
-              GLL.value = response.data;
-              break;
-            case "dgps/gga":
-              GGAheader.value = dataheader.value;
-              GGA.value = response.data;
-              break;
-            case "dgps/rmc":
-              RMCheader.value = dataheader.value;
-              RMC.value = response.data;
-              break;
-            case "dgps/vtg":
-              VTGheader.value = dataheader.value;
-              VTG.value = response.data;
-              break;
-            case "dgps/zda":
-              ZDAheader.value = dataheader.value;
-              ZDA.value = response.data;
-              break;
-            case "dgps/dtm":
-              DTMheader.value = dataheader.value;
-              DTM.value = response.data;
-              break;
-            case "dgps/gsv":
-              GSVheader.value = dataheader.value;
-              GSV.value = response.data;
-              break;
-            case "dgps/gsa":
-              GSAheader.value = dataheader.value;
-              GSA.value = response.data;
-              break;
-            case "gyro/ths":
-              THSheader.value = dataheader.value;
-              THS.value = response.data;
-              break;
-            case "gyro/hdt":
-              HDTheader.value = dataheader.value;
-              HDT.value = response.data;
-              break;
-            case "gyro/rot":
-              ROTheader.value = dataheader.value;
-              ROT.value = response.data;
-              break;
-            case "anemometer/mwv":
-              MWVheader.value = dataheader.value;
-              MWV.value = response.data;
-              break;
-            case "anemometer/mwd":
-              MWDheader.value = dataheader.value;
-              MWD.value = response.data;
-              break;
-            case "anemometer/vwr":
-              VWRheader.value = dataheader.value;
-              VWR.value = response.data;
-              break;
-            case "anemometer/mtw":
-              MTWheader.value = dataheader.value;
-              MTW.value = response.data;
-              break;
-            case "anemometer/vwt":
-              VWTheader.value = dataheader.value;
-              VWT.value = response.data;
-              break;
-            case "radar/ttm":
-              TTMheader.value = dataheader.value;
-
-              TTM.value = response.data;
-              break;
-            case "radar/tll":
-              TLLheader.value = dataheader.value;
-
-              TLL.value = response.data;
-              break;
-            case "radar/screen":
-              RSCREENheader.value = dataheader.value;
-
-              RSCREEN.value = response.data;
-              break;
-            case "ais/vdm":
-              VDMheader.value = dataheader.value;
-              VDM.value = response.data;
-              break;
-            case "ais/vdo":
-              VDOheader.value = dataheader.value;
-              VDO.value = response.data;
-              break;
-            case "ecdis/routeinfo":
-              ROUTEINFOheader.value = dataheader.value;
-              ROUTEINFO.value = response.data;
-              break;
-            case "ecdis/waypoints":
-              WAYPOINTSheader.value = dataheader.value;
-              WAYPOINTS.value = response.data;
-              break;
-            case "ecdis/screen":
-              ESCREENheader.value = dataheader.value;
-              ESCREEN.value = response.data;
-              break;
-            case "autopilot/rsa":
-              RSAheader.value = dataheader.value;
-              RSA.value = response.data;
-              break;
-            case "autopilot/mode":
-              MODEheader.value = dataheader.value;
-              MODE.value = response.data;
-              break;
-            case "autopilot/htd":
-              HTDheader.value = dataheader.value;
-              HTD.value = response.data;
-              break;
-            case "speedlog/vbw":
-              VBWheader.value = dataheader.value;
-              VBW.value = response.data;
-              break;
-            case "speedlog/vhw":
-              VHWheader.value = dataheader.value;
-              VHW.value = response.data;
-              break;
-            case "speedlog/vlw":
-              VLWheader.value = dataheader.value;
-              VLW.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_61444":
-              NO1ENGINE_PANEL_61444header.value = dataheader.value;
-              NO1ENGINE_PANEL_61444.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65262":
-              NO1ENGINE_PANEL_65262header.value = dataheader.value;
-              NO1ENGINE_PANEL_65262.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65263":
-              NO1ENGINE_PANEL_65263header.value = dataheader.value;
-              NO1ENGINE_PANEL_65263.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65272":
-              NO1ENGINE_PANEL_65272header.value = dataheader.value;
-              NO1ENGINE_PANEL_65272.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65271":
-              NO1ENGINE_PANEL_65271header.value = dataheader.value;
-              NO1ENGINE_PANEL_65271.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65253":
-              NO1ENGINE_PANEL_65253header.value = dataheader.value;
-              NO1ENGINE_PANEL_65253.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65270":
-              NO1ENGINE_PANEL_65270header.value = dataheader.value;
-              NO1ENGINE_PANEL_65270.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65276":
-              NO1ENGINE_PANEL_65276header.value = dataheader.value;
-              NO1ENGINE_PANEL_65276.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65360":
-              NO1ENGINE_PANEL_65360header.value = dataheader.value;
-              NO1ENGINE_PANEL_65360.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65361_lamp":
-              NO1ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-              NO1ENGINE_PANEL_65361_LAMP.value = response.data;
-              console.log("en1lamp");
-              break;
-            case "no1enginepanel/no1engine_panel_65361_status":
-              NO1ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-              NO1ENGINE_PANEL_65361_STATUS.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65378":
-              NO1ENGINE_PANEL_65378header.value = dataheader.value;
-              NO1ENGINE_PANEL_65378.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65376":
-              NO1ENGINE_PANEL_65376header.value = dataheader.value;
-              NO1ENGINE_PANEL_65376.value = response.data;
-              break;
-            case "no1enginepanel/no1engine_panel_65379":
-              NO1ENGINE_PANEL_65379header.value = dataheader.value;
-              NO1ENGINE_PANEL_65379.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_61444":
-              NO2ENGINE_PANEL_61444header.value = dataheader.value;
-              NO2ENGINE_PANEL_61444.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65262":
-              NO2ENGINE_PANEL_65262header.value = dataheader.value;
-              NO2ENGINE_PANEL_65262.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65263":
-              NO2ENGINE_PANEL_65263header.value = dataheader.value;
-              NO2ENGINE_PANEL_65263.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65272":
-              NO2ENGINE_PANEL_65272header.value = dataheader.value;
-              NO2ENGINE_PANEL_65272.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65271":
-              NO2ENGINE_PANEL_65271header.value = dataheader.value;
-              NO2ENGINE_PANEL_65271.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65253":
-              NO2ENGINE_PANEL_65253header.value = dataheader.value;
-              NO2ENGINE_PANEL_65253.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65270":
-              NO2ENGINE_PANEL_65270header.value = dataheader.value;
-              NO2ENGINE_PANEL_65270.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65276":
-              NO2ENGINE_PANEL_65276header.value = dataheader.value;
-              NO2ENGINE_PANEL_65276.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65360":
-              NO2ENGINE_PANEL_65360header.value = dataheader.value;
-              NO2ENGINE_PANEL_65360.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65361_lamp":
-              NO2ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-              NO2ENGINE_PANEL_65361_LAMP.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65361_status":
-              NO2ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-              NO2ENGINE_PANEL_65361_STATUS.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65378":
-              NO2ENGINE_PANEL_65378header.value = dataheader.value;
-              NO2ENGINE_PANEL_65378.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65376":
-              NO2ENGINE_PANEL_65376header.value = dataheader.value;
-              NO2ENGINE_PANEL_65376.value = response.data;
-              break;
-            case "no2enginepanel/no2engine_panel_65379":
-              NO2ENGINE_PANEL_65379header.value = dataheader.value;
-              NO2ENGINE_PANEL_65379.value = response.data;
-              break;
-
-            default:
-              console.error("Unknown axiosItem:", axiosItem);
+          if (dataheader.value == null) {
+            console.log("null");
+          } else {
+            console.log(data[i]);
+            switchValue(data[i], dataheader, response);
+            tabAction();
           }
+        } else {
+          console.log("Response data is empty or undefined");
         }
-      } else {
-        console.log("Response data is empty or undefined");
-      }
+        console.log(GLL.value);
 
-      // console.log(`${response.data[0]} dataheaderdata!!`);
-      // console.log(`${response.data} responsedata!!`);
-    } catch (error) {
-      console.error(error);
+        // console.log(`${response.data[0]} dataheaderdata!!`);
+        // console.log(`${response.data} responsedata!!`);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  } else {
+    for (let i = 0; i < data.length; i++) {
+      const upperData = ref(data[i].toUpperCase());
+      const subComponunt = ref();
+      const content = ref();
+      console.log(startDate.value);
+      [subComponunt.value, content.value] = upperData.value.split("/");
+      try {
+        const response = await axios.post(
+          "http://192.168.0.73:8080/data/period",
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              // "Authorization": "Bearer ",
+              subcomp: `${subComponunt.value}`,
+              content: `${content.value}`,
+              start: `${startDate.value}`,
+              end: `${endDate.value}`,
+            },
+          }
+        );
+        dataSet.value = response.data;
+        if (response.data && response.data.length > 0) {
+          const dataheader = ref(
+            Object.keys(response.data[0]).map((key) => ({
+              title: key,
+              align: "start",
+              key,
+            }))
+          );
+
+          if (dataheader.value == null) {
+            console.log("null");
+          } else {
+            console.log(data[i]);
+            switchValue(data[i], dataheader, response);
+            tabAction();
+          }
+        } else {
+          console.log("Response data is empty or undefined");
+        }
+        console.log(GLL.value);
+
+        // console.log(`${response.data[0]} dataheaderdata!!`);
+        // console.log(`${response.data} responsedata!!`);
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 };
@@ -746,20 +688,24 @@ const axioslist = ref([
 ]);
 
 // 초기 데이터 요청 및 주기적 데이터 업데이트 설정
-onMounted(fetchData); // 초기 데이터 요청
+// onMounted(fetchData); // 초기 데이터 요청
 
 // 데이터 셋에 저장된 데이터 넣기
-const ftchData = () => {
+const tabAction = async () => {
   // console.log(`${contentsSelectedItems.value[`${tab.value}`]}`);
   // console.log(GLL.value);
   // dataSet.value = GLL.value;
   const selectedTab = selectedData.value[tab.value];
+  console.log(selectedTab);
 
   // Find the selected data based on the tab value
   switch (selectedTab) {
     case "GLL":
+      console.log(GLL.value);
       dataSet.value = GLL.value;
+      console.log(dataSet.value);
       headerName.value = GLLheader.value;
+      console.log(headerName.value);
       break;
     case "GGA":
       dataSet.value = GGA.value;
@@ -998,17 +944,9 @@ const initializeData = () => {
   // dataSet.value = []; // dataSet 초기화
 };
 watchEffect(() => {
-  ftchData();
+  tabAction();
   initializeData();
 });
-
-// 검색 이벤트
-const searchData = () => {
-  selectedData.value = contentsSelectedItems.value;
-  // fetchData(); // 초기 데이터 요청
-  ftchData(); // Fetch data when selected items change
-  console.log(selectedData);
-};
 
 const GLLheader = ref([]);
 const GGAheader = ref([]);
@@ -1127,6 +1065,489 @@ const NO2ENGINE_PANEL_65361_STATUS = ref([]);
 const NO2ENGINE_PANEL_65378 = ref([]);
 const NO2ENGINE_PANEL_65376 = ref([]);
 const NO2ENGINE_PANEL_65379 = ref([]);
+
+const headerVariables = [
+  GLLheader,
+  GGAheader,
+  RMCheader,
+  VTGheader,
+  ZDAheader,
+  DTMheader,
+  GSVheader,
+  GSAheader,
+  THSheader,
+  HDTheader,
+  ROTheader,
+  MWVheader,
+  MWDheader,
+  VWRheader,
+  MTWheader,
+  VWTheader,
+  TTMheader,
+  TLLheader,
+  RSCREENheader,
+  VDMheader,
+  VDOheader,
+  ROUTEINFOheader,
+  WAYPOINTSheader,
+  ESCREENheader,
+  RSAheader,
+  MODEheader,
+  HTDheader,
+  VBWheader,
+  VHWheader,
+  VLWheader,
+  NO1ENGINE_PANEL_61444header,
+  NO1ENGINE_PANEL_65262header,
+  NO1ENGINE_PANEL_65263header,
+  NO1ENGINE_PANEL_65272header,
+  NO1ENGINE_PANEL_65271header,
+  NO1ENGINE_PANEL_65253header,
+  NO1ENGINE_PANEL_65270header,
+  NO1ENGINE_PANEL_65276header,
+  NO1ENGINE_PANEL_65360header,
+  NO1ENGINE_PANEL_65361_LAMPheader,
+  NO1ENGINE_PANEL_65361_STATUSheader,
+  NO1ENGINE_PANEL_65378header,
+  NO1ENGINE_PANEL_65376header,
+  NO1ENGINE_PANEL_65379header,
+  NO2ENGINE_PANEL_61444header,
+  NO2ENGINE_PANEL_65262header,
+  NO2ENGINE_PANEL_65263header,
+  NO2ENGINE_PANEL_65272header,
+  NO2ENGINE_PANEL_65271header,
+  NO2ENGINE_PANEL_65253header,
+  NO2ENGINE_PANEL_65270header,
+  NO2ENGINE_PANEL_65276header,
+  NO2ENGINE_PANEL_65360header,
+  NO2ENGINE_PANEL_65361_LAMPheader,
+  NO2ENGINE_PANEL_65361_STATUSheader,
+  NO2ENGINE_PANEL_65378header,
+  NO2ENGINE_PANEL_65376header,
+  NO2ENGINE_PANEL_65379header,
+];
+
+const dataVariables = [
+  GLL,
+  GGA,
+  RMC,
+  VTG,
+  ZDA,
+  DTM,
+  GSV,
+  GSA,
+  THS,
+  HDT,
+  ROT,
+  MWV,
+  MWD,
+  VWR,
+  MTW,
+  VWT,
+  TTM,
+  TLL,
+  RSCREEN,
+  VDM,
+  VDO,
+  ROUTEINFO,
+  WAYPOINTS,
+  ESCREEN,
+  RSA,
+  MODE,
+  HTD,
+  VBW,
+  VHW,
+  VLW,
+  NO1ENGINE_PANEL_61444,
+  NO1ENGINE_PANEL_65262,
+  NO1ENGINE_PANEL_65263,
+  NO1ENGINE_PANEL_65272,
+  NO1ENGINE_PANEL_65271,
+  NO1ENGINE_PANEL_65253,
+  NO1ENGINE_PANEL_65270,
+  NO1ENGINE_PANEL_65276,
+  NO1ENGINE_PANEL_65360,
+  NO1ENGINE_PANEL_65361_LAMP,
+  NO1ENGINE_PANEL_65361_STATUS,
+  NO1ENGINE_PANEL_65378,
+  NO1ENGINE_PANEL_65376,
+  NO1ENGINE_PANEL_65379,
+  NO2ENGINE_PANEL_61444,
+  NO2ENGINE_PANEL_65262,
+  NO2ENGINE_PANEL_65263,
+  NO2ENGINE_PANEL_65272,
+  NO2ENGINE_PANEL_65271,
+  NO2ENGINE_PANEL_65253,
+  NO2ENGINE_PANEL_65270,
+  NO2ENGINE_PANEL_65276,
+  NO2ENGINE_PANEL_65360,
+  NO2ENGINE_PANEL_65361_LAMP,
+  NO2ENGINE_PANEL_65361_STATUS,
+  NO2ENGINE_PANEL_65378,
+  NO2ENGINE_PANEL_65376,
+  NO2ENGINE_PANEL_65379,
+];
+
+let downloadData = [];
+
+const switchValue = (axiosItem, dataheader, response) => {
+  switch (axiosItem) {
+    case "dgps/gll":
+      GLLheader.value = dataheader.value;
+      GLL.value = response.data;
+      downloadData.push(GLL);
+      dataValues1.push("GLL");
+      break;
+    case "dgps/gga":
+      GGAheader.value = dataheader.value;
+      GGA.value = response.data;
+      downloadData.push(GGA);
+      dataValues1.push("GGA");
+      break;
+    case "dgps/rmc":
+      RMCheader.value = dataheader.value;
+      RMC.value = response.data;
+      downloadData.push(RMC);
+      dataValues1.push("RMC");
+      break;
+    case "dgps/vtg":
+      VTGheader.value = dataheader.value;
+      VTG.value = response.data;
+      downloadData.push(VTG);
+      dataValues1.push("VTG");
+      break;
+    case "dgps/zda":
+      ZDAheader.value = dataheader.value;
+      ZDA.value = response.data;
+      downloadData.push(ZDA);
+      dataValues1.push("ZDA");
+      break;
+    case "dgps/dtm":
+      DTMheader.value = dataheader.value;
+      DTM.value = response.data;
+      downloadData.push(DTM);
+      dataValues1.push("DTM");
+      break;
+    case "dgps/gsv":
+      GSVheader.value = dataheader.value;
+      GSV.value = response.data;
+      downloadData.push(GSV);
+      dataValues1.push("GSV");
+      break;
+    case "dgps/gsa":
+      GSAheader.value = dataheader.value;
+      GSA.value = response.data;
+      downloadData.push(GSA);
+      dataValues1.push("GSA");
+      break;
+    case "gyro/ths":
+      THSheader.value = dataheader.value;
+      THS.value = response.data;
+      downloadData.push(THS);
+      dataValues1.push("THS");
+      break;
+    case "gyro/hdt":
+      HDTheader.value = dataheader.value;
+      HDT.value = response.data;
+      downloadData.push(HDT);
+      dataValues1.push("HDT");
+      break;
+    case "gyro/rot":
+      ROTheader.value = dataheader.value;
+      ROT.value = response.data;
+      downloadData.push(ROT);
+      dataValues1.push("ROT");
+      break;
+    case "anemometer/mwv":
+      MWVheader.value = dataheader.value;
+      MWV.value = response.data;
+      downloadData.push(MWV);
+      dataValues1.push("MWV");
+      break;
+    case "anemometer/mwd":
+      MWDheader.value = dataheader.value;
+      MWD.value = response.data;
+      downloadData.push(MWD);
+      dataValues1.push("MWD");
+      break;
+    case "anemometer/vwr":
+      VWRheader.value = dataheader.value;
+      VWR.value = response.data;
+      downloadData.push(VWR);
+      dataValues1.push("VWR");
+      break;
+    case "anemometer/mtw":
+      MTWheader.value = dataheader.value;
+      MTW.value = response.data;
+      downloadData.push(MTW);
+      dataValues1.push("MTW");
+      break;
+    case "anemometer/vwt":
+      VWTheader.value = dataheader.value;
+      VWT.value = response.data;
+      downloadData.push(VWT);
+      dataValues1.push("VWT");
+      break;
+    case "radar/ttm":
+      TTMheader.value = dataheader.value;
+
+      TTM.value = response.data;
+      downloadData.push(TTM);
+      dataValues1.push("TTM");
+      break;
+    case "radar/tll":
+      TLLheader.value = dataheader.value;
+
+      TLL.value = response.data;
+      downloadData.push(TLL);
+      dataValues1.push("TLL");
+      break;
+    case "radar/screen":
+      RSCREENheader.value = dataheader.value;
+
+      RSCREEN.value = response.data;
+      downloadData.push(RSCREEN);
+      dataValues1.push("RSCREEN");
+      break;
+    case "ais/vdm":
+      VDMheader.value = dataheader.value;
+      VDM.value = response.data;
+      downloadData.push(VDM);
+      dataValues1.push("VDM");
+      break;
+    case "ais/vdo":
+      VDOheader.value = dataheader.value;
+      VDO.value = response.data;
+      downloadData.push(VDO);
+      dataValues1.push("VDO");
+      break;
+    case "ecdis/routeinfo":
+      ROUTEINFOheader.value = dataheader.value;
+      ROUTEINFO.value = response.data;
+      downloadData.push(ROUTEINFO);
+      dataValues1.push("ROUTEINFO");
+      break;
+    case "ecdis/waypoints":
+      WAYPOINTSheader.value = dataheader.value;
+      WAYPOINTS.value = response.data;
+      downloadData.push(WAYPOINTS);
+      dataValues1.push("WAYPOINTS");
+      break;
+    case "ecdis/screen":
+      ESCREENheader.value = dataheader.value;
+      ESCREEN.value = response.data;
+      downloadData.push(ESCREEN);
+      dataValues1.push("ESCREEN");
+      break;
+    case "autopilot/rsa":
+      RSAheader.value = dataheader.value;
+      RSA.value = response.data;
+      downloadData.push(RSA);
+      dataValues1.push("RSA");
+      break;
+    case "autopilot/mode":
+      MODEheader.value = dataheader.value;
+      MODE.value = response.data;
+      downloadData.push(MODE);
+      dataValues1.push("MODE");
+      break;
+    case "autopilot/htd":
+      HTDheader.value = dataheader.value;
+      HTD.value = response.data;
+      downloadData.push(HTD);
+      dataValues1.push("HTD");
+      break;
+    case "speedlog/vbw":
+      VBWheader.value = dataheader.value;
+      VBW.value = response.data;
+      downloadData.push(VBW);
+      dataValues1.push("VBW");
+      break;
+    case "speedlog/vhw":
+      VHWheader.value = dataheader.value;
+      VHW.value = response.data;
+      downloadData.push(VHW);
+      dataValues1.push("VHW");
+      break;
+    case "speedlog/vlw":
+      VLWheader.value = dataheader.value;
+      VLW.value = response.data;
+      downloadData.push(VLW);
+      dataValues1.push("VLW");
+      break;
+    case "no1enginepanel/no1engine_panel_61444":
+      NO1ENGINE_PANEL_61444header.value = dataheader.value;
+      NO1ENGINE_PANEL_61444.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_61444);
+      dataValues1.push("NO.1ENGINE_PANEL_61444");
+      break;
+    case "no1enginepanel/no1engine_panel_65262":
+      NO1ENGINE_PANEL_65262header.value = dataheader.value;
+      NO1ENGINE_PANEL_65262.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65262);
+      dataValues1.push("NO.1ENGINE_PANEL_65262");
+      break;
+    case "no1enginepanel/no1engine_panel_65263":
+      NO1ENGINE_PANEL_65263header.value = dataheader.value;
+      NO1ENGINE_PANEL_65263.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65263);
+      dataValues1.push("NO.1ENGINE_PANEL_65263");
+      break;
+    case "no1enginepanel/no1engine_panel_65272":
+      NO1ENGINE_PANEL_65272header.value = dataheader.value;
+      NO1ENGINE_PANEL_65272.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65272);
+      dataValues1.push("NO.1ENGINE_PANEL_65272");
+      break;
+    case "no1enginepanel/no1engine_panel_65271":
+      NO1ENGINE_PANEL_65271header.value = dataheader.value;
+      NO1ENGINE_PANEL_65271.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65271);
+      dataValues1.push("NO1ENGINE_PANEL_65271");
+      break;
+    case "no1enginepanel/no1engine_panel_65253":
+      NO1ENGINE_PANEL_65253header.value = dataheader.value;
+      NO1ENGINE_PANEL_65253.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65253);
+      dataValues1.push("NO1ENGINE_PANEL_65253");
+      break;
+    case "no1enginepanel/no1engine_panel_65270":
+      NO1ENGINE_PANEL_65270header.value = dataheader.value;
+      NO1ENGINE_PANEL_65270.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65270);
+      dataValues1.push("NO1ENGINE_PANEL_65270");
+      break;
+    case "no1enginepanel/no1engine_panel_65276":
+      NO1ENGINE_PANEL_65276header.value = dataheader.value;
+      NO1ENGINE_PANEL_65276.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65276);
+      dataValues1.push("NO1ENGINE_PANEL_65276");
+      break;
+    case "no1enginepanel/no1engine_panel_65360":
+      NO1ENGINE_PANEL_65360header.value = dataheader.value;
+      NO1ENGINE_PANEL_65360.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65360);
+      dataValues1.push("NO1ENGINE_PANEL_65360");
+      break;
+    case "no1enginepanel/no1engine_panel_65361_lamp":
+      NO1ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
+      NO1ENGINE_PANEL_65361_LAMP.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65361_LAMP);
+      dataValues1.push("NO1ENGINE_PANEL_65361_LAMP");
+      break;
+    case "no1enginepanel/no1engine_panel_65361_status":
+      NO1ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
+      NO1ENGINE_PANEL_65361_STATUS.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65361_STATUS);
+      dataValues1.push("NO1ENGINE_PANEL_65361_STATUS");
+      break;
+    case "no1enginepanel/no1engine_panel_65378":
+      NO1ENGINE_PANEL_65378header.value = dataheader.value;
+      NO1ENGINE_PANEL_65378.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65378);
+      dataValues1.push("NO1ENGINE_PANEL_65378");
+      break;
+    case "no1enginepanel/no1engine_panel_65376":
+      NO1ENGINE_PANEL_65376header.value = dataheader.value;
+      NO1ENGINE_PANEL_65376.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65376);
+      dataValues1.push("NO1ENGINE_PANEL_65376");
+      break;
+    case "no1enginepanel/no1engine_panel_65379":
+      NO1ENGINE_PANEL_65379header.value = dataheader.value;
+      NO1ENGINE_PANEL_65379.value = response.data;
+      downloadData.push(NO1ENGINE_PANEL_65379);
+      dataValues1.push("NO1ENGINE_PANEL_65379");
+      break;
+    case "no2enginepanel/no2engine_panel_61444":
+      NO2ENGINE_PANEL_61444header.value = dataheader.value;
+      NO2ENGINE_PANEL_61444.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_61444);
+      dataValues1.push("NO2ENGINE_PANEL_61444");
+      break;
+    case "no2enginepanel/no2engine_panel_65262":
+      NO2ENGINE_PANEL_65262header.value = dataheader.value;
+      NO2ENGINE_PANEL_65262.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65262);
+      dataValues1.push("NO2ENGINE_PANEL_65262");
+      break;
+    case "no2enginepanel/no2engine_panel_65263":
+      NO2ENGINE_PANEL_65263header.value = dataheader.value;
+      NO2ENGINE_PANEL_65263.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65263);
+      dataValues1.push("NO2ENGINE_PANEL_65263");
+      break;
+    case "no2enginepanel/no2engine_panel_65272":
+      NO2ENGINE_PANEL_65272header.value = dataheader.value;
+      NO2ENGINE_PANEL_65272.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65272);
+      dataValues1.push("NO2ENGINE_PANEL_65272");
+      break;
+    case "no2enginepanel/no2engine_panel_65271":
+      NO2ENGINE_PANEL_65271header.value = dataheader.value;
+      NO2ENGINE_PANEL_65271.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65271);
+      dataValues1.push("NO2ENGINE_PANEL_65271");
+      break;
+    case "no2enginepanel/no2engine_panel_65253":
+      NO2ENGINE_PANEL_65253header.value = dataheader.value;
+      NO2ENGINE_PANEL_65253.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65253);
+      dataValues1.push("NO2ENGINE_PANEL_65253");
+      break;
+    case "no2enginepanel/no2engine_panel_65270":
+      NO2ENGINE_PANEL_65270header.value = dataheader.value;
+      NO2ENGINE_PANEL_65270.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65270);
+      dataValues1.push("NO2ENGINE_PANEL_65270");
+      break;
+    case "no2enginepanel/no2engine_panel_65276":
+      NO2ENGINE_PANEL_65276header.value = dataheader.value;
+      NO2ENGINE_PANEL_65276.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65276);
+      dataValues1.push("NO2ENGINE_PANEL_65276");
+      break;
+    case "no2enginepanel/no2engine_panel_65360":
+      NO2ENGINE_PANEL_65360header.value = dataheader.value;
+      NO2ENGINE_PANEL_65360.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65360);
+      dataValues1.push("NO2ENGINE_PANEL_65360");
+      break;
+    case "no2enginepanel/no2engine_panel_65361_lamp":
+      NO2ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
+      NO2ENGINE_PANEL_65361_LAMP.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65361_LAMP);
+      dataValues1.push("NO2ENGINE_PANEL_65361_LAMP");
+      break;
+    case "no2enginepanel/no2engine_panel_65361_status":
+      NO2ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
+      NO2ENGINE_PANEL_65361_STATUS.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65361_STATUS);
+      dataValues1.push("NO2ENGINE_PANEL_65361_STATUS");
+      break;
+    case "no2enginepanel/no2engine_panel_65378":
+      NO2ENGINE_PANEL_65378header.value = dataheader.value;
+      NO2ENGINE_PANEL_65378.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65378);
+      dataValues1.push("NO2ENGINE_PANEL_65378");
+      break;
+    case "no2enginepanel/no2engine_panel_65376":
+      NO2ENGINE_PANEL_65376header.value = dataheader.value;
+      NO2ENGINE_PANEL_65376.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65376);
+      dataValues1.push("NO2ENGINE_PANEL_65376");
+      break;
+    case "no2enginepanel/no2engine_panel_65379":
+      NO2ENGINE_PANEL_65379header.value = dataheader.value;
+      NO2ENGINE_PANEL_65379.value = response.data;
+      downloadData.push(NO2ENGINE_PANEL_65379);
+      dataValues1.push("NO2ENGINE_PANEL_65379");
+      break;
+
+    default:
+      console.error("Unknown axiosItem:", axiosItem);
+  }
+};
 </script>
 
 <style scoped>

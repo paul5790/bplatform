@@ -2,7 +2,7 @@
   <v-chart class="chart" :option="option" autoresize />
 </template>
 
-<script setup>
+<script setup props="props">
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { GaugeChart } from "echarts/charts"; // GaugeChart로 변경
@@ -12,7 +12,13 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted } from "vue";
+import { ref, provide, onMounted, defineProps } from "vue";
+
+const props = defineProps({
+  // #2 props 정의
+  value: Number,
+  barWidth: Number,
+});
 
 const windspeed = ref(0);
 
@@ -120,8 +126,11 @@ const option = ref({
 
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  option.value.series[0].data[0].value = Math.floor(Math.random() * 361);
-  windspeed.value = Math.floor(Math.random() * 101);
+  if (props.value <= 0) {
+    option.value.series[0].data[0].value = 0;
+  } else {
+    option.value.series[0].data[0].value = props.value;
+  }
 };
 
 onMounted(() => {

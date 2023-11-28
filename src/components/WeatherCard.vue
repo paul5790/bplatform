@@ -109,6 +109,81 @@ const forecast = [
 
 const expand = ref(false);
 const time = ref(0);
+
+
+
+
+const axioslist = ref([
+  "dgps/gll",
+  "dgps/gga",
+  "dgps/rmc",
+  "dgps/vtg",
+  "dgps/zda",
+  "dgps/dtm",
+  "dgps/gsv",
+  "dgps/gsa",
+  "gyro/ths",
+  "gyro/hdt",
+  "gyro/rot",
+  "anemometer/mwv",
+  "anemometer/mwd",
+  "anemometer/vwr",
+  "anemometer/mtw",
+  "anemometer/vwt",
+  "radar/ttm",
+  "radar/tll",
+  "radar/screen",
+  "ais/vdm",
+  "ais/vdo",
+  "ecdis/routeinfo",
+  "ecdis/waypoints",
+  "ecdis/screen",
+  "autopilot/rsa",
+  "autopilot/mode",
+  "autopilot/htd",
+  "speedlog/vbw",
+  "speedlog/vhw",
+  "speedlog/vlw",
+  "no1enginepanel/no1engine_panel_61444",
+  "no1enginepanel/no1engine_panel_65262",
+  "no1enginepanel/no1engine_panel_65263",
+  "no1enginepanel/no1engine_panel_65272",
+  "no1enginepanel/no1engine_panel_65271",
+  "no1enginepanel/no1engine_panel_65253",
+  "no1enginepanel/no1engine_panel_65270",
+  "no1enginepanel/no1engine_panel_65276",
+  "no1enginepanel/no1engine_panel_65360",
+  "no1enginepanel/no1engine_panel_65361_lamp",
+  "no1enginepanel/no1engine_panel_65361_status",
+  "no1enginepanel/no1engine_panel_65378",
+  "no1enginepanel/no1engine_panel_65376",
+  "no1enginepanel/no1engine_panel_65379",
+  "no2enginepanel/no2engine_panel_61444",
+  "no2enginepanel/no2engine_panel_65262",
+  "no2enginepanel/no2engine_panel_65263",
+  "no2enginepanel/no2engine_panel_65272",
+  "no2enginepanel/no2engine_panel_65271",
+  "no2enginepanel/no2engine_panel_65253",
+  "no2enginepanel/no2engine_panel_65270",
+  "no2enginepanel/no2engine_panel_65276",
+  "no2enginepanel/no2engine_panel_65360",
+  "no2enginepanel/no2engine_panel_65361_lamp",
+  "no2enginepanel/no2engine_panel_65361_status",
+  "no2enginepanel/no2engine_panel_65378",
+  "no2enginepanel/no2engine_panel_65376",
+  "no2enginepanel/no2engine_panel_65379",
+]);
+
+
+
+
+
+
+
+
+
+
+
 </script>
 
 <style scoped>
@@ -116,3 +191,10 @@ const time = ref(0);
   height: 50vh;
 }
 </style>
+
+
+
+
+
+
+

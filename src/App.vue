@@ -9,7 +9,7 @@
     <div v-else-if="showSignup">
       <div class="form-signup">
         <img
-          :src="require('../public/image/kriso.png')"
+          img src="/image/kriso.png"
           alt=""
           width="200"
           style="margin-bottom: 30px"
@@ -110,7 +110,7 @@
     <!-- 사용자 이름이 'a'가 아닐 때 로그인 양식 표시 -->
     <div v-else>
       <div class="form-signin">
-        <img :src="require('../public/image/kriso.png')" alt="" width="200" />
+        <img src="/image/kriso.png" alt="" width="200" />
 
         <v-form fast-fail style="margin-top: 30px">
           <div class="text-subtitle-1 text-medium-emphasis d-flex justify-left">

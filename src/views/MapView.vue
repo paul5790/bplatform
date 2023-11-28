@@ -1,47 +1,17 @@
 <template>
   <div style="padding: 0px; padding-top: 0px">
-    <!-- <v-sheet style="height: 7vh; display: flex">
-      <v-row>
-        <v-col cols="3">
-          <v-select
-            style="margin-top: 1px"
-            v-model="sailingselect"
-            :items="items1"
-            density="comfortable"
-            label="Comfortable"
-            variant="underlined"
-          ></v-select>
-        </v-col>
-        <v-col cols="3">
-          <v-select
-            style="margin-top: 1px"
-            v-model="sailingselect"
-            :items="items1"
-            density="comfortable"
-            label="Default"
-            variant="underlined"
-          ></v-select>
-        </v-col>
-        <v-col cols="1">
-          <v-btn @click="test()" style="width: 100px; margin-top: 10px"
-            >조회하기</v-btn
-          >
-        </v-col>
-        <v-col cols="1">
-          <v-btn @click="marker()" style="width: 100px; margin-top: 10px"
-            >마커추가</v-btn
-          >
-        </v-col>
-      </v-row>
-    </v-sheet> -->
     <div id="map" style="height: 68vh"></div>
   </div>
 </template>
 
-<script setup>
+<script setup props="props">
 import L from "leaflet";
-import { ref, toRefs, onMounted } from "vue";
+import { ref, toRefs, onMounted, defineProps } from "vue";
 import axios from "axios";
+const props = defineProps({
+  // #2 props 정의
+  trial: String,
+});
 
 const state = toRefs({
   items1: [
@@ -50,63 +20,92 @@ const state = toRefs({
     "SYS Information",
     "Control Data",
   ],
-  trialdata: [
-    [35.46, 129.38],
-    [35.47, 129.39],
-    [35.48, 129.4],
-  ],
+  trialdata: [],
   pathCoordinates: null,
   sailingselect: null,
   map: null, // 추가: 맵 객체를 저장할 변수
 });
 
 // 맵을 초기화하는 함수
-const initializeMap = () => {
+const initializeMap = (waypoints, ais, startlocation, endlocation) => {
   state.pathCoordinates = state.trialdata;
 
   // 맵 객체 생성 및 저장
-  state.map = L.map("map").setView([35.46, 129.38], 14);
+  state.map = L.map("map").setView(startlocation.value, 13);
 
   // OSM 타일 레이어 추가
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
     state.map
   );
-    const pathCoordinates = [
-      [35.46, 129.38],
-    [35.461764,	129.382251],
-    [35.462171,	129.388250],
-    [35.462779,	129.389245],
-    [35.463789,	129.389246],
-    [35.465093,	129.389249],
-    [35.464589,	129.390246],
-    [35.464689,	129.391046],
-    [35.464789,	129.395246],
-    [35.460089,	129.395446],
-    [35.455589,	129.388246],
-    [35.454589,	129.384246],
-    [35.453589,	129.382146],
-    [35.458589,	129.383246],
-    [35.459,	129.381],
-    // ... 다른 경로 좌표
-  ];
   // 폴리라인(선)을 그려서 지도에 추가
-  L.polyline(pathCoordinates, { color: "blue", weight: 2 }).addTo(state.map);
-
-  // pathCoordinates가 정의되어 있고, 길이가 2 이상인 경우에만 폴리라인(선)을 그려서 지도에 추가
-  // if (state.pathCoordinates && state.pathCoordinates.length >= 2) {
-  //   L.polyline(state.pathCoordinates, { color: "blue" }).addTo(state.map);
-  // }
+  L.polyline(ais.value, { color: "blue", weight: 2 }).addTo(state.map);
 
   // 마커 추가 (예제 마커)
-  L.marker([35.46, 129.38])
-    .addTo(state.map)
-    .bindPopup("start")
-    .openPopup();
+  L.marker(startlocation.value).addTo(state.map).bindPopup("start").openPopup();
+  L.marker(endlocation.value).addTo(state.map).bindPopup("end");
+
+  const greenIcon = new L.Icon({
+    iconUrl: "/image/marker-icon-2x-green.png",
+    shadowUrl: "/image/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });
+  // 추가 마커
+  for (let i = 0; i < waypoints.value.length; i++) {
+    L.marker(waypoints.value[i], { icon: greenIcon })
+      .addTo(state.map)
+      .bindPopup(`waypoint${i + 1}`);
+  }
 };
 
-onMounted(() => {
-  // 초기에 한 번만 맵을 설정
-  initializeMap();
+onMounted(async () => {
+  try {
+    const waypointData = await axios.post(
+      `http://192.168.0.73:8080/info/waypoints/${props.trial}`
+      // `http://192.168.0.73:8080/info/waypoints/5`
+    );
+
+    const aisData = await axios.post(
+      `http://192.168.0.73:8080/info/ais/${props.trial}`
+      // `http://192.168.0.73:8080/info/ais/5`
+    );
+
+    // 시작점, 끝점
+    const startlocation = ref([]);
+    const endlocation = ref([]);
+
+    // waypoints 설정
+    const waypoints = ref([]);
+    for (let i = 0; i < waypointData.data.length; i++) {
+      waypoints.value.push([
+        waypointData.data[i].latitude,
+        waypointData.data[i].longitude,
+      ]);
+    }
+
+    // ais 항적 설정
+    const ais = ref([]);
+    for (let i = 0; i < aisData.data.length; i++) {
+      const latitude = aisData.data[i].latitude;
+      const longitude = aisData.data[i].longitude;
+
+      // latitude 또는 longitude가 null이 아닌 경우에만 데이터를 추가
+      if (latitude !== null && longitude !== null) {
+        ais.value.push([latitude, longitude]);
+      }
+    }
+    
+    startlocation.value = ais.value[0];
+    endlocation.value = ais.value[ais.value.length - 1];
+
+    console.log(startlocation.value);
+    console.log(endlocation.value);
+    initializeMap(waypoints, ais, startlocation, endlocation);
+  } catch (error) {
+    console.error(error);
+  }
 });
 
 const marker = () => {
@@ -114,10 +113,8 @@ const marker = () => {
   if (state.map !== null) {
     // Add a green marker at the specified coordinates
     const greenIcon = new L.Icon({
-      iconUrl:
-        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png",
-      shadowUrl:
-        "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-shadow.png",
+      iconUrl: "../../public/image/marker-icon-2x-green.png",
+      shadowUrl: "../../public/image/marker-shadow.png",
       iconSize: [25, 41],
       iconAnchor: [12, 41],
       popupAnchor: [1, -34],

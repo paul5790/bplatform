@@ -1,7 +1,7 @@
 <template>
   <v-sheet
     style="
-      height: 47vh;
+      height: 48vh;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -10,7 +10,7 @@
     class="scrollable-card"
   >
     <v-card-title>
-      <span style="font-size: 19; font-weight: 550;">항차 테이블</span>
+      <span style="font-size: 19px; font-weight: 550">항차 테이블</span>
     </v-card-title>
     <v-data-table
       v-model:page="page"
@@ -18,7 +18,7 @@
       :headers="headers"
       :items="items"
       :items-per-page="itemsPerPage"
-      density="extra-dense"
+      density="dense"
       hide-default-footer
       item-value="name"
     >
@@ -48,7 +48,7 @@
       <v-card-text>
         <v-sheet style="display: flex">
           <v-container fluid>
-            <MapView />
+            <MapView :trial="seatrialProps"/>
           </v-container>
         </v-sheet>
       </v-card-text>
@@ -56,9 +56,6 @@
         <v-spacer></v-spacer>
         <v-btn color="blue-darken-1" variant="text" @click="close()">
           Close
-        </v-btn>
-        <v-btn color="blue-darken-1" variant="text" @click="close()">
-          Save
         </v-btn>
       </v-card-actions>
     </v-card>
@@ -68,16 +65,14 @@
 <script setup>
 import MapView from "../views/MapView.vue";
 import { ref, computed, watch } from "vue";
+import axios from "axios";
 
 const page = ref(1);
-const itemsPerPage = 9;
+const itemsPerPage = 10;
 
 const headers = [
-  {
-    title: "항차",
-    align: "start",
-    key: "name",
-  },
+  { title: "항차", align: "start", key: "name",},
+  { title: "Ship ID", align: "start", key: "shipid" },
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "끝시간", align: "start", key: "enddate" },
   { title: "목적", align: "start", key: "purpose" },
@@ -121,225 +116,42 @@ watch(dialogDelete, (val) => {
   val || closeDelete();
 });
 
-const initialize = () => {
-  items.value = [
-    {
-      name: "시운전 #1",
-      startdate: "2023-08-29T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
+const items1 = ref([]);
 
-      enddate: "2023-08-31T01:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #2",
-      startdate: "2023-09-27T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
+// 데이터 받아오기
+const fetchData = async () => {
+  try {
+    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
+    for (let i = 0; i < response.data.length; i++) {
 
-      enddate: "2023-09-30T08:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #3",
-      startdate: "2023-10-20T04:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
+      items.value.push({
+        name: `${response.data[i].seatrialid}`,
+        shipid: `${response.data[i].shipid.shipid}`,
+        startdate: `${response.data[i].start_TIME_UTC}`,
+        purpose: `${response.data[i].test_PURPOSE}`,
+        location: `${response.data[i].navigation_AREA}`,
+        storage: `${response.data[i].seatrialid}`,
+        enddate: `${response.data[i].end_TIME_UTC}`,
+        description: `${response.data[i].description}`,
+      });
 
-      enddate: "2023-10-21T06:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #4",
-      startdate: "2023-10-29T18:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-29T20:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #5",
-      startdate: "2023-08-29T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-08-31T01:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #6",
-      startdate: "2023-09-27T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-09-30T08:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #7",
-      startdate: "2023-10-20T04:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-21T06:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #8",
-      startdate: "2023-10-29T18:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-29T20:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #9",
-      startdate: "2023-08-29T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-08-31T01:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #10",
-      startdate: "2023-09-27T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-09-30T08:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #11",
-      startdate: "2023-10-20T04:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-21T06:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #12",
-      startdate: "2023-10-29T18:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-29T20:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #13",
-      startdate: "2023-08-29T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-08-31T01:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #14",
-      startdate: "2023-09-27T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-09-30T08:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #15",
-      startdate: "2023-10-20T04:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-21T06:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #16",
-      startdate: "2023-10-29T18:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-29T20:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #17",
-      startdate: "2023-08-29T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-08-31T01:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #18",
-      startdate: "2023-09-27T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-09-30T08:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #19",
-      startdate: "2023-10-20T04:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-21T06:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #20",
-      startdate: "2023-10-29T18:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-10-29T20:24:33",
-      description: "##테스트 시운전",
-    },
-    {
-      name: "시운전 #21",
-      startdate: "2023-08-29T08:28:43",
-      purpose: "%%테스트",
-      location: "울산 실증센터",
-      storage: "26MB",
-
-      enddate: "2023-08-31T01:24:33",
-      description: "##테스트 시운전",
-    },
-  ];
+      console.log(`${response.data[i].seatrialid} here!!!!!!!!!!!!`);
+      console.log(`${response.data[i].test_PURPOSE} here!!!!!!!!!!!!`);
+    }
+  } catch (error) {
+    console.error(error);
+  }
 };
 
+fetchData();
+
+
+const seatrialProps = ref();
 const maptitle = ref();
 const map = (item) => {
   console.log(item.name + "아이템");
-  maptitle.value = `${item.name}의 지도`
+  seatrialProps.value = `${item.name}`;
+  maptitle.value = `${item.name}의 지도`;
   dialog.value = true;
 };
 
@@ -373,8 +185,7 @@ const save = () => {
   close();
 };
 
-// Call initialize function on component creation
-initialize();
+
 </script>
 <style scoped>
 .mgt-10 {

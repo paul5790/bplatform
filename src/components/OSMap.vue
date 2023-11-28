@@ -8,9 +8,15 @@
   </div>
 </template>
 
-<script setup>
+<script setup props="props">
 import L from "leaflet";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, defineProps } from "vue";
+
+const props = defineProps({
+  // #2 props 정의
+  lat: Number,
+  lon: Number,
+});
 
 let map = null;
 
@@ -21,7 +27,7 @@ let lonview = ref();
 
 onMounted(() => {
   // 지도 초기화
-  map = L.map("map").setView([lat.value, lon.value], 10);
+  map = L.map("map").setView([35.46, 129.38], 10);
 
   // OSM 타일 레이어 추가
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
@@ -32,7 +38,7 @@ onMounted(() => {
     .bindPopup("Realtime Location.")
     .openPopup();
 
-  setInterval(updateValue, 5000);
+  setInterval(updateValue, 6000);
   updateValue();
 });
 
@@ -42,11 +48,11 @@ const updateValue = () => {
     layer.remove();
   });
 
-  lat.value += Math.random() * 0.1 - 0.05;
-  lon.value += Math.random() * 0.1 - 0.05;
+  // lat.value += Math.random() * 0.1 - 0.05;
+  // lon.value += Math.random() * 0.1 - 0.05;
 
-  latview.value = lat.value.toFixed(4);
-  lonview.value = lon.value.toFixed(4);
+  latview.value = props.lat.toFixed(4);
+  lonview.value = props.lon.toFixed(4);
 
   // 새로운 위치로 마커 및 맵 생성
   L.marker([lat.value, lon.value])

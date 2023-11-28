@@ -12,8 +12,9 @@
           display: flex;
           background-color: #f7f7f7;
         "
+        elevation="2"
       >
-        <v-card :color="primary" :variant="elevated" style="flex: 1">
+        <v-card style="flex: 1">
           <v-card-item>
             <EchartDrillDown />
           </v-card-item>
@@ -22,7 +23,7 @@
       <!-- <v-sheet
         style="height: 50vh; padding: 10px; padding-right: 0; display: flex"
       >
-        <v-card :color="primary" :variant="elevated" style="flex: 1">
+        <v-card style="flex: 1">
           <v-card-item>
             <SaillingAnimation />
           </v-card-item>
@@ -40,7 +41,7 @@
           background-color: #f7f7f7;
         "
       >
-        <v-card :color="primary" :variant="elevated" style="flex: 1">
+        <v-card style="flex: 1">
           <v-card-item>
             <EchartDoughnut />
           </v-card-item>
@@ -57,30 +58,18 @@
           background-color: #f7f7f7;
         "
       >
-        <v-card :color="primary" :variant="elevated" style="flex: 1">
+        <v-card style="flex: 1">
           <v-card-item>
             <EchartHalfDoughnut />
           </v-card-item>
         </v-card>
       </v-sheet>
     </v-col>
-
-    <!-- <v-col cols="4">
-      <v-sheet class="bg-surface-variant" >
-        <SaillingAnimation />
-      </v-sheet>
-    </v-col>
-    <v-col cols="4">
-      <v-sheet style="height: 50vh"> .v-col-auto </v-sheet>
-    </v-col>
-    <v-col cols="4">
-      <v-sheet style="height: 50vh"> .v-col-auto </v-sheet>
-    </v-col> -->
   </v-row>
   <v-row>
     <v-col style="background-color: #f7f7f7">
       <v-sheet style="height: 51vh; padding-right: 10px; padding-left: 10px; background-color: #f7f7f7">
-        <v-card :color="primary" :variant="elevated" style="flex: 1">
+        <v-card style="flex: 1">
           <v-card-item>
             <VoyageTable />
           </v-card-item>
@@ -91,7 +80,7 @@
 </template>
 
 <script setup>
-import VoyageTable from "../components/VoyageTable1.vue";
+import VoyageTable from "../components/VoyageTable.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut1";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";

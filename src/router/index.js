@@ -8,19 +8,9 @@ const routes = [
     component: () => import("../views/DashBoard.vue"),
   },
   {
-    path: "/signup",
-    name: "signup",
-    component: () => import("../views/SignUpView.vue"),
-  },
-  {
     path: "/realtimeview",
     name: "realtimeview",
     component: () => import("../views/RealtimeView.vue"),
-  },
-  {
-    path: "/trialrundata",
-    name: "trialrundata",
-    component: () => import("../views/TrialRunData.vue"),
   },
   {
     path: "/alldata",
@@ -43,21 +33,6 @@ const routes = [
     component: () => import("../views/DataGraph.vue"),
   },
   {
-    path: "/adminview",
-    name: "adminview",
-    component: () => import("../views/AdminView.vue"),
-  },
-  {
-    path: "/voyagedata",
-    name: "voyagedata",
-    component: () => import("../views/VoyageData.vue"),
-  },
-  {
-    path: "/authority",
-    name: "authority",
-    component: () => import("../views/AuthorityView.vue"),
-  },
-  {
     path: "/manager",
     name: "manager",
     component: () => import("../views/ManagerAll.vue"),
@@ -69,11 +44,6 @@ const routes = [
   },
 
   // components
-  {
-    path: "/weathercard",
-    name: "weathercard",
-    component: () => import("../components/WeatherCard.vue"),
-  },
   {
     path: "/ex1",
     name: "ex1",
