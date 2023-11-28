@@ -9,7 +9,8 @@
     <div v-else-if="showSignup">
       <div class="form-signup">
         <img
-          img src="/image/kriso.png"
+          img
+          src="/image/kriso.png"
           alt=""
           width="200"
           style="margin-bottom: 30px"
@@ -59,13 +60,6 @@
 
         <v-text-field
           variant="outlined"
-          v-model="newemail"
-          :rules="rules.Email"
-          label="이메일"
-        ></v-text-field>
-
-        <v-text-field
-          variant="outlined"
           v-model="newname"
           :rules="rules.Name"
           label="이름"
@@ -78,7 +72,21 @@
           label="소속"
         ></v-text-field>
 
-        <v-row>
+        <v-text-field
+          variant="outlined"
+          v-model="newemail"
+          :rules="rules.Email"
+          label="이메일"
+        ></v-text-field>
+
+        <v-text-field
+          variant="outlined"
+          v-model="newphone"
+          label="전화번호"
+          hint="선택사항"
+        ></v-text-field>
+
+        <v-row style="padding-top: 20px;">
           <v-col cols="6">
             <v-btn
               block
@@ -118,7 +126,7 @@
           </div>
 
           <v-text-field
-            placeholder="Email address"
+            placeholder="Enter your ID"
             prepend-inner-icon="mdi-email-outline"
             variant="outlined"
             type="text"
@@ -141,6 +149,7 @@
             prepend-inner-icon="mdi-lock-outline"
             variant="outlined"
             @click:append-inner="visible = !visible"
+            @keyup.enter="login"
           ></v-text-field>
           <!-- 
           <v-card class="mb-12" color="surface-variant" variant="tonal">
@@ -199,6 +208,7 @@ const checknewpassword = ref("");
 const newemail = ref("");
 const newname = ref("");
 const newaffiliation = ref("");
+const newphone = ref("");
 
 const rulesid = ref(false);
 const rulespw = ref(false);
@@ -235,6 +245,10 @@ const signupBtn = () => {
     const data = {
       userName: `${newid.value}`,
       password: `${newpassword.value}`,
+      name: `${newname.value}`,
+      affiliation: `${newaffiliation.value}`,
+      email: `${newemail.value}`,
+      phone: `${newphone.value}`,
     };
     // 회원가입 기능
 
@@ -295,7 +309,7 @@ const rules = ref({
         return true;
       } else {
         rulesname.value = false;
-        return "Must be at least 1 character.";
+        return "1글자 이상 입력하세요";
       }
     },
   ],
@@ -306,7 +320,7 @@ const rules = ref({
         return true;
       } else {
         rulesname.value = false;
-        return "Must be at least 1 character.";
+        return "1글자 이상 입력하세요";
       }
     },
   ],
@@ -317,7 +331,7 @@ const rules = ref({
         return true;
       } else {
         rulesname.value = false;
-        return "ID must be at least 4 characters.";
+        return "아이디는 최소 4글자를 입력해주세요";
       }
     },
   ],
@@ -328,7 +342,7 @@ const rules = ref({
         return true;
       } else {
         rulesname.value = false;
-        return "Password must be at least 6 characters and contain numbers and letters..";
+        return "비밀번호는 최소 6글자를 입력하고, 문자를 포함해주세요";
       }
     },
   ],
@@ -353,24 +367,15 @@ const rules = ref({
         return true;
       } else {
         rulesemail.value = false;
-        return "Invalid e-mail.";
+        return "이메일 형식으로 입력해주세요";
       }
     },
   ],
 });
 
-// 페이지가 처음 로드될 때 사용자 로그인 상태를 확인합니다.
-onMounted(() => {
-  if (userid.value === "a") {
-    showDashboard.value = true;
-  }
-});
 
 // 로그인 및 로그아웃 로직을 구현합니다.
 const login = () => {
-  if (userid.value === "a") {
-    showDashboard.value = true;
-  }
   const data = {
     userName: `${userid.value}`,
     password: `${password.value}`,
@@ -387,8 +392,8 @@ const login = () => {
       alert(response.data);
       showDashboard.value = true;
       sessionStorage.setItem("showDashboard", true);
-      userid.value = '';
-      password.value = '';
+      userid.value = "";
+      password.value = "";
     })
     .catch((error) => {
       console.error(error.response.data);
@@ -409,7 +414,6 @@ const logout = () => {
   sessionStorage.setItem("userid", userid.value);
   sessionStorage.setItem("isAdmin", userid.value);
 };
-
 </script>
 
 <style>

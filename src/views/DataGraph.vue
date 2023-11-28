@@ -1,5 +1,9 @@
 <template>
-  <v-card height="93vh" class="pa-1 d-flex justify-center align-center">
+  <v-card
+    height="93vh"
+    style="background-color: #f7f7f7"
+    class="pa-1 d-flex justify-center align-center"
+  >
     <v-row>
       <v-col cols="9">
         <v-row>
@@ -11,6 +15,7 @@
                 padding-bottom: 0px;
                 padding-right: 0;
                 display: flex;
+                background-color: #f7f7f7;
               "
             >
               <v-card style="flex: 1">
@@ -33,6 +38,7 @@
                 padding-top: 10px;
                 padding-right: 0;
                 display: flex;
+                background-color: #f7f7f7;
               "
             >
               <v-card style="flex: 1">
@@ -61,6 +67,7 @@
                 padding-bottom: 5px;
                 padding-left: 10;
                 display: flex;
+                background-color: #f7f7f7;
               "
             >
               <v-card style="flex: 1">
@@ -319,13 +326,15 @@ const searchData = async () => {
             analysisData.value = [];
             analysisTime.value = [];
             for (let i = 0; i < gga.data.length; i++) {
-              analysisData.value.push((gga.data[i].latitude/100));
+              analysisData.value.push(gga.data[i].latitude / 100);
 
               analysisTime.value.push(
                 gga.data[i].timestamp_DATACONF.slice(11, 19)
               );
             }
-            analysis.value[0].name = "latitude";analysis.value[0].name = "heading";analysis.value[0].name = "heading";
+            analysis.value[0].name = "latitude";
+            analysis.value[0].name = "heading";
+            analysis.value[0].name = "heading";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             break;
@@ -333,13 +342,15 @@ const searchData = async () => {
             analysisData.value = [];
             analysisTime.value = [];
             for (let i = 0; i < gga.data.length; i++) {
-              analysisData.value.push((gga.data[i].longitude/100));
+              analysisData.value.push(gga.data[i].longitude / 100);
 
               analysisTime.value.push(
                 gga.data[i].timestamp_DATACONF.slice(11, 19)
               );
             }
-            analysis.value[0].name = "longitude";analysis.value[0].name = "heading";analysis.value[0].name = "heading";
+            analysis.value[0].name = "longitude";
+            analysis.value[0].name = "heading";
+            analysis.value[0].name = "heading";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             break;
@@ -353,7 +364,9 @@ const searchData = async () => {
                 gga.data[i].timestamp_DATACONF.slice(11, 19)
               );
             }
-            analysis.value[0].name = "altitude";analysis.value[0].name = "heading";analysis.value[0].name = "heading";
+            analysis.value[0].name = "altitude";
+            analysis.value[0].name = "heading";
+            analysis.value[0].name = "heading";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             break;
@@ -367,7 +380,9 @@ const searchData = async () => {
                 vtg.data[i].timestamp_DATACONF.slice(11, 19)
               );
             }
-            analysis.value[0].name = "speedovergroundknots";analysis.value[0].name = "heading";analysis.value[0].name = "heading";
+            analysis.value[0].name = "speedovergroundknots";
+            analysis.value[0].name = "heading";
+            analysis.value[0].name = "heading";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             break;
@@ -381,7 +396,9 @@ const searchData = async () => {
                 vtg.data[i].timestamp_DATACONF.slice(11, 19)
               );
             }
-            analysis.value[0].name = "courseovergrounddegreestrue";analysis.value[0].name = "heading";analysis.value[0].name = "heading";
+            analysis.value[0].name = "courseovergrounddegreestrue";
+            analysis.value[0].name = "heading";
+            analysis.value[0].name = "heading";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             break;
@@ -423,7 +440,9 @@ const searchData = async () => {
                 rot.data[i].timestamp_DATACONF.slice(11, 19)
               );
             }
-            analysis.value[0].name = "rateofturn";analysis.value[0].name = "heading";analysis.value[0].name = "heading";
+            analysis.value[0].name = "rateofturn";
+            analysis.value[0].name = "heading";
+            analysis.value[0].name = "heading";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             break;
@@ -462,7 +481,9 @@ const searchData = async () => {
                 mwv.data[i].timestamp_DATACONF.slice(11, 19)
               );
             }
-            analysis.value[0].name = "anemometerspeed";analysis.value[0].name = "heading";analysis.value[0].name = "heading";
+            analysis.value[0].name = "anemometerspeed";
+            analysis.value[0].name = "heading";
+            analysis.value[0].name = "heading";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             break;
@@ -489,7 +510,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 vhw.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "speedn";
+            }
+            analysis.value[0].name = "speedn";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -536,7 +558,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_61444.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_SPEED";
+            }
+            analysis.value[0].name = "engine_SPEED";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -552,7 +575,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65262.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_OIL_TEMPERATURE1";
+            }
+            analysis.value[0].name = "engine_OIL_TEMPERATURE1";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -568,7 +592,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_OIL_PRESSURE";
+            }
+            analysis.value[0].name = "engine_OIL_PRESSURE";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -584,7 +609,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_COOLANT_LEVEL";
+            }
+            analysis.value[0].name = "engine_COOLANT_LEVEL";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -600,7 +626,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65272.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "transmission_OIL_PRESSURE";
+            }
+            analysis.value[0].name = "transmission_OIL_PRESSURE";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -616,7 +643,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
+            }
+            analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -632,7 +660,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "battery_POTENTIAL";
+            }
+            analysis.value[0].name = "battery_POTENTIAL";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -648,7 +677,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65253.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_TOTAL_HOURS";
+            }
+            analysis.value[0].name = "engine_TOTAL_HOURS";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -662,7 +692,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "";
+            }
+            analysis.value[0].name = "";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -676,7 +707,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "";
+            }
+            analysis.value[0].name = "";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -690,7 +722,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "";
+            }
+            analysis.value[0].name = "";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -706,7 +739,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no1engine_panel_65276.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "fuel_LEVEL_1";
+            }
+            analysis.value[0].name = "fuel_LEVEL_1";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -753,7 +787,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_61444.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_SPEED";
+            }
+            analysis.value[0].name = "engine_SPEED";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -769,7 +804,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65262.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_OIL_TEMPERATURE1";
+            }
+            analysis.value[0].name = "engine_OIL_TEMPERATURE1";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -785,7 +821,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_OIL_PRESSURE";
+            }
+            analysis.value[0].name = "engine_OIL_PRESSURE";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -801,7 +838,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_COOLANT_LEVEL";
+            }
+            analysis.value[0].name = "engine_COOLANT_LEVEL";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -817,7 +855,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65272.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "transmission_OIL_PRESSURE";
+            }
+            analysis.value[0].name = "transmission_OIL_PRESSURE";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -833,7 +872,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
+            }
+            analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -849,7 +889,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "battery_POTENTIAL";
+            }
+            analysis.value[0].name = "battery_POTENTIAL";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -865,7 +906,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65253.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "engine_TOTAL_HOURS";
+            }
+            analysis.value[0].name = "engine_TOTAL_HOURS";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -879,7 +921,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "";
+            }
+            analysis.value[0].name = "";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -893,7 +936,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "";
+            }
+            analysis.value[0].name = "";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -907,7 +951,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "";
+            }
+            analysis.value[0].name = "";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);
@@ -923,7 +968,8 @@ const searchData = async () => {
               analysisTime.value.push(
                 no2engine_panel_65276.data[i].timestamp_DATACONF.slice(11, 19)
               );
-            }analysis.value[0].name = "fuel_LEVEL_1";
+            }
+            analysis.value[0].name = "fuel_LEVEL_1";
             console.log(analysisData.value);
             console.log(analysisTime.value);
             console.log(selectedtrialNum.value);

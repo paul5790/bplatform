@@ -1,11 +1,9 @@
 <template>
   <v-card>
-    <v-layout style="
-      height: 100vh;
-      display: flex;
-      overflow-y: auto;
-    "
-    class="scrollable-card">
+    <v-layout
+      style="height: 100vh; display: flex; overflow-y: auto"
+      class="scrollable-card"
+    >
       <v-navigation-drawer v-model="drawer" app expand-on-hover rail>
         <v-list>
           <v-list-item>
@@ -93,7 +91,7 @@
             v-if="iconshow"
           ></v-app-bar-nav-icon>
           <v-toolbar-title>
-            <p style="font-size: 23px; margin-top: 5px">
+            <p style="font-size: 23.5px; margin-top: 5px">
               {{ selected_item }}
             </p></v-toolbar-title
           >
@@ -143,6 +141,7 @@
               <v-col cols="12"><p style="font-size: 13px">기본정보</p></v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  :readonly="change"
                   label="User ID"
                   variant="solo"
                   required
@@ -151,9 +150,9 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  :readonly="change"
                   label="User Name"
                   variant="solo"
-                  hint="example of persistent helper text"
                   persistent-hint
                   v-model="cname"
                   required
@@ -161,6 +160,7 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
+                  :readonly="change"
                   label="Affiliation"
                   variant="solo"
                   type="text"
@@ -176,9 +176,12 @@
                   v-model="permission"
                 ></v-text-field>
               </v-col>
-              <v-col cols="12"><p style="font-size: 13px">연락처 정보</p></v-col>
+              <v-col cols="12"
+                ><p style="font-size: 13px">연락처 정보</p></v-col
+              >
               <v-col cols="12">
                 <v-text-field
+                  :readonly="change"
                   v-model="cemail"
                   label="User Email"
                   variant="solo"
@@ -187,6 +190,7 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field
+                  :readonly="change"
                   v-model="cnumber"
                   label="Phone Number"
                   variant="solo"
@@ -194,7 +198,6 @@
               </v-col>
             </v-row>
           </v-container>
-          <small>*indicates required field</small>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -234,6 +237,7 @@ const emits = defineEmits(["logout"]);
 const logoutDialog = ref(false);
 const privacyDialog = ref(false);
 const selected_item = ref(sessionStorage.getItem("page") || "대시보드");
+const change = ref(true);
 watchEffect(() => {
   //
 });
@@ -280,10 +284,13 @@ const caffiliation = ref();
 const cnumber = ref();
 const privacyout = () => {
   privacyDialog.value = false;
+  change.value = true;
 };
 
 const privacychange = () => {
-  privacyDialog.value = false;
+  privacyDialog.value = true;
+  change.value = false;
+
 };
 
 const toggleDrawer = () => {

@@ -1,4 +1,13 @@
 <template>
+    <div class="autocomplete-container">
+    <v-autocomplete
+    v-model="selectedtrialNum"
+      label="select"
+      :items="trialrun"
+      variant="underlined"
+      style="width: 120px;"
+       position="top right"
+    ></v-autocomplete>
   <v-sheet
     :elevation="elevation"
     style="display: flex; flex-direction: column; align-items: center"
@@ -11,6 +20,7 @@
       @click="handleChartClick"
     />
   </v-sheet>
+  </div>
 </template>
 
 <script setup>
@@ -25,7 +35,7 @@ import {
   GraphicComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted } from "vue";
+import { ref, provide, onMounted, watch } from "vue";
 import axios from "axios";
 
 use([
@@ -37,6 +47,28 @@ use([
   GridComponent,
   GraphicComponent,
 ]);
+
+const trialrun = ref([]);
+const selectedtrialNum = ref();
+const trialNum = ref(1);
+
+const getTrialDate = async () => {
+  try {
+    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
+    for (let i = 0; i < response.data.length; i++) {
+      
+      trialrun.value.push(`항차 ${i + 1}번`);
+      selectedtrialNum.value = trialrun.value[0]
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+onMounted(getTrialDate);
+
+
+
+
 const GLL = ref(0);
 const GGA = ref(0);
 const RMC = ref(0);
@@ -224,8 +256,9 @@ const fetchData = async () => {
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
         const response = await axios.post(
-          `http://192.168.0.73:8080/info/lossdata/${endpoint}/1/${settingTime.value}`
+          `http://192.168.0.73:8080/info/lossdata/${endpoint}/${trialNum.value}/${settingTime.value}`
         );
+        dataRefs[i].value = 0
         dataRefs[i].value += Number(response.data.countDelay);
       } catch (error) {
         if (error.response && error.response.status === 409) {
@@ -246,6 +279,14 @@ const fetchData = async () => {
   }
 };
 onMounted(() => {
+  fetchData();
+});
+
+// selectedtrialNum의 변경을 감시하고 변경되면 trialNum을 갱신하고 fetchData 실행
+watch(selectedtrialNum, (newTrialNum) => {
+  // 항차 N번에서 N 추출
+  const num = parseInt(newTrialNum.match(/\d+/)[0]);
+  trialNum.value = num;
   fetchData();
 });
 
@@ -369,7 +410,7 @@ const handleChartClick = (event) => {
         graphic: [
           {
             type: "text",
-            right: 50,
+            left: 50,
             top: 20,
             style: {
               text: "Back",
@@ -726,5 +767,14 @@ const updateChart = () => {
 }
 body {
   margin: 0;
+}
+.autocomplete-container {
+  position: relative;
+}
+
+.v-autocomplete {
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 </style>

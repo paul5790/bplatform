@@ -145,11 +145,13 @@
         </v-tab>
       </v-tabs>
       <v-window
+      class="scrollable-card"
         v-model="tab"
         style="
+          overflow-y: auto;
           box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
           border-radius: 8px;
-          height: 72vh;
+          height: 69vh;
         "
       >
         <v-window-item
@@ -157,19 +159,18 @@
           :key="index"
           :value="index"
         >
-          <v-card style="flex: 1">
+          <v-card>
             <v-card-item>
               <v-data-table
                 v-model="selectedData"
                 v-model:page="page"
                 :items-per-page="itemsPerPage"
-                density="dense"
-                class="elevation-1"
+                :density="'dense'"
                 :headers="headerName"
                 :items="dataSet"
                 item-value="name"
                 return-object
-                style="height: 70vh"
+                style="padding-top: 5px"
               >
                 <template v-slot:bottom>
                   <div class="text-center pt-2">
@@ -189,7 +190,7 @@
         <v-spacer></v-spacer>
         <v-btn
           color="white"
-          style="background-color: #009dff"
+          style="background-color: #009dff; margin-top: 10px;"
           @click="dataDownload()"
           >데이터 다운로드</v-btn
         >
@@ -697,241 +698,300 @@ const tabAction = async () => {
   // dataSet.value = GLL.value;
   const selectedTab = selectedData.value[tab.value];
   console.log(selectedTab);
+  page.value = 1;
 
   // Find the selected data based on the tab value
   switch (selectedTab) {
     case "GLL":
       console.log(GLL.value);
+      itemsPerPage.value = 11;
       dataSet.value = GLL.value;
       console.log(dataSet.value);
       headerName.value = GLLheader.value;
       console.log(headerName.value);
       break;
     case "GGA":
+      itemsPerPage.value = 11;
       dataSet.value = GGA.value;
       headerName.value = GGAheader.value;
       break;
     case "RMC":
+      itemsPerPage.value = 11;
       dataSet.value = RMC.value;
       headerName.value = RMCheader.value;
       break;
     case "VTG":
+      itemsPerPage.value = 11;
       dataSet.value = VTG.value;
       headerName.value = VTGheader.value;
       break;
     case "ZDA":
+      itemsPerPage.value = 11;
       dataSet.value = ZDA.value;
       headerName.value = ZDAheader.value;
       break;
     case "DTM":
+      itemsPerPage.value = 11;
       dataSet.value = DTM.value;
       headerName.value = DTMheader.value;
       break;
     case "GSV":
+      itemsPerPage.value = 11;
       dataSet.value = GSV.value;
       headerName.value = GSVheader.value;
       break;
     case "GSA":
+      itemsPerPage.value = 11;
       dataSet.value = GSA.value;
       headerName.value = GSAheader.value;
       break;
     case "THS":
+      itemsPerPage.value = 22;
       dataSet.value = THS.value;
       headerName.value = THSheader.value;
       break;
     case "HDT":
+      itemsPerPage.value = 22;
       dataSet.value = HDT.value;
       headerName.value = HDTheader.value;
       break;
     case "ROT":
+      itemsPerPage.value = 22;
       dataSet.value = ROT.value;
       headerName.value = ROTheader.value;
       break;
     case "MWV":
+      itemsPerPage.value = 11;
       dataSet.value = MWV.value;
       headerName.value = MWVheader.value;
       break;
     case "MWD":
+      itemsPerPage.value = 11;
       dataSet.value = MWD.value;
       headerName.value = MWDheader.value;
       break;
     case "VWR":
+      itemsPerPage.value = 11;
       dataSet.value = VWR.value;
       headerName.value = VWRheader.value;
       break;
     case "MTW":
+      itemsPerPage.value = 11;
       dataSet.value = MTW.value;
       headerName.value = MTWheader.value;
       break;
     case "VWT":
+      itemsPerPage.value = 11;
       dataSet.value = VWT.value;
       headerName.value = VWTheader.value;
       break;
     case "TTM":
+      itemsPerPage.value = 11;
       dataSet.value = TTM.value;
       headerName.value = TTMheader.value;
       break;
     case "TLL":
+      itemsPerPage.value = 11;
       dataSet.value = TLL.value;
       headerName.value = TLLheader.value;
       break;
     case "RSCREEN":
+      itemsPerPage.value = 11;
       dataSet.value = RSCREEN.value;
       headerName.value = RSCREENheader.value;
       break;
     case "VDM":
+      itemsPerPage.value = 11;
       dataSet.value = VDM.value;
       headerName.value = VDMheader.value;
       break;
     case "VDO":
+      itemsPerPage.value = 11;
       dataSet.value = VDO.value;
       headerName.value = VDOheader.value;
       break;
     case "ROUTEINFO":
+      itemsPerPage.value = 11;
       dataSet.value = ROUTEINFO.value;
       headerName.value = ROUTEINFOheader.value;
       break;
     case "WAYPOINTS":
+      itemsPerPage.value = 11;
       dataSet.value = WAYPOINTS.value;
       headerName.value = WAYPOINTSheader.value;
       break;
     case "ESCREEN":
+      itemsPerPage.value = 11;
       dataSet.value = ESCREEN.value;
       headerName.value = ESCREENheader.value;
       break;
     case "RSA":
+      itemsPerPage.value = 22;
       dataSet.value = RSA.value;
       headerName.value = RSAheader.value;
       break;
     case "MODE":
+      itemsPerPage.value = 11;
       dataSet.value = MODE.value;
       headerName.value = MODEheader.value;
       break;
     case "HTD":
+      itemsPerPage.value = 11;
       dataSet.value = HTD.value;
       headerName.value = HTDheader.value;
       break;
     case "VBW":
+      itemsPerPage.value = 11;
       dataSet.value = VBW.value;
       headerName.value = VBWheader.value;
       break;
     case "VHW":
+      itemsPerPage.value = 11;
       dataSet.value = VHW.value;
       headerName.value = VHWheader.value;
       break;
     case "VLW":
+      itemsPerPage.value = 11;
       dataSet.value = VLW.value;
       headerName.value = VLWheader.value;
       break;
     case "NO.1ENGINE_PANEL_61444":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_61444.value;
       headerName.value = NO1ENGINE_PANEL_61444header.value;
       break;
     case "NO.1ENGINE_PANEL_65262":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65262.value;
       headerName.value = NO1ENGINE_PANEL_65262header.value;
       break;
     case "NO.1ENGINE_PANEL_65263":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65263.value;
       headerName.value = NO1ENGINE_PANEL_65263header.value;
       break;
     case "NO.1ENGINE_PANEL_65272":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65272.value;
       headerName.value = NO1ENGINE_PANEL_65272header.value;
       break;
     case "NO.1ENGINE_PANEL_65271":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65271.value;
       headerName.value = NO1ENGINE_PANEL_65271header.value;
       break;
     case "NO.1ENGINE_PANEL_65253":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65253.value;
       headerName.value = NO1ENGINE_PANEL_65253header.value;
       break;
     case "NO.1ENGINE_PANEL_65270":
+      itemsPerPage.value = 11;
       dataSet.value = NO1ENGINE_PANEL_65270.value;
       headerName.value = NO1ENGINE_PANEL_65270header.value;
       break;
     case "NO.1ENGINE_PANEL_65276":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65276.value;
       headerName.value = NO1ENGINE_PANEL_65276header.value;
       break;
     case "NO.1ENGINE_PANEL_65360":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65360.value;
       headerName.value = NO1ENGINE_PANEL_65360header.value;
       break;
     case "NO.1ENGINE_PANEL_65361_LAMP":
+      itemsPerPage.value = 11;
       dataSet.value = NO1ENGINE_PANEL_65361_LAMP.value;
       headerName.value = NO1ENGINE_PANEL_65361_LAMPheader.value;
       break;
     case "NO.1ENGINE_PANEL_65361_STATUS":
+      itemsPerPage.value = 11;
       dataSet.value = NO1ENGINE_PANEL_65361_STATUS.value;
       headerName.value = NO1ENGINE_PANEL_65361_STATUSheader.value;
       break;
     case "NO.1ENGINE_PANEL_65378":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65378.value;
       headerName.value = NO1ENGINE_PANEL_65378header.value;
       break;
     case "NO.1ENGINE_PANEL_65376":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65376.value;
       headerName.value = NO1ENGINE_PANEL_65376header.value;
       break;
     case "NO.1ENGINE_PANEL_65379":
+      itemsPerPage.value = 22;
       dataSet.value = NO1ENGINE_PANEL_65379.value;
       headerName.value = NO1ENGINE_PANEL_65379header.value;
       break;
     case "NO.2ENGINE_PANEL_61444":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_61444.value;
       headerName.value = NO2ENGINE_PANEL_61444header.value;
       break;
     case "NO.2ENGINE_PANEL_65262":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65262.value;
       headerName.value = NO2ENGINE_PANEL_65262header.value;
       break;
     case "NO.2ENGINE_PANEL_65263":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65263.value;
       headerName.value = NO2ENGINE_PANEL_65263header.value;
       break;
     case "NO.2ENGINE_PANEL_65272":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65272.value;
       headerName.value = NO2ENGINE_PANEL_65272header.value;
       break;
     case "NO.2ENGINE_PANEL_65271":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65271.value;
       headerName.value = NO2ENGINE_PANEL_65271header.value;
       break;
     case "NO.2ENGINE_PANEL_65253":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65253.value;
       headerName.value = NO2ENGINE_PANEL_65253header.value;
       break;
     case "NO.2ENGINE_PANEL_65270":
+      itemsPerPage.value = 11;
       dataSet.value = NO2ENGINE_PANEL_65270.value;
       headerName.value = NO2ENGINE_PANEL_65270header.value;
       break;
     case "NO.2ENGINE_PANEL_65276":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65276.value;
       headerName.value = NO2ENGINE_PANEL_65276header.value;
       break;
     case "NO.2ENGINE_PANEL_65360":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65360.value;
       headerName.value = NO2ENGINE_PANEL_65360header.value;
       break;
     case "NO.2ENGINE_PANEL_65361_LAMP":
+      itemsPerPage.value = 11;
       dataSet.value = NO2ENGINE_PANEL_65361_LAMP.value;
       headerName.value = NO2ENGINE_PANEL_65361_LAMPheader.value;
       break;
     case "NO.2ENGINE_PANEL_65361_STATUS":
+      itemsPerPage.value = 11;
       dataSet.value = NO2ENGINE_PANEL_65361_STATUS.value;
       headerName.value = NO2ENGINE_PANEL_65361_STATUSheader.value;
       break;
     case "NO.2ENGINE_PANEL_65378":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65378.value;
       headerName.value = NO2ENGINE_PANEL_65378header.value;
       break;
     case "NO.2ENGINE_PANEL_65376":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65376.value;
       headerName.value = NO2ENGINE_PANEL_65376header.value;
       break;
     case "NO.2ENGINE_PANEL_65379":
+      itemsPerPage.value = 22;
       dataSet.value = NO2ENGINE_PANEL_65379.value;
       headerName.value = NO2ENGINE_PANEL_65379header.value;
       break;
