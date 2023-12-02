@@ -155,13 +155,13 @@ use([
 ]);
 provide(THEME_KEY);
 // 왼쪽 셀렉바 설정
+const tokenid = ref(sessionStorage.getItem("token") || "");
 const analysisData = ref([]);
 const analysisTime = ref([]);
 const subComponents = ref([
   "DGPS",
   "GYRO",
   "ANEMOMETER",
-  "AUTOPILOT",
   "SPEEDLOG",
   "NO.1ENGINEPANEL",
   "NO.2ENGINEPANEL",
@@ -180,8 +180,8 @@ const getTrialDate = async () => {
   try {
     const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
     for (let i = 0; i < response.data.length; i++) {
-      setStartTime.value.push(`${response.data[i].start_TIME_UTC}`);
-      setEndTime.value.push(`${response.data[i].end_TIME_UTC}`);
+      setStartTime.value.push(`${response.data[i].startTimeUtc}`);
+      setEndTime.value.push(`${response.data[i].endTimeUtc}`);
       selectedtrialNum.value = i + 1;
       console.log(setStartTime.value);
       console.log(setEndTime.value);
@@ -306,7 +306,8 @@ onMounted(() => {
 });
 
 const searchData = async () => {
-  analysisData.value = [];
+  try {
+    analysisData.value = [];
   analysisTime.value = [];
   if (
     selectedsubComponent.value !== null &&
@@ -316,10 +317,24 @@ const searchData = async () => {
     if (selectedsubComponent.value === "DGPS") {
       try {
         const gga = await axios.post(
-          `http://192.168.0.73:8080/data2/dgps/gga/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/dgps/gga/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const vtg = await axios.post(
-          `http://192.168.0.73:8080/data2/dgps/vtg/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/dgps/vtg/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         switch (selectedItem.value) {
           case "위도":
@@ -329,7 +344,7 @@ const searchData = async () => {
               analysisData.value.push(gga.data[i].latitude / 100);
 
               analysisTime.value.push(
-                gga.data[i].timestamp_DATACONF.slice(11, 19)
+                gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "latitude";
@@ -345,7 +360,7 @@ const searchData = async () => {
               analysisData.value.push(gga.data[i].longitude / 100);
 
               analysisTime.value.push(
-                gga.data[i].timestamp_DATACONF.slice(11, 19)
+                gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "longitude";
@@ -361,7 +376,7 @@ const searchData = async () => {
               analysisData.value.push(gga.data[i].altitude);
 
               analysisTime.value.push(
-                gga.data[i].timestamp_DATACONF.slice(11, 19)
+                gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "altitude";
@@ -377,7 +392,7 @@ const searchData = async () => {
               analysisData.value.push(vtg.data[i].speedovergroundknots);
 
               analysisTime.value.push(
-                vtg.data[i].timestamp_DATACONF.slice(11, 19)
+                vtg.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "speedovergroundknots";
@@ -393,7 +408,7 @@ const searchData = async () => {
               analysisData.value.push(vtg.data[i].courseovergrounddegreestrue);
 
               analysisTime.value.push(
-                vtg.data[i].timestamp_DATACONF.slice(11, 19)
+                vtg.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "courseovergrounddegreestrue";
@@ -409,10 +424,24 @@ const searchData = async () => {
     } else if (selectedsubComponent.value === "GYRO") {
       try {
         const hdt = await axios.post(
-          `http://192.168.0.73:8080/data2/gyro/hdt/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/gyro/hdt/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const rot = await axios.post(
-          `http://192.168.0.73:8080/data2/gyro/rot/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/gyro/rot/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         switch (selectedItem.value) {
           case "Heading":
@@ -422,7 +451,7 @@ const searchData = async () => {
               analysisData.value.push(hdt.data[i].heading);
 
               analysisTime.value.push(
-                hdt.data[i].timestamp_DATACONF.slice(11, 19)
+                hdt.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "heading";
@@ -437,7 +466,7 @@ const searchData = async () => {
               analysisData.value.push(rot.data[i].rateofturn);
 
               analysisTime.value.push(
-                rot.data[i].timestamp_DATACONF.slice(11, 19)
+                rot.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "rateofturn";
@@ -453,7 +482,14 @@ const searchData = async () => {
     } else if (selectedsubComponent.value === "ANEMOMETER") {
       try {
         const mwv = await axios.post(
-          `http://192.168.0.73:8080/data2/anemometer/mwv/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/anemometer/mwv/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         switch (selectedItem.value) {
           case "풍향":
@@ -463,7 +499,7 @@ const searchData = async () => {
               analysisData.value.push(mwv.data[i].anemometerangle);
 
               analysisTime.value.push(
-                mwv.data[i].timestamp_DATACONF.slice(11, 19)
+                mwv.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "anemometerangle";
@@ -478,7 +514,7 @@ const searchData = async () => {
               analysisData.value.push(mwv.data[i].anemometerspeed);
 
               analysisTime.value.push(
-                mwv.data[i].timestamp_DATACONF.slice(11, 19)
+                mwv.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "anemometerspeed";
@@ -494,7 +530,14 @@ const searchData = async () => {
     } else if (selectedsubComponent.value === "SPEEDLOG") {
       try {
         const vhw = await axios.post(
-          `http://192.168.0.73:8080/data2/speedlog/vhw/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/speedlog/vhw/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         switch (selectedItem.value) {
           case "선박 속도":
@@ -508,7 +551,7 @@ const searchData = async () => {
               }
 
               analysisTime.value.push(
-                vhw.data[i].timestamp_DATACONF.slice(11, 19)
+                vhw.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "speedn";
@@ -523,28 +566,84 @@ const searchData = async () => {
     } else if (selectedsubComponent.value === "NO.1ENGINEPANEL") {
       try {
         const no1engine_panel_61444 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_61444/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_61444/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no1engine_panel_65262 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_65262/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65262/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no1engine_panel_65263 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_65263/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65263/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no1engine_panel_65272 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_65272/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65272/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no1engine_panel_65271 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_65271/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65271/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no1engine_panel_65253 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_65253/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65253/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no1engine_panel_65270 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_65270/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65270/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no1engine_panel_65276 = await axios.post(
-          `http://192.168.0.73:8080/data2/no1enginepanel/no1engine_panel_65276/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65276/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         switch (selectedItem.value) {
           case "엔진1 속도":
@@ -556,7 +655,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_61444.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_SPEED";
@@ -573,7 +672,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65262.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_OIL_TEMPERATURE1";
@@ -590,7 +689,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_OIL_PRESSURE";
@@ -607,7 +706,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_COOLANT_LEVEL";
@@ -624,7 +723,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65272.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "transmission_OIL_PRESSURE";
@@ -641,7 +740,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
@@ -658,7 +757,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "battery_POTENTIAL";
@@ -675,7 +774,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65253.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_TOTAL_HOURS";
@@ -690,7 +789,7 @@ const searchData = async () => {
               analysisData.value.push(no1engine_panel_65270.data[i]);
 
               analysisTime.value.push(
-                no1engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "";
@@ -705,7 +804,7 @@ const searchData = async () => {
               analysisData.value.push(no1engine_panel_65270.data[i]);
 
               analysisTime.value.push(
-                no1engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "";
@@ -720,7 +819,7 @@ const searchData = async () => {
               analysisData.value.push(no1engine_panel_65270.data[i]);
 
               analysisTime.value.push(
-                no1engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "";
@@ -737,7 +836,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no1engine_panel_65276.data[i].timestamp_DATACONF.slice(11, 19)
+                no1engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "fuel_LEVEL_1";
@@ -752,28 +851,84 @@ const searchData = async () => {
     } else if (selectedsubComponent.value === "NO.2ENGINEPANEL") {
       try {
         const no2engine_panel_61444 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_61444/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_61444/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no2engine_panel_65262 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_65262/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65262/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no2engine_panel_65263 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_65263/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65263/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no2engine_panel_65272 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_65272/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65272/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no2engine_panel_65271 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_65271/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65271/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no2engine_panel_65253 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_65253/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65253/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no2engine_panel_65270 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_65270/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65270/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         const no2engine_panel_65276 = await axios.post(
-          `http://192.168.0.73:8080/data2/no2enginepanel/no2engine_panel_65276/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65276/${selectedtrialNum.value}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
         );
         switch (selectedItem.value) {
           case "엔진2 속도":
@@ -785,7 +940,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_61444.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_SPEED";
@@ -802,7 +957,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65262.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_OIL_TEMPERATURE1";
@@ -819,7 +974,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_OIL_PRESSURE";
@@ -836,7 +991,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65263.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_COOLANT_LEVEL";
@@ -853,7 +1008,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65272.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "transmission_OIL_PRESSURE";
@@ -870,7 +1025,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
@@ -887,7 +1042,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65271.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "battery_POTENTIAL";
@@ -904,7 +1059,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65253.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "engine_TOTAL_HOURS";
@@ -919,7 +1074,7 @@ const searchData = async () => {
               analysisData.value.push(no2engine_panel_65270.data[i]);
 
               analysisTime.value.push(
-                no2engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "";
@@ -934,7 +1089,7 @@ const searchData = async () => {
               analysisData.value.push(no2engine_panel_65270.data[i]);
 
               analysisTime.value.push(
-                no2engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "";
@@ -949,7 +1104,7 @@ const searchData = async () => {
               analysisData.value.push(no2engine_panel_65270.data[i]);
 
               analysisTime.value.push(
-                no2engine_panel_65270.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "";
@@ -966,7 +1121,7 @@ const searchData = async () => {
               );
 
               analysisTime.value.push(
-                no2engine_panel_65276.data[i].timestamp_DATACONF.slice(11, 19)
+                no2engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(11, 19)
               );
             }
             analysis.value[0].name = "fuel_LEVEL_1";
@@ -1146,6 +1301,10 @@ const searchData = async () => {
   } else {
     alert("null man~");
   }
+  } catch(error){
+    console.log(error);
+  }
+
 };
 const datasetRaw = ref([["time", "value"]]);
 

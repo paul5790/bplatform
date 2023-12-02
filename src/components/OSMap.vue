@@ -38,7 +38,7 @@ onMounted(() => {
     .bindPopup("Realtime Location.")
     .openPopup();
 
-  setInterval(updateValue, 6000);
+  setInterval(updateValue, 30000);
   updateValue();
 });
 

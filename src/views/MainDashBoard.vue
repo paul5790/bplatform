@@ -21,7 +21,7 @@
 
         <v-list density="compact" nav>
           <v-list-item
-            v-if="permission === 'Admin' || permission === 'User'"
+            v-if="permission === 'ADMIN' || permission === 'USER'"
             :key="0"
             :to="`/`"
             :exact="true"
@@ -31,7 +31,7 @@
             @click="handleListItemClick(`대시보드`)"
           ></v-list-item>
           <v-list-item
-            v-if="permission === 'Admin' || permission === 'User'"
+            v-if="permission === 'ADMIN' || permission === 'USER'"
             :key="1"
             :to="`/realtimeview`"
             :exact="true"
@@ -42,7 +42,7 @@
           ></v-list-item>
 
           <v-list-item
-            v-if="permission === 'Admin' || permission === 'User'"
+            v-if="permission === 'ADMIN' || permission === 'USER'"
             :key="3"
             :to="`/datagraph`"
             :exact="true"
@@ -52,7 +52,7 @@
             @click="handleListItemClick(`데이터 분석`)"
           ></v-list-item>
           <v-list-item
-            v-if="permission === 'Admin' || permission === 'User'"
+            v-if="permission === 'ADMIN' || permission === 'USER'"
             :key="4"
             :to="`/alldata`"
             :exact="true"
@@ -73,7 +73,7 @@
           ></v-list-item>
 
           <v-list-item
-            v-if="permission === 'Admin'"
+            v-if="permission === 'ADMIN'"
             :key="9"
             :to="`/manager`"
             :exact="true"
@@ -126,8 +126,69 @@
         <v-card-title>로그아웃</v-card-title>
         <v-card-text>로그아웃 하시겠습니까?</v-card-text>
         <v-card-actions>
-          <v-btn @click="logout" to="/">예</v-btn>
-          <v-btn @click="cancelLogout">아니오</v-btn>
+          <v-spacer></v-spacer>
+          <v-btn color="blue-darken-1" variant="text" @click="logout()" to="/"
+            >예</v-btn
+          >
+          <v-btn color="blue-darken-1" variant="text" @click="cancelLogout()"
+            >아니오</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <!-- 개인정보 수정 비밀번호 팝업 -->
+    <v-dialog v-model="passwordchange" max-width="400">
+      <v-card>
+        <v-card-title>비밀번호 변경</v-card-title>
+        <v-card-text>
+          <v-container>
+            <v-row>
+              <v-col cols="12"
+                ><p style="font-size: 13px">변경할 비밀번호</p></v-col
+              >
+              <v-col cols="12">
+                <v-text-field
+                  :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="visible ? 'text' : 'password'"
+                  label="비밀번호"
+                  variant="solo"
+                  :rules="rules.Password"
+                  required
+                  v-model="newpw"
+                  @click:append-inner="visible = !visible"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12"
+                ><p style="font-size: 13px">비밀번호 재입력</p></v-col
+              >
+              <v-col cols="12">
+                <v-text-field
+                  :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="visible ? 'text' : 'password'"
+                  label="비밀번호 확인"
+                  variant="solo"
+                  :rules="rules.PasswordConfirmation"
+                  persistent-hint
+                  v-model="newpwcheck"
+                  @click:append-inner="visible = !visible"
+                  required
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue-darken-1"
+            variant="text"
+            @click="passwordcancle()"
+            to="/"
+            >취소</v-btn
+          >
+          <v-btn color="blue-darken-1" variant="text" @click="passwordOK()"
+            >입력</v-btn
+          >
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -141,18 +202,10 @@
               <v-col cols="12"><p style="font-size: 13px">기본정보</p></v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
-                  :readonly="change"
-                  label="User ID"
-                  variant="solo"
-                  required
-                  v-model="cuserid"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6">
-                <v-text-field
-                  :readonly="change"
+                  :readonly="true"
                   label="User Name"
                   variant="solo"
+                  :rules="rules.Name"
                   persistent-hint
                   v-model="cname"
                   required
@@ -160,11 +213,21 @@
               </v-col>
               <v-col cols="12" sm="6">
                 <v-text-field
-                  :readonly="change"
-                  label="Affiliation"
+                  :readonly="true"
+                  @click="hi()"
+                  label="Change Password"
                   variant="solo"
+                  required
+                  v-model="cpassword"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6">
+                <v-text-field
+                  label="department"
+                  variant="solo"
+                  :rules="rules.Affiliation"
                   type="text"
-                  v-model="caffiliation"
+                  v-model="cdepartment"
                   required
                 ></v-text-field>
               </v-col>
@@ -176,13 +239,20 @@
                   v-model="permission"
                 ></v-text-field>
               </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  label="Description"
+                  variant="solo"
+                  v-model="cdescription"
+                ></v-text-field>
+              </v-col>
               <v-col cols="12"
                 ><p style="font-size: 13px">연락처 정보</p></v-col
               >
               <v-col cols="12">
                 <v-text-field
-                  :readonly="change"
                   v-model="cemail"
+                  :rules="rules.Email"
                   label="User Email"
                   variant="solo"
                   required
@@ -190,9 +260,9 @@
               </v-col>
               <v-col cols="12">
                 <v-text-field
-                  :readonly="change"
-                  v-model="cnumber"
+                  v-model="cphone"
                   label="Phone Number"
+                  hint="선택사항"
                   variant="solo"
                 ></v-text-field>
               </v-col>
@@ -204,12 +274,12 @@
           <v-btn
             color="blue-darken-1"
             variant="text"
-            @click="privacychange"
+            @click="privacyout()"
             to="/"
-            >수정하기</v-btn
+            >취소</v-btn
           >
-          <v-btn color="blue-darken-1" variant="text" @click="privacyout"
-            >완료</v-btn
+          <v-btn color="blue-darken-1" variant="text" @click="privacypost()"
+            >수정</v-btn
           >
         </v-card-actions>
       </v-card>
@@ -226,8 +296,9 @@ import {
   onMounted,
   onBeforeUnmount,
 } from "vue";
+import axios from "axios";
 import { useRoute } from "vue-router";
-
+const visible = ref(false);
 const isMiniVariant = ref(true);
 const drawer = ref(true);
 const iconshow = ref(true);
@@ -238,6 +309,7 @@ const logoutDialog = ref(false);
 const privacyDialog = ref(false);
 const selected_item = ref(sessionStorage.getItem("page") || "대시보드");
 const change = ref(true);
+const passwordchange = ref(false);
 watchEffect(() => {
   //
 });
@@ -253,6 +325,7 @@ const handleListItemClick = (itemTitle) => {
     selected_item.value = itemTitle;
     sessionStorage.setItem("page", itemTitle.toString());
     if (itemTitle === "개인정보 변경") {
+      fetchData();
       logoutDialog.value = false;
       privacyDialog.value = true;
     } else {
@@ -276,21 +349,136 @@ const cancelLogout = () => {
   logoutDialog.value = false;
 };
 
+const rulesid = ref(false);
+const rulespw = ref(false);
+const rulescpw = ref(false);
+const rulesemail = ref(false);
+const rulesname = ref(false);
+const rulesaf = ref(false);
+
+// Rules
+const rules = ref({
+  Name: [
+    (value) => {
+      if (value?.length > 0) {
+        rulesname.value = true;
+        return true;
+      } else {
+        rulesname.value = false;
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  Affiliation: [
+    (value) => {
+      if (value?.length > 0) {
+        rulesaf.value = true;
+        return true;
+      } else {
+        rulesname.value = false;
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  ID: [
+    (value) => {
+      if (value?.length > 3) {
+        rulesid.value = true;
+        return true;
+      } else {
+        rulesname.value = false;
+        return "아이디는 최소 4글자를 입력해주세요";
+      }
+    },
+  ],
+  Password: [
+    (value) => {
+      if (value?.length >= 6 && /[0-9]/.test(value) && /[a-zA-Z]/.test(value)) {
+        rulespw.value = true;
+        return true;
+      } else {
+        rulespw.value = false;
+        return "비밀번호는 최소 6글자를 입력하고, 문자를 포함해주세요";
+      }
+    },
+  ],
+  PasswordConfirmation: [
+    () => {
+      if (newpw.value === newpwcheck.value) {
+        rulescpw.value = true;
+        return true;
+      } else {
+        rulescpw.value = false;
+        return "Passwords do not match.";
+      }
+    },
+  ],
+  Email: [
+    (value) => {
+      const pattern =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      // return pattern.test(value) || "Invalid e-mail.";
+      if (pattern.test(value)) {
+        rulesemail.value = true;
+        return true;
+      } else {
+        rulesemail.value = false;
+        return "이메일 형식으로 입력해주세요";
+      }
+    },
+  ],
+});
+
 // 개인 정보 변경
-const cuserid = ref();
+const cdescription = ref();
 const cname = ref();
 const cemail = ref();
-const caffiliation = ref();
-const cnumber = ref();
-const privacyout = () => {
-  privacyDialog.value = false;
-  change.value = true;
+const cdepartment = ref();
+const cphone = ref();
+const cgroup = ref();
+const cpassword = ref();
+const newpw = ref();
+const newpwcheck = ref();
+const privacypost = () => {
+  if (rulespw.value === true && rulescpw.value === true) {
+    alert("ok");
+    const data = {
+      password: newpw.value,
+      department: cdepartment.value,
+      phoneNumber: cphone.value,
+      eMail: cemail.value,
+      description: cdescription.value
+    };
+    console.log(data);
+    try {
+      axios.post("http://192.168.0.73:8080/auth/userinfo/update/mine", data, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      });
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data || "An error occurred during signup.");
+    }
+
+    cpassword.value = null;
+    newpw.value = null;
+    newpwcheck.value = null;
+    rulespw.value = false;
+    privacyDialog.value = false;
+    change.value = true;
+  } else {
+    alert("no");
+  }
 };
 
-const privacychange = () => {
-  privacyDialog.value = true;
-  change.value = false;
+const hi = () => {
+  passwordchange.value = true;
+};
 
+const privacyout = () => {
+  privacyDialog.value = false;
 };
 
 const toggleDrawer = () => {
@@ -298,12 +486,53 @@ const toggleDrawer = () => {
   console.log(drawer.value);
 };
 
+const passwordOK = () => {
+  if (rulespw.value && rulescpw.value) {
+    cpassword.value = "입력완료";
+    passwordchange.value = false;
+  } else {
+    alert("입력을 하지 않았거나 유효성 검사를 통과하지 못한 항목이 있습니다.");
+  }
+};
+
+const passwordcancle = () => {
+  cpassword.value = null;
+  newpw.value = null;
+  newpwcheck.value = null;
+  passwordchange.value = false;
+};
+
 const checkScreenSize = () => {
   iconshow.value = window.innerWidth <= 1280; // 여기서 1280은 lg 사이즈의 임계값입니다.
+};
+const tokenid = ref(sessionStorage.getItem("token") || "");
+const fetchData = async () => {
+  try {
+      const userDataResponse = await axios.post(
+    "http://192.168.0.73:8080/auth/userinfo/mine",
+    {},
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid.value}`,
+      },
+    }
+  );
+  cname.value = userDataResponse.data.userName;
+  cgroup.value = userDataResponse.data.userGroup;
+  cdepartment.value = userDataResponse.data.department;
+  cphone.value = userDataResponse.data.phoneNumber;
+  cdescription.value = userDataResponse.data.description;
+  cemail.value = userDataResponse.data.email;
+  }
+   catch (error) {
+    console.error(error);
+  }
 };
 
 onMounted(() => {
   checkScreenSize();
+  fetchData();
   window.addEventListener("resize", checkScreenSize);
 });
 
@@ -332,7 +561,7 @@ watch(useRoute, () => {
 });
 
 // 권한별 메뉴
-const permission = ref("Admin");
+const permission = ref(sessionStorage.getItem("isAdmin"));
 const userid = ref(sessionStorage.getItem("userid"));
 const toolbarname = ref(`${userid.value}(${permission.value})`);
 </script>

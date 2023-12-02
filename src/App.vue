@@ -15,15 +15,15 @@
           width="200"
           style="margin-bottom: 30px"
         />
-        <v-row>
-          <v-col cols="9">
-            <v-text-field
-              variant="outlined"
-              v-model="newid"
-              :rules="rules.ID"
-              label="아이디"
-            ></v-text-field>
-          </v-col>
+        <!-- <v-row>
+          <v-col cols="9"> -->
+        <v-text-field
+          variant="outlined"
+          v-model="newid"
+          :rules="rules.ID"
+          label="아이디"
+        ></v-text-field>
+        <!-- </v-col>
           <v-col cols="3">
             <v-btn
               color="blue"
@@ -36,7 +36,7 @@
               중복확인
             </v-btn>
           </v-col>
-        </v-row>
+        </v-row> -->
 
         <v-text-field
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
@@ -86,7 +86,7 @@
           hint="선택사항"
         ></v-text-field>
 
-        <v-row style="padding-top: 20px;">
+        <v-row style="padding-top: 20px">
           <v-col cols="6">
             <v-btn
               block
@@ -174,7 +174,7 @@
 
           <v-card-text class="text-center">
             <router-link
-              to="/signup"
+              to="/"
               @click="movesignup()"
               class="text-blue text-decoration-none"
             >
@@ -194,6 +194,20 @@ import Dashboard from "../src/views/MainDashBoard.vue";
 
 const visible = ref(false);
 const isAdmin = ref(false);
+const firstPage = ref("/");
+const decodedTokenData = ref(null);
+
+axios.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response.status === 401 || error.response.status === 500) {
+      // 401 또는 500 상태 코드가 발생한 경우 로그아웃 처리
+      alert("토큰 시간 만료")
+      logout();  // 로그아웃 처리 함수 호출
+    }
+    return Promise.reject(error);
+  }
+);
 
 // 사용자 로그인 상태를 세션 스토리지에서 가져옵니다.
 const showDashboard = ref(
@@ -223,11 +237,13 @@ const showSignup = ref(
 );
 
 const movesignup = () => {
+  userid.value = "";
+  password.value = "";
   showSignup.value = true;
   sessionStorage.setItem("showSignup", showSignup.value.toString());
 };
 
-const signupBtn = () => {
+const signupBtn = async () => {
   console.log(newid.value);
 
   if (
@@ -243,31 +259,52 @@ const signupBtn = () => {
     // 유효성 검사를 모두 통과한 경우
 
     const data = {
-      userName: `${newid.value}`,
+      id: `${newid.value}`,
       password: `${newpassword.value}`,
-      name: `${newname.value}`,
-      affiliation: `${newaffiliation.value}`,
-      email: `${newemail.value}`,
-      phone: `${newphone.value}`,
+      userName: `${newname.value}`,
+      department: `${newaffiliation.value}`,
+      eMail: `${newemail.value}`,
+      phoneNumber: `${newphone.value}`,
     };
-    // 회원가입 기능
 
-    axios
-      .post("http://192.168.0.73:8080/api/v1/users/join", data, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      })
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+    try {
+      // 회원가입 기능
+      const response = await axios.post(
+        "http://192.168.0.73:8080/auth/join",
+        data,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
 
-    showSignup.value = false;
-    sessionStorage.setItem("showSignup", showSignup.value.toString());
+      console.log(response.data);
+      alert("가입이 완료되었습니다.");
+
+      showSignup.value = false;
+      sessionStorage.setItem("showSignup", showSignup.value.toString());
+
+      newid.value = "";
+      newpassword.value = "";
+      checknewpassword.value = "";
+      newemail.value = "";
+      newname.value = "";
+      newaffiliation.value = "";
+      newphone.value = "";
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data || "An error occurred during signup.");
+    }
   } else {
+    console.log(
+      rulesid.value,
+      rulespw.value,
+      rulescpw.value,
+      rulesemail.value,
+      rulesname.value,
+      rulesaf.value
+    );
     // 유효성 검사를 통과하지 못한 경우
     alert(
       "입력을 하지 않았거나 유효성 검사를 통과하지 못한 항목이 있습니다.\n다시 확인해주세요."
@@ -277,27 +314,15 @@ const signupBtn = () => {
 };
 
 const signfinish = () => {
+  newid.value = "";
+  newpassword.value = "";
+  checknewpassword.value = "";
+  newemail.value = "";
+  newname.value = "";
+  newaffiliation.value = "";
+  newphone.value = "";
   showSignup.value = false;
   sessionStorage.setItem("showSignup", showSignup.value.toString());
-};
-
-const checkid = () => {
-  alert("중복확인");
-  const fetchData = async () => {
-    try {
-      const response = await axios.post(
-        "http://192.168.0.73:8080/info/seatrial"
-      );
-      for (let i = 0; i < response.data.length; i++) {
-        console.log(`${response.data[i].seatrialid} here!!!!!!!!!!!!`);
-        console.log(`${response.data[i].test_PURPOSE} here!!!!!!!!!!!!`);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  fetchData();
 };
 
 // Rules
@@ -319,7 +344,7 @@ const rules = ref({
         rulesaf.value = true;
         return true;
       } else {
-        rulesname.value = false;
+        rulesaf.value = false;
         return "1글자 이상 입력하세요";
       }
     },
@@ -330,7 +355,7 @@ const rules = ref({
         rulesid.value = true;
         return true;
       } else {
-        rulesname.value = false;
+        rulesid.value = false;
         return "아이디는 최소 4글자를 입력해주세요";
       }
     },
@@ -341,7 +366,7 @@ const rules = ref({
         rulespw.value = true;
         return true;
       } else {
-        rulesname.value = false;
+        rulespw.value = false;
         return "비밀번호는 최소 6글자를 입력하고, 문자를 포함해주세요";
       }
     },
@@ -352,7 +377,7 @@ const rules = ref({
         rulescpw.value = true;
         return true;
       } else {
-        rulesname.value = false;
+        rulescpw.value = false;
         return "Passwords do not match.";
       }
     },
@@ -373,42 +398,112 @@ const rules = ref({
   ],
 });
 
+const expirationTime = ref(); // 초 단위를 밀리초로 변환
+const currentTime = ref();
+const tokenlogin = ref();
+let intervalId;
 
 // 로그인 및 로그아웃 로직을 구현합니다.
-const login = () => {
+const login = async () => {
   const data = {
-    userName: `${userid.value}`,
+    id: `${userid.value}`,
     password: `${password.value}`,
   };
 
-  axios
-    .post("http://192.168.0.73:8080/api/v1/users/login", data, {
-      headers: {
-        "Content-Type": "application/json",
-        // "Authorization": "Bearer "
-      },
-    })
-    .then((response) => {
-      alert(response.data);
-      showDashboard.value = true;
-      sessionStorage.setItem("showDashboard", true);
-      userid.value = "";
-      password.value = "";
-    })
-    .catch((error) => {
-      console.error(error.response.data);
-      alert(error.response.data);
-    });
+  try {
+    // 로그인 요청
+    const response = await axios.post(
+      "http://192.168.0.73:8080/auth/login",
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          // "Authorization": "Bearer "
+        },
+      }
+    );
 
-  // 세션 스토리지에 사용자 로그인 상태를 저장합니다.
-  sessionStorage.setItem("showDashboard", showDashboard.value.toString());
-  sessionStorage.setItem("userid", userid.value);
-  sessionStorage.setItem("isAdmin", userid.value);
+   
+    sessionStorage.setItem("token", response.data);
+
+    // 사용자 정보 요청
+    const userDataResponse = await axios.post(
+      "http://192.168.0.73:8080/auth/userinfo/mine",
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${response.data}`,
+        },
+      }
+    );
+
+    const tokenPayload = jwtDecode(response.data);
+    decodedTokenData.value = tokenPayload;
+    console.log(decodedTokenData.value);
+
+    expirationTime.value = decodedTokenData.value.exp * 1000; // 초 단위를 밀리초로 변환
+    tokenlogin.value = true;
+    if (!intervalId) {
+      checkTokenExpiration();
+    }
+
+    // 토큰이 유효한 경우에 수행할 작업 (예: 로그인 후의 동작)
+    // ...
+    const userName = userDataResponse.data.userName;
+    const userGroup = userDataResponse.data.userGroup;
+    console.log(userName);
+    console.log(userGroup);
+    sessionStorage.setItem("userid", userName);
+    sessionStorage.setItem("isAdmin", userGroup);
+
+    // 이후 작업 수행 (예: 토큰을 저장하거나 처리)
+
+    showDashboard.value = true;
+    sessionStorage.setItem("showDashboard", true);
+    userid.value = "";
+    password.value = "";
+
+    // 세션 스토리지에 사용자 로그인 상태를 저장
+    sessionStorage.setItem("showDashboard", showDashboard.value.toString());
+  } catch (error) {
+    console.error(error.response?.data || error.message);
+    alert(error.response?.data || error.message);
+  }
+};
+const checkTokenExpiration = () => {
+  intervalId = setInterval(() => {
+    if (tokenlogin.value && expirationTime.value > 0) {
+      const currentTime = new Date().getTime();
+      const remainingTime = expirationTime.value - currentTime;
+
+      if (remainingTime <= 0) {
+        // 토큰이 만료되었음을 처리 (예: 로그아웃)
+        alert("토큰시간 만료");
+        logout();
+
+        // setInterval을 멈춤
+        clearInterval(intervalId);
+      } else {
+        // 토큰이 유효한 경우에 수행할 작업
+        console.log("남은 시간: " + remainingTime + "밀리초");
+      }
+    }
+  }, 5000); // 5초 간격으로 체크
+};
+
+const jwtDecode = (token) => {
+  try {
+    return JSON.parse(atob(token.split(".")[1]));
+  } catch (e) {
+    return null;
+  }
 };
 
 const logout = () => {
   userid.value = "";
   showDashboard.value = false;
+  tokenlogin.value = false;
   // 세션 스토리지에서 사용자 로그인 상태를 저장합니다.
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);

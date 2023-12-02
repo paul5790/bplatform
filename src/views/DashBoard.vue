@@ -1,5 +1,17 @@
 <template>
+  <v-card v-if="guest" height="93vh" class="pa-1 d-flex justify-center align-center">
+    <div style="text-align: center">
+      <p style="font-weight: 600; font-size: 20px">
+        <span style="color: #f76060">'User 등급'</span> 이상이 되시면 사용이
+        가능합니다.
+      </p>
+      <p style="font-weight: 400; font-size: 15px">
+        현재 {{ userid }}님의 등급은 Guest입니다.
+      </p>
+    </div>
+  </v-card>
   <v-card
+    v-else
     height="93vh"
     style="background-color: #f7f7f7"
     class="pa-1 d-flex justify-center align-center"
@@ -74,10 +86,15 @@
 </template>
 
 <script setup>
+import { ref } from "vue";
 import VoyageTable from "../components/VoyageTable.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut1";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
+const guest = ref(true);
+const userid = ref(sessionStorage.getItem("isAdmin"));
+if (userid.value === "GUEST") guest.value = true
+else guest.value = false
 </script>
 
 <style scoped></style>

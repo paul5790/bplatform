@@ -16,7 +16,6 @@
           <v-pagination
             v-model="page"
             :length="pageCount"
-            :size="small"
             :total-visible="6"
             rounded="circle"
           ></v-pagination>

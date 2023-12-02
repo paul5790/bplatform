@@ -1,25 +1,26 @@
 <template>
-    <div class="autocomplete-container">
+  <div class="autocomplete-container">
     <v-autocomplete
-    v-model="selectedtrialNum"
+      v-model="selectedtrialNum"
       label="select"
       :items="trialrun"
       variant="underlined"
-      style="width: 120px;"
-       position="top right"
+      style="width: 120px"
+      position="top right"
+      density="compact"
     ></v-autocomplete>
-  <v-sheet
-    :elevation="elevation"
-    style="display: flex; flex-direction: column; align-items: center"
-  >
-    <v-chart
-      ref="chart"
-      class="chart"
-      :option="option"
-      autoresize
-      @click="handleChartClick"
-    />
-  </v-sheet>
+    <v-sheet
+      :elevation="elevation"
+      style="display: flex; flex-direction: column; align-items: center"
+    >
+      <v-chart
+        ref="chart"
+        class="chart"
+        :option="option"
+        autoresize
+        @click="handleChartClick"
+      />
+    </v-sheet>
   </div>
 </template>
 
@@ -56,18 +57,14 @@ const getTrialDate = async () => {
   try {
     const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
     for (let i = 0; i < response.data.length; i++) {
-      
       trialrun.value.push(`항차 ${i + 1}번`);
-      selectedtrialNum.value = trialrun.value[0]
+      selectedtrialNum.value = trialrun.value[0];
     }
   } catch (error) {
     console.error(error);
   }
 };
 onMounted(getTrialDate);
-
-
-
 
 const GLL = ref(0);
 const GGA = ref(0);
@@ -249,23 +246,58 @@ const axioslist = ref([
   "no2enginepanel/no2engine_panel_65376",
   "no2enginepanel/no2engine_panel_65379",
 ]);
+const tokenid = ref(sessionStorage.getItem("token") || "");
 const settingTime = ref(5);
+
+// lossdata 시간 설정
+const lossdataTime = async () => {
+  try {
+    const response = await axios.post(
+      `http://192.168.0.73:8080/info/lossdata`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
+    );
+    settingTime.value = response.data.countDelay;
+  } catch (error) {
+    // console.error(error);
+    // console.log(`${endpoint} 데이터가 없음`);
+  }
+};
 
 const fetchData = async () => {
   try {
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
-        const response = await axios.post(
-          `http://192.168.0.73:8080/info/lossdata/${endpoint}/${trialNum.value}/${settingTime.value}`
+        const timedata = await axios.post(
+          "http://192.168.0.73:8080/info/get/timedata",
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenid.value}`,
+            },
+          }
         );
-        dataRefs[i].value = 0
+        await (settingTime.value = timedata.data.lossTime);
+        const response = await axios.post(
+          `http://192.168.0.73:8080/info/lossdata/${endpoint}/${trialNum.value}/${settingTime.value}`,
+          {},
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenid.value}`, // response 변수의 정의가 필요함
+            },
+          }
+        );
+        dataRefs[i].value = 0;
         dataRefs[i].value += Number(response.data.countDelay);
       } catch (error) {
-        if (error.response && error.response.status === 409) {
-          console.log(`${endpoint} 데이터가 없음`);
-        } else {
-          console.error(error);
-        }
+        //console.error(error);
       }
     });
 
@@ -275,9 +307,10 @@ const fetchData = async () => {
     // 데이터를 모두 받아온 후에 차트 업데이트
     updateChart();
   } catch (error) {
-    console.error('Error during fetchData:', error);
+    console.error("Error during fetchData:", error);
   }
 };
+
 onMounted(() => {
   fetchData();
 });
@@ -773,6 +806,7 @@ body {
 }
 
 .v-autocomplete {
+  margin-top: 5px;
   position: absolute;
   top: 0;
   right: 0;

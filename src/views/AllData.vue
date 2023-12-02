@@ -145,7 +145,7 @@
         </v-tab>
       </v-tabs>
       <v-window
-      class="scrollable-card"
+        class="scrollable-card"
         v-model="tab"
         style="
           overflow-y: auto;
@@ -188,9 +188,14 @@
       </v-window>
       <v-card-actions>
         <v-spacer></v-spacer>
+        <select v-model="selectDownlodFormat">
+          <option value="xlsx">Excel (xlsx)</option>
+          <option value="txt">Text (txt)</option>
+          <option value="csv">CSV (csv)</option>
+        </select>
         <v-btn
           color="white"
-          style="background-color: #009dff; margin-top: 10px;"
+          style="background-color: #009dff; margin-top: 10px"
           @click="dataDownload()"
           >데이터 다운로드</v-btn
         >
@@ -203,13 +208,15 @@
 import { ref, computed, watchEffect, onMounted } from "vue";
 import axios from "axios";
 import * as XLSX from "xlsx";
+import Papa from 'papaparse';
+import { saveAs } from "file-saver";
 
 const tab = ref(0);
 // const initializeData = () => {
 //   // contentsSelectedItems에 따라 데이터 초기화
 //   fetchData();
 // };
-
+const tokenid = ref(sessionStorage.getItem("token") || "");
 const itemsPerPage = ref(11);
 const page = ref(1);
 const headerName = ref([]); // 빈 배열로 초기화
@@ -230,6 +237,8 @@ const firstSelect = ref([
   "ECDIS",
   "AUTOPILOT",
   "SPEEDLOG",
+  "CanThrottle",
+  "AUTOPILOTCONTACT",
   "NO.1ENGINEPANEL",
   "NO.2ENGINEPANEL",
 ]);
@@ -272,37 +281,39 @@ watchEffect(() => {
   secondSelect.value = []; // 기존 secondSelect 초기화
   contentsSelectedItems.value = [];
   if (firstSelectedItems.value.includes("DGPS")) {
-    secondSelect.value.push(
-      "GLL",
-      "GGA",
-      "RMC",
-      "VTG",
-      "ZDA",
-      "DTM",
-      "GSV",
-      "GSA"
-    );
+    secondSelect.value.push("GLL", "GGA", "RMC", "VTG", "ZDA", "GSV", "GSA");
   }
   if (firstSelectedItems.value.includes("GYRO")) {
-    secondSelect.value.push("THS", "HDT", "ROT");
+    secondSelect.value.push("HDT", "ROT");
   }
   if (firstSelectedItems.value.includes("ANEMOMETER")) {
-    secondSelect.value.push("MWV", "MWD", "VWR", "MTW");
+    secondSelect.value.push("MWV");
   }
   if (firstSelectedItems.value.includes("RADAR")) {
-    secondSelect.value.push("TTM", "TLL", "RSCREEN");
+    secondSelect.value.push("RADAR_SCREEN");
   }
   if (firstSelectedItems.value.includes("AIS")) {
     secondSelect.value.push("VDM", "VDO");
   }
   if (firstSelectedItems.value.includes("ECDIS")) {
-    secondSelect.value.push("ROUTEINFO", "WAYPOINTS", "ESCREEN");
+    secondSelect.value.push("ROUTEINFO", "WAYPOINTS", "RTZ", "ECDIS_SCREEN");
   }
   if (firstSelectedItems.value.includes("AUTOPILOT")) {
-    secondSelect.value.push("RSA", "HTD", "MODE");
+    secondSelect.value.push("RSA", "HTD");
   }
   if (firstSelectedItems.value.includes("SPEEDLOG")) {
     secondSelect.value.push("VBW", "VHW", "VLW");
+  }
+  if (firstSelectedItems.value.includes("CanThrottle")) {
+    secondSelect.value.push(
+      "CAN_Online_State",
+      "Engine_RPM",
+      "Rudder",
+      "Rudder_Scale"
+    );
+  }
+  if (firstSelectedItems.value.includes("AUTOPILOTCONTACT")) {
+    secondSelect.value.push("AUTOPILOTCONTACT");
   }
   if (firstSelectedItems.value.includes("NO.1ENGINEPANEL")) {
     secondSelect.value.push(
@@ -354,8 +365,8 @@ const getTrialDate = async () => {
   try {
     const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
     for (let i = 0; i < response.data.length; i++) {
-      setStartTime.value.push(`${response.data[i].start_TIME_UTC}`);
-      setEndTime.value.push(`${response.data[i].end_TIME_UTC}`);
+      setStartTime.value.push(`${response.data[i].startTimeUtc}`);
+      setEndTime.value.push(`${response.data[i].endTimeUtc}`);
       voyage.value.push(`항차 ${i + 1}번`);
     }
   } catch (error) {
@@ -412,22 +423,68 @@ watchEffect(() => {
   }
 });
 let dataValues1 = [];
+// const selectDownlodFormat = ref('xlsx');
+// // 데이터 다운로드
+// const dataDownload = () => {
+//   if (!selectedData.value || selectedData.value.length === 0) {
+//     alert("선택안됌");
+//   } else {
+//     try {
+//       const workbook = XLSX.utils.book_new();
+//       const dataValues = Object.values(selectedData.value);
+//       console.log(dataValues1);
+//       for (let i = 0; i < downloadData.length; i++) {
+//         const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+//         XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+//       }
+//       XLSX.writeFile(workbook, `${dataValues1}_datatable.xlsx`);
+//     } catch (error) {
+//       alert(selectDownlodFormat.value, "다운로드 할 데이터가 존재하지 않습니다.");
+//       console.log(error);
+//     }
+//   }
+// };
+
+const selectDownlodFormat = ref('xlsx');
+
 // 데이터 다운로드
 const dataDownload = () => {
   if (!selectedData.value || selectedData.value.length === 0) {
     alert("선택안됌");
   } else {
-    const workbook = XLSX.utils.book_new();
+    try {
+      const workbook = XLSX.utils.book_new();
+      const dataValues = Object.values(selectedData.value);
 
-    const dataValues = Object.values(selectedData.value);
-    console.log(dataValues1);
-    for (let i = 0; i < downloadData.length; i++) {
-      const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-      XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+      for (let i = 0; i < downloadData.length; i++) {
+        if (selectDownlodFormat.value === 'xlsx') {
+          // xlsx 선택 시
+          const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+          XLSX.utils.book_append_sheet(workbook, worksheet, dataValues[i]);
+        } else if (selectDownlodFormat.value === 'csv') {
+          // csv 선택 시
+          const csvData = Papa.unparse(downloadData[i].value);
+          const csvBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+          saveAs(csvBlob, `${dataValues[i]}_csv.csv`);
+        } else if (selectDownlodFormat.value === 'txt') {
+          // txt 선택 시
+          const txtData = JSON.stringify(downloadData[i].value, null, 2);
+          const txtBlob = new Blob([txtData], { type: 'text/plain;charset=utf-8;' });
+          saveAs(txtBlob, `${dataValues[i]}_txt.txt`);
+        }
+      }
+
+      if (selectDownlodFormat.value === 'xlsx') {
+        // xlsx 선택 시
+        XLSX.writeFile(workbook, `${dataValues}_xlsx.xlsx`);
+      }
+    } catch (error) {
+      alert(`다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`);
+      console.error(error);
     }
-    XLSX.writeFile(workbook, `${dataValues1}_datatable.xlsx`);
   }
 };
+
 
 // 데이터 조회
 
@@ -461,38 +518,46 @@ const getVariableName = (item) => {
     RMC: "dgps/rmc",
     VTG: "dgps/vtg",
     ZDA: "dgps/zda",
-    DTM: "dgps/dtm",
+    // DTM: "dgps/dtm",
     GSV: "dgps/gsv",
     GSA: "dgps/gsa",
 
-    THS: "gyro/ths",
+    // THS: "gyro/ths",
     HDT: "gyro/hdt",
     ROT: "gyro/rot",
 
     MWV: "anemometer/mwv",
-    MWD: "anemometer/mwd",
-    VWR: "anemometer/vwr",
-    MTW: "anemometer/mtw",
-    VWT: "anemometer/vwt",
+    // MWD: "anemometer/mwd",
+    // VWR: "anemometer/vwr",
+    // MTW: "anemometer/mtw",
+    // VWT: "anemometer/vwt",
 
-    TTM: "radar/ttm",
-    TLL: "radar/tll",
-    RSCREEN: "radar/screen",
+    // TTM: "radar/ttm",
+    // TLL: "radar/tll",
+    RADAR_SCREEN: "radar/screen",
 
     VDM: "ais/vdm",
     VDO: "ais/vdo",
 
     ROUTEINFO: "ecdis/routeinfo",
     WAYPOINTS: "ecdis/waypoints",
-    ESCREEN: "ecdis/screen",
+    RTZ: "ecdis/rtz",
+    ECDIS_SCREEN: "ecdis/screen",
 
     RSA: "autopilot/rsa",
-    MODE: "autopilot/mode",
+    // MODE: "autopilot/mode",
     HTD: "autopilot/htd",
 
     VBW: "speedlog/vbw",
     VHW: "speedlog/vhw",
     VLW: "speedlog/vlw",
+
+    CAN_Online_State: "canthrottle/canonlinestate",
+    Engine_RPM: "canthrottle/enginerpm",
+    Rudder: "canthrottle/rudder",
+    Rudder_Scale: "canthrottle/rudderscale",
+
+    AUTOPILOTCONTACT: "autopilotcontact/autopilotcontact",
 
     "NO.1ENGINE_PANEL_61444": "no1enginepanel/no1engine_panel_61444",
     "NO.1ENGINE_PANEL_65262": "no1enginepanel/no1engine_panel_65262",
@@ -544,7 +609,7 @@ const fetchData = async (data) => {
     for (let i = 0; i < data.length; i++) {
       try {
         const response = await axios.post(
-          `http://192.168.0.73:8080/data2/${data[i]}/${selectedtrialNum.value}`
+          `http://192.168.0.73:8080/data/${data[i]}/${selectedtrialNum.value}`
         );
         dataSet.value = response.data;
         if (response.data && response.data.length > 0) {
@@ -730,11 +795,11 @@ const tabAction = async () => {
       dataSet.value = ZDA.value;
       headerName.value = ZDAheader.value;
       break;
-    case "DTM":
-      itemsPerPage.value = 11;
-      dataSet.value = DTM.value;
-      headerName.value = DTMheader.value;
-      break;
+    // case "DTM":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = DTM.value;
+    //   headerName.value = DTMheader.value;
+    //   break;
     case "GSV":
       itemsPerPage.value = 11;
       dataSet.value = GSV.value;
@@ -745,11 +810,11 @@ const tabAction = async () => {
       dataSet.value = GSA.value;
       headerName.value = GSAheader.value;
       break;
-    case "THS":
-      itemsPerPage.value = 22;
-      dataSet.value = THS.value;
-      headerName.value = THSheader.value;
-      break;
+    // case "THS":
+    //   itemsPerPage.value = 22;
+    //   dataSet.value = THS.value;
+    //   headerName.value = THSheader.value;
+    //   break;
     case "HDT":
       itemsPerPage.value = 22;
       dataSet.value = HDT.value;
@@ -765,40 +830,40 @@ const tabAction = async () => {
       dataSet.value = MWV.value;
       headerName.value = MWVheader.value;
       break;
-    case "MWD":
+    // case "MWD":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = MWD.value;
+    //   headerName.value = MWDheader.value;
+    //   break;
+    // case "VWR":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = VWR.value;
+    //   headerName.value = VWRheader.value;
+    //   break;
+    // case "MTW":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = MTW.value;
+    //   headerName.value = MTWheader.value;
+    //   break;
+    // case "VWT":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = VWT.value;
+    //   headerName.value = VWTheader.value;
+    //   break;
+    // case "TTM":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = TTM.value;
+    //   headerName.value = TTMheader.value;
+    //   break;
+    // case "TLL":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = TLL.value;
+    //   headerName.value = TLLheader.value;
+    //   break;
+    case "RADAR_SCREEN":
       itemsPerPage.value = 11;
-      dataSet.value = MWD.value;
-      headerName.value = MWDheader.value;
-      break;
-    case "VWR":
-      itemsPerPage.value = 11;
-      dataSet.value = VWR.value;
-      headerName.value = VWRheader.value;
-      break;
-    case "MTW":
-      itemsPerPage.value = 11;
-      dataSet.value = MTW.value;
-      headerName.value = MTWheader.value;
-      break;
-    case "VWT":
-      itemsPerPage.value = 11;
-      dataSet.value = VWT.value;
-      headerName.value = VWTheader.value;
-      break;
-    case "TTM":
-      itemsPerPage.value = 11;
-      dataSet.value = TTM.value;
-      headerName.value = TTMheader.value;
-      break;
-    case "TLL":
-      itemsPerPage.value = 11;
-      dataSet.value = TLL.value;
-      headerName.value = TLLheader.value;
-      break;
-    case "RSCREEN":
-      itemsPerPage.value = 11;
-      dataSet.value = RSCREEN.value;
-      headerName.value = RSCREENheader.value;
+      dataSet.value = RADAR_SCREEN.value;
+      headerName.value = RADAR_SCREENheader.value;
       break;
     case "VDM":
       itemsPerPage.value = 11;
@@ -820,21 +885,21 @@ const tabAction = async () => {
       dataSet.value = WAYPOINTS.value;
       headerName.value = WAYPOINTSheader.value;
       break;
-    case "ESCREEN":
+    case "ECDIS_SCREEN":
       itemsPerPage.value = 11;
-      dataSet.value = ESCREEN.value;
-      headerName.value = ESCREENheader.value;
+      dataSet.value = ECDIS_SCREEN.value;
+      headerName.value = ECDIS_SCREENheader.value;
       break;
     case "RSA":
       itemsPerPage.value = 22;
       dataSet.value = RSA.value;
       headerName.value = RSAheader.value;
       break;
-    case "MODE":
-      itemsPerPage.value = 11;
-      dataSet.value = MODE.value;
-      headerName.value = MODEheader.value;
-      break;
+    // case "MODE":
+    //   itemsPerPage.value = 11;
+    //   dataSet.value = MODE.value;
+    //   headerName.value = MODEheader.value;
+    //   break;
     case "HTD":
       itemsPerPage.value = 11;
       dataSet.value = HTD.value;
@@ -854,6 +919,31 @@ const tabAction = async () => {
       itemsPerPage.value = 11;
       dataSet.value = VLW.value;
       headerName.value = VLWheader.value;
+      break;
+    case "CAN_Online_State":
+      itemsPerPage.value = 11;
+      dataSet.value = CAN_Online_State.value;
+      headerName.value = CAN_Online_Stateheader.value;
+      break;
+    case "Engine_RPM":
+      itemsPerPage.value = 11;
+      dataSet.value = Engine_RPM.value;
+      headerName.value = Engine_RPMheader.value;
+      break;
+    case "Rudder":
+      itemsPerPage.value = 11;
+      dataSet.value = Rudder.value;
+      headerName.value = Rudderheader.value;
+      break;
+    case "Rudder_Scale":
+      itemsPerPage.value = 11;
+      dataSet.value = Rudder_Scale.value;
+      headerName.value = Rudder_Scaleheader.value;
+      break;
+    case "AUTOPILOTCONTACT":
+      itemsPerPage.value = 11;
+      dataSet.value = AUTOPILOTCONTACT.value;
+      headerName.value = AUTOPILOTCONTACTheader.value;
       break;
     case "NO.1ENGINE_PANEL_61444":
       itemsPerPage.value = 22;
@@ -1013,31 +1103,37 @@ const GGAheader = ref([]);
 const RMCheader = ref([]);
 const VTGheader = ref([]);
 const ZDAheader = ref([]);
-const DTMheader = ref([]);
+// const DTMheader = ref([]);
 const GSVheader = ref([]);
 const GSAheader = ref([]);
-const THSheader = ref([]);
+// const THSheader = ref([]);
 const HDTheader = ref([]);
 const ROTheader = ref([]);
 const MWVheader = ref([]);
-const MWDheader = ref([]);
-const VWRheader = ref([]);
-const MTWheader = ref([]);
-const VWTheader = ref([]);
-const TTMheader = ref([]);
-const TLLheader = ref([]);
-const RSCREENheader = ref([]);
+// const MWDheader = ref([]);
+// const VWRheader = ref([]);
+// const MTWheader = ref([]);
+// const VWTheader = ref([]);
+// const TTMheader = ref([]);
+// const TLLheader = ref([]);
+const RADAR_SCREENheader = ref([]);
 const VDMheader = ref([]);
 const VDOheader = ref([]);
 const ROUTEINFOheader = ref([]);
 const WAYPOINTSheader = ref([]);
-const ESCREENheader = ref([]);
+const ECDIS_SCREENheader = ref([]);
 const RSAheader = ref([]);
-const MODEheader = ref([]);
+// const MODEheader = ref([]);
 const HTDheader = ref([]);
 const VBWheader = ref([]);
 const VHWheader = ref([]);
 const VLWheader = ref([]);
+const CAN_Online_Stateheader = ref([]);
+const Engine_RPMheader = ref([]);
+const Rudderheader = ref([]);
+const Rudder_Scaleheader = ref([]);
+const AUTOPILOTCONTACTheader = ref([]);
+
 const NO1ENGINE_PANEL_61444header = ref([]);
 const NO1ENGINE_PANEL_65262header = ref([]);
 const NO1ENGINE_PANEL_65263header = ref([]);
@@ -1072,31 +1168,36 @@ const GGA = ref([]);
 const RMC = ref([]);
 const VTG = ref([]);
 const ZDA = ref([]);
-const DTM = ref([]);
+// const DTM = ref([]);
 const GSV = ref([]);
 const GSA = ref([]);
-const THS = ref([]);
+// const THS = ref([]);
 const HDT = ref([]);
 const ROT = ref([]);
 const MWV = ref([]);
-const MWD = ref([]);
-const VWR = ref([]);
-const MTW = ref([]);
-const VWT = ref([]);
-const TTM = ref([]);
-const TLL = ref([]);
-const RSCREEN = ref([]);
+// const MWD = ref([]);
+// const VWR = ref([]);
+// const MTW = ref([]);
+// const VWT = ref([]);
+// const TTM = ref([]);
+// const TLL = ref([]);
+const RADAR_SCREEN = ref([]);
 const VDM = ref([]);
 const VDO = ref([]);
 const ROUTEINFO = ref([]);
 const WAYPOINTS = ref([]);
-const ESCREEN = ref([]);
+const ECDIS_SCREEN = ref([]);
 const RSA = ref([]);
-const MODE = ref([]);
+// const MODE = ref([]);
 const HTD = ref([]);
 const VBW = ref([]);
 const VHW = ref([]);
 const VLW = ref([]);
+const CAN_Online_State = ref([]);
+const Engine_RPM = ref([]);
+const Rudder = ref([]);
+const Rudder_Scale = ref([]);
+const AUTOPILOTCONTACT = ref([]);
 const NO1ENGINE_PANEL_61444 = ref([]);
 const NO1ENGINE_PANEL_65262 = ref([]);
 const NO1ENGINE_PANEL_65263 = ref([]);
@@ -1132,31 +1233,36 @@ const headerVariables = [
   RMCheader,
   VTGheader,
   ZDAheader,
-  DTMheader,
+  // DTMheader,
   GSVheader,
   GSAheader,
-  THSheader,
+  // THSheader,
   HDTheader,
   ROTheader,
   MWVheader,
-  MWDheader,
-  VWRheader,
-  MTWheader,
-  VWTheader,
-  TTMheader,
-  TLLheader,
-  RSCREENheader,
+  // MWDheader,
+  // VWRheader,
+  // MTWheader,
+  // VWTheader,
+  // TTMheader,
+  // TLLheader,
+  RADAR_SCREENheader,
   VDMheader,
   VDOheader,
   ROUTEINFOheader,
   WAYPOINTSheader,
-  ESCREENheader,
+  ECDIS_SCREENheader,
   RSAheader,
-  MODEheader,
+  // MODEheader,
   HTDheader,
   VBWheader,
   VHWheader,
   VLWheader,
+  CAN_Online_Stateheader,
+  Engine_RPMheader,
+  Rudderheader,
+  Rudder_Scaleheader,
+  AUTOPILOTCONTACTheader,
   NO1ENGINE_PANEL_61444header,
   NO1ENGINE_PANEL_65262header,
   NO1ENGINE_PANEL_65263header,
@@ -1193,31 +1299,36 @@ const dataVariables = [
   RMC,
   VTG,
   ZDA,
-  DTM,
+  // DTM,
   GSV,
   GSA,
-  THS,
+  // THS,
   HDT,
   ROT,
   MWV,
-  MWD,
-  VWR,
-  MTW,
-  VWT,
-  TTM,
-  TLL,
-  RSCREEN,
+  // MWD,
+  // VWR,
+  // MTW,
+  // VWT,
+  // TTM,
+  // TLL,
+  RADAR_SCREEN,
   VDM,
   VDO,
   ROUTEINFO,
   WAYPOINTS,
-  ESCREEN,
+  ECDIS_SCREEN,
   RSA,
-  MODE,
+  // MODE,
   HTD,
   VBW,
   VHW,
   VLW,
+  CAN_Online_State,
+  Engine_RPM,
+  Rudder,
+  Rudder_Scale,
+  AUTOPILOTCONTACT,
   NO1ENGINE_PANEL_61444,
   NO1ENGINE_PANEL_65262,
   NO1ENGINE_PANEL_65263,
@@ -1282,12 +1393,12 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(ZDA);
       dataValues1.push("ZDA");
       break;
-    case "dgps/dtm":
-      DTMheader.value = dataheader.value;
-      DTM.value = response.data;
-      downloadData.push(DTM);
-      dataValues1.push("DTM");
-      break;
+    // case "dgps/dtm":
+    //   DTMheader.value = dataheader.value;
+    //   DTM.value = response.data;
+    //   downloadData.push(DTM);
+    //   dataValues1.push("DTM");
+    //   break;
     case "dgps/gsv":
       GSVheader.value = dataheader.value;
       GSV.value = response.data;
@@ -1300,12 +1411,12 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(GSA);
       dataValues1.push("GSA");
       break;
-    case "gyro/ths":
-      THSheader.value = dataheader.value;
-      THS.value = response.data;
-      downloadData.push(THS);
-      dataValues1.push("THS");
-      break;
+    // case "gyro/ths":
+    //   THSheader.value = dataheader.value;
+    //   THS.value = response.data;
+    //   downloadData.push(THS);
+    //   dataValues1.push("THS");
+    //   break;
     case "gyro/hdt":
       HDTheader.value = dataheader.value;
       HDT.value = response.data;
@@ -1324,50 +1435,50 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(MWV);
       dataValues1.push("MWV");
       break;
-    case "anemometer/mwd":
-      MWDheader.value = dataheader.value;
-      MWD.value = response.data;
-      downloadData.push(MWD);
-      dataValues1.push("MWD");
-      break;
-    case "anemometer/vwr":
-      VWRheader.value = dataheader.value;
-      VWR.value = response.data;
-      downloadData.push(VWR);
-      dataValues1.push("VWR");
-      break;
-    case "anemometer/mtw":
-      MTWheader.value = dataheader.value;
-      MTW.value = response.data;
-      downloadData.push(MTW);
-      dataValues1.push("MTW");
-      break;
-    case "anemometer/vwt":
-      VWTheader.value = dataheader.value;
-      VWT.value = response.data;
-      downloadData.push(VWT);
-      dataValues1.push("VWT");
-      break;
-    case "radar/ttm":
-      TTMheader.value = dataheader.value;
+    // case "anemometer/mwd":
+    //   MWDheader.value = dataheader.value;
+    //   MWD.value = response.data;
+    //   downloadData.push(MWD);
+    //   dataValues1.push("MWD");
+    //   break;
+    // case "anemometer/vwr":
+    //   VWRheader.value = dataheader.value;
+    //   VWR.value = response.data;
+    //   downloadData.push(VWR);
+    //   dataValues1.push("VWR");
+    //   break;
+    // case "anemometer/mtw":
+    //   MTWheader.value = dataheader.value;
+    //   MTW.value = response.data;
+    //   downloadData.push(MTW);
+    //   dataValues1.push("MTW");
+    //   break;
+    // case "anemometer/vwt":
+    //   VWTheader.value = dataheader.value;
+    //   VWT.value = response.data;
+    //   downloadData.push(VWT);
+    //   dataValues1.push("VWT");
+    //   break;
+    // case "radar/ttm":
+    //   TTMheader.value = dataheader.value;
 
-      TTM.value = response.data;
-      downloadData.push(TTM);
-      dataValues1.push("TTM");
-      break;
-    case "radar/tll":
-      TLLheader.value = dataheader.value;
+    //   TTM.value = response.data;
+    //   downloadData.push(TTM);
+    //   dataValues1.push("TTM");
+    //   break;
+    // case "radar/tll":
+    //   TLLheader.value = dataheader.value;
 
-      TLL.value = response.data;
-      downloadData.push(TLL);
-      dataValues1.push("TLL");
-      break;
+    //   TLL.value = response.data;
+    //   downloadData.push(TLL);
+    //   dataValues1.push("TLL");
+    //   break;
     case "radar/screen":
-      RSCREENheader.value = dataheader.value;
+      RADAR_SCREENheader.value = dataheader.value;
 
-      RSCREEN.value = response.data;
-      downloadData.push(RSCREEN);
-      dataValues1.push("RSCREEN");
+      RADAR_SCREEN.value = response.data;
+      downloadData.push(RADAR_SCREEN);
+      dataValues1.push("RADAR_SCREEN");
       break;
     case "ais/vdm":
       VDMheader.value = dataheader.value;
@@ -1394,10 +1505,10 @@ const switchValue = (axiosItem, dataheader, response) => {
       dataValues1.push("WAYPOINTS");
       break;
     case "ecdis/screen":
-      ESCREENheader.value = dataheader.value;
-      ESCREEN.value = response.data;
-      downloadData.push(ESCREEN);
-      dataValues1.push("ESCREEN");
+      ECDIS_SCREENheader.value = dataheader.value;
+      ECDIS_SCREEN.value = response.data;
+      downloadData.push(ECDIS_SCREEN);
+      dataValues1.push("ECDIS_SCREEN");
       break;
     case "autopilot/rsa":
       RSAheader.value = dataheader.value;
@@ -1405,12 +1516,12 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(RSA);
       dataValues1.push("RSA");
       break;
-    case "autopilot/mode":
-      MODEheader.value = dataheader.value;
-      MODE.value = response.data;
-      downloadData.push(MODE);
-      dataValues1.push("MODE");
-      break;
+    // case "autopilot/mode":
+    //   MODEheader.value = dataheader.value;
+    //   MODE.value = response.data;
+    //   downloadData.push(MODE);
+    //   dataValues1.push("MODE");
+    //   break;
     case "autopilot/htd":
       HTDheader.value = dataheader.value;
       HTD.value = response.data;
@@ -1434,6 +1545,37 @@ const switchValue = (axiosItem, dataheader, response) => {
       VLW.value = response.data;
       downloadData.push(VLW);
       dataValues1.push("VLW");
+      break;
+
+    case "CAN_Online_State":
+      CAN_Online_Stateheader.value = dataheader.value;
+      CAN_Online_State.value = response.data;
+      downloadData.push(CAN_Online_State);
+      dataValues1.push("CAN_Online_State");
+      break;
+    case "Engine_RPM":
+      Engine_RPMheader.value = dataheader.value;
+      Engine_RPM.value = response.data;
+      downloadData.push(Engine_RPM);
+      dataValues1.push("Engine_RPM");
+      break;
+    case "Rudder":
+      Rudderheader.value = dataheader.value;
+      Rudder.value = response.data;
+      downloadData.push(Rudder);
+      dataValues1.push("Rudder");
+      break;
+    case "Rudder_Scale":
+      Rudder_Scaleheader.value = dataheader.value;
+      Rudder_Scale.value = response.data;
+      downloadData.push(Rudder_Scale);
+      dataValues1.push("Rudder_Scale");
+      break;
+    case "AUTOPILOTCONTACT":
+      AUTOPILOTCONTACTheader.value = dataheader.value;
+      AUTOPILOTCONTACT.value = response.data;
+      downloadData.push(AUTOPILOTCONTACT);
+      dataValues1.push("AUTOPILOTCONTACT");
       break;
     case "no1enginepanel/no1engine_panel_61444":
       NO1ENGINE_PANEL_61444header.value = dataheader.value;
@@ -1618,5 +1760,21 @@ const switchValue = (axiosItem, dataheader, response) => {
 }
 .d-flex {
   display: flex;
+}
+select {
+  text-align: center;
+  margin-right: 7px;
+  margin-top: 10px;
+  padding: 4px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+select:hover,
+select:focus {
+  border-color: #007bff;
 }
 </style>

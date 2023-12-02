@@ -14,13 +14,13 @@
     </v-card-title>
     <v-data-table
       v-model:page="page"
-      class="elevation-1 mgt-10"
       :headers="headers"
       :items="items"
       :items-per-page="itemsPerPage"
       density="dense"
       hide-default-footer
       item-value="name"
+      return-object
     >
       <template v-slot:[`item.actions`]="{ item }">
         <v-icon size="x-large" class="me-2" @click="map(item)">
@@ -28,7 +28,13 @@
         </v-icon>
       </template>
       <template v-slot:no-data>
-        <v-btn color="primary" @click="initialize"> Reset </v-btn>
+        <v-sheet height="40vh" class="pa-1 d-flex justify-center align-center">
+          <div style="text-align: center">
+            <p style="font-weight: 500; font-size: 20px">
+              {{ message }}
+            </p>
+          </div>
+        </v-sheet>
       </template>
       <template v-slot:bottom>
         <div class="text-center pt-2">
@@ -64,16 +70,16 @@
 
 <script setup>
 import MapView from "../views/MapView.vue";
-import { ref, computed, watch, defineEmits } from "vue";
+import { ref, computed, watch, defineEmits, onMounted } from "vue";
 import axios from "axios";
 
 const emits = defineEmits(["trial"]);
 const page = ref(1);
-const itemsPerPage = 10;
+const itemsPerPage = ref(10);
 
-
-const headers = [
-  { title: "항차", align: "start", key: "name" },
+const headers = ref([
+  { title: "구분", align: "start", key: "division" },
+  { title: "항차 이름", align: "start", key: "name" },
   { title: "Ship ID", align: "start", key: "shipid" },
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "끝시간", align: "start", key: "enddate" },
@@ -82,15 +88,18 @@ const headers = [
   { title: "저장 용량", align: "start", key: "storage" },
   { title: "map", key: "actions", sortable: false },
   { title: "설명", align: "start", key: "description" },
-];
+]);
 
 const items = ref([]);
+const message = ref("항차 테이블 정보 로딩중...");
 const editedIndex = ref(-1);
 
 const formTitle = computed(() =>
   editedIndex.value === -1 ? "New Item" : "Edit Item"
 );
-const pageCount = computed(() => Math.ceil(items.value.length / itemsPerPage));
+const pageCount = computed(() =>
+  Math.ceil(items.value.length / itemsPerPage.value)
+);
 
 const dialog = ref(false);
 const dialogDelete = ref(false);
@@ -100,39 +109,53 @@ watch(dialog, (val) => {
 });
 
 const items1 = ref([]);
-
-// 데이터 받아오기
+const tokenid = ref(sessionStorage.getItem("token") || "");
 const fetchData = async () => {
   try {
-    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
+    const response = await axios.post(
+      "http://192.168.0.73:8080/info/seatrial",
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
+    );
+    const newItems = [];
     for (let i = 0; i < response.data.length; i++) {
-      items.value.push({
-        name: `${response.data[i].seatrialid}`,
-        shipid: `${response.data[i].shipid.shipid}`,
-        startdate: `${response.data[i].start_TIME_UTC}`,
-        purpose: `${response.data[i].test_PURPOSE}`,
-        location: `${response.data[i].navigation_AREA}`,
-        storage: `${response.data[i].seatrialid}`,
-        enddate: `${response.data[i].end_TIME_UTC}`,
-        description: `${response.data[i].description}`,
+      newItems.push({
+        division: response.data[i].seatrialId,
+        name: response.data[i].name,
+        shipid: response.data[i].groupId,
+        startdate: response.data[i].startTimeUtc,
+        purpose: response.data[i].testPurpose,
+        location: response.data[i].navigationArea,
+        storage: response.data[i].storageSize,
+        enddate: response.data[i].endTimeUtc,
+        description: response.data[i].description,
       });
-
-      console.log(`${response.data[i].seatrialid} here!!!!!!!!!!!!`);
-      console.log(`${response.data[i].test_PURPOSE} here!!!!!!!!!!!!`);
     }
+
+    console.log("Fetched data:", newItems); // 로그 추가
+    items.value = newItems;
   } catch (error) {
     console.error(error);
+    message.value = `api 오류(${error})`
   }
 };
 
-fetchData();
+onMounted(() => {
+  fetchData();
+});
 
 const seatrialProps = ref();
 const maptitle = ref();
 const map = (item) => {
+  alert(item.division);
   console.log(item.name + "아이템");
-  seatrialProps.value = `${item.name}`;
-  maptitle.value = `항차 ${item.name}번의 지도`;
+  seatrialProps.value = `${item.division}`;
+  maptitle.value = `항차: ${item.name}의 지도`;
   dialog.value = true;
 };
 
@@ -143,5 +166,8 @@ const close = () => {
 <style scoped>
 .mgt-10 {
   margin-top: 11px;
+}
+.custom-select {
+  --v-select-menu-font-size: 10px;
 }
 </style>

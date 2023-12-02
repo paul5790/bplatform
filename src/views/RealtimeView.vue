@@ -13,7 +13,10 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <!-- <OSMap :lat="parseFloat(latitude)" :lon="parseFloat(longitude)"/> -->
+                  <OSMap
+                    :lat="parseFloat(latitude)"
+                    :lon="parseFloat(longitude)"
+                  />
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -265,6 +268,7 @@ import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 // 웹소켓 관련, Web Socket
 import { ref, inject, onMounted } from "vue";
 import { onMessage, onOpen, onClose, onError } from "vue3-websocket";
+import axios from "axios";
 
 const text = ref(""); // 보낼 데이터
 const responseMsg = ref(""); // 받아온 데이터
@@ -281,6 +285,9 @@ let engine2_TransmissionPressure = ref();
 let engine2_ExhaustGasTemperature = ref();
 let timer = null;
 
+const lampdatatime = ref(sessionStorage.getItem("lampdatatime") || "");
+const tokenid = ref(sessionStorage.getItem("token") || "");
+
 const updateValue = () => {
   Object.keys(checkdata.value).forEach((key) => {
     checkdata.value[key];
@@ -294,6 +301,26 @@ const updateValue = () => {
   engine2_OilPressure.value = Math.floor(Math.random() * 10 + 8);
   engine2_TransmissionPressure.value = Math.floor(Math.random() * 10 + 8);
   engine2_ExhaustGasTemperature.value = Math.floor(Math.random() * 10 + 8);
+};
+
+const checkTime = ref();
+const fetchData = async () => {
+  try {
+    const timedata = await axios.post(
+      "http://192.168.0.73:8080/info/get/timedata",
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
+    );
+    await (checkTime.value = timedata.data.lampTime);
+
+  } catch (error) {
+    //console.error(error);
+  }
 };
 
 onMounted(() => {
@@ -736,7 +763,7 @@ onMessage((message) => {
       messageTimeout = setTimeout(() => {
         console.log("No data received for 5 seconds. Closing the connection.");
         offlamp(16);
-      }, 5000);
+      }, Number(checkTime.value) * 1000);
     }
   } catch (error) {
     console.error(error);

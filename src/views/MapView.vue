@@ -8,6 +8,8 @@
 import L from "leaflet";
 import { ref, toRefs, onMounted, defineProps } from "vue";
 import axios from "axios";
+
+const tokenid = ref(sessionStorage.getItem("token") || "");
 const props = defineProps({
   // #2 props 정의
   trial: String,
@@ -63,12 +65,26 @@ const initializeMap = (waypoints, ais, startlocation, endlocation) => {
 onMounted(async () => {
   try {
     const waypointData = await axios.post(
-      `http://192.168.0.73:8080/info/waypoints/${props.trial}`
+      `http://192.168.0.73:8080/info/waypoints/${props.trial}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
       // `http://192.168.0.73:8080/info/waypoints/5`
     );
 
     const aisData = await axios.post(
-      `http://192.168.0.73:8080/info/ais/${props.trial}`
+      `http://192.168.0.73:8080/info/ais/${props.trial}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid.value}`,
+        },
+      }
       // `http://192.168.0.73:8080/info/ais/5`
     );
 
@@ -96,7 +112,7 @@ onMounted(async () => {
         ais.value.push([latitude, longitude]);
       }
     }
-    
+
     startlocation.value = ais.value[0];
     endlocation.value = ais.value[ais.value.length - 1];
 
