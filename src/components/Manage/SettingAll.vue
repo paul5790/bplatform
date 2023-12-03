@@ -77,7 +77,7 @@ const changeData = async () => {
   try {
     // 서버에 POST 요청을 보내고 응답을 받음
     const response = await axios.post(
-      "http://192.168.0.73:8080/info/update/timedata",
+      "http://192.168.0.73:8080/info/update/settime",
       {
         lossTime: lossdatatime.value,
         lampTime: lampdatatime.value,
@@ -105,7 +105,7 @@ const changeData = async () => {
 const fetchData = async () => {
   try {
       const timedata = await axios.post(
-    "http://192.168.0.73:8080/info/get/timedata",
+    "http://192.168.0.73:8080/info/get/settime",
     {},
     {
       headers: {

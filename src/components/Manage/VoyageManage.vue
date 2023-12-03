@@ -1,6 +1,9 @@
 <template>
   <v-sheet class="manager-sheet">
-    <v-card style="flex: 1">
+    <v-card class="scrollable-card" style="flex: 1; height: 75vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;">
       <v-card-item>
         <v-row class="dialog-row">
           <!-- 시작하기 -->
@@ -565,7 +568,7 @@
         >
           <template v-slot:no-data>
             <v-sheet
-              height="40vh"
+              height="55vh"
               class="pa-1 d-flex justify-center align-center"
             >
               <div style="text-align: center">
@@ -663,8 +666,14 @@ const openDialog1 = () => {
 };
 
 const openDialog1_1 = () => {
+  // 현재 endTimeUtc.value의 값을 Date 객체로 변환
+
   endTimeUtc.value = new Date();
-  sessionStorage.setItem("endTimeUtc", endTimeUtc.value.toString());
+
+  const endTime = new Date(endTimeUtc.value);
+  endTime.setHours(endTime.getHours() + 9);
+  // sessionStorage.setItem("endTimeUtc", endTimeUtc.value.toString());
+  sessionStorage.setItem("endTimeUtc", endTime.toISOString());
   dialog1_1.value = true;
 };
 
@@ -739,7 +748,11 @@ const waitStart = () => {
     sessionStorage.setItem("name", startname.value.toString());
     sessionStorage.setItem("testPurpose", startpurpose.value.toString());
     sessionStorage.setItem("navigationArea", startlocation.value.toString());
-    sessionStorage.setItem("startTimeUtc", startTimeUtc.value.toString());
+    const startTime = new Date(startTimeUtc.value);
+
+    // 9시간을 더함
+    startTime.setHours(startTime.getHours() + 9);
+    sessionStorage.setItem("startTimeUtc", startTime.toISOString());
     sessionStorage.setItem("description", startdescription.value.toString());
 
     sessionStorage.setItem("startstate", "true");
@@ -755,7 +768,6 @@ const waitStart = () => {
       console.error("An error occurred in waitStart:", error);
     }
   }
-  
 };
 
 // 종료하기 후 저장
@@ -763,12 +775,12 @@ const startData = () => {
   sessionStorage.setItem("startstate", "false");
   startstate.value = false;
 
-  const name = (sessionStorage.getItem("name")) || null;
-  const testPurpose = (sessionStorage.getItem("testPurpose")) || null;
-  const navigationArea = (sessionStorage.getItem("navigationArea")) || null;
-  const startTimeUtc = (sessionStorage.getItem("startTimeUtc")) || null;
-  const endTimeUtc = (sessionStorage.getItem("endTimeUtc")) || null;
-  const description = (sessionStorage.getItem("description")) || null;
+  const name = sessionStorage.getItem("name") || null;
+  const testPurpose = sessionStorage.getItem("testPurpose") || null;
+  const navigationArea = sessionStorage.getItem("navigationArea") || null;
+  const startTimeUtc = sessionStorage.getItem("startTimeUtc") || null;
+  const endTimeUtc = sessionStorage.getItem("endTimeUtc") || null;
+  const description = sessionStorage.getItem("description") || null;
 
   const data = {
     seatrialId: division.value,

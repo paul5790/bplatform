@@ -172,6 +172,18 @@
                 return-object
                 style="padding-top: 5px"
               >
+                <template v-slot:no-data>
+                  <v-sheet
+                    height="60vh"
+                    class="pa-1 d-flex justify-center align-center"
+                  >
+                    <div style="text-align: center">
+                      <p style="font-weight: 500; font-size: 20px">
+                        {{ message }}
+                      </p>
+                    </div>
+                  </v-sheet>
+                </template>
                 <template v-slot:bottom>
                   <div class="text-center pt-2">
                     <v-pagination
@@ -208,7 +220,7 @@
 import { ref, computed, watchEffect, onMounted } from "vue";
 import axios from "axios";
 import * as XLSX from "xlsx";
-import Papa from 'papaparse';
+import Papa from "papaparse";
 import { saveAs } from "file-saver";
 
 const tab = ref(0);
@@ -222,6 +234,7 @@ const page = ref(1);
 const headerName = ref([]); // 빈 배열로 초기화
 const dataSet = ref([]); // 빈 배열로 초기화
 const selectedData = ref([]); //
+const message = ref("데이터가 존재하지 않습니다.");
 
 const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
@@ -445,7 +458,7 @@ let dataValues1 = [];
 //   }
 // };
 
-const selectDownlodFormat = ref('xlsx');
+const selectDownlodFormat = ref("xlsx");
 
 // 데이터 다운로드
 const dataDownload = () => {
@@ -457,34 +470,39 @@ const dataDownload = () => {
       const dataValues = Object.values(selectedData.value);
 
       for (let i = 0; i < downloadData.length; i++) {
-        if (selectDownlodFormat.value === 'xlsx') {
+        if (selectDownlodFormat.value === "xlsx") {
           // xlsx 선택 시
           const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
           XLSX.utils.book_append_sheet(workbook, worksheet, dataValues[i]);
-        } else if (selectDownlodFormat.value === 'csv') {
+        } else if (selectDownlodFormat.value === "csv") {
           // csv 선택 시
           const csvData = Papa.unparse(downloadData[i].value);
-          const csvBlob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+          const csvBlob = new Blob([csvData], {
+            type: "text/csv;charset=utf-8;",
+          });
           saveAs(csvBlob, `${dataValues[i]}_csv.csv`);
-        } else if (selectDownlodFormat.value === 'txt') {
+        } else if (selectDownlodFormat.value === "txt") {
           // txt 선택 시
           const txtData = JSON.stringify(downloadData[i].value, null, 2);
-          const txtBlob = new Blob([txtData], { type: 'text/plain;charset=utf-8;' });
+          const txtBlob = new Blob([txtData], {
+            type: "text/plain;charset=utf-8;",
+          });
           saveAs(txtBlob, `${dataValues[i]}_txt.txt`);
         }
       }
 
-      if (selectDownlodFormat.value === 'xlsx') {
+      if (selectDownlodFormat.value === "xlsx") {
         // xlsx 선택 시
         XLSX.writeFile(workbook, `${dataValues}_xlsx.xlsx`);
       }
     } catch (error) {
-      alert(`다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`);
+      alert(
+        `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
+      );
       console.error(error);
     }
   }
 };
-
 
 // 데이터 조회
 

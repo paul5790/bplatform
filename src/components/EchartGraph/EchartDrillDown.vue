@@ -274,7 +274,7 @@ const fetchData = async () => {
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
         const timedata = await axios.post(
-          "http://192.168.0.73:8080/info/get/timedata",
+          "http://192.168.0.73:8080/info/get/settime",
           {},
           {
             headers: {

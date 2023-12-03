@@ -1,13 +1,16 @@
 <template>
   <v-sheet class="manager-sheet">
-    <v-card style="flex: 1">
+    <v-card class="scrollable-card" style="flex: 1; height: 75vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;">
       <v-card-item>
         <v-row class="dialog-row">
           <div class="dialog-div">
             <!-- <v-btn color="blue" @click="update()">수정하기</v-btn> -->
-                       
-                <v-btn color="blue" @click="check()"> 수정하기 </v-btn>
-          
+
+            <v-btn color="blue" @click="check()"> 수정하기 </v-btn>
+
             <v-dialog v-model="dialog" persistent width="1024">
               <v-card>
                 <v-card-title>
@@ -16,11 +19,13 @@
                 <v-card-text>
                   <v-container>
                     <v-row>
-                      <v-col cols="12"><p style="font-size: 13px">기본 정보</p></v-col>
+                      <v-col cols="12"
+                        ><p style="font-size: 13px">기본 정보</p></v-col
+                      >
                       <v-col cols="12" sm="6">
                         <v-text-field
                           label="사용자 ID"
-                          :readonly=true
+                          
                           required
                           v-model="selectedId"
                         ></v-text-field>
@@ -28,7 +33,7 @@
                       <v-col cols="12" sm="6">
                         <v-text-field
                           label="이름"
-                          :readonly=true
+                          
                           hint="example of persistent helper text"
                           persistent-hint
                           v-model="selecteduserName"
@@ -39,7 +44,7 @@
                         <v-text-field
                           v-model="selectedemail"
                           label="이메일"
-                          :readonly=true
+                          
                           required
                         ></v-text-field>
                       </v-col>
@@ -47,11 +52,13 @@
                         <v-text-field
                           v-model="selectedphoneNumber"
                           label="전화번호"
-                          :readonly=true
+                          
                           required
                         ></v-text-field>
                       </v-col>
-                      <v-col cols="12"><p style="font-size: 13px">유저 설정</p></v-col>
+                      <v-col cols="12"
+                        ><p style="font-size: 13px">유저 설정</p></v-col
+                      >
                       <v-col cols="12" sm="6">
                         <v-text-field
                           label="소속"
@@ -117,6 +124,18 @@
           return-object
           show-select
         >
+          <template v-slot:no-data>
+            <v-sheet
+              height="55vh"
+              class="pa-1 d-flex justify-center align-center"
+            >
+              <div style="text-align: center">
+                <p style="font-weight: 500; font-size: 20px">
+                  {{ message }}
+                </p>
+              </div>
+            </v-sheet>
+          </template>
           <template v-slot:bottom>
             <div class="text-center pt-2">
               <v-pagination
@@ -149,6 +168,7 @@ const selecteduserGroup = ref();
 const selecteddescription = ref();
 const selectedphoneNumber = ref();
 const readonly = ref(true);
+const message = ref("유저 정보 로딩중...");
 
 const username = ref("홍길동");
 
@@ -161,7 +181,11 @@ const check = () => {
     selecteduserGroup.value = selectedItems.value[0].userGroup;
     selecteddescription.value = selectedItems.value[0].description;
     selectedphoneNumber.value = selectedItems.value[0].phoneNumber;
-    if (selecteduserName.value === null || selecteduserName.value === "" || selecteduserName.value === undefined) {
+    if (
+      selecteduserName.value === null ||
+      selecteduserName.value === "" ||
+      selecteduserName.value === undefined
+    ) {
       dialog.value = true;
       console.log("No user selected");
     } else {
@@ -175,9 +199,7 @@ const check = () => {
   console.log(selectedemail.value);
 };
 
-const saveData = () => {
-  
-}
+const saveData = () => {};
 
 const pageCount = computed(() => {
   return Math.ceil(items.value.length / itemsPerPage.value);
@@ -223,13 +245,14 @@ const fetchData = async () => {
     }
   } catch (error) {
     console.error(error);
+    message.value = `api 오류(${error})`;
   }
 };
 
 fetchData();
 
 const changeData = () => {
-  console.log(selectedItems.value)
+  console.log(selectedItems.value);
   try {
     const data = {
       id: selectedId.value,
@@ -238,7 +261,7 @@ const changeData = () => {
       department: selecteddepartment.value,
       phoneNumber: selectedphoneNumber.value,
       eMail: selectedemail.value,
-      description: selecteddescription.value
+      description: selecteddescription.value,
     };
     console.log(data);
     try {
@@ -275,185 +298,7 @@ const nullDialog = () => {
 
 // 데이터 테이블 바디
 const items1 = ref([
-  {
-    name: "유저 #1",
-    startdate: "2023-08-29T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "admin",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #2",
-    startdate: "2023-09-27T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "admin",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #3",
-    startdate: "2023-10-20T04:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "admin",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #4",
-    startdate: "2023-10-29T18:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "admin",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #5",
-    startdate: "2023-08-29T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "admin",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #6",
-    startdate: "2023-09-27T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #7",
-    startdate: "2023-10-20T04:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #8",
-    startdate: "2023-10-29T18:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #9",
-    startdate: "2023-08-29T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #10",
-    startdate: "2023-09-27T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #11",
-    startdate: "2023-10-20T04:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #12",
-    startdate: "2023-10-29T18:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #13",
-    startdate: "2023-08-29T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #14",
-    startdate: "2023-09-27T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #15",
-    startdate: "2023-10-20T04:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #16",
-    startdate: "2023-10-29T18:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    permission: "user",
-    affiliation: "지노스",
-    username: username.value,
-  },
-  {
-    name: "유저 #17",
-    startdate: "2023-08-29T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    username: username.value,
-  },
-  {
-    name: "유저 #18",
-    startdate: "2023-09-27T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    username: username.value,
-  },
-  {
-    name: "유저 #19",
-    startdate: "2023-10-20T04:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    username: username.value,
-  },
-  {
-    name: "유저 #20",
-    startdate: "2023-10-29T18:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    username: username.value,
-  },
-  {
-    name: "유저 #21",
-    startdate: "2023-08-29T08:28:43",
-    email: "a@xinnos.com",
-    description: "##테스트 유저",
-    username: username.value,
-  },
+  
 ]);
 </script>
 
