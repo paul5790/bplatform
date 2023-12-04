@@ -127,7 +127,7 @@
 
           <v-text-field
             placeholder="Enter your ID"
-            prepend-inner-icon="mdi-email-outline"
+            prepend-inner-icon="mdi-account-outline"
             variant="outlined"
             type="text"
             v-model="userid"
@@ -469,6 +469,8 @@ const login = async () => {
   } catch (error) {
     console.error(error.response?.data || error.message);
     alert(error.response?.data || error.message);
+    userid.value = "";
+    password.value = "";
   }
 };
 const checkTokenExpiration = () => {

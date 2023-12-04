@@ -23,6 +23,8 @@ const AIS = ref({ value: 0, name: "AIS" });
 const ECDIS = ref({ value: 0, name: "ECDIS" });
 const AUTOPILOT = ref({ value: 0, name: "AUTOPILOT" });
 const SPEEDLOG = ref({ value: 0, name: "SPEEDLOG" });
+const Canthrottle = ref({ value: 0, name: "Canthrottle", itemStyle: { color: "#2F55b3" }  });
+const AUTOPILOTCONTACT = ref({ value: 0, name: "AUTOPILOTCONTACT", itemStyle: { color: "#fFb763" }  });
 const NO1ENGINEPANEL = ref({ value: 0, name: "NO.1ENGINEPANEL" });
 const NO2ENGINEPANEL = ref({ value: 0, name: "NO.2ENGINEPANEL" });
 
@@ -60,6 +62,12 @@ const fetchData = async () => {
           break;
         case 'speedlog':
           SPEEDLOG.value.value += Number(item.dataLength);
+          break;
+        case 'canthrottle':
+          Canthrottle.value.value += Number(item.dataLength);
+          break;
+        case 'autopilotcontact':
+          AUTOPILOTCONTACT.value.value += Number(item.dataLength);
           break;
         case 'no1enginepanel':
           NO1ENGINEPANEL.value.value += Number(item.dataLength);
@@ -146,6 +154,8 @@ const option = ref({
         ECDIS.value,
         AUTOPILOT.value,
         SPEEDLOG.value,
+        Canthrottle.value,
+        AUTOPILOTCONTACT.value,
         NO1ENGINEPANEL.value,
         NO2ENGINEPANEL.value,
       ],

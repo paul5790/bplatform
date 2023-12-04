@@ -21,7 +21,7 @@
               <v-card style="flex: 1">
                 <v-card-item>
                   <v-card-title>
-                    <span class="text-h6">Contents/Item</span>
+                    <span class="text-h6">{{ selectedcontentsItem }}</span>
                   </v-card-title>
                   <v-chart class="chart" :option="option" autoresize />
                 </v-card-item>
@@ -176,6 +176,7 @@ const selectedsubComponent = ref(null);
 const selectedItem = ref(null);
 const selectedtrialrun = ref(null);
 const selectedtrialNum = ref();
+const selectedcontentsItem = ref("Contents/Item");
 const getTrialDate = async () => {
   try {
     const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
@@ -272,14 +273,14 @@ const headers = ref([
     key: "name",
     sortable: false,
   },
-  { title: "최솟값", align: "end", key: "min", sortable: false },
-  { title: "최댓값", align: "end", key: "max", sortable: false },
-  { title: "평균값", align: "end", key: "average", sortable: false },
-  { title: "중앙값", align: "end", key: "median", sortable: false },
-  { title: "분산", align: "end", key: "variance", sortable: false },
-  { title: "표준편차", align: "end", key: "rmse", sortable: false },
-  { title: "표준오차", align: "end", key: "error", sortable: false },
-  { title: "RMS", align: "end", key: "rms", sortable: false },
+  { title: "최솟값", align: "center", key: "min", sortable: false },
+  { title: "최댓값", align: "center", key: "max", sortable: false },
+  { title: "평균값", align: "center", key: "average", sortable: false },
+  { title: "중앙값", align: "center", key: "median", sortable: false },
+  { title: "분산", align: "center", key: "variance", sortable: false },
+  { title: "표준편차", align: "center", key: "rmse", sortable: false },
+  { title: "표준오차", align: "center", key: "error", sortable: false },
+  { title: "RMS", align: "center", key: "rms", sortable: false },
 ]);
 
 const analysis = ref([
@@ -308,1003 +309,1095 @@ onMounted(() => {
 const searchData = async () => {
   try {
     analysisData.value = [];
-  analysisTime.value = [];
-  if (
-    selectedsubComponent.value !== null &&
-    selectedItem.value !== null &&
-    selectedtrialrun.value !== null
-  ) {
-    if (selectedsubComponent.value === "DGPS") {
-      try {
-        const gga = await axios.post(
-          `http://192.168.0.73:8080/data/dgps/gga/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const vtg = await axios.post(
-          `http://192.168.0.73:8080/data/dgps/vtg/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        switch (selectedItem.value) {
-          case "위도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < gga.data.length; i++) {
-              analysisData.value.push(gga.data[i].latitude / 100);
-
-              analysisTime.value.push(
-                gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
+    analysisTime.value = [];
+    if (
+      selectedsubComponent.value !== null &&
+      selectedItem.value !== null &&
+      selectedtrialrun.value !== null
+    ) {
+      if (selectedsubComponent.value === "DGPS") {
+        try {
+          const gga = await axios.post(
+            `http://192.168.0.73:8080/data/dgps/gga/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
             }
-            analysis.value[0].name = "latitude";
-            analysis.value[0].name = "heading";
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            break;
-          case "경도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < gga.data.length; i++) {
-              analysisData.value.push(gga.data[i].longitude / 100);
-
-              analysisTime.value.push(
-                gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
+          );
+          const vtg = await axios.post(
+            `http://192.168.0.73:8080/data/dgps/vtg/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
             }
-            analysis.value[0].name = "longitude";
-            analysis.value[0].name = "heading";
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            break;
-          case "고도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < gga.data.length; i++) {
-              analysisData.value.push(gga.data[i].altitude);
+          );
+          switch (selectedItem.value) {
+            case "위도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < gga.data.length; i++) {
+                analysisData.value.push(gga.data[i].latitude / 100);
 
-              analysisTime.value.push(
-                gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "altitude";
-            analysis.value[0].name = "heading";
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            break;
-          case "SOG":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < vtg.data.length; i++) {
-              analysisData.value.push(vtg.data[i].speedovergroundknots);
-
-              analysisTime.value.push(
-                vtg.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "speedovergroundknots";
-            analysis.value[0].name = "heading";
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            break;
-          case "COG":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < vtg.data.length; i++) {
-              analysisData.value.push(vtg.data[i].courseovergrounddegreestrue);
-
-              analysisTime.value.push(
-                vtg.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "courseovergrounddegreestrue";
-            analysis.value[0].name = "heading";
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            break;
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    } else if (selectedsubComponent.value === "GYRO") {
-      try {
-        const hdt = await axios.post(
-          `http://192.168.0.73:8080/data/gyro/hdt/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const rot = await axios.post(
-          `http://192.168.0.73:8080/data/gyro/rot/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        switch (selectedItem.value) {
-          case "Heading":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < hdt.data.length; i++) {
-              analysisData.value.push(hdt.data[i].heading);
-
-              analysisTime.value.push(
-                hdt.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "회전 속도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < rot.data.length; i++) {
-              analysisData.value.push(rot.data[i].rateofturn);
-
-              analysisTime.value.push(
-                rot.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "rateofturn";
-            analysis.value[0].name = "heading";
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            break;
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    } else if (selectedsubComponent.value === "ANEMOMETER") {
-      try {
-        const mwv = await axios.post(
-          `http://192.168.0.73:8080/data/anemometer/mwv/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        switch (selectedItem.value) {
-          case "풍향":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < mwv.data.length; i++) {
-              analysisData.value.push(mwv.data[i].anemometerangle);
-
-              analysisTime.value.push(
-                mwv.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "anemometerangle";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "풍속":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < mwv.data.length; i++) {
-              analysisData.value.push(mwv.data[i].anemometerspeed);
-
-              analysisTime.value.push(
-                mwv.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "anemometerspeed";
-            analysis.value[0].name = "heading";
-            analysis.value[0].name = "heading";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            break;
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    } else if (selectedsubComponent.value === "SPEEDLOG") {
-      try {
-        const vhw = await axios.post(
-          `http://192.168.0.73:8080/data/speedlog/vhw/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        switch (selectedItem.value) {
-          case "선박 속도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < vhw.data.length; i++) {
-              if (vhw.data[i].speedn <= 0) {
-                analysisData.value.push("0");
-              } else {
-                analysisData.value.push(vhw.data[i].speedn);
+                analysisTime.value.push(
+                  gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
               }
+              selectedcontentsItem.value = "gga/latitude";
+              analysis.value[0].name = "latitude";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              break;
+            case "경도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < gga.data.length; i++) {
+                analysisData.value.push(gga.data[i].longitude / 100);
 
-              analysisTime.value.push(
-                vhw.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "speedn";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
+                analysisTime.value.push(
+                  gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "gga/longitude";
+              analysis.value[0].name = "longitude";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              break;
+            case "고도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < gga.data.length; i++) {
+                analysisData.value.push(gga.data[i].altitude);
+
+                analysisTime.value.push(
+                  gga.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "gga/altitude";
+              analysis.value[0].name = "altitude";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              break;
+            case "SOG":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < vtg.data.length; i++) {
+                analysisData.value.push(vtg.data[i].speedovergroundknots);
+
+                analysisTime.value.push(
+                  vtg.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "vtg/speedovergroundknots";
+              analysis.value[0].name = "speedovergroundknots";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              break;
+            case "COG":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < vtg.data.length; i++) {
+                analysisData.value.push(
+                  vtg.data[i].courseovergrounddegreestrue
+                );
+
+                analysisTime.value.push(
+                  vtg.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "vtg/courseovergrounddegreestrue";
+              analysis.value[0].name = "courseovergrounddegreestrue";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              break;
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
-      }
-    } else if (selectedsubComponent.value === "NO.1ENGINEPANEL") {
-      try {
-        const no1engine_panel_61444 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_61444/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no1engine_panel_65262 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65262/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no1engine_panel_65263 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65263/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no1engine_panel_65272 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65272/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no1engine_panel_65271 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65271/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no1engine_panel_65253 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65253/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no1engine_panel_65270 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65270/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no1engine_panel_65276 = await axios.post(
-          `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65276/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        switch (selectedItem.value) {
-          case "엔진1 속도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_61444.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_61444.data[i].engine_SPEED
-              );
-
-              analysisTime.value.push(
-                no1engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
+      } else if (selectedsubComponent.value === "GYRO") {
+        try {
+          const hdt = await axios.post(
+            `http://192.168.0.73:8080/data/gyro/hdt/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
             }
-            analysis.value[0].name = "engine_SPEED";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 오일 온도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65262.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65262.data[i].engine_OIL_TEMPERATURE1
-              );
-
-              analysisTime.value.push(
-                no1engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
+          );
+          const rot = await axios.post(
+            `http://192.168.0.73:8080/data/gyro/rot/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
             }
-            analysis.value[0].name = "engine_OIL_TEMPERATURE1";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 오일 압력":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65263.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65263.data[i].engine_OIL_PRESSURE
-              );
+          );
+          switch (selectedItem.value) {
+            case "Heading":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < hdt.data.length; i++) {
+                analysisData.value.push(hdt.data[i].heading);
 
-              analysisTime.value.push(
-                no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "engine_OIL_PRESSURE";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 냉각수 량":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65263.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65263.data[i].engine_COOLANT_LEVEL
-              );
+                analysisTime.value.push(
+                  hdt.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "hdt/heading";
+              analysis.value[0].name = "heading";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "회전 속도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < rot.data.length; i++) {
+                analysisData.value.push(rot.data[i].rateofturn);
 
-              analysisTime.value.push(
-                no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "engine_COOLANT_LEVEL";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 변속기 오일 압력":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65272.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65272.data[i].transmission_OIL_PRESSURE
-              );
-
-              analysisTime.value.push(
-                no1engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "transmission_OIL_PRESSURE";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 충전 시스템 전압":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65271.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65271.data[i].charging_SYSTEM_POTENTIAL
-              );
-
-              analysisTime.value.push(
-                no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 배터리 전압":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65271.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65271.data[i].battery_POTENTIAL
-              );
-
-              analysisTime.value.push(
-                no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "battery_POTENTIAL";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 누적 가동시간":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65253.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65253.data[i].engine_TOTAL_HOURS
-              );
-
-              analysisTime.value.push(
-                no1engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "engine_TOTAL_HOURS";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 흡입 매니폴드 압력(대기)":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
-              analysisData.value.push(no1engine_panel_65270.data[i]);
-
-              analysisTime.value.push(
-                no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 흡입 매니폴드 온도(대기)":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
-              analysisData.value.push(no1engine_panel_65270.data[i]);
-
-              analysisTime.value.push(
-                no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 배기가스 온도(대기)":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
-              analysisData.value.push(no1engine_panel_65270.data[i]);
-
-              analysisTime.value.push(
-                no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진1 연료 량":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no1engine_panel_65276.data.length; i++) {
-              analysisData.value.push(
-                no1engine_panel_65276.data[i].fuel_LEVEL_1
-              );
-
-              analysisTime.value.push(
-                no1engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "fuel_LEVEL_1";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
+                analysisTime.value.push(
+                  rot.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "rot/rateofturn";
+              analysis.value[0].name = "rateofturn";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              break;
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
-      }
-    } else if (selectedsubComponent.value === "NO.2ENGINEPANEL") {
-      try {
-        const no2engine_panel_61444 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_61444/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no2engine_panel_65262 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65262/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no2engine_panel_65263 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65263/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no2engine_panel_65272 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65272/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no2engine_panel_65271 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65271/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no2engine_panel_65253 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65253/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no2engine_panel_65270 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65270/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        const no2engine_panel_65276 = await axios.post(
-          `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65276/${selectedtrialNum.value}`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-        );
-        switch (selectedItem.value) {
-          case "엔진2 속도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_61444.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_61444.data[i].engine_SPEED
-              );
-
-              analysisTime.value.push(
-                no2engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
+      } else if (selectedsubComponent.value === "ANEMOMETER") {
+        try {
+          const mwv = await axios.post(
+            `http://192.168.0.73:8080/data/anemometer/mwv/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
             }
-            analysis.value[0].name = "engine_SPEED";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 오일 온도":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65262.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65262.data[i].engine_OIL_TEMPERATURE1
-              );
+          );
+          switch (selectedItem.value) {
+            case "풍향":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < mwv.data.length; i++) {
+                analysisData.value.push(mwv.data[i].anemometerangle);
 
-              analysisTime.value.push(
-                no2engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "engine_OIL_TEMPERATURE1";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 오일 압력":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65263.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65263.data[i].engine_OIL_PRESSURE
-              );
+                analysisTime.value.push(
+                  mwv.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "mwv/anemometerangle";
+              analysis.value[0].name = "anemometerangle";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "풍속":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < mwv.data.length; i++) {
+                analysisData.value.push(mwv.data[i].anemometerspeed);
 
-              analysisTime.value.push(
-                no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "engine_OIL_PRESSURE";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 냉각수 량":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65263.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65263.data[i].engine_COOLANT_LEVEL
-              );
-
-              analysisTime.value.push(
-                no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "engine_COOLANT_LEVEL";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 변속기 오일 압력":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65272.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65272.data[i].transmission_OIL_PRESSURE
-              );
-
-              analysisTime.value.push(
-                no2engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "transmission_OIL_PRESSURE";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 충전 시스템 전압":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65271.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65271.data[i].charging_SYSTEM_POTENTIAL
-              );
-
-              analysisTime.value.push(
-                no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "charging_SYSTEM_POTENTIAL";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 배터리 전압":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65271.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65271.data[i].battery_POTENTIAL
-              );
-
-              analysisTime.value.push(
-                no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "battery_POTENTIAL";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 누적 가동시간":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65253.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65253.data[i].engine_TOTAL_HOURS
-              );
-
-              analysisTime.value.push(
-                no2engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "engine_TOTAL_HOURS";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 흡입 매니폴드 압력(대기)":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
-              analysisData.value.push(no2engine_panel_65270.data[i]);
-
-              analysisTime.value.push(
-                no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 흡입 매니폴드 온도(대기)":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
-              analysisData.value.push(no2engine_panel_65270.data[i]);
-
-              analysisTime.value.push(
-                no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 배기가스 온도(대기)":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
-              analysisData.value.push(no2engine_panel_65270.data[i]);
-
-              analysisTime.value.push(
-                no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
-          case "엔진2 연료 량":
-            analysisData.value = [];
-            analysisTime.value = [];
-            for (let i = 0; i < no2engine_panel_65276.data.length; i++) {
-              analysisData.value.push(
-                no2engine_panel_65276.data[i].fuel_LEVEL_1
-              );
-
-              analysisTime.value.push(
-                no2engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(11, 19)
-              );
-            }
-            analysis.value[0].name = "fuel_LEVEL_1";
-            console.log(analysisData.value);
-            console.log(analysisTime.value);
-            console.log(selectedtrialNum.value);
-            break;
+                analysisTime.value.push(
+                  mwv.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "mwv/anemometerspeed";
+              analysis.value[0].name = "anemometerspeed";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              break;
+          }
+        } catch (error) {
+          console.error(error);
         }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    const datasetRaw2 = ref([["time", "value"]]);
-    datasetRaw2.value = [];
-    for (let i = 0; i <= analysisTime.value.length; i++) {
-      datasetRaw2.value.push([
-        analysisTime.value[i + 1],
-        analysisData.value[i],
-      ]);
-    }
-    console.log(`ROW2: ${datasetRaw2.value}`);
+      } else if (selectedsubComponent.value === "SPEEDLOG") {
+        try {
+          const vhw = await axios.post(
+            `http://192.168.0.73:8080/data/speedlog/vhw/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          switch (selectedItem.value) {
+            case "선박 속도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < vhw.data.length; i++) {
+                if (vhw.data[i].speedn <= 0) {
+                  analysisData.value.push("0");
+                } else {
+                  analysisData.value.push(vhw.data[i].speedn);
+                }
 
-    option.value = {
-      dataset: [
-        {
-          id: "dataset_raw",
-          source: datasetRaw2.value,
-        },
-      ],
-      tooltip: {
-        trigger: "axis",
-        formatter: function (params) {
-          params = params[0];
-          return `Time: ${params.value[0]}, Value: ${params.value[1]}`;
-        },
-        axisPointer: {
-          animation: false,
-        },
-      },
-      dataZoom: [
-        {
-          show: true,
-          realtime: true,
-          start: 0,
-          end: 100,
-          xAxisIndex: [0, 1],
-          height: "2%",
-        },
-      ],
-      xAxis: {
-        type: "category",
-        nameLocation: "middle",
-        data: analysisTime.value, // x축 데이터를 times 배열로 설정
-      },
-      yAxis: {},
-      series: [
-        {
-          type: "line",
-          datasetId: "dataset_raw",
-          showSymbol: false,
-          encode: {
-            x: "time",
-            y: "value",
-            itemName: "time",
-            tooltip: ["value"],
+                analysisTime.value.push(
+                  vhw.data[i].timestamp_EQUIPMENT.slice(11, 19)
+                );
+              }
+              selectedcontentsItem.value = "vhw/speedn";
+              analysis.value[0].name = "speedn";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else if (selectedsubComponent.value === "NO.1ENGINEPANEL") {
+        try {
+          const no1engine_panel_61444 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_61444/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no1engine_panel_65262 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65262/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no1engine_panel_65263 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65263/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no1engine_panel_65272 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65272/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no1engine_panel_65271 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65271/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no1engine_panel_65253 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65253/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no1engine_panel_65270 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65270/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no1engine_panel_65276 = await axios.post(
+            `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65276/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          switch (selectedItem.value) {
+            case "엔진1 속도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_61444.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_61444.data[i].engine_SPEED
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_61444/Engine Speed";
+              analysis.value[0].name = "Engine Speed";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 오일 온도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65262.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65262.data[i].engine_OIL_TEMPERATURE1
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65262/Engine Oil Temperature";
+              analysis.value[0].name = "Engine Oil Temperature";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 오일 압력":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65263.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65263.data[i].engine_OIL_PRESSURE
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65263/Engine Oil Pressure";
+              analysis.value[0].name = "Engine Oil Pressure";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 냉각수 량":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65263.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65263.data[i].engine_COOLANT_LEVEL
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65263/Engine Coolant Level";
+              analysis.value[0].name = "Engine Coolant Level";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 변속기 오일 압력":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65272.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65272.data[i].transmission_OIL_PRESSURE
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(11,19)
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65272/Transmission Oil Pressure";
+              analysis.value[0].name = "Transmission Oil Pressure";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 충전 시스템 전압":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65271.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65271.data[i].charging_SYSTEM_POTENTIAL
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65271/Charging System Potential";
+              analysis.value[0].name = "Charging System Potential";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 배터리 전압":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65271.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65271.data[i].battery_POTENTIAL
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65271/Battery Potential";
+              analysis.value[0].name = "Battery Potential";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 누적 가동시간":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65253.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65253.data[i].engine_TOTAL_HOURS
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65253/Engine total hours";
+              analysis.value[0].name = "Engine total hours";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 흡입 매니폴드 압력":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65270.data[i].engine_INTAKE_MANIFOLD_NO1_PRESSURE
+                );
+                analysisTime.value.push(
+                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              console.log(analysisData.value);
+              selectedcontentsItem.value = "no1engine_panel_65270/Engine Intake Manifold Pressure";
+              analysis.value[0].name = "Engine Intake Manifold Pressure";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 흡입 매니폴드 온도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
+                analysisData.value.push(no1engine_panel_65270.data[i].engine_INTAKE_MANIFOLD_NO1_TEMP);
+
+                analysisTime.value.push(
+                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65270/Engine Intake Manifold Temp";
+              analysis.value[0].name = "Engine Intake Manifold Temp";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 배기가스 온도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
+                analysisData.value.push(no1engine_panel_65270.data[i].engine_EXHAUST_GAS_TEMPERATURE);
+
+                analysisTime.value.push(
+                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65270/Engine Exhaust Gas Temperature";
+              analysis.value[0].name = "Engine Exhaust Gas Temperature";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진1 연료 량":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no1engine_panel_65276.data.length; i++) {
+                analysisData.value.push(
+                  no1engine_panel_65276.data[i].fuel_LEVEL_1
+                );
+
+                analysisTime.value.push(
+                  no1engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no1engine_panel_65270/Fuel Level";
+              analysis.value[0].name = "fuel_LEVEL";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else if (selectedsubComponent.value === "NO.2ENGINEPANEL") {
+        try {
+          const no2engine_panel_61444 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_61444/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no2engine_panel_65262 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65262/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no2engine_panel_65263 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65263/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no2engine_panel_65272 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65272/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no2engine_panel_65271 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65271/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no2engine_panel_65253 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65253/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no2engine_panel_65270 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65270/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          const no2engine_panel_65276 = await axios.post(
+            `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65276/${selectedtrialNum.value}`,
+            {},
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
+          switch (selectedItem.value) {
+            case "엔진2 속도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_61444.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_61444.data[i].engine_SPEED
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_61444/Engine Speed";
+              analysis.value[0].name = "Engine Speed";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 오일 온도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65262.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65262.data[i].engine_OIL_TEMPERATURE1
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65262/Engine Oil Temperature";
+              analysis.value[0].name = "Engine Oil Temperature";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 오일 압력":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65263.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65263.data[i].engine_OIL_PRESSURE
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65263/Engine Oil Pressure";
+              analysis.value[0].name = "Engine Oil Pressure";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 냉각수 량":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65263.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65263.data[i].engine_COOLANT_LEVEL
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65263/Engine Coolant Level";
+              analysis.value[0].name = "Engine Coolant Level";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 변속기 오일 압력":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65272.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65272.data[i].transmission_OIL_PRESSURE
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65272/Transmission Oil Pressure";
+              analysis.value[0].name = "Transmission Oil Pressure";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 충전 시스템 전압":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65271.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65271.data[i].charging_SYSTEM_POTENTIAL
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65271/Charging System Potential";
+              analysis.value[0].name = "Charging System Potential";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 배터리 전압":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65271.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65271.data[i].battery_POTENTIAL
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65271/Battery Potential";
+              analysis.value[0].name = "Battery Potential";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 누적 가동시간":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65253.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65253.data[i].engine_TOTAL_HOURS
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65253/Engine total hours";
+              analysis.value[0].name = "Engine total hours";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 흡입 매니폴드 압력":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
+                analysisData.value.push(no2engine_panel_65270.data[i].engine_INTAKE_MANIFOLD_NO1_PRESSURE);
+
+                analysisTime.value.push(
+                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65270/Engine Intake Manifold Pressure";
+              analysis.value[0].name = "Engine Intake Manifold Pressure";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 흡입 매니폴드 온도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
+                analysisData.value.push(no2engine_panel_65270.data[i]);
+
+                analysisTime.value.push(
+                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65270/Engine Intake Manifold Temp";
+              analysis.value[0].name = "Engine Intake Manifold Temp";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 배기가스 온도":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
+                analysisData.value.push(no2engine_panel_65270.data[i]);
+
+                analysisTime.value.push(
+                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65270/Engine Exhaust Gas Temperature";
+              analysis.value[0].name = "Engine Exhaust Gas Temperature";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+            case "엔진2 연료 량":
+              analysisData.value = [];
+              analysisTime.value = [];
+              for (let i = 0; i < no2engine_panel_65276.data.length; i++) {
+                analysisData.value.push(
+                  no2engine_panel_65276.data[i].fuel_LEVEL_1
+                );
+
+                analysisTime.value.push(
+                  no2engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(
+                    11,
+                    19
+                  )
+                );
+              }
+              selectedcontentsItem.value = "no2engine_panel_65270/Fuel Level";
+              analysis.value[0].name = "fuel_LEVEL";
+              console.log(analysisData.value);
+              console.log(analysisTime.value);
+              console.log(selectedtrialNum.value);
+              break;
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      const datasetRaw2 = ref([["time", "value"]]);
+      datasetRaw2.value = [];
+      for (let i = 0; i <= analysisTime.value.length; i++) {
+        datasetRaw2.value.push([
+          analysisTime.value[i + 1],
+          analysisData.value[i],
+        ]);
+      }
+      console.log(`ROW2: ${datasetRaw2.value}`);
+
+      option.value = {
+        dataset: [
+          {
+            id: "dataset_raw",
+            source: datasetRaw2.value,
+          },
+        ],
+        tooltip: {
+          trigger: "axis",
+          formatter: function (params) {
+            params = params[0];
+            return `Time: ${params.value[0]}, Value: ${params.value[1]}`;
+          },
+          axisPointer: {
+            animation: false,
           },
         },
-      ],
-    };
+        dataZoom: [
+          {
+            show: true,
+            realtime: true,
+            start: 0,
+            end: 100,
+            xAxisIndex: [0, 1],
+            height: "2%",
+          },
+        ],
+        xAxis: {
+          type: "category",
+          nameLocation: "middle",
+          data: analysisTime.value, // x축 데이터를 times 배열로 설정
+        },
+        yAxis: {},
+        series: [
+          {
+            type: "line",
+            datasetId: "dataset_raw",
+            showSymbol: false,
+            encode: {
+              x: "time",
+              y: "value",
+              itemName: "time",
+              tooltip: ["value"],
+            },
+          },
+        ],
+      };
 
-    // analysisData.value = [];
-    // analysisData.value = [
-    //   "1",
-    //   "2",
-    //   "3",
-    //   "4",
-    //   "5",
-    //   "4",
-    //   "3",
-    //   "2",
-    //   "1",
-    //   "1",
-    //   "1",
-    // ];
+      // analysisData.value = [];
+      // analysisData.value = [
+      //   "1",
+      //   "2",
+      //   "3",
+      //   "4",
+      //   "5",
+      //   "4",
+      //   "3",
+      //   "2",
+      //   "1",
+      //   "1",
+      //   "1",
+      // ];
 
-    const minValue = ref(); // 최솟값
-    const maxValue = ref(); // 최댓값
-    const averageValue = ref(); // 평균값
-    const standardDeviation = ref(); // 표준편차
-    const rms = ref(); // 제곱평균제곱근
-    const median = ref(); // 중앙값
-    const standardError = ref(); // 표준오차
-    const variance = ref();
-    const numericValues = analysisData.value
-      .map((value) => Number(value))
-      .filter((value) => !isNaN(value));
+      const minValue = ref(); // 최솟값
+      const maxValue = ref(); // 최댓값
+      const averageValue = ref(); // 평균값
+      const standardDeviation = ref(); // 표준편차
+      const rms = ref(); // 제곱평균제곱근
+      const median = ref(); // 중앙값
+      const standardError = ref(); // 표준오차
+      const variance = ref();
+      const numericValues = analysisData.value
+        .map((value) => Number(value))
+        .filter((value) => !isNaN(value));
 
-    if (numericValues.length > 1) {
-      // 최솟값 구하기
-      minValue.value = Math.min(...analysisData.value);
+      if (numericValues.length > 1) {
+        // 최솟값 구하기
+        minValue.value = Math.min(...analysisData.value);
 
-      // 최댓값 구하기
-      maxValue.value = Math.max(...analysisData.value);
-      // 평균 계산sortedValues
-      const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
-      averageValue.value = sum.value / numericValues.length;
+        // 최댓값 구하기
+        maxValue.value = Math.max(...analysisData.value);
+        // 평균 계산sortedValues
+        const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
+        averageValue.value = sum.value / numericValues.length;
 
-      // 표준편차 계산
-      const squaredDifferences = ref(
-        numericValues.map((value) => Math.pow(value - averageValue.value, 2))
-      );
-      const sumOfSquaredDifferences = squaredDifferences.value.reduce(
-        (acc, value) => acc + value,
-        0
-      );
-      variance.value = sumOfSquaredDifferences / numericValues.length;
-      standardDeviation.value = Math.sqrt(variance.value);
+        // 표준편차 계산
+        const squaredDifferences = ref(
+          numericValues.map((value) => Math.pow(value - averageValue.value, 2))
+        );
+        const sumOfSquaredDifferences = squaredDifferences.value.reduce(
+          (acc, value) => acc + value,
+          0
+        );
+        variance.value = sumOfSquaredDifferences / numericValues.length;
+        standardDeviation.value = Math.sqrt(variance.value);
 
-      // 제곱평균제곱근(RMS) 계산
-      const sumOfSquares = ref(
-        numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
-      );
-      rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
+        // 제곱평균제곱근(RMS) 계산
+        const sumOfSquares = ref(
+          numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
+        );
+        rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
 
-      // 중앙값 계산
-      const sortedValues = numericValues.sort((a, b) => a - b);
-      const mid = ref(Math.floor(sortedValues.length / 2));
+        // 중앙값 계산
+        const sortedValues = numericValues.sort((a, b) => a - b);
+        const mid = ref(Math.floor(sortedValues.length / 2));
 
-      if (sortedValues.length % 2 === 0) {
-        // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
-        median.value =
-          (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
-        console.log("짝수");
+        if (sortedValues.length % 2 === 0) {
+          // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
+          median.value =
+            (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
+          console.log("짝수");
+        } else {
+          // 홀수일 경우 중간 값이 중앙값
+          median.value = sortedValues[mid.value];
+          console.log("홀수");
+        }
+        // 표준 오차 계산
+        standardError.value =
+          standardDeviation.value / Math.sqrt(numericValues.length);
       } else {
-        // 홀수일 경우 중간 값이 중앙값
-        median.value = sortedValues[mid.value];
-        console.log("홀수");
+        averageValue.value = 0;
+        standardDeviation.value = 0;
+        rms.value = 0;
+        median.value = 0;
+        standardError.value = 0;
       }
-      // 표준 오차 계산
-      standardError.value =
-        standardDeviation.value / Math.sqrt(numericValues.length);
+
+      console.log(`Minimum Value: ${minValue.value}`); // 최솟값
+      analysis.value[0].min = minValue.value.toFixed(4);
+      console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
+      analysis.value[0].max = maxValue.value.toFixed(4);
+      console.log(`Average Value: ${averageValue.value}`); // 평균값
+      analysis.value[0].average = averageValue.value.toFixed(4);
+      console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
+      analysis.value[0].rmse = standardDeviation.value.toFixed(4);
+      console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
+      analysis.value[0].rms = rms.value.toFixed(4);
+      console.log(`Median: ${median.value}`); // 중앙값
+      analysis.value[0].median = median.value.toFixed(4);
+      console.log(`Standard Error: ${standardError.value}`); // 표준 오차
+      analysis.value[0].error = standardError.value.toFixed(4);
+      console.log(`Variance: ${variance.value}`); // 분산
+      analysis.value[0].variance = variance.value.toFixed(4);
+
+      console.log(`NaN Check: ${analysisData.value.some(isNaN)}`);
+      console.log(`Empty Value Check: ${analysisData.value.includes("")}`);
+      console.log(
+        `Undefined Value Check: ${analysisData.value.includes(undefined)}`
+      );
+      console.log(
+        `Non-numeric Value Check: ${analysisData.value.some(
+          (value) => typeof value !== "number" || isNaN(value)
+        )}`
+      );
     } else {
-      averageValue.value = 0;
-      standardDeviation.value = 0;
-      rms.value = 0;
-      median.value = 0;
-      standardError.value = 0;
+      alert("null man~");
     }
-
-    console.log(`Minimum Value: ${minValue.value}`); // 최솟값
-    analysis.value[0].min = minValue.value.toFixed(4);
-    console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
-    analysis.value[0].max = maxValue.value.toFixed(4);
-    console.log(`Average Value: ${averageValue.value}`); // 평균값
-    analysis.value[0].average = averageValue.value.toFixed(4);
-    console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
-    analysis.value[0].rmse = standardDeviation.value.toFixed(4);
-    console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
-    analysis.value[0].rms = rms.value.toFixed(4);
-    console.log(`Median: ${median.value}`); // 중앙값
-    analysis.value[0].median = median.value.toFixed(4);
-    console.log(`Standard Error: ${standardError.value}`); // 표준 오차
-    analysis.value[0].error = standardError.value.toFixed(4);
-    console.log(`Variance: ${variance.value}`); // 분산
-    analysis.value[0].variance = variance.value.toFixed(4);
-
-    console.log(`NaN Check: ${analysisData.value.some(isNaN)}`);
-    console.log(`Empty Value Check: ${analysisData.value.includes("")}`);
-    console.log(
-      `Undefined Value Check: ${analysisData.value.includes(undefined)}`
-    );
-    console.log(
-      `Non-numeric Value Check: ${analysisData.value.some(
-        (value) => typeof value !== "number" || isNaN(value)
-      )}`
-    );
-  } else {
-    alert("null man~");
-  }
-  } catch(error){
+  } catch (error) {
     console.log(error);
   }
-
 };
 const datasetRaw = ref([["time", "value"]]);
 

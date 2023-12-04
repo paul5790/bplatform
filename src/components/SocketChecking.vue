@@ -30,7 +30,7 @@
                 </v-sheet>
               </v-sheet>
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(4, 8)" :key="item.key">
+                <v-sheet v-for="item in data.slice(4, 7)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -52,7 +52,7 @@
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(8, 10)" :key="item.key">
+                <v-sheet v-for="item in data.slice(7, 8)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -64,7 +64,7 @@
                 </v-sheet>
               </v-sheet>
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(10, 11)" :key="item.key">
+                <v-sheet v-for="item in data.slice(8, 9)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -86,19 +86,7 @@
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(11, 14)" :key="item.key">
-                  <v-icon
-                    :color="getIconColor(item.key)"
-                    :icon="getIconIcon(item.key)"
-                    size="small"
-                  ></v-icon>
-                  <span style="font-size: 14px"
-                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-                  ><br /><br />
-                </v-sheet>
-              </v-sheet>
-              <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(14, 16)" :key="item.key">
+                <v-sheet v-for="item in data.slice(9, 10)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -367,34 +355,6 @@ const toggleGroup = (group) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // 총 58개 데이터
 const data = [
   { key: "GLL" }, //DGPS
@@ -402,31 +362,37 @@ const data = [
   { key: "RMC" },
   { key: "VTG" },
   { key: "ZDA" },
-  { key: "DTM" },
+  //{ key: "DTM" },
   { key: "GSV" },
   { key: "GSA" },
-  { key: "THS" }, //GYRO
+  //{ key: "THS" }, //GYRO
   { key: "HDT" },
   { key: "ROT" },
   { key: "MWV" }, //ANEMOMETER
-  { key: "MWD" },
-  { key: "VWR" },
-  { key: "MTW" },
-  { key: "VWT" },
-  { key: "TTM" }, //RADAR
-  { key: "TLL" },
+  // { key: "MWD" },
+  // { key: "VWR" },
+  // { key: "MTW" },
+  // { key: "VWT" },
+  // { key: "TTM" }, //RADAR
+  // { key: "TLL" },
   { key: "RSCREEN" },
   { key: "VDM" }, //AIS
   { key: "VDO" },
   { key: "ROUTEINFO" }, //ECDIS
   { key: "WAYPOINTS" },
+  { key: "RTZ" },
   { key: "ESCREEN" },
   { key: "RSA" }, //AUTOPILOT
-  { key: "MODE" },
+  // { key: "MODE" },
   { key: "HTD" },
   { key: "VBW" }, //SPEEDLOG
   { key: "VHW" },
   { key: "VLW" },
+  { key: "CAN_Online_State" },//CanThrottle
+  { key: "Engine_RPM" },
+  { key: "Rudder" },
+  { key: "Rudder_Scale" },
+  { key: "AUTOPILOTCONTACT" },
   { key: "NO1ENGINE_PANEL_61444" }, //NO.1
   { key: "NO1ENGINE_PANEL_65262" },
   { key: "NO1ENGINE_PANEL_65263" },

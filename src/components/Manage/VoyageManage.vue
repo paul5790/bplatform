@@ -893,7 +893,7 @@ const headers = ref([
   { title: "끝시간", align: "start", key: "enddate" },
   { title: "목적", align: "start", key: "purpose" },
   { title: "해역 위치", align: "start", key: "location" },
-  { title: "저장 용량", align: "start", key: "storage" },
+  // { title: "저장 용량", align: "start", key: "storage" },
   { title: "설명", align: "start", key: "description" },
   { title: "입력자", align: "end", key: "user" },
 ]);
@@ -908,11 +908,11 @@ const fetchData = async () => {
       items.value.push({
         division: response.data[i].seatrialId,
         name: response.data[i].name,
-        shipid: response.data[i].groupId,
+        shipid: response.data[i].shipId,
         startdate: response.data[i].startTimeUtc,
         purpose: response.data[i].testPurpose,
         location: response.data[i].navigationArea,
-        storage: response.data[i].storageSize,
+        // storage: response.data[i].storageSize + "MB",
         enddate: response.data[i].endTimeUtc,
         description: response.data[i].description,
       });

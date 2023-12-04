@@ -632,11 +632,12 @@ const fetchData = async (data) => {
         dataSet.value = response.data;
         if (response.data && response.data.length > 0) {
           const dataheader = ref(
-            Object.keys(response.data[0]).map((key) => ({
-              title: key,
-              align: "start",
-              key,
-            }))
+            Object.keys(response.data[0]).reduce((acc, key) => {
+              if (key.toLowerCase() !== "id") {
+                acc.push({ title: key, align: "start", key });
+              }
+              return acc;
+            }, [])
           );
 
           if (dataheader.value == null) {
@@ -734,7 +735,8 @@ const axioslist = ref([
   "ais/vdo",
   "ecdis/routeinfo",
   "ecdis/waypoints",
-  "ecdis/screen",
+  "ecdis/rtz",
+  "ecdis/ecdisscreen",
   "autopilot/rsa",
   "autopilot/mode",
   "autopilot/htd",
@@ -902,6 +904,11 @@ const tabAction = async () => {
       itemsPerPage.value = 11;
       dataSet.value = WAYPOINTS.value;
       headerName.value = WAYPOINTSheader.value;
+      break;
+    case "RTZ":
+      itemsPerPage.value = 11;
+      dataSet.value = RTZ.value;
+      headerName.value = RTZheader.value;
       break;
     case "ECDIS_SCREEN":
       itemsPerPage.value = 11;
@@ -1139,6 +1146,7 @@ const VDMheader = ref([]);
 const VDOheader = ref([]);
 const ROUTEINFOheader = ref([]);
 const WAYPOINTSheader = ref([]);
+const RTZheader = ref([]);
 const ECDIS_SCREENheader = ref([]);
 const RSAheader = ref([]);
 // const MODEheader = ref([]);
@@ -1204,6 +1212,7 @@ const VDM = ref([]);
 const VDO = ref([]);
 const ROUTEINFO = ref([]);
 const WAYPOINTS = ref([]);
+const RTZ = ref([]);
 const ECDIS_SCREEN = ref([]);
 const RSA = ref([]);
 // const MODE = ref([]);
@@ -1269,6 +1278,7 @@ const headerVariables = [
   VDOheader,
   ROUTEINFOheader,
   WAYPOINTSheader,
+  RTZheader,
   ECDIS_SCREENheader,
   RSAheader,
   // MODEheader,
@@ -1335,6 +1345,7 @@ const dataVariables = [
   VDO,
   ROUTEINFO,
   WAYPOINTS,
+  RTZ,
   ECDIS_SCREEN,
   RSA,
   // MODE,
@@ -1521,6 +1532,12 @@ const switchValue = (axiosItem, dataheader, response) => {
       WAYPOINTS.value = response.data;
       downloadData.push(WAYPOINTS);
       dataValues1.push("WAYPOINTS");
+      break;
+    case "ecdis/rtz":
+      RTZheader.value = dataheader.value;
+      RTZ.value = response.data;
+      downloadData.push(RTZ);
+      dataValues1.push("RTZ");
       break;
     case "ecdis/screen":
       ECDIS_SCREENheader.value = dataheader.value;

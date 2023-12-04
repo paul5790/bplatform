@@ -84,10 +84,11 @@ const headers = ref([
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "끝시간", align: "start", key: "enddate" },
   { title: "목적", align: "start", key: "purpose" },
+  { title: "map", key: "actions", sortable: false },
   { title: "해역 위치", align: "start", key: "location" },
   { title: "저장 용량", align: "start", key: "storage" },
-  { title: "map", key: "actions", sortable: false },
-  { title: "설명", align: "start", key: "description" },
+  
+  // { title: "설명", align: "start", key: "description" },
 ]);
 
 const items = ref([]);
@@ -127,11 +128,11 @@ const fetchData = async () => {
       newItems.push({
         division: response.data[i].seatrialId,
         name: response.data[i].name,
-        shipid: response.data[i].groupId,
+        shipid: response.data[i].shipId,
         startdate: response.data[i].startTimeUtc,
         purpose: response.data[i].testPurpose,
         location: response.data[i].navigationArea,
-        storage: response.data[i].storageSize,
+        storage: response.data[i].storageSize + "MB",
         enddate: response.data[i].endTimeUtc,
         description: response.data[i].description,
       });

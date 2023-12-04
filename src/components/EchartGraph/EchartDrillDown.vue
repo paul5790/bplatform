@@ -89,6 +89,7 @@ const VDM = ref(0);
 const VDO = ref(0);
 const ROUTEINFO = ref(0);
 const WAYPOINTS = ref(0);
+const RTZ = ref(0);
 const ESCREEN = ref(0);
 const RSA = ref(0);
 const MODE = ref(0);
@@ -96,6 +97,11 @@ const HTD = ref(0);
 const VBW = ref(0);
 const VHW = ref(0);
 const VLW = ref(0);
+const CAN_Online_State = ref(0);
+const Engine_RPM = ref(0);
+const Rudder = ref(0);
+const Rudder_Scale = ref(0);
+const AUTOPILOTCONTACT = ref(0);
 const NO1ENGINE_PANEL_61444 = ref(0);
 const NO1ENGINE_PANEL_65262 = ref(0);
 const NO1ENGINE_PANEL_65263 = ref(0);
@@ -149,6 +155,7 @@ const dataRefs = [
   VDO,
   ROUTEINFO,
   WAYPOINTS,
+  RTZ,
   ESCREEN,
   RSA,
   MODE,
@@ -156,6 +163,11 @@ const dataRefs = [
   VBW,
   VHW,
   VLW,
+  CAN_Online_State,
+  Engine_RPM,
+  Rudder,
+  Rudder_Scale,
+  AUTOPILOTCONTACT,
   NO1ENGINE_PANEL_61444,
   NO1ENGINE_PANEL_65262,
   NO1ENGINE_PANEL_65263,
@@ -210,13 +222,19 @@ const axioslist = ref([
   "ais/vdo",
   "ecdis/routeinfo",
   "ecdis/waypoints",
-  "ecdis/screen",
+  "ecdus/rtz",
+  "ecdis/ecdisscreen",
   "autopilot/rsa",
   "autopilot/mode",
   "autopilot/htd",
   "speedlog/vbw",
   "speedlog/vhw",
   "speedlog/vlw",
+  "canthrottle/canonlinestate",
+  "canthrottle/enginerpm",
+  "canthrottle/rudder",
+  "canthrottle/rudderscale",
+  "autopilotcontact/autopilotcontact",
   "no1enginepanel/no1engine_panel_61444",
   "no1enginepanel/no1engine_panel_65262",
   "no1enginepanel/no1engine_panel_65263",
@@ -353,6 +371,8 @@ const option = ref({
       "ECDIS",
       "AUTOPILOT",
       "SPEEDLOG",
+      "CanThrottle",
+      "AUTOPILOTCONTACT",
       "NO.1ENGINE",
       "NO.2ENGINE",
     ],
@@ -396,6 +416,14 @@ const option = ref({
       {
         value: 0,
         groupId: "SPEEDLOG",
+      },
+      {
+        value: 0,
+        groupId: "CanThrottle",
+      },
+      {
+        value: 0,
+        groupId: "AUTOPILOTCONTACT",
       },
       {
         value: 0,
@@ -462,6 +490,8 @@ const handleChartClick = (event) => {
                     "ECDIS",
                     "AUTOPILOT",
                     "SPEEDLOG",
+                    "CanThrottle",
+                    "AUTOPILOTCONTACT",
                     "NO.1ENGINE",
                     "NO.2ENGINE",
                   ],
@@ -478,26 +508,28 @@ const handleChartClick = (event) => {
                         RMC.value +
                         VTG.value +
                         ZDA.value +
-                        DTM.value +
+                        // DTM.value +
                         GSV.value +
                         GSA.value,
                       groupId: "DGPS",
                     },
                     {
-                      value: THS.value + HDT.value + ROT.value,
+                      value:
+                        // THS.value +
+                        HDT.value + ROT.value,
                       groupId: "GYRO",
                     },
                     {
-                      value:
-                        MWV.value +
-                        MWD.value +
-                        VWR.value +
-                        MTW.value +
-                        VWT.value,
+                      value: MWV.value,
+                      // MWD.value +
+                      // VWR.value +
+                      // MTW.value +
+                      // VWT.value,
                       groupId: "ANEMOMETER",
                     },
                     {
-                      value: TTM.value + TLL.value + RSCREEN.value,
+                      // TTM.value + TLL.value +
+                      value: RSCREEN.value,
                       groupId: "RADAR",
                     },
                     {
@@ -505,16 +537,29 @@ const handleChartClick = (event) => {
                       groupId: "AIS",
                     },
                     {
-                      value: ROUTEINFO.value + WAYPOINTS.value + ESCREEN.value,
+                      value: ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value,
                       groupId: "ECDIS",
                     },
                     {
-                      value: RSA.value + MODE.value + HTD.value,
+                      value: RSA.value + HTD.value,
+                      //+ MODE.value,
                       groupId: "AUTOPILOT",
                     },
                     {
                       value: VBW.value + VHW.value + VLW.value,
                       groupId: "SPEEDLOG",
+                    },
+                    {
+                      value:
+                        CAN_Online_State.value +
+                        Engine_RPM.value +
+                        Rudder.value +
+                        Rudder_Scale.value,
+                      groupId: "CanThrottle",
+                    },
+                    {
+                      value: AUTOPILOTCONTACT.value,
+                      groupId: "AUTOPILOTCONTACT",
                     },
                     {
                       value:
@@ -598,21 +643,28 @@ const updateChart = () => {
             RMC.value +
             VTG.value +
             ZDA.value +
-            DTM.value +
+            // DTM.value +
             GSV.value +
             GSA.value,
           groupId: "DGPS",
         },
         {
-          value: THS.value + HDT.value + ROT.value,
+          value:
+            // THS.value +
+            HDT.value + ROT.value,
           groupId: "GYRO",
         },
         {
-          value: MWV.value + MWD.value + VWR.value + MTW.value + VWT.value,
+          value: MWV.value,
+          // MWD.value +
+          // VWR.value +
+          // MTW.value +
+          // VWT.value,
           groupId: "ANEMOMETER",
         },
         {
-          value: TTM.value + TLL.value + RSCREEN.value,
+          // TTM.value + TLL.value +
+          value: RSCREEN.value,
           groupId: "RADAR",
         },
         {
@@ -620,16 +672,29 @@ const updateChart = () => {
           groupId: "AIS",
         },
         {
-          value: ROUTEINFO.value + WAYPOINTS.value + ESCREEN.value,
+          value: ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value,
           groupId: "ECDIS",
         },
         {
-          value: RSA.value + MODE.value + HTD.value,
+          value: RSA.value + HTD.value,
+          //+ MODE.value,
           groupId: "AUTOPILOT",
         },
         {
           value: VBW.value + VHW.value + VLW.value,
           groupId: "SPEEDLOG",
+        },
+        {
+          value:
+            CAN_Online_State.value +
+            Engine_RPM.value +
+            Rudder.value +
+            Rudder_Scale.value,
+          groupId: "CanThrottle",
+        },
+        {
+          value: AUTOPILOTCONTACT.value,
+          groupId: "AUTOPILOTCONTACT",
         },
         {
           value:
@@ -685,7 +750,7 @@ const updateChart = () => {
         ["RMC", RMC.value],
         ["VTG", VTG.value],
         ["ZDA", Number(ZDA.value)],
-        ["DTM", DTM.value],
+        // ["DTM", DTM.value],
         ["GSV", GSV.value],
         ["GSA", GSA.value],
       ],
@@ -693,7 +758,7 @@ const updateChart = () => {
     {
       dataGroupId: "GYRO",
       data: [
-        ["THS", THS.value],
+        //["THS", THS.value],
         ["HDT", HDT.value],
         ["ROT", ROT.value],
       ],
@@ -702,17 +767,17 @@ const updateChart = () => {
       dataGroupId: "ANEMOMETER",
       data: [
         ["MWV", MWV.value],
-        ["MWD", MWD.value],
-        ["VWR", VWR.value],
-        ["MTW", MTW.value],
-        ["VWT", VWT.value],
+        // ["MWD", MWD.value],
+        // ["VWR", VWR.value],
+        // ["MTW", MTW.value],
+        // ["VWT", VWT.value],
       ],
     },
     {
       dataGroupId: "RADAR",
       data: [
-        ["TTM", TTM.value],
-        ["TLL", TLL.value],
+        // ["TTM", TTM.value],
+        // ["TLL", TLL.value],
         ["RSCREEN", RSCREEN.value],
       ],
     },
@@ -728,6 +793,7 @@ const updateChart = () => {
       data: [
         ["ROUTEINFO", ROUTEINFO.value],
         ["WAYPOINTS", WAYPOINTS.value],
+        ["RTZ", RTZ.value],
         ["ESCREEN", ESCREEN.value],
       ],
     },
@@ -735,7 +801,7 @@ const updateChart = () => {
       dataGroupId: "AUTOPILOT",
       data: [
         ["RSA", RSA.value],
-        ["MODE", MODE.value],
+        // ["MODE", MODE.value],
         ["HTD", HTD.value],
       ],
     },
@@ -747,6 +813,20 @@ const updateChart = () => {
         ["VLW", VLW.value],
       ],
     },
+    {
+      dataGroupId: "CanThrottle",
+      data: [
+        ["CAN_Online_State,", CAN_Online_State.value],
+        ["Engine_RPM,", Engine_RPM.value],
+        ["Rudder,", Rudder.value],
+        ["Rudder_Scale,", Rudder_Scale.value],
+      ],
+    },
+    {
+      dataGroupId: "AUTOPILOTCONTACT",
+      data: [["AUTOPILOTCONTACT", AUTOPILOTCONTACT.value]],
+    },
+
     {
       dataGroupId: "NO.1ENGINE",
       data: [
