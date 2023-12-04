@@ -40,40 +40,40 @@ const fetchData = async () => {
       // Adding dataLength to the corresponding variable based on the prefix
       switch (prefix) {
         case 'ais':
-          AIS.value.value += Number(item.dataLength);
+          AIS.value.value += Number(item.tableSize);
           break;
         case 'gyro':
-          GYRO.value.value += Number(item.dataLength);
+          GYRO.value.value += Number(item.tableSize);
           break;
         case 'anemometer':
-          ANEMOMETER.value.value += Number(item.dataLength);
+          ANEMOMETER.value.value += Number(item.tableSize);
           break;
         case 'radar':
-          RADAR.value.value += Number(item.dataLength);
+          RADAR.value.value += Number(item.tableSize);
           break;
         case 'dgps':
-          DGPS.value.value += Number(item.dataLength);
+          DGPS.value.value += Number(item.tableSize);
           break;
         case 'ecdis':
-          ECDIS.value.value += Number(item.dataLength);
+          ECDIS.value.value += Number(item.tableSize);
           break;
         case 'autopilot':
-          AUTOPILOT.value.value += Number(item.dataLength);
+          AUTOPILOT.value.value += Number(item.tableSize);
           break;
         case 'speedlog':
-          SPEEDLOG.value.value += Number(item.dataLength);
+          SPEEDLOG.value.value += Number(item.tableSize);
           break;
         case 'canthrottle':
-          Canthrottle.value.value += Number(item.dataLength);
+          Canthrottle.value.value += Number(item.tableSize);
           break;
         case 'autopilotcontact':
-          AUTOPILOTCONTACT.value.value += Number(item.dataLength);
+          AUTOPILOTCONTACT.value.value += Number(item.tableSize);
           break;
         case 'no1enginepanel':
-          NO1ENGINEPANEL.value.value += Number(item.dataLength);
+          NO1ENGINEPANEL.value.value += Number(item.tableSize);
           break;
         case 'no2enginepanel':
-          NO2ENGINEPANEL.value.value += Number(item.dataLength);
+          NO2ENGINEPANEL.value.value += Number(item.tableSize);
           break;
       }
     });
@@ -117,7 +117,7 @@ const option = ref({
   },
   tooltip: {
     trigger: "item",
-    formatter: "{a} <br/>{b} : {c} ({d}%)",
+    formatter: "{b} : {c}MB ({d}%)",
   },
   legend: {
     orient: "vertical", // 수직 방향으로 표시

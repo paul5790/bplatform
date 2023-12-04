@@ -1,9 +1,15 @@
 <template>
   <v-sheet class="manager-sheet">
-    <v-card class="scrollable-card" style="flex: 1; height: 75vh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;">
+    <v-card
+      class="scrollable-card"
+      style="
+        flex: 1;
+        height: 75vh;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      "
+    >
       <v-card-item>
         <v-row class="dialog-row">
           <!-- 시작하기 -->
@@ -40,6 +46,7 @@
                                 variant="outlined"
                                 v-model="startname"
                                 type="text"
+                                :rules="rules1.name"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -80,6 +87,7 @@
                                 variant="outlined"
                                 v-model="startpurpose"
                                 type="text"
+                                :rules="rules1.purpose"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -98,6 +106,7 @@
                                 variant="outlined"
                                 v-model="startlocation"
                                 type="text"
+                                :rules="rules1.location"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -116,6 +125,8 @@
                                 variant="outlined"
                                 v-model="startdescription"
                                 type="text"
+                                :rules="rules1.description"
+                                maxlength="25"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -225,23 +236,6 @@
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 구분
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="division"
-                                type="text"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
                                   항차 이름 입력
                                 </p></v-list-subheader
                               >
@@ -252,6 +246,7 @@
                                 variant="outlined"
                                 v-model="editname"
                                 type="text"
+                                :rules="rules2.name"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -312,6 +307,7 @@
                                 variant="outlined"
                                 v-model="editpurpose"
                                 type="text"
+                                :rules="rules2.purpose"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -331,6 +327,7 @@
                                 variant="outlined"
                                 v-model="editlocation"
                                 type="text"
+                                :rules="rules2.location"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -350,6 +347,8 @@
                                 v-model="editdescription"
                                 type="text"
                                 style="margin-bottom: 35px"
+                                :rules="rules2.description"
+                                maxlength="25"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -397,23 +396,6 @@
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 구분
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="selecteddivision"
-                                type="text"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
                                   항차 이름 입력
                                 </p></v-list-subheader
                               >
@@ -424,6 +406,7 @@
                                 variant="outlined"
                                 v-model="selectedname"
                                 type="text"
+                                :rules="rules3.name"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -484,6 +467,7 @@
                                 variant="outlined"
                                 v-model="selectedpurpose"
                                 type="text"
+                                :rules="rules3.purpose"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -503,6 +487,7 @@
                                 variant="outlined"
                                 v-model="selectedlocation"
                                 type="text"
+                                :rules="rules3.location"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -522,6 +507,8 @@
                                 v-model="selecteddescription"
                                 type="text"
                                 style="margin-bottom: 35px"
+                                :rules="rules3.description"
+                                maxlength="25"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -656,6 +643,123 @@ const selectedpurpose = ref();
 const selectedlocation = ref();
 const selecteddescription = ref();
 
+const rules1 = ref({
+  name: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  purpose: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  location: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  description: [
+    (value) => {
+      if (value?.length <= 25) {
+        return true;
+      } else {
+        return "최대 25자까지 작성 가능합니다.";
+      }
+    },
+  ],
+});
+
+const rules2 = ref({
+  name: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  purpose: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  location: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  description: [
+    (value) => {
+      if (value?.length <= 25 && value?.length > 0) {
+        return true;
+      } else {
+        return "최대 25자까지 작성 가능합니다.";
+      }
+    },
+  ],
+});
+
+const rules3 = ref({
+  name: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  purpose: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  location: [
+    (value) => {
+      if (value?.length > 0) {
+        return true;
+      } else {
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  description: [
+    (value) => {
+      if (value?.length <= 25) {
+        return true;
+      } else {
+        return "최대 25자까지 작성 가능합니다.";
+      }
+    },
+  ],
+});
+
 let isEditing = ref(false); // 수정 모드인지 여부
 
 // 데이트 피커
@@ -744,28 +848,33 @@ const nullDialog3 = () => {
 
 // 시작하기 후 대기
 const waitStart = () => {
-  try {
-    sessionStorage.setItem("name", startname.value.toString());
-    sessionStorage.setItem("testPurpose", startpurpose.value.toString());
-    sessionStorage.setItem("navigationArea", startlocation.value.toString());
-    const startTime = new Date(startTimeUtc.value);
+  if (startname.value === null) {
+    console.log(startname.value);
+    alert("빈칸을 전부 기입하세요.");
+  } else {
+    try {
+      sessionStorage.setItem("name", startname.value.toString());
+      sessionStorage.setItem("testPurpose", startpurpose.value.toString());
+      sessionStorage.setItem("navigationArea", startlocation.value.toString());
+      const startTime = new Date(startTimeUtc.value);
 
-    // 9시간을 더함
-    startTime.setHours(startTime.getHours() + 9);
-    sessionStorage.setItem("startTimeUtc", startTime.toISOString());
-    sessionStorage.setItem("description", startdescription.value.toString());
+      // 9시간을 더함
+      startTime.setHours(startTime.getHours() + 9);
+      sessionStorage.setItem("startTimeUtc", startTime.toISOString());
+      sessionStorage.setItem("description", startdescription.value.toString());
 
-    sessionStorage.setItem("startstate", "true");
-    startstate.value = true;
-    nullDialog1();
-    location.reload();
-  } catch (error) {
-    // 특정 에러인 경우에 따라 다르게 처리합니다.
-    if (error instanceof TypeError && error.message.includes("toString")) {
-      alert("항차 정보를 전부 입력해 주세요.");
-      console.error("toString error occurred in waitStart:", error.message);
-    } else {
-      console.error("An error occurred in waitStart:", error);
+      sessionStorage.setItem("startstate", "true");
+      startstate.value = true;
+      nullDialog1();
+      location.reload();
+    } catch (error) {
+      // 특정 에러인 경우에 따라 다르게 처리합니다.
+      if (error instanceof TypeError && error.message.includes("toString")) {
+        alert("항차 정보를 전부 입력해 주세요.");
+        console.error("toString error occurred in waitStart:", error.message);
+      } else {
+        console.error("An error occurred in waitStart:", error);
+      }
     }
   }
 };
@@ -817,71 +926,110 @@ const startData = () => {
   nullDialog1_1();
 };
 const editData = () => {
-  const data = {
-    seatrialId: division.value,
-    name: editname.value,
-    shipId: "440714900",
-    groupId: "1",
-    testPurpose: editpurpose.value,
-    navigationArea: editlocation.value,
-    startTimeUtc: editstartdate.value,
-    endTimeUtc: editenddate.value,
-    description: editdescription.value,
-    storageSize: 0,
-  };
-  console.log(data);
-  try {
-    axios.post("http://192.168.0.73:8080/admin/set/info/seatrial", data, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${tokenid.value}`,
-      },
-    });
-  } catch (error) {
-    console.error(error);
-    alert(error.response?.data || "An error occurred during signup.");
-  }
-  dialog2.value = false;
-  nullDialog2();
-  location.reload();
-};
-
-const changeData = () => {
-  console.log(selectedData.value);
-  try {
+  if (
+    editname.value === "" ||
+    editpurpose.value === "" ||
+    editlocation.value === "" ||
+    editdescription.value === "" ||
+    editstartdate.value === "" ||
+    editstartdate.value === null ||
+    editenddate.value === null ||
+    editenddate.value === ""
+  ) {
+    alert("항차 정보를 전부 입력해 주세요.");
+  } else {
     const data = {
-      seatrialId: selecteddivision.value,
-      name: selectedname.value,
+      seatrialId: division.value,
+      name: editname.value,
       shipId: "440714900",
       groupId: "1",
-      testPurpose: selectedpurpose.value,
-      navigationArea: selectedlocation.value,
-      startTimeUtc: selectedstartdate.value,
-      endTimeUtc: selectedenddate.value,
-      description: selecteddescription.value,
+      testPurpose: editpurpose.value,
+      navigationArea: editlocation.value,
+      startTimeUtc: editstartdate.value,
+      endTimeUtc: editenddate.value,
+      description: editdescription.value,
       storageSize: 0,
     };
     console.log(data);
     try {
-      axios.post("http://192.168.0.73:8080/admin/update/info/seatrial", data, {
+      axios.post("http://192.168.0.73:8080/admin/set/info/seatrial", data, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenid.value}`,
         },
       });
+      dialog2.value = false;
+      nullDialog2();
+      location.reload();
+    } catch (error) {
+      // 특정 에러인 경우에 따라 다르게 처리합니다.
+      if (error instanceof TypeError && error.message.includes("toString")) {
+        alert("항차 정보를 전부 입력해 주세요.");
+        console.error("toString error occurred in waitStart:", error.message);
+      } else {
+        console.error("An error occurred in waitStart:", error);
+      }
+    }
+  }
+};
+
+const changeData = () => {
+  if (
+    selectedname.value === "" ||
+    selectedpurpose.value === "" ||
+    selectedlocation.value === "" ||
+    selecteddescription.value === "" ||
+    selectedstartdate.value === "" ||
+    selectedstartdate.value === null ||
+    selectedenddate.value === null ||
+    selectedenddate.value === ""
+  ) {
+    alert("항차 정보를 전부 입력해 주세요.");
+  } else {
+    console.log(selectedData.value);
+    try {
+      const data = {
+        seatrialId: selecteddivision.value,
+        name: selectedname.value,
+        shipId: "440714900",
+        groupId: "1",
+        testPurpose: selectedpurpose.value,
+        navigationArea: selectedlocation.value,
+        startTimeUtc: selectedstartdate.value,
+        endTimeUtc: selectedenddate.value,
+        description: selecteddescription.value,
+        storageSize: 0,
+      };
+      console.log(data);
+      try {
+        axios.post(
+          "http://192.168.0.73:8080/admin/update/info/seatrial",
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenid.value}`,
+            },
+          }
+        );
+
+        fetchData();
+        dialog3.value = false;
+        nullDialog3();
+        location.reload();
+      } catch (error) {
+        if (error instanceof TypeError && error.message.includes("toString")) {
+          alert("항차 정보를 올바르게 입력해 주세요.");
+          console.error("toString error occurred in waitStart:", error.message);
+        } else {
+          console.error("An error occurred in waitStart:", error);
+        }
+      }
     } catch (error) {
       console.error(error);
-      alert(error.response?.data || "An error occurred during signup.");
+      alert("선택된 항차 목록이 존재하지 않습니다.");
     }
-  } catch (error) {
-    console.error(error);
-    alert("선택된 항차 목록이 존재하지 않습니다.");
   }
-
-  fetchData();
-  dialog3.value = false;
-  nullDialog3();
-  location.reload();
 };
 
 // 데이터 테이블 헤더
@@ -917,7 +1065,7 @@ const fetchData = async () => {
         description: response.data[i].description,
       });
     }
-    division.value = Number(response.data.length) + 1;
+    division.value = Number(response.data.length);
     sessionStorage.setItem("division", division.value.toString());
   } catch (error) {
     console.error(error);

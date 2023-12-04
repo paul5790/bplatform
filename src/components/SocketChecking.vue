@@ -108,7 +108,85 @@
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(16, 18)" :key="item.key">
+                <v-sheet v-for="item in data.slice(10, 11)" :key="item.key">
+                  <v-icon
+                    :color="getIconColor(item.key)"
+                    :icon="getIconIcon(item.key)"
+                    size="small"
+                  ></v-icon>
+                  <span style="font-size: 14px"
+                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
+                  ><br /><br />
+                </v-sheet>
+              </v-sheet>
+            </div>
+          </v-list-item>
+        </v-list-group>
+        <!-- AIS -->
+        <v-list-group>
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" title="AIS"></v-list-item>
+          </template>
+          <v-list-item>
+            <div style="height: auto; display: flex" class="scrollable-card-1">
+              <v-sheet style="flex: 0 0 50%">
+                <v-sheet v-for="item in data.slice(11, 12)" :key="item.key">
+                  <v-icon
+                    :color="getIconColor(item.key)"
+                    :icon="getIconIcon(item.key)"
+                    size="small"
+                  ></v-icon>
+                  <span style="font-size: 14px"
+                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
+                  ><br /><br />
+                </v-sheet>
+              </v-sheet>
+              <v-sheet style="flex: 0 0 50%">
+                <v-sheet v-for="item in data.slice(12, 13)" :key="item.key">
+                  <v-icon
+                    :color="getIconColor(item.key)"
+                    :icon="getIconIcon(item.key)"
+                    size="small"
+                  ></v-icon>
+                  <span style="font-size: 14px"
+                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
+                  ><br /><br />
+                </v-sheet>
+              </v-sheet>
+            </div>
+          </v-list-item>
+        </v-list-group>
+        <!-- ECDIS -->
+        <v-list-group>
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" title="ECDIS"></v-list-item>
+          </template>
+          <v-list-item>
+            <div style="height: auto; display: flex" class="scrollable-card-1">
+              <v-sheet style="flex: 050 50%">
+                <v-sheet v-for="item in data.slice(13, 17)" :key="item.key">
+                  <v-icon
+                    :color="getIconColor(item.key)"
+                    :icon="getIconIcon(item.key)"
+                    size="small"
+                  ></v-icon>
+                  <span style="font-size: 14px"
+                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
+                  ><br /><br />
+                </v-sheet>
+              </v-sheet>
+            </div>
+          </v-list-item>
+        </v-list-group>
+        <!-- AUTOPILOT -->
+        <v-list-group>
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" title="AUTOPILOT"></v-list-item>
+          </template>
+          <v-list-item>
+            <div style="height: auto; display: flex" class="scrollable-card-1">
+              <v-sheet style="flex: 0 0 50%">
+                <v-sheet v-for="item in data.slice(17, 18)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -134,96 +212,6 @@
             </div>
           </v-list-item>
         </v-list-group>
-        <!-- AIS -->
-        <v-list-group>
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" title="AIS"></v-list-item>
-          </template>
-          <v-list-item>
-            <div style="height: auto; display: flex" class="scrollable-card-1">
-              <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(19, 20)" :key="item.key">
-                  <v-icon
-                    :color="getIconColor(item.key)"
-                    :icon="getIconIcon(item.key)"
-                    size="small"
-                  ></v-icon>
-                  <span style="font-size: 14px"
-                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-                  ><br /><br />
-                </v-sheet>
-              </v-sheet>
-              <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(20, 21)" :key="item.key">
-                  <v-icon
-                    :color="getIconColor(item.key)"
-                    :icon="getIconIcon(item.key)"
-                    size="small"
-                  ></v-icon>
-                  <span style="font-size: 14px"
-                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-                  ><br /><br />
-                </v-sheet>
-              </v-sheet>
-            </div>
-          </v-list-item>
-        </v-list-group>
-        <!-- ECDIS -->
-        <v-list-group>
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" title="ECDIS"></v-list-item>
-          </template>
-          <v-list-item>
-            <div style="height: auto; display: flex" class="scrollable-card-1">
-              <v-sheet style="flex: 050 50%">
-                <v-sheet v-for="item in data.slice(21, 24)" :key="item.key">
-                  <v-icon
-                    :color="getIconColor(item.key)"
-                    :icon="getIconIcon(item.key)"
-                    size="small"
-                  ></v-icon>
-                  <span style="font-size: 14px"
-                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-                  ><br /><br />
-                </v-sheet>
-              </v-sheet>
-            </div>
-          </v-list-item>
-        </v-list-group>
-        <!-- AUTOPILOT -->
-        <v-list-group>
-          <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" title="AUTOPILOT"></v-list-item>
-          </template>
-          <v-list-item>
-            <div style="height: auto; display: flex" class="scrollable-card-1">
-              <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(24, 26)" :key="item.key">
-                  <v-icon
-                    :color="getIconColor(item.key)"
-                    :icon="getIconIcon(item.key)"
-                    size="small"
-                  ></v-icon>
-                  <span style="font-size: 14px"
-                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-                  ><br /><br />
-                </v-sheet>
-              </v-sheet>
-              <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(26, 27)" :key="item.key">
-                  <v-icon
-                    :color="getIconColor(item.key)"
-                    :icon="getIconIcon(item.key)"
-                    size="small"
-                  ></v-icon>
-                  <span style="font-size: 14px"
-                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-                  ><br /><br />
-                </v-sheet>
-              </v-sheet>
-            </div>
-          </v-list-item>
-        </v-list-group>
         <!-- SPEEDLOG -->
         <v-list-group>
           <template v-slot:activator="{ props }">
@@ -232,7 +220,7 @@
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(27, 29)" :key="item.key">
+                <v-sheet v-for="item in data.slice(19, 21)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -244,7 +232,53 @@
                 </v-sheet>
               </v-sheet>
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(29, 30)" :key="item.key">
+                <v-sheet v-for="item in data.slice(21, 22)" :key="item.key">
+                  <v-icon
+                    :color="getIconColor(item.key)"
+                    :icon="getIconIcon(item.key)"
+                    size="small"
+                  ></v-icon>
+                  <span style="font-size: 14px"
+                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
+                  ><br /><br />
+                </v-sheet>
+              </v-sheet>
+            </div>
+          </v-list-item>
+        </v-list-group>
+
+        <!-- CanThrottle -->
+        <v-list-group>
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" title="CanThrottle"></v-list-item>
+          </template>
+          <v-list-item>
+            <div style="height: auto; display: flex" class="scrollable-card-1">
+              <v-sheet style="flex: 0 0 50%">
+                <v-sheet v-for="item in data.slice(22, 26)" :key="item.key">
+                  <v-icon
+                    :color="getIconColor(item.key)"
+                    :icon="getIconIcon(item.key)"
+                    size="small"
+                  ></v-icon>
+                  <span style="font-size: 14px"
+                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
+                  ><br /><br />
+                </v-sheet>
+              </v-sheet>
+            </div>
+          </v-list-item>
+        </v-list-group>
+        
+        <!-- AutoPilotContact -->
+        <v-list-group>
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" title="AutoPilotContact"></v-list-item>
+          </template>
+          <v-list-item>
+            <div style="height: auto; display: flex" class="scrollable-card-1">
+              <v-sheet style="flex: 0 0 50%">
+                <v-sheet v-for="item in data.slice(26, 27)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -266,7 +300,7 @@
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(30, 44)" :key="item.key">
+                <v-sheet v-for="item in data.slice(27, 41)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -288,7 +322,7 @@
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
               <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(44, 58)" :key="item.key">
+                <v-sheet v-for="item in data.slice(41, 55)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
                     :icon="getIconIcon(item.key)"
@@ -355,6 +389,12 @@ const toggleGroup = (group) => {
 
 
 
+
+
+
+
+
+
 // 총 58개 데이터
 const data = [
   { key: "GLL" }, //DGPS
@@ -362,20 +402,12 @@ const data = [
   { key: "RMC" },
   { key: "VTG" },
   { key: "ZDA" },
-  //{ key: "DTM" },
   { key: "GSV" },
   { key: "GSA" },
-  //{ key: "THS" }, //GYRO
   { key: "HDT" },
   { key: "ROT" },
   { key: "MWV" }, //ANEMOMETER
-  // { key: "MWD" },
-  // { key: "VWR" },
-  // { key: "MTW" },
-  // { key: "VWT" },
-  // { key: "TTM" }, //RADAR
-  // { key: "TLL" },
-  { key: "RSCREEN" },
+  { key: "RSCREEN" },//Radar
   { key: "VDM" }, //AIS
   { key: "VDO" },
   { key: "ROUTEINFO" }, //ECDIS
@@ -383,7 +415,6 @@ const data = [
   { key: "RTZ" },
   { key: "ESCREEN" },
   { key: "RSA" }, //AUTOPILOT
-  // { key: "MODE" },
   { key: "HTD" },
   { key: "VBW" }, //SPEEDLOG
   { key: "VHW" },

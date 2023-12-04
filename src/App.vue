@@ -247,14 +247,13 @@ const signupBtn = async () => {
   console.log(newid.value);
 
   if (
-    `${
       rulesid.value &&
       rulespw.value &&
       rulescpw.value &&
       rulesemail.value &&
       rulesname.value &&
       rulesaf.value
-    }` === "true"
+     === true
   ) {
     // 유효성 검사를 모두 통과한 경우
 
@@ -372,8 +371,8 @@ const rules = ref({
     },
   ],
   PasswordConfirmation: [
-    () => {
-      if (newpassword.value === checknewpassword.value) {
+    (value) => {
+      if (newpassword.value === checknewpassword.value && value?.length > 0) {
         rulescpw.value = true;
         return true;
       } else {

@@ -1,9 +1,15 @@
 <template>
   <v-sheet class="manager-sheet">
-    <v-card class="scrollable-card" style="flex: 1; height: 75vh;
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;">
+    <v-card
+      class="scrollable-card"
+      style="
+        flex: 1;
+        height: 75vh;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      "
+    >
       <v-card-item>
         <v-row class="dialog-row">
           <div class="dialog-div">
@@ -25,7 +31,6 @@
                       <v-col cols="12" sm="6">
                         <v-text-field
                           label="사용자 ID"
-                          
                           required
                           v-model="selectedId"
                         ></v-text-field>
@@ -33,7 +38,6 @@
                       <v-col cols="12" sm="6">
                         <v-text-field
                           label="이름"
-                          
                           hint="example of persistent helper text"
                           persistent-hint
                           v-model="selecteduserName"
@@ -44,7 +48,6 @@
                         <v-text-field
                           v-model="selectedemail"
                           label="이메일"
-                          
                           required
                         ></v-text-field>
                       </v-col>
@@ -52,7 +55,6 @@
                         <v-text-field
                           v-model="selectedphoneNumber"
                           label="전화번호"
-                          
                           required
                         ></v-text-field>
                       </v-col>
@@ -63,6 +65,7 @@
                         <v-text-field
                           label="소속"
                           type="text"
+                          :rules="rules.department"
                           v-model="selecteddepartment"
                           required
                         ></v-text-field>
@@ -77,9 +80,11 @@
                       </v-col>
                       <v-col cols="12">
                         <v-textarea
+                          counter="25"
                           label="설명"
                           type="text"
-                          maxlength="120"
+                          :rules="rules.description"
+                          maxlength="25"
                           v-model="selecteddescription"
                           multi-line
                         ></v-textarea>
@@ -99,7 +104,7 @@
                   <v-btn
                     color="blue-darken-1"
                     variant="text"
-                    @click="changeData(), (dialog = false)"
+                    @click="changeData()"
                   >
                     Save
                   </v-btn>
@@ -172,6 +177,34 @@ const message = ref("유저 정보 로딩중...");
 
 const username = ref("홍길동");
 
+const rulesdepartment = ref(false);
+const rulesdescription = ref(false);
+// Rules
+const rules = ref({
+  department: [
+    (value) => {
+      if (value?.length > 0) {
+        rulesdepartment.value = true;
+        return true;
+      } else {
+        rulesdepartment.value = false;
+        return "1글자 이상 입력하세요";
+      }
+    },
+  ],
+  description: [
+    (value) => {
+      if (value?.length <= 25) {
+        rulesdescription.value = true;
+        return true;
+      } else {
+        rulesdescription.value = false;
+        return "최대 25자까지 작성 가능합니다.";
+      }
+    },
+  ],
+});
+
 const check = () => {
   if (selectedItems.value.length > 0) {
     selectedId.value = selectedItems.value[0].userId;
@@ -206,10 +239,11 @@ const pageCount = computed(() => {
 });
 
 const headers = ref([
+  { title: "ID", key: "userId" },
   { title: "userName", key: "userName" },
+  { title: "userGroup", key: "userGroup" },
   { title: "department", key: "department" },
   { title: "email", key: "email" },
-  { title: "userGroup", key: "userGroup" },
   { title: "phoneNumber", key: "phoneNumber" },
   { title: "description", key: "description" },
 ]);
@@ -252,37 +286,47 @@ const fetchData = async () => {
 fetchData();
 
 const changeData = () => {
-  console.log(selectedItems.value);
-  try {
-    const data = {
-      id: selectedId.value,
-      userName: selecteduserName.value,
-      userGroup: selecteduserGroup.value,
-      department: selecteddepartment.value,
-      phoneNumber: selectedphoneNumber.value,
-      eMail: selectedemail.value,
-      description: selecteddescription.value,
-    };
-    console.log(data);
+  if ((rulesdepartment.value === true) && (rulesdescription.value === true)) {
+    console.log(selectedItems.value);
     try {
-      axios.post("http://192.168.0.73:8080/admin/auth/userinfo/update", data, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      });
+      const data = {
+        id: selectedId.value,
+        userName: selecteduserName.value,
+        userGroup: selecteduserGroup.value,
+        department: selecteddepartment.value,
+        phoneNumber: selectedphoneNumber.value,
+        eMail: selectedemail.value,
+        description: selecteddescription.value,
+      };
+      console.log(data);
+      try {
+        axios.post(
+          "http://192.168.0.73:8080/admin/auth/userinfo/update",
+          data,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenid.value}`,
+            },
+          }
+        );
+        alert("수정완료");
+      } catch (error) {
+        console.error(error);
+        alert(error.response?.data || "An error occurred during signup.");
+      }
     } catch (error) {
       console.error(error);
-      alert(error.response?.data || "An error occurred during signup.");
     }
-  } catch (error) {
-    console.error(error);
-    alert("선택된 항차 목록이 존재하지 않습니다.");
-  }
 
-  fetchData();
-  nullDialog();
-  location.reload();
+
+    fetchData();
+    nullDialog();
+    location.reload();
+  }
+  else {
+    alert("소속을 입력해주세요.")
+  }
 };
 
 const nullDialog = () => {
@@ -297,9 +341,7 @@ const nullDialog = () => {
 };
 
 // 데이터 테이블 바디
-const items1 = ref([
-  
-]);
+const items1 = ref([]);
 </script>
 
 <style scoped>

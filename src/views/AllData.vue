@@ -130,13 +130,15 @@
 
       <!-- 탭 기능 구현 -->
       <v-tabs
-        style="height: 5vh; margin-left: 15px"
+        v-if="searchstart"
+        style="height: 5vh; margin-left: 15px; margin-right: 15px"
         v-model="tab"
-        color="#009dff"
+        color="grey-darken-1"
         align-tabs="start"
       >
         <!-- for문 사용해서 탭 늘리기 -->
         <v-tab
+          style="background-color: #eeeeee"
           :value="index"
           v-for="(item, index) in selectedData"
           :key="index"
@@ -235,6 +237,7 @@ const headerName = ref([]); // 빈 배열로 초기화
 const dataSet = ref([]); // 빈 배열로 초기화
 const selectedData = ref([]); //
 const message = ref("데이터가 존재하지 않습니다.");
+const searchstart = ref(false);
 
 const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
@@ -398,9 +401,13 @@ const endDate = ref(); // 반응적인(ref) 변수로 선언
 
 const voyagesearch = ref(false);
 
+const daterange = ref("");
+
 watchEffect(() => {
+  console.log(daterange.value);
   const index = voyage.value.indexOf(selectedvoyage.value);
   selectedtrialNum.value = index;
+  daterange.value = `${selectedtrialNum.value}항차 데이터`;
 
   if (selectedvoyage.value === "직접 선택") {
     date_readonly.value = false;
@@ -413,8 +420,9 @@ watchEffect(() => {
       // 유효한 날짜인 경우에만 ISO 문자열로 변환
       startDate.value = start.toISOString();
       endDate.value = end.toISOString();
-      console.log("start.toISOString():", start.toISOString());
-      console.log("end.toISOString():", end.toISOString());
+      console.log("start.toISOString():", start.toISOString().slice(0, 10));
+      console.log("end.toISOString():", end.toISOString().slice(0, 10));
+      daterange.value = `${start.toISOString().slice(0, 10)}~${end.toISOString().slice(0, 10)} 데이터`;
     } else {
       console.error("Invalid date values in dateRange.value");
     }
@@ -493,7 +501,7 @@ const dataDownload = () => {
 
       if (selectDownlodFormat.value === "xlsx") {
         // xlsx 선택 시
-        XLSX.writeFile(workbook, `${dataValues}_xlsx.xlsx`);
+        XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
       }
     } catch (error) {
       alert(
@@ -521,6 +529,7 @@ const searchData = () => {
   console.log(variableName);
   fetchData(variableName); // 초기 데이터 요청
   console.log("fetch");
+  searchstart.value = true;
 
   // console.log(GLL.value);
   // console.log(dataSet.value);

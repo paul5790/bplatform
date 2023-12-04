@@ -126,10 +126,14 @@ const option = ref({
 
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  if (props.value <= 0) {
+  if (isNaN(props.value) || props.value === undefined) {
     option.value.series[0].data[0].value = 0;
   } else {
-    option.value.series[0].data[0].value = props.value;
+    if (props.value <= 0) {
+      option.value.series[0].data[0].value = 0;
+    } else {
+      option.value.series[0].data[0].value = props.value;
+    }
   }
 };
 

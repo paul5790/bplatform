@@ -51,8 +51,13 @@ const updateValue = () => {
   // lat.value += Math.random() * 0.1 - 0.05;
   // lon.value += Math.random() * 0.1 - 0.05;
 
-  latview.value = props.lat.toFixed(4);
-  lonview.value = props.lon.toFixed(4);
+  if (isNaN(props.value) || props.value === undefined) {
+    latview.value = 35.46;
+    lonview.value = 129.38;
+  } else {
+    latview.value = props.lat.toFixed(4);
+    lonview.value = props.lon.toFixed(4);
+  }
 
   // 새로운 위치로 마커 및 맵 생성
   L.marker([lat.value, lon.value])

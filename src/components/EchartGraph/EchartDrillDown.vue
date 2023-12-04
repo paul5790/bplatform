@@ -471,11 +471,11 @@ const handleChartClick = (event) => {
         graphic: [
           {
             type: "text",
-            left: 50,
-            top: 20,
+            left: 0,
+            top: 0,
             style: {
-              text: "Back",
-              fontSize: 18,
+              text: ". .",
+              fontSize: 1880,
             },
             onclick: () => {
               // 'Back' 버튼 클릭 시 최상위 그래프로 이동하는 옵션 설정
