@@ -108,7 +108,7 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "데이터 저장 용량 비교",
+    text: "전체 데이터 저장 용량",
     left: "center",
     textStyle: {
       fontSize: 19, // 폰트 크기 설정
@@ -166,7 +166,9 @@ const option = ref({
 
 <style scoped>
 .chart {
+  margin-top: 2vh;
   height: 40vh;
+  padding: 5px;
 }
 body {
   margin: 0;

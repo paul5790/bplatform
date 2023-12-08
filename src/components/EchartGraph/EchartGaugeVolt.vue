@@ -12,7 +12,7 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted, defineProps } from "vue";
+import { ref, provide, onMounted, defineProps, computed } from "vue";
 
 const props = defineProps({
   // #2 props 정의
@@ -20,6 +20,7 @@ const props = defineProps({
   value: String,
   unit: String,
   max_value: Number,
+  height: Number,
 });
 
 use([
@@ -48,7 +49,7 @@ const option = ref({
       name: props.name,
       type: "gauge", // gauge 타입 사용
       radius: "90%",
-      center: ["45%", "65%"],
+      center: ["50%", "65%"],
       splitNumber: 5,
       min: 0,
       max: props.max_value,
@@ -99,7 +100,7 @@ const option = ref({
 // 1초마다 랜덤값 생성
 const updateValue = () => {
   if (isNaN(props.value) || props.value === undefined) {
-    option.value.series[0].data[0].value = 0;
+    option.value.series[0].data[0].value = null;
   } else {
     if (props.value <= 0) {
       option.value.series[0].data[0].value = 0;
@@ -115,6 +116,8 @@ onMounted(() => {
   setInterval(updateValue, 1000);
   updateValue();
 });
+
+const chartHeight = computed(() => `${props.height}vh`);
 </script>
 
 <style scoped>
@@ -122,6 +125,11 @@ onMounted(() => {
   height: 17vh;
   padding: 5px;
 }
+
+:root {
+  --chart-height: {{ chartHeight }};
+}
+
 body {
   margin: 0;
 }

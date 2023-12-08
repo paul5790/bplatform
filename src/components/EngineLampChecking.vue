@@ -3,7 +3,7 @@
     style="height: 21vh; overflow-x: auto; display: flex"
     class="scrollable-card-1"
   >
-    <v-sheet style="flex: 0 0 20%">
+    <v-sheet style="flex:20%">
       <v-sheet v-for="item in data.slice(0, 4)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"
@@ -15,7 +15,7 @@
       </v-sheet>
     </v-sheet>
 
-    <v-sheet style="flex: 0 0 22%">
+    <v-sheet style="flex:22%">
       <v-sheet v-for="item in data.slice(4, 8)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"
@@ -27,7 +27,7 @@
       </v-sheet>
     </v-sheet>
 
-    <v-sheet style="flex: 0 0 28%">
+    <v-sheet style="flex:28%">
       <v-sheet v-for="item in data.slice(8, 12)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"
@@ -39,7 +39,7 @@
       </v-sheet>
     </v-sheet>
 
-    <v-sheet style="flex: 0 0 30%">
+    <v-sheet style="flex:30%">
       <v-sheet v-for="item in data.slice(12, 16)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"

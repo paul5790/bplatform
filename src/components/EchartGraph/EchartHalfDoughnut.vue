@@ -48,7 +48,7 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "저장 가능 공간 및 저장된 공간",
+    text: "서버 저장 공간 현황",
     left: "center",
     textStyle: {
       fontSize: 19, // 폰트 크기 설정

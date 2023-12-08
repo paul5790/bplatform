@@ -18,6 +18,7 @@ const props = defineProps({
   // #2 props 정의
   value: Number,
   barWidth: Number,
+  name: String,
 });
 
 const windspeed = ref(0);
@@ -34,10 +35,10 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "Heading(GYRO)",
-    left: "left",
+    text: props.name,
+    left: "center",
     textStyle: {
-      fontSize: 14, // 폰트 크기 설정
+      fontSize: 10, // 폰트 크기 설정
     },
   },
   series: [
@@ -45,8 +46,8 @@ const option = ref({
       type: "gauge",
       startAngle: 90,
       endAngle: 450,
-      center: ["50%", "40%"],
-      radius: "68%",
+      center: ["50%", "52%"],
+      radius: "75%",
       splitNumber: 8,
       min: 0,
       max: 360,
@@ -64,29 +65,32 @@ const option = ref({
       },
       pointer: {
         length: "40%",
-        width: 10,
+        width: 3,
         offsetCenter: [0, 0],
         itemStyle: {
           color: "auto",
         },
       },
       axisTick: {
-        length: 7,
+        distance: 5,
+        length: 4,
         lineStyle: {
           color: "auto",
-          width: 1.5,
+          width: 0.7,
         },
       },
       splitLine: {
-        length: 12,
+        distance: 5,
+        length: 5,
         lineStyle: {
           color: "auto",
-          width: 3,
+          width: 2,
         },
       },
       axisLabel: {
+        show: false,
         color: "#464646",
-        fontSize: 15,
+        fontSize: 7,
         distance: -35,
         rotate: "tangential",
         formatter: function (value) {
@@ -103,14 +107,14 @@ const option = ref({
         },
       },
       detail: {
-        fontSize: 15,
+        fontSize: 10,
         // formatter: function () {
         //   return `${windspeed.value} m/s`;
         // },
         formatter: function (value) {
           return `degree: ${value} °`;
         },
-        offsetCenter: ["100%", "100%"],
+        offsetCenter: ["0%", "115%"],
         valueAnimation: true,
         color: "#464646",
       },
@@ -127,7 +131,7 @@ const option = ref({
 // 1초마다 랜덤값 생성
 const updateValue = () => {
   if (isNaN(props.value) || props.value === undefined) {
-    option.value.series[0].data[0].value = 0;
+    option.value.series[0].data[0].value = null;
   } else {
     if (props.value <= 0) {
       option.value.series[0].data[0].value = 0;
@@ -145,7 +149,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 40vh;
+  height: 16vh;
   padding: 0px;
 }
 body {

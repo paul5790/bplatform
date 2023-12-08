@@ -12,6 +12,68 @@
     >
       <v-card-item>
         <v-row class="dialog-row">
+          <!-- 종료 후 저장 -->
+          <div class="dialog-div">
+            <v-btn
+              v-if="startstate"
+              color="blue"
+              v-bind="props"
+              @click="openDialog1_1()"
+            >
+              시운전 진행중..(종료하기)
+            </v-btn>
+            <v-dialog v-model="dialog1_1" persistent width="600">
+              <v-card>
+                <v-card-title>
+                  <span class="text-h5">항차 측정 종료</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-sheet style="display: flex">
+                    <v-card style="flex: 1">
+                      <v-card-item>
+                        <v-container fluid>
+                          <v-row>
+                            <v-col cols="4" style="margin-top: 5px">
+                              <v-list-subheader
+                                ><p style="font-size: 17px">
+                                  측정 종료 시간 :
+                                </p></v-list-subheader
+                              >
+                            </v-col>
+
+                            <v-col cols="8" style="margin-top: 5px">
+                              <v-list-subheader
+                                ><p style="font-size: 17px">
+                                  {{ endTimeUtc }}
+                                </p></v-list-subheader
+                              >
+                            </v-col>
+                          </v-row>
+                        </v-container>
+                      </v-card-item>
+                    </v-card>
+                  </v-sheet>
+                </v-card-text>
+                <v-card-actions style="margin-top: 0px">
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="text"
+                    @click="nullDialog1_1()"
+                  >
+                    뒤로가기
+                  </v-btn>
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="text"
+                    @click="startData()"
+                  >
+                    측정종료
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
           <!-- 시작하기 -->
           <div class="dialog-div">
             <v-btn
@@ -36,7 +98,7 @@
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 이름 입력
+                                  항차 번호 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -44,9 +106,9 @@
                             <v-col cols="8">
                               <v-text-field
                                 variant="outlined"
-                                v-model="startname"
+                                v-model="startdivision"
                                 type="text"
-                                :rules="rules1.name"
+                                :rules="rules1.division"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -76,7 +138,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 목적 입력
+                                  항차 이름 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -84,6 +146,25 @@
                             <v-col cols="8">
                               <v-text-field
                                 style="margin-top: 20px"
+                                variant="outlined"
+                                v-model="startname"
+                                type="text"
+                                :rules="rules1.name"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+
+                          <v-row>
+                            <v-col cols="4" style="margin-top: 8px">
+                              <v-list-subheader
+                                ><p style="font-size: 17px">
+                                  항차 목적 입력
+                                </p></v-list-subheader
+                              >
+                            </v-col>
+
+                            <v-col cols="8">
+                              <v-text-field
                                 variant="outlined"
                                 v-model="startpurpose"
                                 type="text"
@@ -155,68 +236,6 @@
               </v-card>
             </v-dialog>
           </div>
-          <!-- 종료 후 저장 -->
-          <div class="dialog-div">
-            <v-btn
-              v-if="startstate"
-              color="blue"
-              v-bind="props"
-              @click="openDialog1_1()"
-            >
-              시운전 진행중..(종료하기)
-            </v-btn>
-            <v-dialog v-model="dialog1_1" persistent width="600">
-              <v-card>
-                <v-card-title>
-                  <span class="text-h5">항차 측정 종료</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-sheet style="display: flex">
-                    <v-card style="flex: 1">
-                      <v-card-item>
-                        <v-container fluid>
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  측정 종료 시간 :
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  {{ endTimeUtc }}
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-                          </v-row>
-                        </v-container>
-                      </v-card-item>
-                    </v-card>
-                  </v-sheet>
-                </v-card-text>
-                <v-card-actions style="margin-top: 0px">
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="nullDialog1_1()"
-                  >
-                    뒤로가기
-                  </v-btn>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="startData()"
-                  >
-                    측정종료
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
           <!-- 추가하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
             <v-btn color="blue" v-bind="props" @click="openDialog2()">
@@ -236,7 +255,7 @@
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 이름 입력
+                                  항차 번호 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -244,9 +263,9 @@
                             <v-col cols="8">
                               <v-text-field
                                 variant="outlined"
-                                v-model="editname"
+                                v-model="editdivision"
                                 type="text"
-                                :rules="rules2.name"
+                                :rules="rules1.division"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -296,7 +315,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 목적 입력
+                                  항차 이름 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -305,9 +324,28 @@
                               <v-text-field
                                 style="margin-top: 20px"
                                 variant="outlined"
+                                v-model="editname"
+                                type="text"
+                                :rules="rules1.name"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+
+                          <v-row>
+                            <v-col cols="4" style="margin-top: 8px">
+                              <v-list-subheader
+                                ><p style="font-size: 17px">
+                                  항차 목적 입력
+                                </p></v-list-subheader
+                              >
+                            </v-col>
+
+                            <v-col cols="8">
+                              <v-text-field
+                                variant="outlined"
                                 v-model="editpurpose"
                                 type="text"
-                                :rules="rules2.purpose"
+                                :rules="rules1.purpose"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -327,7 +365,7 @@
                                 variant="outlined"
                                 v-model="editlocation"
                                 type="text"
-                                :rules="rules2.location"
+                                :rules="rules1.location"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -346,8 +384,8 @@
                                 variant="outlined"
                                 v-model="editdescription"
                                 type="text"
-                                style="margin-bottom: 35px"
-                                :rules="rules2.description"
+                                style="margin-bottom: 5px"
+                                :rules="rules1.description"
                                 maxlength="25"
                               ></v-text-field>
                             </v-col>
@@ -364,14 +402,14 @@
                     variant="text"
                     @click="nullDialog2()"
                   >
-                    Close
+                    뒤로가기
                   </v-btn>
                   <v-btn
                     color="blue-darken-1"
                     variant="text"
                     @click="editData()"
                   >
-                    Save
+                    저장하기
                   </v-btn>
                 </v-card-actions>
               </v-card>
@@ -385,32 +423,13 @@
             <v-dialog v-model="dialog3" persistent width="800">
               <v-card>
                 <v-card-title>
-                  <span class="text-h5">항차 추가</span>
+                  <span class="text-h5">항차 수정</span>
                 </v-card-title>
                 <v-card-text>
                   <v-sheet style="display: flex">
                     <v-card style="flex: 1">
                       <v-card-item>
                         <v-container fluid>
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  항차 이름 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="selectedname"
-                                type="text"
-                                :rules="rules3.name"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-
                           <v-row>
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
@@ -456,7 +475,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 목적 입력
+                                  항차 이름 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -465,9 +484,28 @@
                               <v-text-field
                                 style="margin-top: 20px"
                                 variant="outlined"
+                                v-model="selectedname"
+                                type="text"
+                                :rules="rules1.name"
+                              ></v-text-field>
+                            </v-col>
+                          </v-row>
+
+                          <v-row>
+                            <v-col cols="4" style="margin-top: 8px">
+                              <v-list-subheader
+                                ><p style="font-size: 17px">
+                                  항차 목적 입력
+                                </p></v-list-subheader
+                              >
+                            </v-col>
+
+                            <v-col cols="8">
+                              <v-text-field
+                                variant="outlined"
                                 v-model="selectedpurpose"
                                 type="text"
-                                :rules="rules3.purpose"
+                                :rules="rules1.purpose"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -487,7 +525,7 @@
                                 variant="outlined"
                                 v-model="selectedlocation"
                                 type="text"
-                                :rules="rules3.location"
+                                :rules="rules1.location"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -507,7 +545,7 @@
                                 v-model="selecteddescription"
                                 type="text"
                                 style="margin-bottom: 35px"
-                                :rules="rules3.description"
+                                :rules="rules1.description"
                                 maxlength="25"
                               ></v-text-field>
                             </v-col>
@@ -524,15 +562,42 @@
                     variant="text"
                     @click="nullDialog3()"
                   >
-                    Close
+                    뒤로가기
                   </v-btn>
                   <v-btn
                     color="blue-darken-1"
                     variant="text"
                     @click="changeData()"
                   >
-                    Save
+                    저장하기
                   </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+          <div style="display: flex; margin: 15px; margin-left: 0">
+            <v-btn color="blue" @click="openDialog4()"> 삭제하기 </v-btn>
+
+            <v-dialog v-model="dialog4" persistent width="350">
+              <v-card>
+                <v-card-title>
+                  <span class="text-h5">항차 정보 삭제</span>
+                </v-card-title>
+                <v-card-text
+                  >{{ selecteddivision }}항차의 정보를
+                  삭제하시겠습니까?</v-card-text
+                >
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="text"
+                    @click="deleteData()"
+                    >예</v-btn
+                  >
+                  <v-btn color="blue-darken-1" variant="text" @click="cancel()"
+                    >아니오</v-btn
+                  >
                 </v-card-actions>
               </v-card>
             </v-dialog>
@@ -592,6 +657,7 @@ const dialog1 = ref(false);
 const dialog1_1 = ref(false);
 const dialog2 = ref(false);
 const dialog3 = ref(false);
+const dialog4 = ref(false);
 const message = ref("항차 테이블 정보 로딩중...");
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
@@ -643,12 +709,41 @@ const selectedpurpose = ref();
 const selectedlocation = ref();
 const selecteddescription = ref();
 
+const divisiontrue = ref(false);
+const nametrue = ref(false);
+const purposetrue = ref(false);
+const locationtrue = ref(false);
+const descriptiontrue = ref(false);
 const rules1 = ref({
+  division: [
+    (value) => {
+      for (let i = 0; i < division.value - 1; i++) {
+        if (items.value[i].division === value) {
+          divisiontrue.value = false;
+          return "겹치는 항차가 존재합니다.";
+        }
+      }
+      if (/^\d+$/.test(value)) {
+        if (value.length >= 5 || parseInt(value) >= 10000) {
+          divisiontrue.value = false;
+          return "9999이하의 숫자를 사용하세요";
+        } else {
+          divisiontrue.value = true;
+          return true;
+        }
+      } else {
+        divisiontrue.value = false;
+        return "숫자만 입력하세요";
+      }
+    },
+  ],
   name: [
     (value) => {
       if (value?.length > 0) {
+        nametrue.value = true;
         return true;
       } else {
+        nametrue.value = false;
         return "1글자 이상 입력하세요";
       }
     },
@@ -656,8 +751,10 @@ const rules1 = ref({
   purpose: [
     (value) => {
       if (value?.length > 0) {
+        purposetrue.value = true;
         return true;
       } else {
+        purposetrue.value = false;
         return "1글자 이상 입력하세요";
       }
     },
@@ -665,47 +762,10 @@ const rules1 = ref({
   location: [
     (value) => {
       if (value?.length > 0) {
+        locationtrue.value = true;
         return true;
       } else {
-        return "1글자 이상 입력하세요";
-      }
-    },
-  ],
-  description: [
-    (value) => {
-      if (value?.length <= 25) {
-        return true;
-      } else {
-        return "최대 25자까지 작성 가능합니다.";
-      }
-    },
-  ],
-});
-
-const rules2 = ref({
-  name: [
-    (value) => {
-      if (value?.length > 0) {
-        return true;
-      } else {
-        return "1글자 이상 입력하세요";
-      }
-    },
-  ],
-  purpose: [
-    (value) => {
-      if (value?.length > 0) {
-        return true;
-      } else {
-        return "1글자 이상 입력하세요";
-      }
-    },
-  ],
-  location: [
-    (value) => {
-      if (value?.length > 0) {
-        return true;
-      } else {
+        locationtrue.value = false;
         return "1글자 이상 입력하세요";
       }
     },
@@ -713,47 +773,10 @@ const rules2 = ref({
   description: [
     (value) => {
       if (value?.length <= 25 && value?.length > 0) {
+        descriptiontrue.value = true;
         return true;
       } else {
-        return "최대 25자까지 작성 가능합니다.";
-      }
-    },
-  ],
-});
-
-const rules3 = ref({
-  name: [
-    (value) => {
-      if (value?.length > 0) {
-        return true;
-      } else {
-        return "1글자 이상 입력하세요";
-      }
-    },
-  ],
-  purpose: [
-    (value) => {
-      if (value?.length > 0) {
-        return true;
-      } else {
-        return "1글자 이상 입력하세요";
-      }
-    },
-  ],
-  location: [
-    (value) => {
-      if (value?.length > 0) {
-        return true;
-      } else {
-        return "1글자 이상 입력하세요";
-      }
-    },
-  ],
-  description: [
-    (value) => {
-      if (value?.length <= 25) {
-        return true;
-      } else {
+        descriptiontrue.value = false;
         return "최대 25자까지 작성 가능합니다.";
       }
     },
@@ -797,7 +820,17 @@ const openDialog3 = () => {
     selecteddescription.value = selectedData.value[0].description;
     dialog3.value = true;
   } else {
-    alert(null);
+    alert("항차를 선택해주세요.");
+    console.log("항차를 선택해주세요.");
+  }
+};
+
+const openDialog4 = () => {
+  if (selectedData.value.length > 0) {
+    selecteddivision.value = selectedData.value[0].division;
+    dialog4.value = true;
+  } else {
+    alert("항차를 선택해주세요.");
     console.log("항차를 선택해주세요.");
   }
 };
@@ -845,14 +878,25 @@ const nullDialog3 = () => {
   selecteddescription.value = "";
   selecteddivision.value = "";
 };
+const cancel = () => {
+  dialog4.value = false;
+};
 
 // 시작하기 후 대기
 const waitStart = () => {
-  if (startname.value === null) {
+  if (
+    nametrue.value === false ||
+    purposetrue.value === false ||
+    locationtrue.value === false ||
+    descriptiontrue.value === false
+  ) {
     console.log(startname.value);
     alert("빈칸을 전부 기입하세요.");
+  } else if (divisiontrue.value === false) {
+    alert("항차 번호를 형식에 맞춰 입력하세요.");
   } else {
     try {
+      sessionStorage.setItem("division", startdivision.value.toString());
       sessionStorage.setItem("name", startname.value.toString());
       sessionStorage.setItem("testPurpose", startpurpose.value.toString());
       sessionStorage.setItem("navigationArea", startlocation.value.toString());
@@ -884,6 +928,7 @@ const startData = () => {
   sessionStorage.setItem("startstate", "false");
   startstate.value = false;
 
+  const division = sessionStorage.getItem("division") || null;
   const name = sessionStorage.getItem("name") || null;
   const testPurpose = sessionStorage.getItem("testPurpose") || null;
   const navigationArea = sessionStorage.getItem("navigationArea") || null;
@@ -892,7 +937,7 @@ const startData = () => {
   const description = sessionStorage.getItem("description") || null;
 
   const data = {
-    seatrialId: division.value,
+    seatrialId: division,
     name: name,
     shipId: "440714900",
     groupId: "1",
@@ -925,7 +970,10 @@ const startData = () => {
 
   nullDialog1_1();
 };
+
+//추가하기
 const editData = () => {
+  console.log(items.value.division);
   if (
     editname.value === "" ||
     editpurpose.value === "" ||
@@ -936,43 +984,63 @@ const editData = () => {
     editenddate.value === null ||
     editenddate.value === ""
   ) {
-    alert("항차 정보를 전부 입력해 주세요.");
+    alert("항차 정보를 전부 올바르게 입력해 주세요.");
   } else {
-    const data = {
-      seatrialId: division.value,
-      name: editname.value,
-      shipId: "440714900",
-      groupId: "1",
-      testPurpose: editpurpose.value,
-      navigationArea: editlocation.value,
-      startTimeUtc: editstartdate.value,
-      endTimeUtc: editenddate.value,
-      description: editdescription.value,
-      storageSize: 0,
-    };
-    console.log(data);
-    try {
-      axios.post("http://192.168.0.73:8080/admin/set/info/seatrial", data, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      });
-      dialog2.value = false;
-      nullDialog2();
-      location.reload();
-    } catch (error) {
-      // 특정 에러인 경우에 따라 다르게 처리합니다.
-      if (error instanceof TypeError && error.message.includes("toString")) {
-        alert("항차 정보를 전부 입력해 주세요.");
-        console.error("toString error occurred in waitStart:", error.message);
-      } else {
+    let start = new Date(editstartdate.value).toISOString().slice(0, 19);
+    let end = new Date(editenddate.value).toISOString().slice(0, 19);
+    let range = `${start}~${end}`;
+    let check = checkIfRangeExists(range);
+    if (check) {
+      alert("선택된 날짜에 항차가 이미 존재합니다.");
+    } else {
+      try {
+        const data = {
+          seatrialId: editdivision.value,
+          name: editname.value,
+          shipId: "440714900",
+          groupId: "1",
+          testPurpose: editpurpose.value,
+          navigationArea: editlocation.value,
+          startTimeUtc: editstartdate.value,
+          endTimeUtc: editenddate.value,
+          description: editdescription.value,
+          storageSize: 0,
+        };
+        console.log(data);
+        try {
+          axios.post("http://192.168.0.73:8080/admin/set/info/seatrial", data, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${tokenid.value}`,
+            },
+          });
+
+          dialog2.value = false;
+          nullDialog2();
+          location.reload();
+        } catch (error) {
+          // 특정 에러인 경우에 따라 다르게 처리합니다.
+          if (
+            error instanceof TypeError &&
+            error.message.includes("toString")
+          ) {
+            alert("항차 정보를 전부 입력해 주세요.");
+            console.error(
+              "toString error occurred in waitStart:",
+              error.message
+            );
+          } else {
+            console.error("An error occurred in waitStart:", error);
+          }
+        }
+      } catch (error) {
         console.error("An error occurred in waitStart:", error);
       }
     }
   }
 };
 
+// 수정하기
 const changeData = () => {
   if (
     selectedname.value === "" ||
@@ -984,75 +1052,126 @@ const changeData = () => {
     selectedenddate.value === null ||
     selectedenddate.value === ""
   ) {
-    alert("항차 정보를 전부 입력해 주세요.");
+    alert("항차 정보를 전부 올바르게 입력해 주세요.");
   } else {
-    console.log(selectedData.value);
-    try {
-      const data = {
-        seatrialId: selecteddivision.value,
-        name: selectedname.value,
-        shipId: "440714900",
-        groupId: "1",
-        testPurpose: selectedpurpose.value,
-        navigationArea: selectedlocation.value,
-        startTimeUtc: selectedstartdate.value,
-        endTimeUtc: selectedenddate.value,
-        description: selecteddescription.value,
-        storageSize: 0,
-      };
-      console.log(data);
+    let start = new Date(selectedstartdate.value).toISOString().slice(0, 19);
+    let end = new Date(selectedenddate.value).toISOString().slice(0, 19);
+    let range = `${start}~${end}`;
+    let check = checkIfRangeExists(range);
+    if (check) {
+      alert("선택된 날짜에 항차가 이미 존재합니다.");
+    } else {
+      console.log(selectedData.value);
       try {
-        axios.post(
-          "http://192.168.0.73:8080/admin/update/info/seatrial",
-          data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenid.value}`,
-            },
-          }
-        );
+        const data = {
+          seatrialId: selecteddivision.value,
+          name: selectedname.value,
+          shipId: "440714900",
+          groupId: "1",
+          testPurpose: selectedpurpose.value,
+          navigationArea: selectedlocation.value,
+          startTimeUtc: selectedstartdate.value,
+          endTimeUtc: selectedenddate.value,
+          description: selecteddescription.value,
+          storageSize: 0,
+        };
+        console.log(data);
+        try {
+          axios.post(
+            "http://192.168.0.73:8080/admin/update/info/seatrial",
+            data,
+            {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${tokenid.value}`,
+              },
+            }
+          );
 
-        fetchData();
-        dialog3.value = false;
-        nullDialog3();
-        location.reload();
-      } catch (error) {
-        if (error instanceof TypeError && error.message.includes("toString")) {
-          alert("항차 정보를 올바르게 입력해 주세요.");
-          console.error("toString error occurred in waitStart:", error.message);
-        } else {
-          console.error("An error occurred in waitStart:", error);
+          fetchData();
+          dialog3.value = false;
+          nullDialog3();
+          location.reload();
+        } catch (error) {
+          if (
+            error instanceof TypeError &&
+            error.message.includes("toString")
+          ) {
+            alert("항차 정보를 올바르게 입력해 주세요.");
+            console.error(
+              "toString error occurred in waitStart:",
+              error.message
+            );
+          } else {
+            console.error("An error occurred in waitStart:", error);
+          }
         }
+      } catch (error) {
+        console.error(error);
+        alert("선택된 항차 목록이 존재하지 않습니다.");
       }
-    } catch (error) {
-      console.error(error);
-      alert("선택된 항차 목록이 존재하지 않습니다.");
     }
+  }
+};
+
+// 삭제하기
+const deleteData = () => {
+  const data = {
+    seatrialId: selecteddivision.value,
+  };
+  try {
+    axios.post("http://192.168.0.73:8080/admin/delete/info/seatrial", data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid.value}`,
+      },
+    });
+    dialog4.value = false;
+    alert("삭제가 완료되었습니다.");
+    location.reload();
+  } catch (error) {
+    console.error("An error occurred in waitStart:", error);
   }
 };
 
 // 데이터 테이블 헤더
 const headers = ref([
-  { title: "구분", align: "start", key: "division" },
-  { title: "항차", align: "start", key: "name" },
+  { title: "항차", align: "start", key: "division" },
   { title: "Ship ID", align: "start", key: "shipid" },
+  { title: "진행 시간", align: "start", key: "time" },
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "끝시간", align: "start", key: "enddate" },
+  { title: "이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
   { title: "해역 위치", align: "start", key: "location" },
   // { title: "저장 용량", align: "start", key: "storage" },
   { title: "설명", align: "start", key: "description" },
-  { title: "입력자", align: "end", key: "user" },
+  // { title: "입력자", align: "end", key: "user" },
 ]);
 
 const items = ref([]);
-
+const timeRange = ref([]);
 // 데이터 받아오기
 const fetchData = async () => {
   try {
     const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
     for (let i = 0; i < response.data.length; i++) {
+      const startTime = new Date(response.data[i].startTimeUtc);
+      const endTime = new Date(response.data[i].endTimeUtc);
+
+      const timeDiff = endTime - startTime;
+      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+      timeRange.value.push(
+        `${response.data[i].startTimeUtc.slice(0, 19)}~${response.data[
+          i
+        ].endTimeUtc.slice(0, 19)}`
+      );
+      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       items.value.push({
         division: response.data[i].seatrialId,
         name: response.data[i].name,
@@ -1063,10 +1182,12 @@ const fetchData = async () => {
         // storage: response.data[i].storageSize + "MB",
         enddate: response.data[i].endTimeUtc,
         description: response.data[i].description,
+        time: formattedTime,
       });
     }
     division.value = Number(response.data.length);
-    sessionStorage.setItem("division", division.value.toString());
+    console.log(timeRange.value);
+    // sessionStorage.setItem("division", division.value.toString());
   } catch (error) {
     console.error(error);
     message.value = `api 오류(${error})`;
@@ -1076,6 +1197,56 @@ const fetchData = async () => {
 onMounted(() => {
   fetchData();
 });
+
+const handleButtonClick = () => {
+  let check = checkIfRangeExists();
+  if (check) {
+    console.log("존재합니다");
+  } else {
+    console.log("존재하지 않습니다");
+  }
+};
+
+const checkIfRangeExists = (range) => {
+  // 선택한 범위와 시련 기간을 비교하여 겹치는 부분이 있는지 확인하는 함수
+  // 선택한 범위와 시련 기간을 비교하여 겹치는 부분이 있는지 확인하는 함수
+  const isOverlap = (selectedRange, trialRange) => {
+    const [selectedStart, selectedEnd] = selectedRange
+      .split("~")
+      .map((dateString) => new Date(dateString));
+    const [trialStart, trialEnd] = trialRange
+      .split("~")
+      .map((dateString) => new Date(dateString));
+
+    // 겹치는 부분이 있으면 true를 반환
+    return (
+      (selectedStart >= trialStart && selectedStart <= trialEnd) ||
+      (selectedEnd >= trialStart && selectedEnd <= trialEnd) ||
+      (trialStart >= selectedStart && trialStart <= selectedEnd) ||
+      (trialEnd >= selectedStart && trialEnd <= selectedEnd)
+    );
+  };
+
+  // 선택한 범위
+  const selectedRange = range;
+
+  // 시련 기간을 반복하여 겹치는 부분이 있는지 확인
+  const isExist = timeRange.value.some((trialRange) =>
+    isOverlap(selectedRange, trialRange)
+  );
+
+  let start = new Date(selectedstartdate.value).toISOString().slice(0, 19);
+  let end = new Date(selectedenddate.value).toISOString().slice(0, 19);
+  let checkrange = `${start}~${end}`;
+
+  if (checkrange === range){
+    return false;
+  }else{
+    return isExist;
+  }
+
+  
+};
 
 console.log(items);
 </script>

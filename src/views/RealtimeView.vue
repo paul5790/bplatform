@@ -16,46 +16,132 @@
                   <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
+                    :value="Number(mapstart)"
                   />
                 </v-card-item>
               </v-card>
             </v-sheet>
           </v-col>
-          <!-- (최) 헤딩 그래프 -->
+          <!-- port rudder -->
           <v-col cols="3" no-gutters style="padding: 3px">
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <EchartHeading :value="parseFloat(heading)" />
+                  <EchartStarPort
+                    :starport = "parseFloat(port)"
+                    :name="'PortRudder'"
+                  />
                 </v-card-item>
               </v-card>
             </v-sheet>
           </v-col>
-          <!-- (최) 속도 그래프 -->
+          <!-- starboard rudder -->
           <v-col cols="3" no-gutters style="padding: 3px">
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <EchartGauge
+                  <!-- <EchartGauge
                     :name="'Speed (SPEEDLOG)'"
                     :left="'left'"
                     :unit="'kt'"
                     :center_y="'45%'"
                     :max_speed="200"
                     :value="parseFloat(speed)"
+                  /> -->
+                  <EchartStarPort
+                    :starport = "parseFloat(star)"
+                    :name="'StarboardRudder'"
                   />
                 </v-card-item>
               </v-card>
             </v-sheet>
           </v-col>
-          <!-- (최) 러더 그래프 -->
+          <!-- .. -->
           <v-col cols="3" no-gutters style="padding: 3px">
-            <v-sheet style="height: 34vh; display: flex">
+            <!-- <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <EchartStarPort />
+                  <EchartStarPort  
+                  :star="parseFloat(star)"
+                  :port="parseFloat(port)"
+                  />
                 </v-card-item>
               </v-card>
+            </v-sheet> -->
+            <v-sheet style="display: flex">
+              <v-row>
+                <v-col cols="12" no-gutters>
+                  <v-card style="flex: 1">
+                    <v-card-item>
+                      <v-row>
+                        <v-col cols="6" no-gutters style="padding: 3px">
+                          <!-- 스피드 -->
+                          <v-row>
+                            <v-col
+                              cols="12"
+                              no-gutters
+                              style="padding-bottom: 0px"
+                            >
+                              <v-sheet style="height: 17vh; display: flex">
+                                <EchartGaugeVolt
+                                  :name="'SpeedN'"
+                                  :unit="'kt'"
+                                  :max_value="200"
+                                  :value="parseFloat(speed)"
+                                />
+                              </v-sheet>
+                            </v-col>
+                          </v-row>
+                          <!-- 헤딩 -->
+                          <v-row>
+                            <v-col cols="12" no-gutters style="padding-top: 0px"
+                              ><v-sheet style="height: 17vh; display: flex">
+                                <EchartHeading
+                                  :value="parseFloat(heading)"
+                                  :name="'Heading'"
+                                /> </v-sheet
+                            ></v-col>
+                          </v-row>
+                        </v-col>
+                        <v-col cols="6" no-gutters style="padding: 3px">
+                          <!-- 풍속 -->
+                          <v-row>
+                            <v-col
+                              cols="12"
+                              no-gutters
+                              style="padding-bottom: 0px"
+                            >
+                              <v-sheet style="height: 17vh; display: flex">
+                                <EchartGaugeVolt
+                                  :name="'Anemometer Speed'"
+                                  :value="parseFloat(windspeed)"
+                                  :unit="'m/s'"
+                                  :max_value="40"
+                                />
+                              </v-sheet>
+                            </v-col>
+                          </v-row>
+                          <!-- 풍향 -->
+                          <v-row>
+                            <v-col
+                              cols="12"
+                              no-gutters
+                              style="padding-top: 0px"
+                            >
+                              <v-sheet style="height: 17vh; display: flex">
+                                <EchartHeading
+                                  :value="parseFloat(windangle)"
+                                  :name="'Anemometer Angle'"
+                                />
+                              </v-sheet>
+                            </v-col>
+                          </v-row>
+                        </v-col>
+                      </v-row>
+                    </v-card-item>
+                  </v-card>
+                </v-col>
+              </v-row>
             </v-sheet>
           </v-col>
         </v-row>
@@ -86,7 +172,7 @@
                         <v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'OilPressure'"
-                            :value="engine1oilPressure"
+                            :value="parseFloat(engine1oilPressure)"
                             :unit="'bar'"
                             :max_value="10"
                           />
@@ -99,7 +185,7 @@
                         ><v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'OilTemperature'"
-                            :value="engine1oilTemperature"
+                            :value="parseFloat(engine1oilTemperature)"
                             :unit="'°C'"
                             :max_value="200"
                           /> </v-sheet
@@ -113,7 +199,7 @@
                         <v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'TransmissionPressure'"
-                            :value="engine1transmissionPressure"
+                            :value="parseFloat(engine1transmissionPressure)"
                             :unit="'bar'"
                             :max_value="40"
                           />
@@ -126,7 +212,7 @@
                         <v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'ExhaustGasTemperature'"
-                            :value="engine1gasTemperature"
+                            :value="parseFloat(engine1gasTemperature)"
                             :unit="'°C'"
                             :max_value="900"
                           />
@@ -164,7 +250,7 @@
                         :unit="'rpm'"
                         :center_y="'50%'"
                         :max_speed="3000"
-                        :value="Number(engine2Speed)"
+                        :value="parseFloat(engine2Speed)"
                       />
                     </v-sheet>
                   </v-col>
@@ -175,7 +261,7 @@
                         <v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'OilPressure'"
-                            :value="engine2oilPressure"
+                            :value="parseFloat(engine2oilPressure)"
                             :unit="'kPa'"
                             :max_value="10"
                           />
@@ -188,7 +274,7 @@
                         ><v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'OilTemperature'"
-                            :value="engine2oilTemperature"
+                            :value="parseFloat(engine2oilTemperature)"
                             :unit="'°C'"
                             :max_value="200"
                           /> </v-sheet
@@ -202,7 +288,7 @@
                         <v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'TransmissionPressure'"
-                            :value="engine2transmissionPressure"
+                            :value="parseFloat(engine2transmissionPressure)"
                             :unit="'kPa'"
                             :max_value="40"
                           />
@@ -215,7 +301,7 @@
                         <v-sheet style="height: 18vh; display: flex">
                           <EchartGaugeVolt
                             :name="'ExhaustGasTemperature'"
-                            :value="engine2gasTemperature"
+                            :value="parseFloat(engine2gasTemperature)"
                             :unit="'°C'"
                             :max_value="900"
                           />
@@ -441,10 +527,13 @@ const sendMessage = () => socket.value.send(text.value);
 // 센서 데이터
 const latitude = ref();
 const longitude = ref();
+const mapstart = ref(2);
 const heading = ref();
 const speed = ref();
 const star = ref();
 const port = ref();
+const windspeed = ref();
+const windangle = ref();
 
 // 엔진 1
 const engine1Speed = ref();
@@ -521,9 +610,11 @@ const receivedTime = ref({
   NO2ENGINE_PANEL_65376: "",
   NO2ENGINE_PANEL_65379: "",
 });
-let ggaTimeout = null;
+let ggaTimeout1 = null;
 let GLLtimeout = null;
 let GGAtimeout = null;
+let GGAtimeout1 = null;
+let GGAtimeout2 = null;
 let RMCtimeout = null;
 let VTGtimeout = null;
 let ZDAtimeout = null;
@@ -532,8 +623,11 @@ let GSVtimeout = null;
 let GSAtimeout = null;
 let THStimeout = null;
 let HDTtimeout = null;
+let HDTtimeout1 = null;
 let ROTtimeout = null;
 let MWVtimeout = null;
+let MWVtimeout1 = null;
+let MWVtimeout2 = null;
 let MWDtimeout = null;
 let VWRtimeout = null;
 let MTWtimeout = null;
@@ -548,10 +642,13 @@ let WAYPOINTStimeout = null;
 let RTZtimeout = null;
 let ESCREENtimeout = null;
 let RSAtimeout = null;
+let RSAtimeout1 = null;
+let RSAtimeout2 = null;
 let MODEtimeout = null;
 let HTDtimeout = null;
 let VBWtimeout = null;
 let VHWtimeout = null;
+let VHWtimeout1 = null;
 let VLWtimeout = null;
 let CAN_Online_Statetimeout = null;
 let Engine_RPMtimeout = null;
@@ -559,6 +656,7 @@ let Ruddertimeout = null;
 let Rudder_Scaletimeout = null;
 let AUTOPILOTCONTACTtimeout = null;
 let NO1ENGINE_PANEL_61444timeout = null;
+let NO1ENGINE_PANEL_61444timeout1 = null;
 let NO1ENGINE_PANEL_65262timeout = null;
 let NO1ENGINE_PANEL_65263timeout = null;
 let NO1ENGINE_PANEL_65272timeout = null;
@@ -586,6 +684,17 @@ let NO2ENGINE_PANEL_65361_STATUStimeout = null;
 let NO2ENGINE_PANEL_65378timeout = null;
 let NO2ENGINE_PANEL_65376timeout = null;
 let NO2ENGINE_PANEL_65379timeout = null;
+let NO1ENGINE_PANEL_65262timeout1 = null;
+let NO1ENGINE_PANEL_65263timeout1 = null;
+let NO1ENGINE_PANEL_65272timeout1 = null;
+let NO1ENGINE_PANEL_65270timeout1 = null;
+let NO1ENGINE_PANEL_65361_LAMPtimeout1 = null;
+let NO2ENGINE_PANEL_61444timeout1 = null;
+let NO2ENGINE_PANEL_65262timeout1 = null;
+let NO2ENGINE_PANEL_65263timeout1 = null;
+let NO2ENGINE_PANEL_65272timeout1 = null;
+let NO2ENGINE_PANEL_65270timeout1 = null;
+let NO2ENGINE_PANEL_65361_LAMPtimeout1 = null;
 let messageTimeout;
 onOpen(() => {
   console.log("WS connection is stable! ~uWu~");
@@ -607,27 +716,60 @@ onMessage((message) => {
     // 'Package' 내의 데이터 중 "DataSet"의 첫 번째 항목 추출
     // 위치
     if (headerName === "DGPS/GGA") {
-      // checkdata.value.GGA = "ok";
-      // clearTimeout(ggaTimeout); // 이전 타임아웃을 취소
-      // ggaTimeout = setTimeout(() => {
-      //   // 3초 이상 데이터가 오지 않으면 "no"로 변경
-      //   checkdata.value.GGA = "no";
-      // }, 3000);
       latitude.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[2]
       ).toFixed(4);
+      mapstart.value = 1;
+      clearTimeout(GGAtimeout1); // 이전 타임아웃을 취소
+      GGAtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        latitude.value = null;
+        mapstart.value = 2;
+      }, 3000);
       longitude.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[4]
       ).toFixed(4);
+      clearTimeout(GGAtimeout2); // 이전 타임아웃을 취소
+      GGAtimeout2 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        longitude.value = null;
+      }, 3000);
     }
+    if (headerName === "ANEMOMETER/MWV") {
+      windspeed.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[3]
+      ).toFixed(2);
+      clearTimeout(MWVtimeout1); // 이전 타임아웃을 취소
+      MWVtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        windspeed.value = null;
+      }, 3000);
+
+      windangle.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[1]
+      ).toFixed(2);
+      clearTimeout(MWVtimeout2); // 이전 타임아웃을 취소
+      MWVtimeout2 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        windangle.value = null;
+      }, 3000);
+    }
+
     // 헤딩값
     if (headerName === "GYRO/HDT") {
       heading.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[1]
       ).toFixed(2);
+      clearTimeout(HDTtimeout1); // 이전 타임아웃을 취소
+      HDTtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        heading.value = null;
+      }, 3000);
     }
     // 스피드
     if (headerName === "SPEEDLOG/VHW") {
@@ -635,6 +777,11 @@ onMessage((message) => {
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[5]
       ).toFixed(2);
+      clearTimeout(VHWtimeout1); // 이전 타임아웃을 취소
+      VHWtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        speed.value = null;
+      }, 3000);
     }
     // 러더
     if (headerName === "AUTOPILOT/RSA") {
@@ -642,10 +789,20 @@ onMessage((message) => {
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[1]
       ).toFixed(2);
+      clearTimeout(RSAtimeout1); // 이전 타임아웃을 취소
+      RSAtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        star.value = null;
+      }, 3000);
       port.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[3]
       ).toFixed(2);
+      clearTimeout(RSAtimeout2); // 이전 타임아웃을 취소
+      RSAtimeout2 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        port.value = null;
+      }, 3000);
     }
 
     // 엔진1
@@ -654,30 +811,55 @@ onMessage((message) => {
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0]
       ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_61444timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1Speed.value = null;
+      }, 3000);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65262") {
       engine1oilTemperature.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0]
       ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65262timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1oilTemperature.value = null;
+      }, 3000);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65263") {
       engine1oilPressure.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0] / 100
       ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65263timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1oilPressure.value = null;
+      }, 3000);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65272") {
       engine1transmissionPressure.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0] / 100
       ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65272timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1transmissionPressure.value = null;
+      }, 3000);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65270") {
       engine1gasTemperature.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0]
       ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65270timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1gasTemperature.value = null;
+      }, 3000);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_LAMP") {
       console.log(
@@ -724,6 +906,11 @@ onMessage((message) => {
           if (i === 15) checkdata1.value[8] = "no";
         }
       }
+      clearTimeout(NO1ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1gasTemperature.value = null;
+      }, 3000);
     }
 
     // 엔진2
@@ -732,30 +919,55 @@ onMessage((message) => {
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0]
       ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_61444timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2Speed.value = null;
+      }, 3000);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65262") {
       engine2oilTemperature.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0]
       ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65262timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2oilTemperature.value = null;
+      }, 3000);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65263") {
       engine2oilPressure.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0] / 100
       ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65263timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2oilPressure.value = null;
+      }, 3000);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65272") {
       engine2transmissionPressure.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0] / 100
       ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65272timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2transmissionPressure.value = null;
+      }, 3000);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65270") {
       engine2gasTemperature.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[0]
       ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65270timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2gasTemperature.value = null;
+      }, 3000);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_LAMP") {
       console.log(
@@ -772,10 +984,11 @@ onMessage((message) => {
           offlamp(i);
         }
       }
-      messageTimeout = setTimeout(() => {
-        console.log("No data received for 5 seconds. Closing the connection.");
-        offlamp(16);
-      }, Number(checkTime.value) * 1000);
+      clearTimeout(NO2ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1gasTemperature.value = null;
+      }, 3000);
     }
   } catch (error) {
     console.error(error);
@@ -1250,7 +1463,7 @@ const resetCheckdata = () => {
   Object.keys(checkdata.value).forEach((key) => {
     checkdata.value[key] = "no";
   });
-  clearTimeout(ggaTimeout); // 타임아웃도 초기화
+  clearTimeout(ggaTimeout1); // 타임아웃도 초기화
 };
 
 const onlamp = (i) => {

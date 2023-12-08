@@ -61,7 +61,7 @@ const totalSize = computed(() => {
 provide(THEME_KEY);
 const option = ref({
   title: {
-    text: "저장 가능 공간 및 저장된 공간",
+    text: "서버 저장 공간 현황",
     left: "center",
     textStyle: {
       fontSize: 19, // 폰트 크기 설정
@@ -89,15 +89,21 @@ const option = ref({
       data: [
         {
           value: serverInUsedSize,
-          name: `타 프로그램 용량: ${serverInUsedSize.value}GB`,
+          name: `OS 및 기타: ${serverInUsedSize.value}GB`,
           label: {
             show: false,
           },
+          itemStyle: { color: "#E0E0E0" },
         },
-        { value: dbSize, name: `DB 사용량: ${dbSize.value}GB` },
+        {
+          value: dbSize,
+          name: `DB 사용량: ${dbSize.value}GB`,
+          itemStyle: { color: "#43A047" },
+        },
         {
           value: serverRemainingSize,
           name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
+          itemStyle: { color: "#D0E0D0" },
         },
         {
           // make an record to fill the bottom 50%
@@ -124,12 +130,18 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
   option.value.series[0].data = [
     {
       value: serverInUsedSize.value,
-      name: `타 프로그램 용량: ${serverInUsedSize.value}GB`,
+      name: `OS 및 기타: ${serverInUsedSize.value}GB`,
+      itemStyle: { color: "#E0E0E0" },
     },
-    { value: dbSize.value, name: `DB 사용량: ${dbSize.value}GB` },
+    {
+      value: dbSize.value,
+      name: `DB 사용량: ${dbSize.value}GB`,
+      itemStyle: { color: "#43A047" },
+    },
     {
       value: serverRemainingSize.value,
       name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
+      itemStyle: { color: "#E1F3DD" },
     },
     {
       value: totalSize.value,

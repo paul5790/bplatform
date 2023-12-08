@@ -22,50 +22,58 @@ let map = null;
 
 let lat = ref(35.46);
 let lon = ref(129.38);
-let latview = ref();
-let lonview = ref();
+let latview = ref(35.46);
+let lonview = ref(129.38);
 
 onMounted(() => {
   // 지도 초기화
-  map = L.map("map").setView([35.46, 129.38], 10);
+  map = L.map("map").setView([35.29, 129.26], 10);
 
   // OSM 타일 레이어 추가
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
   // 마커 추가 (예제 마커)
-  L.marker([35.46, 129.38])
+  L.marker([35.29, 129.26])
     .addTo(map)
     .bindPopup("Realtime Location.")
     .openPopup();
 
-  setInterval(updateValue, 30000);
-  updateValue();
+  setInterval(updateValue, 10000);
 });
 
 const updateValue = () => {
-  // 기존 마커 및 맵 제거
-  map.eachLayer((layer) => {
-    layer.remove();
-  });
+  try {
+    // 기존 마커 및 맵 제거
+    map.eachLayer((layer) => {
+      layer.remove();
+    });
+    // map = L.map("map").setView([35.29, 129.26], 10);
+    // lat.value += Math.random() * 0.1 - 0.05;
+    // lon.value += Math.random() * 0.1 - 0.05;
 
-  // lat.value += Math.random() * 0.1 - 0.05;
-  // lon.value += Math.random() * 0.1 - 0.05;
+    // 새로운 위치로 마커 및 맵 생성
+    L.marker([props.lat / 100, props.lon / 100])
+      .addTo(map)
+      .bindPopup("Realtime Location.")
+      .openPopup();
 
-  if (isNaN(props.value) || props.value === undefined) {
-    latview.value = 35.46;
-    lonview.value = 129.38;
-  } else {
-    latview.value = props.lat.toFixed(4);
-    lonview.value = props.lon.toFixed(4);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+      map
+    );
+
+    latview.value = (props.lat / 100).toFixed(2);
+    lonview.value = (props.lon / 100).toFixed(2);
+  } catch (error) {
+    console.error("Caught an error:", error);
+    map.eachLayer((layer) => {
+      layer.remove();
+    });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(
+      map
+    );
+    latview.value = "NaN";
+    lonview.value = "NaN";
   }
-
-  // 새로운 위치로 마커 및 맵 생성
-  L.marker([lat.value, lon.value])
-    .addTo(map)
-    .bindPopup("Realtime Location.")
-    .openPopup();
-
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 };
 </script>
 

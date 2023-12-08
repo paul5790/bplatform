@@ -10,7 +10,7 @@
     class="scrollable-card"
   >
     <v-card-title>
-      <span style="font-size: 19px; font-weight: 550">항차 테이블</span>
+      <span style="font-size: 19px; font-weight: 550">항차 리스트</span>
     </v-card-title>
     <v-data-table
       v-model:page="page"
@@ -79,10 +79,11 @@ const itemsPerPage = ref(10);
 
 const headers = ref([
   { title: "구분", align: "start", key: "division" },
-  { title: "항차 이름", align: "start", key: "name" },
   { title: "Ship ID", align: "start", key: "shipid" },
+  { title: "진행 시간", align: "start", key: "time" },
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "끝시간", align: "start", key: "enddate" },
+  { title: "항차 이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
   { title: "map", key: "actions", sortable: false },
   { title: "해역 위치", align: "start", key: "location" },
@@ -103,13 +104,11 @@ const pageCount = computed(() =>
 );
 
 const dialog = ref(false);
-const dialogDelete = ref(false);
 
 watch(dialog, (val) => {
   val || close();
 });
 
-const items1 = ref([]);
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const fetchData = async () => {
   try {
@@ -125,6 +124,17 @@ const fetchData = async () => {
     );
     const newItems = [];
     for (let i = 0; i < response.data.length; i++) {
+      const startTime = new Date(response.data[i].startTimeUtc);
+      const endTime = new Date(response.data[i].endTimeUtc);
+
+      const timeDiff = endTime - startTime;
+      const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+
+      const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+        .toString()
+        .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       newItems.push({
         division: response.data[i].seatrialId,
         name: response.data[i].name,
@@ -135,6 +145,7 @@ const fetchData = async () => {
         storage: response.data[i].storageSize + "MB",
         enddate: response.data[i].endTimeUtc,
         description: response.data[i].description,
+        time: formattedTime,
       });
     }
 
@@ -153,7 +164,6 @@ onMounted(() => {
 const seatrialProps = ref();
 const maptitle = ref();
 const map = (item) => {
-  alert(item.division);
   console.log(item.name + "아이템");
   seatrialProps.value = `${item.division}`;
   maptitle.value = `항차: ${item.name}의 지도`;

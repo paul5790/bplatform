@@ -15,6 +15,7 @@
           <div class="dialog-div">
             <!-- <v-btn color="blue" @click="update()">수정하기</v-btn> -->
 
+            <div style="display: flex;">
             <v-btn color="blue" @click="check()"> 수정하기 </v-btn>
 
             <v-dialog v-model="dialog" persistent width="1024">
@@ -30,6 +31,7 @@
                       >
                       <v-col cols="12" sm="6">
                         <v-text-field
+                          :readonly="true"
                           label="사용자 ID"
                           required
                           v-model="selectedId"
@@ -37,6 +39,7 @@
                       </v-col>
                       <v-col cols="12" sm="6">
                         <v-text-field
+                        :readonly="true"
                           label="이름"
                           hint="example of persistent helper text"
                           persistent-hint
@@ -46,6 +49,7 @@
                       </v-col>
                       <v-col cols="12" sm="6">
                         <v-text-field
+                        :readonly="true"
                           v-model="selectedemail"
                           label="이메일"
                           required
@@ -53,6 +57,7 @@
                       </v-col>
                       <v-col cols="12" sm="6">
                         <v-text-field
+                        :readonly="true"
                           v-model="selectedphoneNumber"
                           label="전화번호"
                           required
@@ -99,18 +104,45 @@
                     variant="text"
                     @click="nullDialog"
                   >
-                    Close
+                    뒤로가기
                   </v-btn>
                   <v-btn
                     color="blue-darken-1"
                     variant="text"
                     @click="changeData()"
                   >
-                    Save
+                    저장하기
                   </v-btn>
                 </v-card-actions>
               </v-card>
             </v-dialog>
+            </div>
+            <div style="display: flex; margin-left: 15px;">
+            <v-btn color="blue" @click="check2()"> 삭제하기 </v-btn>
+
+            <v-dialog v-model="dialog2" persistent width="400">
+              <v-card>
+                <v-card-title>
+                  <span class="text-h5">유저 정보 삭제</span>
+                </v-card-title>
+                <v-card-text
+                  >{{ selectedId }}의 정보를 삭제하시겠습니까?</v-card-text
+                >
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="text"
+                    @click="deleteData()"
+                    >예</v-btn
+                  >
+                  <v-btn color="blue-darken-1" variant="text" @click="cancel()"
+                    >아니오</v-btn
+                  >
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+            </div>
           </div>
         </v-row>
         <v-data-table
@@ -162,6 +194,7 @@ import { computed, ref } from "vue";
 import axios from "axios";
 
 const dialog = ref(false);
+const dialog2 = ref(false);
 const page = ref(1);
 const itemsPerPage = ref(13);
 
@@ -225,11 +258,54 @@ const check = () => {
       dialog.value = true;
     }
   } else {
+    alert("유저를 선택해주세요.");
     console.log("No user selected");
   }
   console.log(selectedphoneNumber.value);
 
   console.log(selectedemail.value);
+};
+const check2 = () => {
+  if (selectedItems.value.length > 0) {
+    selectedId.value = selectedItems.value[0].userId;
+    if (
+      selecteduserName.value === null ||
+      selecteduserName.value === "" ||
+      selecteduserName.value === undefined
+    ) {
+      dialog2.value = true;
+      console.log("No user selected");
+    } else {
+      dialog2.value = true;
+    }
+  } else {
+    alert("유저를 선택해주세요.");
+    console.log("No user selected");
+  }
+  console.log(selectedphoneNumber.value);
+
+  console.log(selectedemail.value);
+};
+
+const deleteData = () => {
+  const data = {
+    id: selectedId.value,
+  };
+  try {
+    axios.post("http://192.168.0.73:8080/admin/auth/userinfo/delete", data, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid.value}`,
+      },
+    });
+    dialog2.value = false;
+    alert("삭제가 완료되었습니다.");
+    location.reload();
+  } catch (error) {
+    // 특정 에러인 경우에 따라 다르게 처리합니다.
+
+    console.error("An error occurred in waitStart:", error);
+  }
 };
 
 const saveData = () => {};
@@ -286,7 +362,7 @@ const fetchData = async () => {
 fetchData();
 
 const changeData = () => {
-  if ((rulesdepartment.value === true) && (rulesdescription.value === true)) {
+  if (rulesdepartment.value === true && rulesdescription.value === true) {
     console.log(selectedItems.value);
     try {
       const data = {
@@ -319,15 +395,17 @@ const changeData = () => {
       console.error(error);
     }
 
-
     fetchData();
     nullDialog();
     location.reload();
-  }
-  else {
-    alert("소속을 입력해주세요.")
+  } else {
+    alert("소속을 입력해주세요.");
   }
 };
+
+const cancel = () => {
+  dialog2.value = false;
+}
 
 const nullDialog = () => {
   dialog.value = false;

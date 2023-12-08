@@ -127,18 +127,36 @@
           </v-col>
         </v-row>
       </v-sheet>
+      <v-sheet
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+        "
+      >
+        <div></div>
+        <div style="font-size: 12px; font-weight: bold">
+          * 날짜 검색은 한국 표준시를 기준으로 작성하며, 데이터는 UTC 기준으로
+          보여짐&nbsp;&nbsp;
+        </div>
+      </v-sheet>
 
       <!-- 탭 기능 구현 -->
       <v-tabs
         v-if="searchstart"
-        style="height: 5vh; margin-left: 15px; margin-right: 15px"
+        style="
+          color: #a8a8a8;
+          height: 5vh;
+          margin-left: 15px;
+          margin-right: 15px;
+        "
         v-model="tab"
-        color="grey-darken-1"
+        color="grey-darken-4"
         align-tabs="start"
       >
         <!-- for문 사용해서 탭 늘리기 -->
         <v-tab
-          style="background-color: #eeeeee"
+          style="background-color: #f7f7f7"
           :value="index"
           v-for="(item, index) in selectedData"
           :key="index"
@@ -146,6 +164,7 @@
           {{ item }}
         </v-tab>
       </v-tabs>
+      <!-- 데이터 테이블 -->
       <v-window
         class="scrollable-card"
         v-model="tab"
@@ -163,7 +182,28 @@
         >
           <v-card>
             <v-card-item>
+              <v-sheet
+                v-if="loading"
+                :elevation="elevation"
+                style="
+                  height: 67vh;
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  justify-content: center;
+                "
+              >
+                <v-progress-circular
+                  :size="50"
+                  color="primary"
+                  indeterminate
+                ></v-progress-circular>
+                <p style="margin-top: 10px; font-weight: 400; font-size: 18px">
+                  loading ({{ loadingpercent }}%)
+                </p>
+              </v-sheet>
               <v-data-table
+                v-if="!loading"
                 v-model="selectedData"
                 v-model:page="page"
                 :items-per-page="itemsPerPage"
@@ -200,13 +240,14 @@
           </v-card>
         </v-window-item>
       </v-window>
+      <!-- 데이터 다운로드 -->
       <v-card-actions>
         <v-spacer></v-spacer>
-        <select v-model="selectDownlodFormat">
+        <!-- <select v-model="selectDownlodFormat">
           <option value="xlsx">Excel (xlsx)</option>
           <option value="txt">Text (txt)</option>
           <option value="csv">CSV (csv)</option>
-        </select>
+        </select> -->
         <v-btn
           color="white"
           style="background-color: #009dff; margin-top: 10px"
@@ -238,6 +279,8 @@ const dataSet = ref([]); // 빈 배열로 초기화
 const selectedData = ref([]); //
 const message = ref("데이터가 존재하지 않습니다.");
 const searchstart = ref(false);
+const loading = ref(false);
+const loadingpercent = ref(0);
 
 const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
@@ -388,52 +431,58 @@ const getTrialDate = async () => {
   } catch (error) {
     console.error(error);
   }
+  console.log(setStartTime.value);
 };
 onMounted(getTrialDate);
 const selectedvoyage = ref();
 
 // 시운전 시간 받아오기
 const date_readonly = ref(true);
-const dateRange = ref([]); // 반응적인(ref) 배열로 초기화
+const dateRange = ref([new Date(), new Date()]); // 반응적인(ref) 배열로 초기화
 
-const startDate = ref(); // 반응적인(ref) 변수로 선언
-const endDate = ref(); // 반응적인(ref) 변수로 선언
+const startDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
+const endDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
+
 
 const voyagesearch = ref(false);
 
-const daterange = ref("");
+const daterange = ref([startDate.value, endDate.value]);
+
+const searchStart = ref();
+const searchEnd = ref();
 
 watchEffect(() => {
   console.log(daterange.value);
   const index = voyage.value.indexOf(selectedvoyage.value);
   selectedtrialNum.value = index;
-  daterange.value = `${selectedtrialNum.value}항차 데이터`;
-
   if (selectedvoyage.value === "직접 선택") {
     date_readonly.value = false;
     voyagesearch.value = false;
-
-    const start = new Date(dateRange.value[0]);
-    const end = new Date(dateRange.value[1]);
-
-    if (!isNaN(start) && !isNaN(end)) {
-      // 유효한 날짜인 경우에만 ISO 문자열로 변환
-      startDate.value = start.toISOString();
-      endDate.value = end.toISOString();
-      console.log("start.toISOString():", start.toISOString().slice(0, 10));
-      console.log("end.toISOString():", end.toISOString().slice(0, 10));
-      daterange.value = `${start.toISOString().slice(0, 10)}~${end.toISOString().slice(0, 10)} 데이터`;
+    console.log(dateRange.value);
+    
+    let start, end;
+    console.log(dateRange.value[0], dateRange.value[1]);
+    if (!isNaN(Date.parse(dateRange.value[0])) && !isNaN(Date.parse(dateRange.value[1]))) {
+      start = dateRange.value[0].toISOString();
+      end = dateRange.value[1].toISOString();
+      
+      console.log(start);
+      console.log(end);
     } else {
-      console.error("Invalid date values in dateRange.value");
+      // 예외처리: dateRange.value[0] 또는 dateRange.value[1]이 Invalid Date인 경우
+      console.error("Invalid date values in dateRange");
+      // 여기에서 적절한 대체 값이나 오류 처리를 추가할 수 있습니다.
     }
+    searchStart.value = start;
+    searchEnd.value = end;
   } else {
     const index = voyage.value.indexOf(selectedvoyage.value);
     console.log(index);
     date_readonly.value = true;
     voyagesearch.value = true;
 
-    const date1 = ref(setStartTime.value[index]);
-    const date2 = ref(setEndTime.value[index]);
+    const date1 = ref(setStartTime.value[index - 1]);
+    const date2 = ref(setEndTime.value[index - 1]);
 
     // Date 객체로 변환
     startDate.value = new Date(date1.value);
@@ -441,33 +490,13 @@ watchEffect(() => {
 
     // 시간 범위 설정
     dateRange.value = [startDate.value, endDate.value];
+
+    startDate.value.setHours(startDate.value.getHours());
+    endDate.value.setHours(endDate.value.getHours());
   }
 });
 let dataValues1 = [];
-// const selectDownlodFormat = ref('xlsx');
-// // 데이터 다운로드
-// const dataDownload = () => {
-//   if (!selectedData.value || selectedData.value.length === 0) {
-//     alert("선택안됌");
-//   } else {
-//     try {
-//       const workbook = XLSX.utils.book_new();
-//       const dataValues = Object.values(selectedData.value);
-//       console.log(dataValues1);
-//       for (let i = 0; i < downloadData.length; i++) {
-//         const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-//         XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
-//       }
-//       XLSX.writeFile(workbook, `${dataValues1}_datatable.xlsx`);
-//     } catch (error) {
-//       alert(selectDownlodFormat.value, "다운로드 할 데이터가 존재하지 않습니다.");
-//       console.log(error);
-//     }
-//   }
-// };
-
 const selectDownlodFormat = ref("xlsx");
-
 // 데이터 다운로드
 const dataDownload = () => {
   if (!selectedData.value || selectedData.value.length === 0) {
@@ -476,46 +505,91 @@ const dataDownload = () => {
     try {
       const workbook = XLSX.utils.book_new();
       const dataValues = Object.values(selectedData.value);
-
+      console.log(dataValues1);
       for (let i = 0; i < downloadData.length; i++) {
-        if (selectDownlodFormat.value === "xlsx") {
-          // xlsx 선택 시
-          const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-          XLSX.utils.book_append_sheet(workbook, worksheet, dataValues[i]);
-        } else if (selectDownlodFormat.value === "csv") {
-          // csv 선택 시
-          const csvData = Papa.unparse(downloadData[i].value);
-          const csvBlob = new Blob([csvData], {
-            type: "text/csv;charset=utf-8;",
-          });
-          saveAs(csvBlob, `${dataValues[i]}_csv.csv`);
-        } else if (selectDownlodFormat.value === "txt") {
-          // txt 선택 시
-          const txtData = JSON.stringify(downloadData[i].value, null, 2);
-          const txtBlob = new Blob([txtData], {
-            type: "text/plain;charset=utf-8;",
-          });
-          saveAs(txtBlob, `${dataValues[i]}_txt.txt`);
-        }
+        const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+        XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
       }
-
-      if (selectDownlodFormat.value === "xlsx") {
-        // xlsx 선택 시
-        XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
-      }
+      XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
     } catch (error) {
       alert(
-        `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
+        selectDownlodFormat.value,
+        "다운로드 할 데이터가 존재하지 않습니다."
       );
-      console.error(error);
+      console.log(error);
     }
   }
 };
+
+// const selectDownlodFormat = ref("xlsx");
+
+// // 데이터 다운로드
+// const dataDownload = () => {
+//   if (!selectedData.value || selectedData.value.length === 0) {
+//     alert("선택안됌");
+//   } else {
+//     try {
+//       const workbook = XLSX.utils.book_new();
+//       const dataValues = Object.values(selectedData.value);
+
+//       for (let i = 0; i < downloadData.length; i++) {
+//         if (selectDownlodFormat.value === "xlsx") {
+//           // xlsx 선택 시
+//           const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+//           XLSX.utils.book_append_sheet(workbook, worksheet, dataValues[i]);
+//         } else if (selectDownlodFormat.value === "csv") {
+//           // csv 선택 시
+//           const csvData = Papa.unparse(downloadData[i].value);
+//           const csvBlob = new Blob([csvData], {
+//             type: "text/csv;charset=utf-8;",
+//           });
+//           saveAs(csvBlob, `${dataValues[i]}_csv.csv`);
+//         } else if (selectDownlodFormat.value === "txt") {
+//           // txt 선택 시
+//           const txtData = JSON.stringify(downloadData[i].value, null, 2);
+//           const txtBlob = new Blob([txtData], {
+//             type: "text/plain;charset=utf-8;",
+//           });
+//           saveAs(txtBlob, `${dataValues[i]}_txt.txt`);
+//         }
+//       }
+
+//       if (selectDownlodFormat.value === "xlsx") {
+//         // xlsx 선택 시
+//         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
+//       }
+//     } catch (error) {
+//       alert(
+//         `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
+//       );
+//       console.error(error);
+//     }
+//   }
+// };
 
 // 데이터 조회
 
 // 검색 이벤트
 const searchData = () => {
+  // if (selectedvoyage.value === "직접 선택") {
+  //   date_readonly.value = false;
+  //   voyagesearch.value = false;
+  //   console.log(dateRange.value);
+  //   let start1, end1;
+  //   if (dateRange.value[0] instanceof Date && dateRange.value[1] instanceof Date) {
+  //     start1 = dateRange.value[0].toISOString();
+  //     end1 = dateRange.value[1].toISOString();
+  //     console.log(start1);
+  //     console.log(end1);
+  //   } else {
+  //     // 예외처리: dateRange.value[0] 또는 dateRange.value[1]이 Invalid Date인 경우
+  //     console.error("Invalid date values in dateRange");
+  //     // 여기에서 적절한 대체 값이나 오류 처리를 추가할 수 있습니다.
+  //   }
+  //   searchStart.value = start1;
+  //   searchEnd.value = end1;
+  // }
+  loading.value = true;
   console.log(selectedData.value);
   headerVariables.forEach((variable) => (variable.value = []));
   dataVariables.forEach((variable) => (variable.value = []));
@@ -527,7 +601,38 @@ const searchData = () => {
   console.log(selectedData.value[0]);
   let variableName = getVariableName(selectedData.value).value;
   console.log(variableName);
+
+  let start = new Date(dateRange.value[0]);
+  let end = new Date(dateRange.value[1]);
+  start.setHours(start.getHours() + 9);
+  end.setHours(end.getHours() + 9);
+
+  console.log(start);
+  console.log(end);
+
+  startDate.value = start.toISOString();
+  endDate.value = end.toISOString();
   fetchData(variableName); // 초기 데이터 요청
+
+  if (!isNaN(start) && !isNaN(end)) {
+    // 유효한 날짜인 경우에만 ISO 문자열로 변환
+    console.log("start.toISOString():", start.toISOString().slice(0, 19));
+    console.log("end.toISOString():", end.toISOString().slice(0, 19));
+    if (selectedvoyage.value === "직접 선택") {
+      daterange.value = `${start.toISOString().slice(0, 19)}~${end
+        .toISOString()
+        .slice(0, 19)} 데이터`;
+      console.log(daterange.value);
+    } else {
+      daterange.value = `${start.toISOString().slice(0, 19)}~${end
+        .toISOString()
+        .slice(0, 19)}, ${selectedtrialNum.value}항차 데이터`;
+      console.log(daterange.value);
+    }
+  } else {
+    console.error("Invalid date values in dateRange.value");
+  }
+
   console.log("fetch");
   searchstart.value = true;
 
@@ -561,7 +666,7 @@ const getVariableName = (item) => {
 
     // TTM: "radar/ttm",
     // TLL: "radar/tll",
-    RADAR_SCREEN: "radar/screen",
+    RADAR_SCREEN: "radar/radarscreen",
 
     VDM: "ais/vdm",
     VDO: "ais/vdo",
@@ -569,7 +674,7 @@ const getVariableName = (item) => {
     ROUTEINFO: "ecdis/routeinfo",
     WAYPOINTS: "ecdis/waypoints",
     RTZ: "ecdis/rtz",
-    ECDIS_SCREEN: "ecdis/screen",
+    ECDIS_SCREEN: "ecdis/ecdisscreen",
 
     RSA: "autopilot/rsa",
     // MODE: "autopilot/mode",
@@ -654,7 +759,12 @@ const fetchData = async (data) => {
           } else {
             console.log(data[i]);
             switchValue(data[i], dataheader, response);
-            tabAction();
+            await tabAction();
+
+            loadingpercent.value = ((i / (data.length - 1)) * 100).toFixed(1);
+            if (i === data.length - 1) {
+              loading.value = false;
+            }
           }
         } else {
           console.log("Response data is empty or undefined");
@@ -674,6 +784,9 @@ const fetchData = async (data) => {
       const content = ref();
       console.log(startDate.value);
       [subComponunt.value, content.value] = upperData.value.split("/");
+      // alert(`${startDate.value}`, `${endDate.value}`);
+      console.log(searchStart.value);
+      console.log(searchEnd.value);
       try {
         const response = await axios.post(
           "http://192.168.0.73:8080/data/period",
@@ -684,19 +797,25 @@ const fetchData = async (data) => {
               // "Authorization": "Bearer ",
               subcomp: `${subComponunt.value}`,
               content: `${content.value}`,
-              start: `${startDate.value}`,
-              end: `${endDate.value}`,
+              start: `${searchStart.value}`,
+              end: `${searchEnd.value}`,
             },
           }
         );
         dataSet.value = response.data;
         if (response.data && response.data.length > 0) {
           const dataheader = ref(
-            Object.keys(response.data[0]).map((key) => ({
-              title: key,
-              align: "start",
-              key,
-            }))
+            // Object.keys(response.data[0]).map((key) => ({
+            //   title: key,
+            //   align: "start",
+            //   key,
+            // }))
+            Object.keys(response.data[0]).reduce((acc, key) => {
+              if (key.toLowerCase() !== "id") {
+                acc.push({ title: key, align: "start", key });
+              }
+              return acc;
+            }, [])
           );
 
           if (dataheader.value == null) {
@@ -704,7 +823,11 @@ const fetchData = async (data) => {
           } else {
             console.log(data[i]);
             switchValue(data[i], dataheader, response);
-            tabAction();
+            await tabAction();
+            loadingpercent.value = ((i / (data.length - 1)) * 100).toFixed(1);
+            if (i === data.length - 1) {
+              loading.value = false;
+            }
           }
         } else {
           console.log("Response data is empty or undefined");
@@ -794,6 +917,14 @@ const tabAction = async () => {
   console.log(selectedTab);
   page.value = 1;
 
+  const fetchDataForTab = async (data, header) => {
+    // 여기서 비동기 작업을 처리하고, 예를 들어 axios를 사용할 경우
+    // await axios.post(...)와 같이 사용합니다.
+    // dataSet.value와 headerName.value에 값을 할당하는 부분이 들어가야 합니다.
+    dataSet.value = data;
+    headerName.value = header;
+  };
+
   // Find the selected data based on the tab value
   switch (selectedTab) {
     case "GLL":
@@ -806,8 +937,9 @@ const tabAction = async () => {
       break;
     case "GGA":
       itemsPerPage.value = 11;
-      dataSet.value = GGA.value;
-      headerName.value = GGAheader.value;
+      await fetchDataForTab(GGA.value, GGAheader.value);
+      // dataSet.value = GGA.value;
+      // headerName.value = GGAheader.value;
       break;
     case "RMC":
       itemsPerPage.value = 11;
@@ -820,7 +952,7 @@ const tabAction = async () => {
       headerName.value = VTGheader.value;
       break;
     case "ZDA":
-      itemsPerPage.value = 11;
+      itemsPerPage.value = 22;
       dataSet.value = ZDA.value;
       headerName.value = ZDAheader.value;
       break;

@@ -12,12 +12,12 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted,defineProps } from "vue";
+import { ref, provide, onMounted, defineProps } from "vue";
 
 const props = defineProps({
   // #2 props 정의
-  star: Number,
-  port: Number,
+  starport: Number,
+  name: String,
 });
 
 const starValue = ref();
@@ -35,7 +35,7 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "Rudder(AUTOPILOT)",
+    text: props.name,
     left: "left",
     textStyle: {
       fontSize: 14, // 폰트 크기 설정
@@ -50,6 +50,7 @@ const option = ref({
         lineStyle: {
           width: 12,
           color: [
+            
             [0.5, "#20d25a"],
             [1, "#ed060d"],
           ],
@@ -85,11 +86,11 @@ const option = ref({
         fontSize: 10,
         formatter: function (value) {
           if (value === -50) {
-            return 'PORT';
+            return "PORT";
           }
           if (value === 50) {
-            return 'STBD';
-          } 
+            return "STBD";
+          }
           if (value < 50 || value > -50) {
             return value;
           }
@@ -113,16 +114,11 @@ const option = ref({
 
 // 1초마다 랜덤값 생성
 const updateValue = () => {
-  if (props.star > 0) {
-    portValue.value = 0;
-    option.value.series[0].data[0].value = props.star;
-  }
-  else if (props.port > 0) {
-    starValue.value = 0;
-    option.value.series[0].data[0].value = props.port;
-  }
-  else {
-    option.value.series[0].data[0].value = 0;
+  if (isNaN(props.starport) || props.starport === undefined) {
+    option.value.series[0].data[0].value = null;
+    alert
+  } else {
+    option.value.series[0].data[0].value = props.starport;
   }
 };
 
@@ -130,7 +126,6 @@ onMounted(() => {
   setInterval(updateValue, 1000);
   updateValue();
 });
-
 </script>
 
 <style scoped>

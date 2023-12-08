@@ -202,12 +202,28 @@ axios.interceptors.response.use(
   (error) => {
     if (error.response.status === 401 || error.response.status === 500) {
       // 401 또는 500 상태 코드가 발생한 경우 로그아웃 처리
-      alert("토큰 시간 만료")
       logout();  // 로그아웃 처리 함수 호출
+      location.reload();
+      // alert("토큰 시간 만료\n다시 로그인 해주세요.")
+      alert(error.response?.data || error.message);
     }
     return Promise.reject(error);
-  }
+  },
 );
+
+// axios.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     if (error.response) {
+//       if (error.response.status === 401 || error.response.data.message === "Token Expired") {
+//         // 401 에러 또는 "Token Expired" 메시지가 발생한 경우 알람 후 로그아웃 처리
+//         alert("토큰 시간 만료");
+//         logout();  // 로그아웃 처리 함수 호출
+//       }
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 // 사용자 로그인 상태를 세션 스토리지에서 가져옵니다.
 const showDashboard = ref(
@@ -467,7 +483,7 @@ const login = async () => {
     sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   } catch (error) {
     console.error(error.response?.data || error.message);
-    alert(error.response?.data || error.message);
+    // alert(error.response?.data || error.message);
     userid.value = "";
     password.value = "";
   }

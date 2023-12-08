@@ -76,7 +76,7 @@ const option = ref({
 // 1초마다 랜덤값 생성
 const updateValue = () => {
   if (isNaN(props.value) || props.value === undefined) {
-    option.value.series[0].data[0].value = 0;
+    option.value.series[0].data[0].value = null;
   } else {
     if (props.value <= 0) {
       option.value.series[0].data[0].value = 0;
