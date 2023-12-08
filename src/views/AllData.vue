@@ -156,7 +156,7 @@
       >
         <!-- for문 사용해서 탭 늘리기 -->
         <v-tab
-          style="background-color: #f7f7f7"
+          :style="{ 'background-color': tab === index ? '#d9d9d9' : '#f7f7f7' }"
           :value="index"
           v-for="(item, index) in selectedData"
           :key="index"
@@ -260,7 +260,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watchEffect, onMounted } from "vue";
+import { ref, computed, watchEffect, onMounted, watch } from "vue";
 import axios from "axios";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
@@ -281,6 +281,10 @@ const message = ref("데이터가 존재하지 않습니다.");
 const searchstart = ref(false);
 const loading = ref(false);
 const loadingpercent = ref(0);
+
+watch(selectedData, (newVal, oldVal) => {
+  tab.value = 0;
+});
 
 const pageCount = computed(() => {
   return Math.ceil(dataSet.value.length / itemsPerPage.value);
@@ -443,7 +447,6 @@ const dateRange = ref([new Date(), new Date()]); // 반응적인(ref) 배열로 
 const startDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
 const endDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
 
-
 const voyagesearch = ref(false);
 
 const daterange = ref([startDate.value, endDate.value]);
@@ -459,13 +462,16 @@ watchEffect(() => {
     date_readonly.value = false;
     voyagesearch.value = false;
     console.log(dateRange.value);
-    
+
     let start, end;
     console.log(dateRange.value[0], dateRange.value[1]);
-    if (!isNaN(Date.parse(dateRange.value[0])) && !isNaN(Date.parse(dateRange.value[1]))) {
+    if (
+      !isNaN(Date.parse(dateRange.value[0])) &&
+      !isNaN(Date.parse(dateRange.value[1]))
+    ) {
       start = dateRange.value[0].toISOString();
       end = dateRange.value[1].toISOString();
-      
+
       console.log(start);
       console.log(end);
     } else {
@@ -636,8 +642,6 @@ const searchData = () => {
   console.log("fetch");
   searchstart.value = true;
 
-  // console.log(GLL.value);
-  // console.log(dataSet.value);
   tabAction();
   console.log("ftch");
   // Fetch data when selected items change
@@ -758,18 +762,20 @@ const fetchData = async (data) => {
             console.log("null");
           } else {
             console.log(data[i]);
+            console.log(response.data);
+            console.log(dataheader.value);
+            console.log(data.length);
             switchValue(data[i], dataheader, response);
             await tabAction();
-
-            loadingpercent.value = ((i / (data.length - 1)) * 100).toFixed(1);
-            if (i === data.length - 1) {
-              loading.value = false;
-            }
+            
           }
         } else {
           console.log("Response data is empty or undefined");
         }
-        console.log(GLL.value);
+        loadingpercent.value = ((i / (data.length)) * 100).toFixed(1);
+            if (i === data.length - 1) {
+              loading.value = false;
+            }
 
         // console.log(`${response.data[0]} dataheaderdata!!`);
         // console.log(`${response.data} responsedata!!`);
@@ -818,21 +824,17 @@ const fetchData = async (data) => {
             }, [])
           );
 
-          if (dataheader.value == null) {
-            console.log("null");
-          } else {
-            console.log(data[i]);
-            switchValue(data[i], dataheader, response);
-            await tabAction();
-            loadingpercent.value = ((i / (data.length - 1)) * 100).toFixed(1);
-            if (i === data.length - 1) {
-              loading.value = false;
-            }
-          }
+          console.log(data[i]);
+          switchValue(data[i], dataheader, response);
+          await tabAction();
+          
         } else {
           console.log("Response data is empty or undefined");
         }
-        console.log(GLL.value);
+        loadingpercent.value = ((i / (data.length - 1)) * 100).toFixed(1);
+          if (i === data.length - 1) {
+            loading.value = false;
+          }
 
         // console.log(`${response.data[0]} dataheaderdata!!`);
         // console.log(`${response.data} responsedata!!`);
@@ -910,9 +912,6 @@ const axioslist = ref([
 
 // 데이터 셋에 저장된 데이터 넣기
 const tabAction = async () => {
-  // console.log(`${contentsSelectedItems.value[`${tab.value}`]}`);
-  // console.log(GLL.value);
-  // dataSet.value = GLL.value;
   const selectedTab = selectedData.value[tab.value];
   console.log(selectedTab);
   page.value = 1;

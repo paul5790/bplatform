@@ -1161,21 +1161,21 @@ const checkingData = (headerName) => {
     clearTimeout(ROUTEINFOtimeout);
     ROUTEINFOtimeout = setTimeout(() => {
       checkdata.value.ROUTEINFO = "no";
-    }, 12000);
+    }, 5000);
   }
   if (headerName === "ECDIS/WAYPOINTS") {
     checkdata.value.WAYPOINTS = "ok";
     clearTimeout(WAYPOINTStimeout);
     WAYPOINTStimeout = setTimeout(() => {
       checkdata.value.WAYPOINTS = "no";
-    }, 12000);
+    }, 5000);
   }
   if (headerName === "ECDIS/RTZ") {
     checkdata.value.RTZ = "ok";
     clearTimeout(RTZtimeout);
     RTZtimeout = setTimeout(() => {
       checkdata.value.RTZ = "no";
-    }, 12000);
+    }, 5000);
   }
   if (headerName === "ECDIS/ECDIS SCREEN") {
     checkdata.value.ESCREEN = "ok";

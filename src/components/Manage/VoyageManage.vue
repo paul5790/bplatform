@@ -22,7 +22,7 @@
             >
               시운전 진행중..(종료하기)
             </v-btn>
-            <v-dialog v-model="dialog1_1" persistent width="600">
+            <v-dialog v-model="dialog1_1" persistent width="800">
               <v-card>
                 <v-card-title>
                   <span class="text-h5">항차 측정 종료</span>
@@ -286,6 +286,8 @@
                                 style="--dp-input-padding: 15px"
                                 v-model="editstartdate"
                                 text-input
+                                :max-date="currentDate"
+                                :max-time="currentTime"
                               />
                             </v-col>
                           </v-row>
@@ -307,6 +309,8 @@
                                 "
                                 v-model="editenddate"
                                 text-input
+                                :max-date="currentDate"
+                                :max-time="currentTime"
                               />
                             </v-col>
                           </v-row>
@@ -647,8 +651,15 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from "vue";
+import { computed, ref, onMounted, watchEffect } from "vue";
 import axios from "axios";
+
+// 데이트 피커 제한
+const currentDate = new Date();
+const currentTime = {
+  hours: new Date().getHours(),
+  minutes: new Date().getMinutes(),
+};
 
 // 데이터 테이블 하단 바 설정
 const page = ref(1);
@@ -798,7 +809,7 @@ const openDialog1_1 = () => {
   endTimeUtc.value = new Date();
 
   const endTime = new Date(endTimeUtc.value);
-  endTime.setHours(endTime.getHours() + 9);
+  // endTime.setHours(endTime.getHours() + 9);
   // sessionStorage.setItem("endTimeUtc", endTimeUtc.value.toString());
   sessionStorage.setItem("endTimeUtc", endTime.toISOString());
   dialog1_1.value = true;
@@ -819,6 +830,7 @@ const openDialog3 = () => {
     selectedlocation.value = selectedData.value[0].location;
     selecteddescription.value = selectedData.value[0].description;
     dialog3.value = true;
+    console.log(selectedData.value[0].index);
   } else {
     alert("항차를 선택해주세요.");
     console.log("항차를 선택해주세요.");
@@ -882,6 +894,8 @@ const cancel = () => {
   dialog4.value = false;
 };
 
+const timeRange = ref([]);
+
 // 시작하기 후 대기
 const waitStart = () => {
   if (
@@ -892,18 +906,15 @@ const waitStart = () => {
   ) {
     console.log(startname.value);
     alert("빈칸을 전부 기입하세요.");
-  } else if (divisiontrue.value === false) {
-    alert("항차 번호를 형식에 맞춰 입력하세요.");
   } else {
     try {
-      sessionStorage.setItem("division", startdivision.value.toString());
       sessionStorage.setItem("name", startname.value.toString());
       sessionStorage.setItem("testPurpose", startpurpose.value.toString());
       sessionStorage.setItem("navigationArea", startlocation.value.toString());
-      const startTime = new Date(startTimeUtc.value);
+      const startTime = new Date();
 
       // 9시간을 더함
-      startTime.setHours(startTime.getHours() + 9);
+      // startTime.setHours(startTime.getHours() + 9);
       sessionStorage.setItem("startTimeUtc", startTime.toISOString());
       sessionStorage.setItem("description", startdescription.value.toString());
 
@@ -974,6 +985,8 @@ const startData = () => {
 //추가하기
 const editData = () => {
   console.log(items.value.division);
+  console.log(editstartdate.value.getTime(), editenddate.value.getTime());
+console.log(editstartdate.value.getTime() === editenddate.value.getTime());
   if (
     editname.value === "" ||
     editpurpose.value === "" ||
@@ -985,17 +998,28 @@ const editData = () => {
     editenddate.value === ""
   ) {
     alert("항차 정보를 전부 올바르게 입력해 주세요.");
-  } else {
+  } else if (editstartdate.value > editenddate.value) {
+    alert("종료시간이 시작시간보다 더 빠릅니다.");
+  } else if (editstartdate.value.getTime() === editenddate.value.getTime()) {
+    alert("시작시간과 종료시간이 같습니다.");
+  }
+  else {
+    console.log("e");
     let start = new Date(editstartdate.value).toISOString().slice(0, 19);
     let end = new Date(editenddate.value).toISOString().slice(0, 19);
+    console.log(start);
+    console.log(end);
     let range = `${start}~${end}`;
+    console.log(range);
     let check = checkIfRangeExists(range);
+    console.log(check);
     if (check) {
       alert("선택된 날짜에 항차가 이미 존재합니다.");
     } else {
       try {
+        const division = sessionStorage.getItem("division") || null;
         const data = {
-          seatrialId: editdivision.value,
+          seatrialId: division,
           name: editname.value,
           shipId: "440714900",
           groupId: "1",
@@ -1040,26 +1064,42 @@ const editData = () => {
   }
 };
 
+
 // 수정하기
 const changeData = () => {
+  const saveTimeRange = timeRange.value.slice();
+  console.log(saveTimeRange);
+  console.log(timeRange.value);
+  console.log(selectedData.value[0].startdate);
+  console.log(selectedData.value[0].startdate === selectedstartdate.value);
+  let start = new Date(selectedstartdate.value).toISOString().slice(0, 19);
+  let end = new Date(selectedenddate.value).toISOString().slice(0, 19);
+  let range = `${start}~${end}`;
+  timeRange.value.splice(selectedData.value[0].index, 1);
+  console.log(saveTimeRange);
+  console.log(timeRange.value);
+  let check = checkIfRangeExists(range);
+  timeRange.value = saveTimeRange;
+  console.log(saveTimeRange);
+  console.log(timeRange.value);
   if (
-    selectedname.value === "" ||
-    selectedpurpose.value === "" ||
-    selectedlocation.value === "" ||
-    selecteddescription.value === "" ||
-    selectedstartdate.value === "" ||
-    selectedstartdate.value === null ||
-    selectedenddate.value === null ||
-    selectedenddate.value === ""
+    check === false ||
+    selectedData.value[0].startdate === selectedstartdate.value
   ) {
-    alert("항차 정보를 전부 올바르게 입력해 주세요.");
-  } else {
-    let start = new Date(selectedstartdate.value).toISOString().slice(0, 19);
-    let end = new Date(selectedenddate.value).toISOString().slice(0, 19);
-    let range = `${start}~${end}`;
-    let check = checkIfRangeExists(range);
-    if (check) {
-      alert("선택된 날짜에 항차가 이미 존재합니다.");
+    if (
+      selectedname.value === "" ||
+      selectedpurpose.value === "" ||
+      selectedlocation.value === "" ||
+      selecteddescription.value === "" ||
+      selectedstartdate.value === "" ||
+      selectedstartdate.value === null ||
+      selectedenddate.value === null ||
+      selectedenddate.value === ""
+    ) {
+      alert("항차 정보를 전부 올바르게 입력해 주세요.");
+    } else if (selectedstartdate.value > selectedenddate.value) {
+      alert("종료시간이 시작시간보다 더 빠릅니다.");
+      console.log(1091)
     } else {
       console.log(selectedData.value);
       try {
@@ -1087,12 +1127,14 @@ const changeData = () => {
               },
             }
           );
-
-          fetchData();
+          console.log(timeRange.value);
+          console.log(timeRange.value);
+          console.log(1120)
           dialog3.value = false;
           nullDialog3();
-          location.reload();
+          //location.reload();
         } catch (error) {
+          console.log(1127)
           if (
             error instanceof TypeError &&
             error.message.includes("toString")
@@ -1109,8 +1151,12 @@ const changeData = () => {
       } catch (error) {
         console.error(error);
         alert("선택된 항차 목록이 존재하지 않습니다.");
+        console.log(1145)
       }
     }
+  } else {
+    alert("선택된 날짜에 항차가 이미 존재합니다.");
+    console.log(1151)
   }
 };
 
@@ -1150,7 +1196,6 @@ const headers = ref([
 ]);
 
 const items = ref([]);
-const timeRange = ref([]);
 // 데이터 받아오기
 const fetchData = async () => {
   try {
@@ -1173,6 +1218,7 @@ const fetchData = async () => {
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       items.value.push({
+        index: i,
         division: response.data[i].seatrialId,
         name: response.data[i].name,
         shipid: response.data[i].shipId,
@@ -1184,6 +1230,12 @@ const fetchData = async () => {
         description: response.data[i].description,
         time: formattedTime,
       });
+      if (i === response.data.length - 1) {
+        sessionStorage.setItem(
+          "division",
+          Number(response.data[i].seatrialId) + 1
+        );
+      }
     }
     division.value = Number(response.data.length);
     console.log(timeRange.value);
@@ -1235,17 +1287,11 @@ const checkIfRangeExists = (range) => {
     isOverlap(selectedRange, trialRange)
   );
 
-  let start = new Date(selectedstartdate.value).toISOString().slice(0, 19);
-  let end = new Date(selectedenddate.value).toISOString().slice(0, 19);
-  let checkrange = `${start}~${end}`;
-
-  if (checkrange === range){
-    return false;
-  }else{
-    return isExist;
-  }
-
-  
+  // if (checkrange === range){
+  //   return false;
+  // }else{
+  return isExist;
+  //}
 };
 
 console.log(items);

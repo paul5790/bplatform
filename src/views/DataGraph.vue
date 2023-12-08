@@ -9,7 +9,75 @@
         <v-row>
           <v-col cols="12" no-gutters style="padding: 3px">
             <v-sheet
-              
+              v-if="nodata"
+              :elevation="elevation"
+              style="
+                height: 75vh;
+                padding: 30px;
+                padding-bottom: 0px;
+                padding-right: 0;
+                display: flex;
+                background-color: #f7f7f7;
+              "
+            >
+              <v-card style="flex: 1">
+                <v-card-title>
+                  <span class="text-h6">{{ selectedcontentsItem }}</span>
+                </v-card-title>
+                <v-card-item>
+                  <v-sheet v-if="!loading">
+                    <v-sheet v-if="first"> </v-sheet>
+                    <v-sheet v-if="!first"
+                    :elevation="elevation"
+                    style="
+                      height: 67vh;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      justify-content: center;
+                    ">
+                    <p
+                      style="
+                        margin-top: 10px;
+                        font-weight: 400;
+                        font-size: 18px;
+                      "
+                    >
+                      no-data
+                    </p>
+                    </v-sheet>
+                  </v-sheet>
+                  <v-sheet
+                    v-if="loading"
+                    :elevation="elevation"
+                    style="
+                      height: 67vh;
+                      display: flex;
+                      flex-direction: column;
+                      align-items: center;
+                      justify-content: center;
+                    "
+                  >
+                    <v-progress-circular
+                      :size="50"
+                      color="primary"
+                      indeterminate
+                    ></v-progress-circular>
+                    <p
+                      style="
+                        margin-top: 10px;
+                        font-weight: 400;
+                        font-size: 18px;
+                      "
+                    >
+                      loading
+                    </p>
+                  </v-sheet>
+                </v-card-item>
+              </v-card>
+            </v-sheet>
+            <v-sheet
+              v-if="!nodata"
               style="
                 height: 75vh;
                 padding: 30px;
@@ -104,10 +172,13 @@
                       range
                       :readonly="date_readonly"
                     />
-                    <p style="font-size: 12px; font-weight: bold">&nbsp;&nbsp;* 날짜 검색은 한국 표준시를 기준으로 작성하며,
-                      &nbsp;&nbsp;</p>
-<p style="font-size: 12px; font-weight: bold">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로
-          보여짐</p>
+                    <p style="font-size: 12px; font-weight: bold">
+                      &nbsp;&nbsp;* 날짜 검색은 한국 표준시를 기준으로 작성하며,
+                      &nbsp;&nbsp;
+                    </p>
+                    <p style="font-size: 12px; font-weight: bold">
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로 보여짐
+                    </p>
                     <v-btn
                       style="margin-top: 30px"
                       width="500px"
@@ -141,7 +212,7 @@
 import { ref, provide, onMounted, watchEffect } from "vue";
 import EchartLine from "../components/EchartGraph/EchartLine.vue";
 import axios from "axios";
-import html2canvas from 'html2canvas';
+import html2canvas from "html2canvas";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { LineChart } from "echarts/charts";
@@ -220,6 +291,9 @@ const daterange = ref("");
 const voyagesearch = ref(false);
 const startDate2 = ref(); // 반응적인(ref) 변수로 선언
 const endDate2 = ref(); // 반응적인(ref) 변수로 선언
+const nodata = ref(true);
+const loading = ref(false);
+const first = ref(true);
 watchEffect(() => {
   const index = trialrun.value.indexOf(selectedtrialrun.value);
   selectedtrialNum.value = index;
@@ -372,6 +446,9 @@ onMounted(() => {
 });
 
 const searchData = async () => {
+  nodata.value = true;
+  loading.value = true;
+  first.value = false;
   try {
     analysisData.value = [];
     analysisTime.value = [];
@@ -381,6 +458,8 @@ const searchData = async () => {
       selectedtrialrun.value !== null
     ) {
       if (selectedsubComponent.value === "DGPS") {
+        console.log(startDate2.value);
+        console.log(endDate2.value);
         try {
           let gga;
           if (voyagesearch.value) {
@@ -1042,7 +1121,7 @@ const searchData = async () => {
               }
             );
           }
-          
+
           switch (selectedItem.value) {
             case "엔진1 속도":
               analysisData.value = [];
@@ -1053,10 +1132,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "RPM";
@@ -1075,10 +1151,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1098,10 +1171,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1121,10 +1191,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "%";
@@ -1144,10 +1211,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1167,10 +1231,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1190,10 +1251,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1213,10 +1271,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "hr";
@@ -1236,10 +1291,7 @@ const searchData = async () => {
                     .engine_INTAKE_MANIFOLD_NO1_PRESSURE
                 );
                 analysisTime.value.push(
-                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1260,10 +1312,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1283,10 +1332,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1306,10 +1352,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no1engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               selectedcontentsItem.value = "no1engine_panel_65270/Fuel Level";
@@ -1559,10 +1602,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "RPM";
@@ -1581,10 +1621,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1604,10 +1641,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1627,10 +1661,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "%";
@@ -1650,10 +1681,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1673,10 +1701,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1696,10 +1721,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1719,10 +1741,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "hr";
@@ -1743,10 +1762,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1764,10 +1780,7 @@ const searchData = async () => {
                 analysisData.value.push(no2engine_panel_65270.data[i]);
 
                 analysisTime.value.push(
-                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1785,10 +1798,7 @@ const searchData = async () => {
                 analysisData.value.push(no2engine_panel_65270.data[i]);
 
                 analysisTime.value.push(
-                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1808,10 +1818,7 @@ const searchData = async () => {
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(
-                    8,
-                    19
-                  )
+                  no2engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "%";
@@ -1833,6 +1840,12 @@ const searchData = async () => {
           analysisTime.value[i + 1],
           analysisData.value[i],
         ]);
+      }
+      if (analysisTime.value.length <= 0) {
+        nodata.value = true;
+        loading.value = false;
+      } else {
+        nodata.value = false;
       }
       console.log(`ROW2: ${datasetRaw2.value}`);
 
@@ -1968,7 +1981,7 @@ const searchData = async () => {
         median.value = 0;
         standardError.value = 0;
       }
-      analysis.value[0].unit = unit.value
+      analysis.value[0].unit = unit.value;
       console.log(`Minimum Value: ${minValue.value}`); // 최솟값
       analysis.value[0].min = minValue.value.toFixed(4);
       console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
@@ -2054,12 +2067,12 @@ const option = ref({
 });
 
 const captureImage = async () => {
-  const graphSheet = document.getElementById('graph');
+  const graphSheet = document.getElementById("graph");
   if (graphSheet) {
     try {
       const canvas = await html2canvas(graphSheet);
-      const imageData = canvas.toDataURL('image/png');
-      
+      const imageData = canvas.toDataURL("image/png");
+
       // 데이터 URI를 Blob으로 변환
       const blobData = await fetch(imageData).then((res) => res.blob());
 
@@ -2067,7 +2080,7 @@ const captureImage = async () => {
       const blobUrl = URL.createObjectURL(blobData);
 
       // 다운로드 링크 생성
-      const downloadLink = document.createElement('a');
+      const downloadLink = document.createElement("a");
       downloadLink.href = blobUrl;
       downloadLink.download = `${analysis.value[0].name}_image.png`; // 파일명 지정
 
@@ -2077,11 +2090,10 @@ const captureImage = async () => {
       // URL 객체 해제
       URL.revokeObjectURL(blobUrl);
     } catch (error) {
-      console.error('Error capturing image:', error);
+      console.error("Error capturing image:", error);
     }
   }
 };
-
 </script>
 
 <style scoped>
