@@ -94,7 +94,7 @@
                     <v-card style="flex: 1">
                       <v-card-item>
                         <v-container fluid>
-                          <v-row>
+                          <!-- <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
@@ -111,7 +111,7 @@
                                 :rules="rules1.division"
                               ></v-text-field>
                             </v-col>
-                          </v-row>
+                          </v-row> -->
 
                           <v-row>
                             <v-col cols="4" style="margin-top: 8px">
@@ -251,7 +251,7 @@
                     <v-card style="flex: 1">
                       <v-card-item>
                         <v-container fluid>
-                          <v-row>
+                          <!-- <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
@@ -268,7 +268,7 @@
                                 :rules="rules1.division"
                               ></v-text-field>
                             </v-col>
-                          </v-row>
+                          </v-row> -->
 
                           <v-row>
                             <v-col cols="4" style="margin-top: 8px">

@@ -164,7 +164,7 @@ onMounted(() => {
 const seatrialProps = ref();
 const maptitle = ref();
 const map = (item) => {
-  console.log(item.name + "아이템");
+  console.log(item.division);
   seatrialProps.value = `${item.division}`;
   maptitle.value = `항차: ${item.name}의 지도`;
   dialog.value = true;
