@@ -196,11 +196,15 @@ const visible = ref(false);
 const isAdmin = ref(false);
 const firstPage = ref("/");
 const decodedTokenData = ref(null);
+// const alertShow = ref(true);
+// sessionStorage.setItem("alertShow", alertShow.value.toString());
 
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response.status === 401 || error.response.status === 500) {
+    
+    const alertShow = ref(sessionStorage.getItem("showDashboard") === "true");
+    if ((error.response.status === 401 || error.response.status === 500) && alertShow.value) {
       // 401 또는 500 상태 코드가 발생한 경우 로그아웃 처리
       logout();  // 로그아웃 처리 함수 호출
       location.reload();
@@ -210,6 +214,7 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   },
 );
+
 
 // axios.interceptors.response.use(
 //   (response) => response,
@@ -482,10 +487,11 @@ const login = async () => {
     // 세션 스토리지에 사용자 로그인 상태를 저장
     sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   } catch (error) {
+    alert(error.response?.data || error.message)
     console.error(error.response?.data || error.message);
-    // alert(error.response?.data || error.message);
-    userid.value = "";
-    password.value = "";
+
+    // userid.value = "";
+    // password.value = "";
   }
 };
 const checkTokenExpiration = () => {
@@ -525,6 +531,7 @@ const logout = () => {
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);
   sessionStorage.setItem("isAdmin", userid.value);
+
 };
 </script>
 

@@ -16,10 +16,9 @@ import { ref, provide, onMounted, defineProps } from "vue";
 
 const props = defineProps({
   // #2 props 정의
-  starport: Number,
+  starport: String,
   name: String,
 });
-
 const starValue = ref();
 const portValue = ref();
 
@@ -137,3 +136,4 @@ body {
   margin: 0;
 }
 </style>
+

@@ -16,7 +16,7 @@
                   <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
-                    :value="Number(mapstart)"
+                    :state="mapstart"
                   />
                 </v-card-item>
               </v-card>
@@ -361,15 +361,16 @@ const responseMsg = ref(""); // 받아온 데이터
 const checktime = ref(3000);
 
 // Props Value 데이터
-let engine1_OilTemperature = ref();
-let engine1_OilPressure = ref();
-let engine1_TransmissionPressure = ref();
-let engine1_ExhaustGasTemperature = ref();
-let engine2_OilTemperature = ref();
-let engine2_OilPressure = ref();
-let engine2_TransmissionPressure = ref();
-let engine2_ExhaustGasTemperature = ref();
+const engine1_OilTemperature = ref();
+const engine1_OilPressure = ref();
+const engine1_TransmissionPressure = ref();
+const engine1_ExhaustGasTemperature = ref();
+const engine2_OilTemperature = ref();
+const engine2_OilPressure = ref();
+const engine2_TransmissionPressure = ref();
+const engine2_ExhaustGasTemperature = ref();
 let timer = null;
+
 
 const lampdatatime = ref(sessionStorage.getItem("lampdatatime") || "");
 const tokenid = ref(sessionStorage.getItem("token") || "");
@@ -527,7 +528,7 @@ const sendMessage = () => socket.value.send(text.value);
 // 센서 데이터
 const latitude = ref();
 const longitude = ref();
-const mapstart = ref(2);
+const mapstart = ref("wait");
 const heading = ref();
 const speed = ref();
 const star = ref();
@@ -710,8 +711,8 @@ onMessage((message) => {
     checkdata.value[variableName] = parsedMessage.Package.Header.TimeSpan.End;
 
     clearTimeout(messageTimeout);
-    console.log(headerName);
-    console.log(parsedMessage);
+    // console.log(headerName);
+    // console.log(parsedMessage);
     checkingData(headerName);
     // 'Package' 내의 데이터 중 "DataSet"의 첫 번째 항목 추출
     // 위치
@@ -720,12 +721,12 @@ onMessage((message) => {
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[2]
       ).toFixed(4);
-      mapstart.value = 1;
+      mapstart.value = "start"
       clearTimeout(GGAtimeout1); // 이전 타임아웃을 취소
       GGAtimeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         latitude.value = null;
-        mapstart.value = 2;
+        mapstart.value = "stop"
       }, 3000);
       longitude.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
@@ -862,9 +863,6 @@ onMessage((message) => {
       }, 3000);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_LAMP") {
-      console.log(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0].Value
-      );
 
       for (let i = 0; i < 16; i++) {
         if (
@@ -970,9 +968,6 @@ onMessage((message) => {
       }, 3000);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_LAMP") {
-      console.log(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0].Value
-      );
 
       for (let i = 0; i < 16; i++) {
         if (

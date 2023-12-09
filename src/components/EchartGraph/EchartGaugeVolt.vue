@@ -20,7 +20,7 @@ const props = defineProps({
   value: String,
   unit: String,
   max_value: Number,
-  height: Number,
+  height: String,
 });
 
 use([
