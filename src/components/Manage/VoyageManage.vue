@@ -921,6 +921,7 @@ const waitStart = () => {
       sessionStorage.setItem("startstate", "true");
       startstate.value = true;
       nullDialog1();
+      alert("항차 측정이 시작됩니다.");
       location.reload();
     } catch (error) {
       // 특정 에러인 경우에 따라 다르게 처리합니다.
@@ -973,6 +974,8 @@ const startData = () => {
     sessionStorage.removeItem("startTimeUtc");
     sessionStorage.removeItem("endTimeUtc");
     sessionStorage.removeItem("description");
+
+    alert("항차 측정이 종료됩니다.");
     location.reload();
   } catch (error) {
     console.error(error);
@@ -986,7 +989,7 @@ const startData = () => {
 const editData = () => {
   console.log(items.value.division);
   console.log(editstartdate.value.getTime(), editenddate.value.getTime());
-console.log(editstartdate.value.getTime() === editenddate.value.getTime());
+  console.log(editstartdate.value.getTime() === editenddate.value.getTime());
   if (
     editname.value === "" ||
     editpurpose.value === "" ||
@@ -1002,8 +1005,7 @@ console.log(editstartdate.value.getTime() === editenddate.value.getTime());
     alert("종료시간이 시작시간보다 더 빠릅니다.");
   } else if (editstartdate.value.getTime() === editenddate.value.getTime()) {
     alert("시작시간과 종료시간이 같습니다.");
-  }
-  else {
+  } else {
     console.log("e");
     let start = new Date(editstartdate.value).toISOString().slice(0, 19);
     let end = new Date(editenddate.value).toISOString().slice(0, 19);
@@ -1039,6 +1041,7 @@ console.log(editstartdate.value.getTime() === editenddate.value.getTime());
             },
           });
 
+          alert("항차 추가가 완료되었습니다.");
           dialog2.value = false;
           nullDialog2();
           location.reload();
@@ -1064,9 +1067,14 @@ console.log(editstartdate.value.getTime() === editenddate.value.getTime());
   }
 };
 
-
 // 수정하기
 const changeData = () => {
+  const startDate = new Date(selectedstartdate.value);
+  const endDate = new Date(selectedenddate.value);
+
+  console.log("Start Date:", startDate);
+  console.log("End Date:", endDate);
+
   const saveTimeRange = timeRange.value.slice();
   console.log(saveTimeRange);
   console.log(timeRange.value);
@@ -1083,8 +1091,8 @@ const changeData = () => {
   console.log(saveTimeRange);
   console.log(timeRange.value);
   if (
-    check === false ||
-    selectedData.value[0].startdate === selectedstartdate.value
+    check === false
+    // || selectedData.value[0].startdate === selectedstartdate.value
   ) {
     if (
       selectedname.value === "" ||
@@ -1097,9 +1105,10 @@ const changeData = () => {
       selectedenddate.value === ""
     ) {
       alert("항차 정보를 전부 올바르게 입력해 주세요.");
-    } else if (selectedstartdate.value > selectedenddate.value) {
+    } else if (startDate > endDate) {
       alert("종료시간이 시작시간보다 더 빠릅니다.");
-      console.log(1091)
+    } else if (startDate.getTime() === endDate.getTime()) {
+      alert("시작시간과 종료시간이 같습니다.");
     } else {
       console.log(selectedData.value);
       try {
@@ -1127,14 +1136,12 @@ const changeData = () => {
               },
             }
           );
-          console.log(timeRange.value);
-          console.log(timeRange.value);
-          console.log(1120)
+          alert("선택된 항차의 수정이 완료되었습니다.");
           dialog3.value = false;
           nullDialog3();
-          //location.reload();
+          location.reload();
         } catch (error) {
-          console.log(1127)
+          console.log(1127);
           if (
             error instanceof TypeError &&
             error.message.includes("toString")
@@ -1151,12 +1158,12 @@ const changeData = () => {
       } catch (error) {
         console.error(error);
         alert("선택된 항차 목록이 존재하지 않습니다.");
-        console.log(1145)
+        console.log(1145);
       }
     }
   } else {
     alert("선택된 날짜에 항차가 이미 존재합니다.");
-    console.log(1151)
+    console.log(1151);
   }
 };
 
@@ -1173,7 +1180,7 @@ const deleteData = () => {
       },
     });
     dialog4.value = false;
-    alert("삭제가 완료되었습니다.");
+    alert("선택한 항차의 삭제가 완료되었습니다.");
     location.reload();
   } catch (error) {
     console.error("An error occurred in waitStart:", error);

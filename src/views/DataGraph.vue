@@ -1929,6 +1929,8 @@ const searchData = async () => {
       const numericValues = analysisData.value
         .map((value) => Number(value))
         .filter((value) => !isNaN(value));
+      
+      console.log(analysisData.value);      // if(analysisData)
 
       if (numericValues.length > 1) {
         // 최솟값 구하기
@@ -2010,7 +2012,9 @@ const searchData = async () => {
         )}`
       );
     } else {
-      alert("null man~");
+      alert("선택항목을 전부 선택해주세요.");
+      loading.value = false;
+      first.value = true;
     }
   } catch (error) {
     console.log(error);

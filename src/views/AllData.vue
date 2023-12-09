@@ -618,6 +618,7 @@ const searchData = () => {
 
   startDate.value = start.toISOString();
   endDate.value = end.toISOString();
+  tab.value = 0;
   fetchData(variableName); // 초기 데이터 요청
 
   if (!isNaN(start) && !isNaN(end)) {

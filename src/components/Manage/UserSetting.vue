@@ -299,7 +299,7 @@ const deleteData = () => {
       },
     });
     dialog2.value = false;
-    alert("삭제가 완료되었습니다.");
+    alert("선택된 사용자의 정보 삭제가 완료되었습니다.");
     location.reload();
   } catch (error) {
     // 특정 에러인 경우에 따라 다르게 처리합니다.
@@ -386,7 +386,8 @@ const changeData = () => {
             },
           }
         );
-        alert("수정완료");
+        
+        alert("선택된 사용자의 정보 수정이 완료되었습니다.");
       } catch (error) {
         console.error(error);
         alert(error.response?.data || "An error occurred during signup.");
@@ -394,8 +395,6 @@ const changeData = () => {
     } catch (error) {
       console.error(error);
     }
-
-    fetchData();
     nullDialog();
     location.reload();
   } else {
