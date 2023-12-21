@@ -13,7 +13,6 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide } from "vue";
-import axios from "axios";
 import { readDataStorage } from "../../api/index.js";
 
 const DGPS = ref({ value: 0, name: "DGPS", itemStyle: { color: "#2Fe7b3" }  });

@@ -1526,13 +1526,6 @@ onMounted(() => {
   getInfo();
 });
 
-const b = () => {
-  alert("b");
-};
-const c = () => {
-  alert("c");
-};
-
 // 개인정보 변경
 const privacypost = async () => {
   if (

@@ -46,7 +46,6 @@
 
 <script setup>
 import { ref, watch } from "vue";
-import SettingAll from "../components/Manage/SettingAll.vue";
 import VoyageManage from "../components/Manage/VoyageManage";
 import UserSetting from "../components/Manage/UserSetting";
 import LogViewing from "../components/Manage/LogViewing";

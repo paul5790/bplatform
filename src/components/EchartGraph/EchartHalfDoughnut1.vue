@@ -13,7 +13,6 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, computed, onMounted, watch } from "vue";
-import axios from "axios";
 import { serverStorage } from "../../api/index.js";
 use([
   CanvasRenderer,

@@ -13,8 +13,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
-import EchartLine from "../components/EchartGraph/EchartLine.vue";
+import { ref } from "vue";
 // 왼쪽 셀렉바 설정
 const userid = ref(sessionStorage.getItem("userid"));
 </script>

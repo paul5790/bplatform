@@ -26,22 +26,8 @@
 
 <script setup>
 import { computed, ref } from "vue";
-
-const dialog = ref(false);
 const page = ref(1);
 const itemsPerPage = ref(16);
-
-const selected = ref([]);
-
-const username = ref("홍길동");
-
-const openDialog = () => {
-  if (selected.value === null || selected.value === "") {
-    dialog.value = false;
-  } else {
-    dialog.value = true;
-  }
-};
 
 const pageCount = computed(() => {
   return Math.ceil(items.value.length / itemsPerPage.value);

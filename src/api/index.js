@@ -3,6 +3,44 @@ import axios from "axios";
 
 const apiLocation = "192.168.0.73:8080";
 
+// 로그인
+export const checkLogin = async (data) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/auth/login`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+// 회원가입
+export const createMineData = async (data) => {
+  try {
+    const response = await axios.post(`http://${apiLocation}/auth/join`, data, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+
+
 // 개인정보 가져오기
 export const readMineData = async (tokenid) => {
   try {
@@ -66,6 +104,9 @@ export const updatePassword = async (tokenid, data) => {
   }
 };
 
+
+
+
 // 사용자 데이터 받아오기
 export const readUserData = async (tokenid) => {
   try {
@@ -128,6 +169,9 @@ export const deleteUserData = async (tokenid, data) => {
     throw error;
   }
 };
+
+
+
 
 // 데이터 소실주기
 export const updateSetTime = async (tokenid, data) => {
@@ -279,17 +323,48 @@ export const deleteTrialData = async (tokenid, data) => {
   }
 };
 
-
 // 데이터 조회하기 (항차)
 export const readDataTrial = async (tokenid, data, selectedtrialNum) => {
   try {
     const response = await axios.post(
       `http://${apiLocation}/data/${data}/${selectedtrialNum}`,
-      data,
+      {},
       {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+
+// 데이터 조회하기 (날짜)
+export const readDataDate = async (
+  tokenid,
+  subComponunt,
+  content,
+  searchStart,
+  searchEnd
+) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/data/period`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+          subcomp: `${subComponunt}`,
+          content: `${content}`,
+          start: `${searchStart}`,
+          end: `${searchEnd}`,
         },
       }
     );
@@ -329,6 +404,51 @@ export const serverStorage = async (tokenid) => {
   try {
     const response = await axios.post(
       `http://${apiLocation}/info/storage/db`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+
+
+
+// 웨이포인트 가져오기
+export const readWaypoint = async (tokenid, trial) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/info/waypoints/${trial}`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+// 항적 가져오기
+export const readAis = async (tokenid, trial) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/info/ais/${trial}`,
       {},
       {
         headers: {

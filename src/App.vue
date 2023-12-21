@@ -151,15 +151,6 @@
             @click:append-inner="visible = !visible"
             @keyup.enter="login"
           ></v-text-field>
-          <!-- 
-          <v-card class="mb-12" color="surface-variant" variant="tonal">
-            <v-card-text class="text-medium-emphasis text-caption">
-              Warning: After 3 consecutive failed login attempts, you account
-              will be temporarily locked for three hours. If you must login now,
-              you can also click "Forgot login password?" below to reset the
-              login password.
-            </v-card-text>
-          </v-card> -->
 
           <v-btn
             @click="login()"
@@ -188,16 +179,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, router } from "vue";
+import { ref } from "vue";
 import axios from "axios";
 import Dashboard from "../src/views/MainDashBoard.vue";
+import { checkLogin, createMineData, readMineData } from "./api/index.js";
 
 const visible = ref(false);
-const isAdmin = ref(false);
-const firstPage = ref("/");
 const decodedTokenData = ref(null);
-// const alertShow = ref(true);
-// sessionStorage.setItem("alertShow", alertShow.value.toString());
 
 axios.interceptors.response.use(
   (response) => response,
@@ -214,21 +202,6 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   },
 );
-
-
-// axios.interceptors.response.use(
-//   (response) => response,
-//   (error) => {
-//     if (error.response) {
-//       if (error.response.status === 401 || error.response.data.message === "Token Expired") {
-//         // 401 에러 또는 "Token Expired" 메시지가 발생한 경우 알람 후 로그아웃 처리
-//         alert("토큰 시간 만료");
-//         logout();  // 로그아웃 처리 함수 호출
-//       }
-//     }
-//     return Promise.reject(error);
-//   }
-// );
 
 // 사용자 로그인 상태를 세션 스토리지에서 가져옵니다.
 const showDashboard = ref(
@@ -289,15 +262,7 @@ const signupBtn = async () => {
 
     try {
       // 회원가입 기능
-      const response = await axios.post(
-        "http://192.168.0.73:8080/auth/join",
-        data,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const response = await createMineData(data);
 
       console.log(response.data);
       alert("가입이 완료되었습니다.");
@@ -419,7 +384,6 @@ const rules = ref({
 });
 
 const expirationTime = ref(); // 초 단위를 밀리초로 변환
-const currentTime = ref();
 const tokenlogin = ref();
 let intervalId;
 
@@ -432,33 +396,14 @@ const login = async () => {
 
   try {
     // 로그인 요청
-    const response = await axios.post(
-      "http://192.168.0.73:8080/auth/login",
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          // "Authorization": "Bearer "
-        },
-      }
-    );
-
+    const response = await checkLogin(data);
    
-    sessionStorage.setItem("token", response.data);
+    sessionStorage.setItem("token", response);
 
     // 사용자 정보 요청
-    const userDataResponse = await axios.post(
-      "http://192.168.0.73:8080/auth/userinfo/mine",
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${response.data}`,
-        },
-      }
-    );
+    const userDataResponse = await readMineData(response);
 
-    const tokenPayload = jwtDecode(response.data);
+    const tokenPayload = jwtDecode(response);
     decodedTokenData.value = tokenPayload;
     console.log(decodedTokenData.value);
 
@@ -470,8 +415,8 @@ const login = async () => {
 
     // 토큰이 유효한 경우에 수행할 작업 (예: 로그인 후의 동작)
     // ...
-    const userName = userDataResponse.data.userName;
-    const userGroup = userDataResponse.data.userGroup;
+    const userName = userDataResponse.userName;
+    const userGroup = userDataResponse.userGroup;
     console.log(userName);
     console.log(userGroup);
     sessionStorage.setItem("userid", userName);
@@ -509,7 +454,7 @@ const checkTokenExpiration = () => {
         clearInterval(intervalId);
       } else {
         // 토큰이 유효한 경우에 수행할 작업
-        console.log("남은 시간: " + remainingTime + "밀리초");
+        // console.log("남은 시간: " + remainingTime + "밀리초");
       }
     }
   }, 5000); // 5초 간격으로 체크
@@ -607,17 +552,6 @@ hr {
   display: block;
   text-align: left;
   margin-top: 10px;
-}
-
-.btn-skyblue {
-  color: #fff;
-  background-color: #67caf1; /* 하늘색 HEX 코드 */
-  border-color: #67caf1; /* 하늘색 HEX 코드 */
-}
-
-.btn-skyblue:hover {
-  background-color: #5badee; /* 하늘색의 hover 상태 HEX 코드 */
-  border-color: #5badee; /* 하늘색의 hover 상태 HEX 코드 */
 }
 
 .halfbtn {

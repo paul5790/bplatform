@@ -567,90 +567,6 @@ const dataDownload = async () => {
   }
 };
 
-// // 데이터 다운로드
-// const dataDownload = async () => {
-//   downloadBtnLoading.value = true;
-
-//   if (!selectedData.value || selectedData.value.length === 0) {
-//     alert("선택안됌");
-//     downloadBtnLoading.value = false;
-//   } else {
-//     setTimeout(async () => {
-//       await selectedDataDownload();
-//       await additionalAsyncOperation();
-//     }, 500);
-//   }
-// };
-
-// const selectedDataDownload = async () => {
-//   try {
-//     const workbook = XLSX.utils.book_new();
-//     console.log(dataValues1);
-//     for (let i = 0; i < downloadData.length; i++) {
-//       const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-//       XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
-//     }
-//     XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
-//   } catch (error) {
-//     alert("다운로드 할 데이터가 존재하지 않습니다.");
-//     console.log(error);
-//   }
-// };
-
-// const additionalAsyncOperation = async () => {
-//   // 파일 다운로드 완료 후 수행되어야 할 비동기 작업
-//   console.log("Additional async operation after file download");
-//   downloadBtnLoading.value = false;
-// };
-
-// const selectDownlodFormat = ref("xlsx");
-
-// // 데이터 다운로드
-// const dataDownload = () => {
-//   if (!selectedData.value || selectedData.value.length === 0) {
-//     alert("선택안됌");
-//   } else {
-//     try {
-//       const workbook = XLSX.utils.book_new();
-//       const dataValues = Object.values(selectedData.value);
-
-//       for (let i = 0; i < downloadData.length; i++) {
-//         if (selectDownlodFormat.value === "xlsx") {
-//           // xlsx 선택 시
-//           const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-//           XLSX.utils.book_append_sheet(workbook, worksheet, dataValues[i]);
-//         } else if (selectDownlodFormat.value === "csv") {
-//           // csv 선택 시
-//           const csvData = Papa.unparse(downloadData[i].value);
-//           const csvBlob = new Blob([csvData], {
-//             type: "text/csv;charset=utf-8;",
-//           });
-//           saveAs(csvBlob, `${dataValues[i]}_csv.csv`);
-//         } else if (selectDownlodFormat.value === "txt") {
-//           // txt 선택 시
-//           const txtData = JSON.stringify(downloadData[i].value, null, 2);
-//           const txtBlob = new Blob([txtData], {
-//             type: "text/plain;charset=utf-8;",
-//           });
-//           saveAs(txtBlob, `${dataValues[i]}_txt.txt`);
-//         }
-//       }
-
-//       if (selectDownlodFormat.value === "xlsx") {
-//         // xlsx 선택 시
-//         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
-//       }
-//     } catch (error) {
-//       alert(
-//         `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
-//       );
-//       console.error(error);
-//     }
-//   }
-// };
-
-// 데이터 조회
-
 // 검색 이벤트
 const searchData = () => {
   loading.value = true;
@@ -776,17 +692,19 @@ const getVariableName = (item) => {
 const fetchData = async (data) => {
   downloadBtnDisabled.value = true;
   loadingpercent.value = 0.0;
-  console.log(data);
+  console.log(data, "여깁니다요");
   if (voyagesearch.value) {
     for (let i = 0; i < data.length; i++) {
       try {
-        const response = await axios.post(
-          `http://192.168.0.73:8080/data/${data[i]}/${selectedtrialNum.value}`
+        const response = await readDataTrial(
+          tokenid.value,
+          data[i],
+          selectedtrialNum.value
         );
-        dataSet.value = response.data;
-        if (response.data && response.data.length > 0) {
+        dataSet.value = response;
+        if (response && response.length > 0) {
           const dataheader = ref(
-            Object.keys(response.data[0]).reduce((acc, key) => {
+            Object.keys(response[0]).reduce((acc, key) => {
               if (key.toLowerCase() !== "id") {
                 let modifiedKey = key;
                 if (key === "timestamp_PUBLISH") {
@@ -836,29 +754,17 @@ const fetchData = async (data) => {
       console.log(searchStart.value);
       console.log(searchEnd.value);
       try {
-        const response = await axios.post(
-          "http://192.168.0.73:8080/data/period",
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-              // "Authorization": "Bearer ",
-              subcomp: `${subComponunt.value}`,
-              content: `${content.value}`,
-              start: `${searchStart.value}`,
-              end: `${searchEnd.value}`,
-            },
-          }
+        const response = await readDataDate(
+          tokenid.value,
+          subComponunt.value,
+          content.value,
+          searchStart.value,
+          searchEnd.value
         );
-        dataSet.value = response.data;
-        if (response.data && response.data.length > 0) {
+        dataSet.value = response;
+        if (response && response.length > 0) {
           const dataheader = ref(
-            // Object.keys(response.data[0]).map((key) => ({
-            //   title: key,
-            //   align: "start",
-            //   key,
-            // }))
-            Object.keys(response.data[0]).reduce((acc, key) => {
+            Object.keys(response[0]).reduce((acc, key) => {
               if (key.toLowerCase() !== "id") {
                 let modifiedKey = key;
                 if (key === "timestamp_PUBLISH") {
@@ -871,7 +777,6 @@ const fetchData = async (data) => {
               return acc;
             }, [])
           );
-
           updateTable();
           switchValue(data[i], dataheader, response);
         } else {
@@ -1378,11 +1283,7 @@ const updateTable = async () => {
   console.log("updateTable");
 };
 
-const initializeData = () => {
-  // dataSet.value = []; // dataSet 초기화
-};
 watchEffect(() => {
-  initializeData();
   updateTable();
 });
 
@@ -1621,333 +1522,333 @@ const switchValue = (axiosItem, dataheader, response) => {
   switch (axiosItem) {
     case "dgps/gll":
       GLLheader.value = dataheader.value;
-      GLL.value = response.data;
+      GLL.value = response;
       downloadData.push(GLL);
       dataValues1.push("GLL");
       break;
     case "dgps/gga":
       GGAheader.value = dataheader.value;
-      GGA.value = response.data;
+      GGA.value = response;
       downloadData.push(GGA);
       dataValues1.push("GGA");
       break;
     case "dgps/rmc":
       RMCheader.value = dataheader.value;
-      RMC.value = response.data;
+      RMC.value = response;
       downloadData.push(RMC);
       dataValues1.push("RMC");
       break;
     case "dgps/vtg":
       VTGheader.value = dataheader.value;
-      VTG.value = response.data;
+      VTG.value = response;
       downloadData.push(VTG);
       dataValues1.push("VTG");
       break;
     case "dgps/zda":
       ZDAheader.value = dataheader.value;
-      ZDA.value = response.data;
+      ZDA.value = response;
       downloadData.push(ZDA);
       dataValues1.push("ZDA");
       break;
     case "dgps/gsv":
       GSVheader.value = dataheader.value;
-      GSV.value = response.data;
+      GSV.value = response;
       downloadData.push(GSV);
       dataValues1.push("GSV");
       break;
     case "dgps/gsa":
       GSAheader.value = dataheader.value;
-      GSA.value = response.data;
+      GSA.value = response;
       downloadData.push(GSA);
       dataValues1.push("GSA");
       break;
     case "gyro/hdt":
       HDTheader.value = dataheader.value;
-      HDT.value = response.data;
+      HDT.value = response;
       downloadData.push(HDT);
       dataValues1.push("HDT");
       break;
     case "gyro/rot":
       ROTheader.value = dataheader.value;
-      ROT.value = response.data;
+      ROT.value = response;
       downloadData.push(ROT);
       dataValues1.push("ROT");
       break;
     case "anemometer/mwv":
       MWVheader.value = dataheader.value;
-      MWV.value = response.data;
+      MWV.value = response;
       downloadData.push(MWV);
       dataValues1.push("MWV");
       break;
     case "radar/screen":
       RADAR_SCREENheader.value = dataheader.value;
 
-      RADAR_SCREEN.value = response.data;
+      RADAR_SCREEN.value = response;
       downloadData.push(RADAR_SCREEN);
       dataValues1.push("RADAR_SCREEN");
       break;
     case "ais/vdm":
       VDMheader.value = dataheader.value;
-      VDM.value = response.data;
+      VDM.value = response;
       downloadData.push(VDM);
       dataValues1.push("VDM");
       break;
     case "ais/vdo":
       VDOheader.value = dataheader.value;
-      VDO.value = response.data;
+      VDO.value = response;
       downloadData.push(VDO);
       dataValues1.push("VDO");
       break;
     case "ecdis/routeinfo":
       ROUTEINFOheader.value = dataheader.value;
-      ROUTEINFO.value = response.data;
+      ROUTEINFO.value = response;
       downloadData.push(ROUTEINFO);
       dataValues1.push("ROUTEINFO");
       break;
     case "ecdis/waypoints":
       WAYPOINTSheader.value = dataheader.value;
-      WAYPOINTS.value = response.data;
+      WAYPOINTS.value = response;
       downloadData.push(WAYPOINTS);
       dataValues1.push("WAYPOINTS");
       break;
     case "ecdis/rtz":
       RTZheader.value = dataheader.value;
-      RTZ.value = response.data;
+      RTZ.value = response;
       downloadData.push(RTZ);
       dataValues1.push("RTZ");
       break;
     case "ecdis/screen":
       ECDIS_SCREENheader.value = dataheader.value;
-      ECDIS_SCREEN.value = response.data;
+      ECDIS_SCREEN.value = response;
       downloadData.push(ECDIS_SCREEN);
       dataValues1.push("ECDIS_SCREEN");
       break;
     case "autopilot/rsa":
       RSAheader.value = dataheader.value;
-      RSA.value = response.data;
+      RSA.value = response;
       downloadData.push(RSA);
       dataValues1.push("RSA");
       break;
     case "autopilot/htd":
       HTDheader.value = dataheader.value;
-      HTD.value = response.data;
+      HTD.value = response;
       downloadData.push(HTD);
       dataValues1.push("HTD");
       break;
     case "speedlog/vbw":
       VBWheader.value = dataheader.value;
-      VBW.value = response.data;
+      VBW.value = response;
       downloadData.push(VBW);
       dataValues1.push("VBW");
       break;
     case "speedlog/vhw":
       VHWheader.value = dataheader.value;
-      VHW.value = response.data;
+      VHW.value = response;
       downloadData.push(VHW);
       dataValues1.push("VHW");
       break;
     case "speedlog/vlw":
       VLWheader.value = dataheader.value;
-      VLW.value = response.data;
+      VLW.value = response;
       downloadData.push(VLW);
       dataValues1.push("VLW");
       break;
 
     case "CAN_Online_State":
       CAN_Online_Stateheader.value = dataheader.value;
-      CAN_Online_State.value = response.data;
+      CAN_Online_State.value = response;
       downloadData.push(CAN_Online_State);
       dataValues1.push("CAN_Online_State");
       break;
     case "Engine_RPM":
       Engine_RPMheader.value = dataheader.value;
-      Engine_RPM.value = response.data;
+      Engine_RPM.value = response;
       downloadData.push(Engine_RPM);
       dataValues1.push("Engine_RPM");
       break;
     case "Rudder":
       Rudderheader.value = dataheader.value;
-      Rudder.value = response.data;
+      Rudder.value = response;
       downloadData.push(Rudder);
       dataValues1.push("Rudder");
       break;
     case "Rudder_Scale":
       Rudder_Scaleheader.value = dataheader.value;
-      Rudder_Scale.value = response.data;
+      Rudder_Scale.value = response;
       downloadData.push(Rudder_Scale);
       dataValues1.push("Rudder_Scale");
       break;
     case "AUTOPILOTCONTACT":
       AUTOPILOTCONTACTheader.value = dataheader.value;
-      AUTOPILOTCONTACT.value = response.data;
+      AUTOPILOTCONTACT.value = response;
       downloadData.push(AUTOPILOTCONTACT);
       dataValues1.push("AUTOPILOTCONTACT");
       break;
     case "no1enginepanel/no1engine_panel_61444":
       NO1ENGINE_PANEL_61444header.value = dataheader.value;
-      NO1ENGINE_PANEL_61444.value = response.data;
+      NO1ENGINE_PANEL_61444.value = response;
       downloadData.push(NO1ENGINE_PANEL_61444);
       dataValues1.push("NO.1ENGINE_PANEL_61444");
       break;
     case "no1enginepanel/no1engine_panel_65262":
       NO1ENGINE_PANEL_65262header.value = dataheader.value;
-      NO1ENGINE_PANEL_65262.value = response.data;
+      NO1ENGINE_PANEL_65262.value = response;
       downloadData.push(NO1ENGINE_PANEL_65262);
       dataValues1.push("NO.1ENGINE_PANEL_65262");
       break;
     case "no1enginepanel/no1engine_panel_65263":
       NO1ENGINE_PANEL_65263header.value = dataheader.value;
-      NO1ENGINE_PANEL_65263.value = response.data;
+      NO1ENGINE_PANEL_65263.value = response;
       downloadData.push(NO1ENGINE_PANEL_65263);
       dataValues1.push("NO.1ENGINE_PANEL_65263");
       break;
     case "no1enginepanel/no1engine_panel_65272":
       NO1ENGINE_PANEL_65272header.value = dataheader.value;
-      NO1ENGINE_PANEL_65272.value = response.data;
+      NO1ENGINE_PANEL_65272.value = response;
       downloadData.push(NO1ENGINE_PANEL_65272);
       dataValues1.push("NO.1ENGINE_PANEL_65272");
       break;
     case "no1enginepanel/no1engine_panel_65271":
       NO1ENGINE_PANEL_65271header.value = dataheader.value;
-      NO1ENGINE_PANEL_65271.value = response.data;
+      NO1ENGINE_PANEL_65271.value = response;
       downloadData.push(NO1ENGINE_PANEL_65271);
       dataValues1.push("NO1ENGINE_PANEL_65271");
       break;
     case "no1enginepanel/no1engine_panel_65253":
       NO1ENGINE_PANEL_65253header.value = dataheader.value;
-      NO1ENGINE_PANEL_65253.value = response.data;
+      NO1ENGINE_PANEL_65253.value = response;
       downloadData.push(NO1ENGINE_PANEL_65253);
       dataValues1.push("NO1ENGINE_PANEL_65253");
       break;
     case "no1enginepanel/no1engine_panel_65270":
       NO1ENGINE_PANEL_65270header.value = dataheader.value;
-      NO1ENGINE_PANEL_65270.value = response.data;
+      NO1ENGINE_PANEL_65270.value = response;
       downloadData.push(NO1ENGINE_PANEL_65270);
       dataValues1.push("NO1ENGINE_PANEL_65270");
       break;
     case "no1enginepanel/no1engine_panel_65276":
       NO1ENGINE_PANEL_65276header.value = dataheader.value;
-      NO1ENGINE_PANEL_65276.value = response.data;
+      NO1ENGINE_PANEL_65276.value = response;
       downloadData.push(NO1ENGINE_PANEL_65276);
       dataValues1.push("NO1ENGINE_PANEL_65276");
       break;
     case "no1enginepanel/no1engine_panel_65360":
       NO1ENGINE_PANEL_65360header.value = dataheader.value;
-      NO1ENGINE_PANEL_65360.value = response.data;
+      NO1ENGINE_PANEL_65360.value = response;
       downloadData.push(NO1ENGINE_PANEL_65360);
       dataValues1.push("NO1ENGINE_PANEL_65360");
       break;
     case "no1enginepanel/no1engine_panel_65361_lamp":
       NO1ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-      NO1ENGINE_PANEL_65361_LAMP.value = response.data;
+      NO1ENGINE_PANEL_65361_LAMP.value = response;
       downloadData.push(NO1ENGINE_PANEL_65361_LAMP);
       dataValues1.push("NO1ENGINE_PANEL_65361_LAMP");
       break;
     case "no1enginepanel/no1engine_panel_65361_status":
       NO1ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-      NO1ENGINE_PANEL_65361_STATUS.value = response.data;
+      NO1ENGINE_PANEL_65361_STATUS.value = response;
       downloadData.push(NO1ENGINE_PANEL_65361_STATUS);
       dataValues1.push("NO1ENGINE_PANEL_65361_STATUS");
       break;
     case "no1enginepanel/no1engine_panel_65378":
       NO1ENGINE_PANEL_65378header.value = dataheader.value;
-      NO1ENGINE_PANEL_65378.value = response.data;
+      NO1ENGINE_PANEL_65378.value = response;
       downloadData.push(NO1ENGINE_PANEL_65378);
       dataValues1.push("NO1ENGINE_PANEL_65378");
       break;
     case "no1enginepanel/no1engine_panel_65376":
       NO1ENGINE_PANEL_65376header.value = dataheader.value;
-      NO1ENGINE_PANEL_65376.value = response.data;
+      NO1ENGINE_PANEL_65376.value = response;
       downloadData.push(NO1ENGINE_PANEL_65376);
       dataValues1.push("NO1ENGINE_PANEL_65376");
       break;
     case "no1enginepanel/no1engine_panel_65379":
       NO1ENGINE_PANEL_65379header.value = dataheader.value;
-      NO1ENGINE_PANEL_65379.value = response.data;
+      NO1ENGINE_PANEL_65379.value = response;
       downloadData.push(NO1ENGINE_PANEL_65379);
       dataValues1.push("NO1ENGINE_PANEL_65379");
       break;
     case "no2enginepanel/no2engine_panel_61444":
       NO2ENGINE_PANEL_61444header.value = dataheader.value;
-      NO2ENGINE_PANEL_61444.value = response.data;
+      NO2ENGINE_PANEL_61444.value = response;
       downloadData.push(NO2ENGINE_PANEL_61444);
       dataValues1.push("NO2ENGINE_PANEL_61444");
       break;
     case "no2enginepanel/no2engine_panel_65262":
       NO2ENGINE_PANEL_65262header.value = dataheader.value;
-      NO2ENGINE_PANEL_65262.value = response.data;
+      NO2ENGINE_PANEL_65262.value = response;
       downloadData.push(NO2ENGINE_PANEL_65262);
       dataValues1.push("NO2ENGINE_PANEL_65262");
       break;
     case "no2enginepanel/no2engine_panel_65263":
       NO2ENGINE_PANEL_65263header.value = dataheader.value;
-      NO2ENGINE_PANEL_65263.value = response.data;
+      NO2ENGINE_PANEL_65263.value = response;
       downloadData.push(NO2ENGINE_PANEL_65263);
       dataValues1.push("NO2ENGINE_PANEL_65263");
       break;
     case "no2enginepanel/no2engine_panel_65272":
       NO2ENGINE_PANEL_65272header.value = dataheader.value;
-      NO2ENGINE_PANEL_65272.value = response.data;
+      NO2ENGINE_PANEL_65272.value = response;
       downloadData.push(NO2ENGINE_PANEL_65272);
       dataValues1.push("NO2ENGINE_PANEL_65272");
       break;
     case "no2enginepanel/no2engine_panel_65271":
       NO2ENGINE_PANEL_65271header.value = dataheader.value;
-      NO2ENGINE_PANEL_65271.value = response.data;
+      NO2ENGINE_PANEL_65271.value = response;
       downloadData.push(NO2ENGINE_PANEL_65271);
       dataValues1.push("NO2ENGINE_PANEL_65271");
       break;
     case "no2enginepanel/no2engine_panel_65253":
       NO2ENGINE_PANEL_65253header.value = dataheader.value;
-      NO2ENGINE_PANEL_65253.value = response.data;
+      NO2ENGINE_PANEL_65253.value = response;
       downloadData.push(NO2ENGINE_PANEL_65253);
       dataValues1.push("NO2ENGINE_PANEL_65253");
       break;
     case "no2enginepanel/no2engine_panel_65270":
       NO2ENGINE_PANEL_65270header.value = dataheader.value;
-      NO2ENGINE_PANEL_65270.value = response.data;
+      NO2ENGINE_PANEL_65270.value = response;
       downloadData.push(NO2ENGINE_PANEL_65270);
       dataValues1.push("NO2ENGINE_PANEL_65270");
       break;
     case "no2enginepanel/no2engine_panel_65276":
       NO2ENGINE_PANEL_65276header.value = dataheader.value;
-      NO2ENGINE_PANEL_65276.value = response.data;
+      NO2ENGINE_PANEL_65276.value = response;
       downloadData.push(NO2ENGINE_PANEL_65276);
       dataValues1.push("NO2ENGINE_PANEL_65276");
       break;
     case "no2enginepanel/no2engine_panel_65360":
       NO2ENGINE_PANEL_65360header.value = dataheader.value;
-      NO2ENGINE_PANEL_65360.value = response.data;
+      NO2ENGINE_PANEL_65360.value = response;
       downloadData.push(NO2ENGINE_PANEL_65360);
       dataValues1.push("NO2ENGINE_PANEL_65360");
       break;
     case "no2enginepanel/no2engine_panel_65361_lamp":
       NO2ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-      NO2ENGINE_PANEL_65361_LAMP.value = response.data;
+      NO2ENGINE_PANEL_65361_LAMP.value = response;
       downloadData.push(NO2ENGINE_PANEL_65361_LAMP);
       dataValues1.push("NO2ENGINE_PANEL_65361_LAMP");
       break;
     case "no2enginepanel/no2engine_panel_65361_status":
       NO2ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-      NO2ENGINE_PANEL_65361_STATUS.value = response.data;
+      NO2ENGINE_PANEL_65361_STATUS.value = response;
       downloadData.push(NO2ENGINE_PANEL_65361_STATUS);
       dataValues1.push("NO2ENGINE_PANEL_65361_STATUS");
       break;
     case "no2enginepanel/no2engine_panel_65378":
       NO2ENGINE_PANEL_65378header.value = dataheader.value;
-      NO2ENGINE_PANEL_65378.value = response.data;
+      NO2ENGINE_PANEL_65378.value = response;
       downloadData.push(NO2ENGINE_PANEL_65378);
       dataValues1.push("NO2ENGINE_PANEL_65378");
       break;
     case "no2enginepanel/no2engine_panel_65376":
       NO2ENGINE_PANEL_65376header.value = dataheader.value;
-      NO2ENGINE_PANEL_65376.value = response.data;
+      NO2ENGINE_PANEL_65376.value = response;
       downloadData.push(NO2ENGINE_PANEL_65376);
       dataValues1.push("NO2ENGINE_PANEL_65376");
       break;
     case "no2enginepanel/no2engine_panel_65379":
       NO2ENGINE_PANEL_65379header.value = dataheader.value;
-      NO2ENGINE_PANEL_65379.value = response.data;
+      NO2ENGINE_PANEL_65379.value = response;
       downloadData.push(NO2ENGINE_PANEL_65379);
       dataValues1.push("NO2ENGINE_PANEL_65379");
       break;

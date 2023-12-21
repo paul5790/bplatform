@@ -45,7 +45,6 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted, watch } from "vue";
-import axios from "axios";
 import { readTrialData, readlossData, readTimeData } from "../../api/index.js";
 
 use([
@@ -413,7 +412,6 @@ watch(selectedtrialNum, (newTrialNum) => {
 provide(THEME_KEY);
 
 const chart = ref(null);
-let isBackButtonActive = false;
 
 // 초기 그래프 옵션 설정
 const option = ref({
@@ -1018,7 +1016,6 @@ const handleChartClick = async (event) => {
     }
   }
 };
-let myChart = null;
 const updateChart = () => {
   if (chart.value) {
   // 차트 데이터 업데이트 로직

@@ -12,7 +12,7 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted, defineProps, computed } from "vue";
+import { ref, provide, onMounted, defineProps } from "vue";
 
 const props = defineProps({
   // #2 props 정의
@@ -117,7 +117,6 @@ onMounted(() => {
   updateValue();
 });
 
-const chartHeight = computed(() => `${props.height}vh`);
 </script>
 
 <style scoped>

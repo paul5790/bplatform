@@ -27,24 +27,26 @@
                 <v-card-item>
                   <v-sheet v-if="!loading">
                     <v-sheet v-if="first"> </v-sheet>
-                    <v-sheet v-if="!first"
-                    :elevation="elevation"
-                    style="
-                      height: 67vh;
-                      display: flex;
-                      flex-direction: column;
-                      align-items: center;
-                      justify-content: center;
-                    ">
-                    <p
+                    <v-sheet
+                      v-if="!first"
+                      :elevation="elevation"
                       style="
-                        margin-top: 10px;
-                        font-weight: 400;
-                        font-size: 18px;
+                        height: 67vh;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
                       "
                     >
-                      no-data
-                    </p>
+                      <p
+                        style="
+                          margin-top: 10px;
+                          font-weight: 400;
+                          font-size: 18px;
+                        "
+                      >
+                        no-data
+                      </p>
                     </v-sheet>
                   </v-sheet>
                   <v-sheet
@@ -209,13 +211,13 @@
 
 <script setup>
 import { ref, provide, onMounted, watchEffect } from "vue";
-import EchartLine from "../components/EchartGraph/EchartLine.vue";
 import axios from "axios";
 import html2canvas from "html2canvas";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
+import { readTrialData, readDataTrial, readDataDate } from "../api/index.js";
 import {
   DatasetComponent,
   TitleComponent,
@@ -267,10 +269,10 @@ const selectedtrialNum = ref();
 const selectedcontentsItem = ref("Contents/Item");
 const getTrialDate = async () => {
   try {
-    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
-    for (let i = 0; i < response.data.length; i++) {
-      setStartTime.value.push(`${response.data[i].startTimeUtc}`);
-      setEndTime.value.push(`${response.data[i].endTimeUtc}`);
+    const response = await readTrialData(tokenid.value);
+    for (let i = 0; i < response.length; i++) {
+      setStartTime.value.push(`${response[i].startTimeUtc}`);
+      setEndTime.value.push(`${response[i].endTimeUtc}`);
       selectedtrialNum.value = i + 1;
       console.log(setStartTime.value);
       console.log(setEndTime.value);
@@ -462,70 +464,46 @@ const searchData = async () => {
         try {
           let gga;
           if (voyagesearch.value) {
-            gga = await axios.post(
-              `http://192.168.0.73:8080/data/dgps/gga/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            gga = await readDataTrial(
+              tokenid.value,
+              "dgps/gga",
+              selectedtrialNum.value
             );
           } else {
-            gga = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "DGPS",
-                  content: "GGA",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            gga = await readDataDate(
+              tokenid.value,
+              "DGPS",
+              "GGA",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
 
           let vtg;
           if (voyagesearch.value) {
-            vtg = await axios.post(
-              `http://192.168.0.73:8080/data/dgps/vtg/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            vtg = await readDataTrial(
+              tokenid.value,
+              "dgps/vtg",
+              selectedtrialNum.value
             );
           } else {
-            vtg = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "DGPS",
-                  content: "VTG",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            vtg = await readDataDate(
+              tokenid.value,
+              "DGPS",
+              "VTG",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           switch (selectedItem.value) {
             case "위도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < gga.data.length; i++) {
-                analysisData.value.push(gga.data[i].latitude / 100);
+              for (let i = 0; i < gga.length; i++) {
+                analysisData.value.push(gga[i].latitude / 100);
 
                 analysisTime.value.push(
-                  gga.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  gga[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree(°)";
@@ -537,11 +515,11 @@ const searchData = async () => {
             case "경도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < gga.data.length; i++) {
-                analysisData.value.push(gga.data[i].longitude / 100);
+              for (let i = 0; i < gga.length; i++) {
+                analysisData.value.push(gga[i].longitude / 100);
 
                 analysisTime.value.push(
-                  gga.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  gga[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree(°)";
@@ -553,11 +531,11 @@ const searchData = async () => {
             case "고도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < gga.data.length; i++) {
-                analysisData.value.push(gga.data[i].altitude);
+              for (let i = 0; i < gga.length; i++) {
+                analysisData.value.push(gga[i].altitude);
 
                 analysisTime.value.push(
-                  gga.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  gga[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "M";
@@ -569,11 +547,11 @@ const searchData = async () => {
             case "SOG":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < vtg.data.length; i++) {
-                analysisData.value.push(vtg.data[i].speedovergroundknots);
+              for (let i = 0; i < vtg.length; i++) {
+                analysisData.value.push(vtg[i].speedovergroundknots);
 
                 analysisTime.value.push(
-                  vtg.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  vtg[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "N";
@@ -585,13 +563,11 @@ const searchData = async () => {
             case "COG":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < vtg.data.length; i++) {
-                analysisData.value.push(
-                  vtg.data[i].courseovergrounddegreestrue
-                );
+              for (let i = 0; i < vtg.length; i++) {
+                analysisData.value.push(vtg[i].courseovergrounddegreestrue);
 
                 analysisTime.value.push(
-                  vtg.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  vtg[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree(°)";
@@ -608,58 +584,34 @@ const searchData = async () => {
         try {
           let hdt;
           if (voyagesearch.value) {
-            hdt = await axios.post(
-              `http://192.168.0.73:8080/data/gyro/hdt/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            hdt = await readDataTrial(
+              tokenid.value,
+              "gyro/hdt",
+              selectedtrialNum.value
             );
           } else {
-            hdt = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "GYRO",
-                  content: "HDT",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            hdt = await readDataDate(
+              tokenid.value,
+              "GYRO",
+              "HDT",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           let rot;
           if (voyagesearch.value) {
-            rot = await axios.post(
-              `http://192.168.0.73:8080/data/gyro/rot/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            rot = await readDataTrial(
+              tokenid.value,
+              "gyro/rot",
+              selectedtrialNum.value
             );
           } else {
-            rot = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "GYRO",
-                  content: "ROT",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            rot = await readDataDate(
+              tokenid.value,
+              "GYRO",
+              "ROT",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
 
@@ -667,11 +619,11 @@ const searchData = async () => {
             case "Heading":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < hdt.data.length; i++) {
-                analysisData.value.push(hdt.data[i].heading);
+              for (let i = 0; i < hdt.length; i++) {
+                analysisData.value.push(hdt[i].heading);
 
                 analysisTime.value.push(
-                  hdt.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  hdt[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree(°)";
@@ -684,11 +636,11 @@ const searchData = async () => {
             case "회전 속도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < rot.data.length; i++) {
-                analysisData.value.push(rot.data[i].rateofturn);
+              for (let i = 0; i < rot.length; i++) {
+                analysisData.value.push(rot[i].rateofturn);
 
                 analysisTime.value.push(
-                  rot.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  rot[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree/minute";
@@ -705,41 +657,29 @@ const searchData = async () => {
         try {
           let mwv;
           if (voyagesearch.value) {
-            mwv = await axios.post(
-              `http://192.168.0.73:8080/data/anemometer/mwv/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            mwv = await readDataTrial(
+              tokenid.value,
+              "anemometer/mwv",
+              selectedtrialNum.value
             );
           } else {
-            mwv = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "ANEMOMETER",
-                  content: "MWV",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            mwv = await readDataDate(
+              tokenid.value,
+              "ANEMOMETER",
+              "MWV",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           switch (selectedItem.value) {
             case "풍향":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < mwv.data.length; i++) {
-                analysisData.value.push(mwv.data[i].anemometerangle);
+              for (let i = 0; i < mwv.length; i++) {
+                analysisData.value.push(mwv[i].anemometerangle);
 
                 analysisTime.value.push(
-                  mwv.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  mwv[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree(°)";
@@ -752,11 +692,11 @@ const searchData = async () => {
             case "풍속":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < mwv.data.length; i++) {
-                analysisData.value.push(mwv.data[i].anemometerspeed);
+              for (let i = 0; i < mwv.length; i++) {
+                analysisData.value.push(mwv[i].anemometerspeed);
 
                 analysisTime.value.push(
-                  mwv.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  mwv[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "m/s";
@@ -773,45 +713,33 @@ const searchData = async () => {
         try {
           let vhw;
           if (voyagesearch.value) {
-            vhw = await axios.post(
-              `http://192.168.0.73:8080/data/speedlog/vhw/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            vhw = await readDataTrial(
+              tokenid.value,
+              "speedlog/vhw",
+              selectedtrialNum.value
             );
           } else {
-            vhw = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "SPEEDLOG",
-                  content: "VHW",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            vhw = await readDataDate(
+              tokenid.value,
+              "SPEEDLOG",
+              "VHW",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           switch (selectedItem.value) {
             case "선박 속도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < vhw.data.length; i++) {
-                if (vhw.data[i].speedn <= 0) {
+              for (let i = 0; i < vhw.length; i++) {
+                if (vhw[i].speedn <= 0) {
                   analysisData.value.push("0");
                 } else {
-                  analysisData.value.push(vhw.data[i].speedn);
+                  analysisData.value.push(vhw[i].speedn);
                 }
 
                 analysisTime.value.push(
-                  vhw.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  vhw[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "N";
@@ -829,41 +757,29 @@ const searchData = async () => {
         try {
           let rsa;
           if (voyagesearch.value) {
-            rsa = await axios.post(
-              `http://192.168.0.73:8080/data/autopilot/rsa/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            rsa = await readDataTrial(
+              tokenid.value,
+              "autopilot/rsa",
+              selectedtrialNum.value
             );
           } else {
-            rsa = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "AUTOPILOT",
-                  content: "RSA",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            rsa = await readDataDate(
+              tokenid.value,
+              "AUTOPILOT",
+              "RSA",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           switch (selectedItem.value) {
-            case "스타보트 러더값":
+            case "스타보트 센서":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < rsa.data.length; i++) {
-                analysisData.value.push(rsa.data[i].starboardruddersensor);
+              for (let i = 0; i < rsa.length; i++) {
+                analysisData.value.push(rsa[i].starboardruddersensor);
 
                 analysisTime.value.push(
-                  rsa.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  rsa[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree(°)";
@@ -873,14 +789,14 @@ const searchData = async () => {
               console.log(analysisTime.value);
               console.log(selectedtrialNum.value);
               break;
-            case "포트 러더값":
+            case "포트 센서":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < rsa.data.length; i++) {
-                analysisData.value.push(rsa.data[i].portruddersensor);
+              for (let i = 0; i < rsa.length; i++) {
+                analysisData.value.push(rsa[i].portruddersensor);
 
                 analysisTime.value.push(
-                  rsa.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  rsa[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "degree(°)";
@@ -897,227 +813,138 @@ const searchData = async () => {
         try {
           let no1engine_panel_61444;
           if (voyagesearch.value) {
-            no1engine_panel_61444 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_61444/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_61444 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_61444",
+              selectedtrialNum.value
             );
           } else {
-            no1engine_panel_61444 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_61444",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_61444 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_61444",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+
           let no1engine_panel_65262;
           if (voyagesearch.value) {
-            no1engine_panel_65262 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65262/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_65262 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_65262",
+              selectedtrialNum.value
             );
           } else {
-            no1engine_panel_65262 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_65262",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_65262 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_65262",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+
           let no1engine_panel_65263;
           if (voyagesearch.value) {
-            no1engine_panel_65263 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65263/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_65263 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_65263",
+              selectedtrialNum.value
             );
           } else {
-            no1engine_panel_65263 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_65263",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_65263 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_65263",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+          
           let no1engine_panel_65272;
           if (voyagesearch.value) {
-            no1engine_panel_65272 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65272/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_65272 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_65272",
+              selectedtrialNum.value
             );
           } else {
-            no1engine_panel_65272 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_65272",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_65272 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_65272",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+
           let no1engine_panel_65271;
           if (voyagesearch.value) {
-            no1engine_panel_65271 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65271/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_65271 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_65271",
+              selectedtrialNum.value
             );
           } else {
-            no1engine_panel_65271 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_65271",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_65271 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_65271",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+
           let no1engine_panel_65253;
           if (voyagesearch.value) {
-            no1engine_panel_65253 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65253/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_65253 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_65253",
+              selectedtrialNum.value
             );
           } else {
-            no1engine_panel_65253 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_65253",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_65253 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_65253",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+
           let no1engine_panel_65270;
           if (voyagesearch.value) {
-            no1engine_panel_65270 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65270/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_65270 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_65270",
+              selectedtrialNum.value
             );
+            console.log('여깁니다용',no1engine_panel_65270);
           } else {
-            no1engine_panel_65270 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_65270",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_65270 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_65270",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
 
           let no1engine_panel_65276;
           if (voyagesearch.value) {
-            no1engine_panel_65276 = await axios.post(
-              `http://192.168.0.73:8080/data/no1enginepanel/no1engine_panel_65276/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no1engine_panel_65276 = await readDataTrial(
+              tokenid.value,
+              "no1enginepanel/no1engine_panel_65276",
+              selectedtrialNum.value
             );
           } else {
-            no1engine_panel_65276 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO1ENGINEPANEL",
-                  content: "NO1ENGINE_PANEL_65276",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no1engine_panel_65276 = await readDataDate(
+              tokenid.value,
+              "NO1ENGINEPANEL",
+              "NO1ENGINE_PANEL_65276",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
 
@@ -1125,13 +952,11 @@ const searchData = async () => {
             case "엔진1 속도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_61444.data.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_61444.data[i].engine_SPEED
-                );
+              for (let i = 0; i < no1engine_panel_61444.length; i++) {
+                analysisData.value.push(no1engine_panel_61444[i].engine_SPEED);
 
                 analysisTime.value.push(
-                  no1engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_61444[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "RPM";
@@ -1144,13 +969,13 @@ const searchData = async () => {
             case "엔진1 오일 온도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65262.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65262.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65262.data[i].engine_OIL_TEMPERATURE1
+                  no1engine_panel_65262[i].engine_OIL_TEMPERATURE1
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65262[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1164,13 +989,13 @@ const searchData = async () => {
             case "엔진1 오일 압력":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65263.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65263.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65263.data[i].engine_OIL_PRESSURE
+                  no1engine_panel_65263[i].engine_OIL_PRESSURE
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1184,13 +1009,13 @@ const searchData = async () => {
             case "엔진1 냉각수 량":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65263.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65263.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65263.data[i].engine_COOLANT_LEVEL
+                  no1engine_panel_65263[i].engine_COOLANT_LEVEL
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "%";
@@ -1204,13 +1029,13 @@ const searchData = async () => {
             case "엔진1 변속기 오일 압력":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65272.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65272.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65272.data[i].transmission_OIL_PRESSURE
+                  no1engine_panel_65272[i].transmission_OIL_PRESSURE
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65272[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1224,13 +1049,13 @@ const searchData = async () => {
             case "엔진1 충전 시스템 전압":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65271.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65271.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65271.data[i].charging_SYSTEM_POTENTIAL
+                  no1engine_panel_65271[i].charging_SYSTEM_POTENTIAL
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1244,13 +1069,13 @@ const searchData = async () => {
             case "엔진1 배터리 전압":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65271.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65271.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65271.data[i].battery_POTENTIAL
+                  no1engine_panel_65271[i].battery_POTENTIAL
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1264,13 +1089,13 @@ const searchData = async () => {
             case "엔진1 누적 가동시간":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65253.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65253.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65253.data[i].engine_TOTAL_HOURS
+                  no1engine_panel_65253[i].engine_TOTAL_HOURS
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65253[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "hr";
@@ -1284,13 +1109,12 @@ const searchData = async () => {
             case "엔진1 흡입 매니폴드 압력":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65270.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65270.data[i]
-                    .engine_INTAKE_MANIFOLD_NO1_PRESSURE
+                  no1engine_panel_65270[i].engine_INTAKE_MANIFOLD_NO1_PRESSURE
                 );
                 analysisTime.value.push(
-                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1305,13 +1129,13 @@ const searchData = async () => {
             case "엔진1 흡입 매니폴드 온도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65270.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65270.data[i].engine_INTAKE_MANIFOLD_NO1_TEMP
+                  no1engine_panel_65270[i].engine_INTAKE_MANIFOLD_NO1_TEMP
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1325,13 +1149,13 @@ const searchData = async () => {
             case "엔진1 배기가스 온도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65270.data.length; i++) {
+              for (let i = 0; i < no1engine_panel_65270.length; i++) {
                 analysisData.value.push(
-                  no1engine_panel_65270.data[i].engine_EXHAUST_GAS_TEMPERATURE
+                  no1engine_panel_65270[i].engine_EXHAUST_GAS_TEMPERATURE
                 );
 
                 analysisTime.value.push(
-                  no1engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1345,13 +1169,11 @@ const searchData = async () => {
             case "엔진1 연료 량":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65276.data.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65276.data[i].fuel_LEVEL_1
-                );
+              for (let i = 0; i < no1engine_panel_65276.length; i++) {
+                analysisData.value.push(no1engine_panel_65276[i].fuel_LEVEL_1);
 
                 analysisTime.value.push(
-                  no1engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no1engine_panel_65276[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               selectedcontentsItem.value = "no1engine_panel_65270/Fuel Level";
@@ -1368,240 +1190,144 @@ const searchData = async () => {
         try {
           let no2engine_panel_61444;
           if (voyagesearch.value) {
-            no2engine_panel_61444 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_61444/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_61444 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_61444",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_61444 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_61444",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_61444 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_61444",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+
           let no2engine_panel_65262;
           if (voyagesearch.value) {
-            no2engine_panel_65262 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65262/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_65262 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_65262",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_65262 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_65262",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_65262 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_65262",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
+
           let no2engine_panel_65263;
           if (voyagesearch.value) {
-            no2engine_panel_65263 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65263/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_65263 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_65263",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_65263 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_65263",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_65263 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_65263",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           let no2engine_panel_65272;
           if (voyagesearch.value) {
-            no2engine_panel_65272 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65272/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_65272 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_65272",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_65272 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_65272",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_65272 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_65272",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           let no2engine_panel_65271;
           if (voyagesearch.value) {
-            no2engine_panel_65271 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65271/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_65271 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_65271",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_65271 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_65271",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_65271 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_65271",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           let no2engine_panel_65253;
           if (voyagesearch.value) {
-            no2engine_panel_65253 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65253/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_65253 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_65253",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_65253 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_65253",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_65253 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_65253",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           let no2engine_panel_65270;
           if (voyagesearch.value) {
-            no2engine_panel_65270 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65270/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_65270 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_65270",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_65270 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_65270",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_65270 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_65270",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
 
           let no2engine_panel_65276;
           if (voyagesearch.value) {
-            no2engine_panel_65276 = await axios.post(
-              `http://192.168.0.73:8080/data/no2enginepanel/no2engine_panel_65276/${selectedtrialNum.value}`,
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                },
-              }
+            no2engine_panel_65276 = await readDataTrial(
+              tokenid.value,
+              "no2enginepanel/no2engine_panel_65276",
+              selectedtrialNum.value
             );
           } else {
-            no2engine_panel_65276 = await axios.post(
-              "http://192.168.0.73:8080/data/period",
-              {},
-              {
-                headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${tokenid.value}`,
-                  subcomp: "NO2ENGINEPANEL",
-                  content: "NO2ENGINE_PANEL_65276",
-                  start: `${startDate2.value}`,
-                  end: `${endDate2.value}`,
-                },
-              }
+            no2engine_panel_65276 = await readDataDate(
+              tokenid.value,
+              "NO2ENGINEPANEL",
+              "NO2ENGINE_PANEL_65276",
+              `${startDate2.value}`,
+              `${endDate2.value}`
             );
           }
           switch (selectedItem.value) {
             case "엔진2 속도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_61444.data.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_61444.data[i].engine_SPEED
-                );
+              for (let i = 0; i < no2engine_panel_61444.length; i++) {
+                analysisData.value.push(no2engine_panel_61444[i].engine_SPEED);
 
                 analysisTime.value.push(
-                  no2engine_panel_61444.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_61444[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "RPM";
@@ -1614,13 +1340,13 @@ const searchData = async () => {
             case "엔진2 오일 온도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65262.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65262.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65262.data[i].engine_OIL_TEMPERATURE1
+                  no2engine_panel_65262[i].engine_OIL_TEMPERATURE1
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65262.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65262[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1634,13 +1360,13 @@ const searchData = async () => {
             case "엔진2 오일 압력":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65263.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65263.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65263.data[i].engine_OIL_PRESSURE
+                  no2engine_panel_65263[i].engine_OIL_PRESSURE
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1654,13 +1380,13 @@ const searchData = async () => {
             case "엔진2 냉각수 량":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65263.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65263.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65263.data[i].engine_COOLANT_LEVEL
+                  no2engine_panel_65263[i].engine_COOLANT_LEVEL
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65263.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "%";
@@ -1674,13 +1400,13 @@ const searchData = async () => {
             case "엔진2 변속기 오일 압력":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65272.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65272.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65272.data[i].transmission_OIL_PRESSURE
+                  no2engine_panel_65272[i].transmission_OIL_PRESSURE
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65272.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65272[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1694,13 +1420,13 @@ const searchData = async () => {
             case "엔진2 충전 시스템 전압":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65271.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65271.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65271.data[i].charging_SYSTEM_POTENTIAL
+                  no2engine_panel_65271[i].charging_SYSTEM_POTENTIAL
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1714,13 +1440,13 @@ const searchData = async () => {
             case "엔진2 배터리 전압":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65271.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65271.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65271.data[i].battery_POTENTIAL
+                  no2engine_panel_65271[i].battery_POTENTIAL
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65271.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "V";
@@ -1734,13 +1460,13 @@ const searchData = async () => {
             case "엔진2 누적 가동시간":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65253.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65253.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65253.data[i].engine_TOTAL_HOURS
+                  no2engine_panel_65253[i].engine_TOTAL_HOURS
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65253.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65253[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "hr";
@@ -1754,14 +1480,13 @@ const searchData = async () => {
             case "엔진2 흡입 매니폴드 압력":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
+              for (let i = 0; i < no2engine_panel_65270.length; i++) {
                 analysisData.value.push(
-                  no2engine_panel_65270.data[i]
-                    .engine_INTAKE_MANIFOLD_NO1_PRESSURE
+                  no2engine_panel_65270[i].engine_INTAKE_MANIFOLD_NO1_PRESSURE
                 );
 
                 analysisTime.value.push(
-                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "kPa";
@@ -1775,11 +1500,11 @@ const searchData = async () => {
             case "엔진2 흡입 매니폴드 온도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
-                analysisData.value.push(no2engine_panel_65270.data[i]);
+              for (let i = 0; i < no2engine_panel_65270.length; i++) {
+                analysisData.value.push(no2engine_panel_65270[i]);
 
                 analysisTime.value.push(
-                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1793,11 +1518,11 @@ const searchData = async () => {
             case "엔진2 배기가스 온도":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65270.data.length; i++) {
-                analysisData.value.push(no2engine_panel_65270.data[i]);
+              for (let i = 0; i < no2engine_panel_65270.length; i++) {
+                analysisData.value.push(no2engine_panel_65270[i]);
 
                 analysisTime.value.push(
-                  no2engine_panel_65270.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "°C";
@@ -1811,13 +1536,11 @@ const searchData = async () => {
             case "엔진2 연료 량":
               analysisData.value = [];
               analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65276.data.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65276.data[i].fuel_LEVEL_1
-                );
+              for (let i = 0; i < no2engine_panel_65276.length; i++) {
+                analysisData.value.push(no2engine_panel_65276[i].fuel_LEVEL_1);
 
                 analysisTime.value.push(
-                  no2engine_panel_65276.data[i].timestamp_EQUIPMENT.slice(8, 19)
+                  no2engine_panel_65276[i].timestamp_EQUIPMENT.slice(8, 19)
                 );
               }
               unit.value = "%";
@@ -1928,8 +1651,8 @@ const searchData = async () => {
       const numericValues = analysisData.value
         .map((value) => Number(value))
         .filter((value) => !isNaN(value));
-      
-      console.log(analysisData.value);      // if(analysisData)
+
+      console.log(analysisData.value); // if(analysisData)
 
       if (numericValues.length > 1) {
         // 최솟값 구하기
