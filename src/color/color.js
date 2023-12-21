@@ -1,0 +1,1 @@
+export const apiLocation ="#f0f0f0";

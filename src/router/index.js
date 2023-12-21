@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHashHistory } from "vue-router";
 
 const routes = [
   // view
@@ -16,11 +16,6 @@ const routes = [
     path: "/alldata",
     name: "alldata",
     component: () => import("../views/AllData.vue"),
-  },
-  {
-    path: "/usersetting",
-    name: "usersetting",
-    component: () => import("../views/UserSetting.vue"),
   },
   {
     path: "/mapview",
@@ -42,28 +37,13 @@ const routes = [
     name: "guest",
     component: () => import("../views/GuestPage.vue"),
   },
+  {
+    path: "/setting",
+    name: "setting",
+    component: () => import("../views/PersonalSetting.vue"),
+  },
 
   // components
-  {
-    path: "/ex1",
-    name: "ex1",
-    component: () => import("../components/EchartGraph/ExChart1.vue"),
-  },
-  {
-    path: "/sailling",
-    name: "sailling",
-    component: () => import("../components/SaillingLottie.vue"),
-  },
-  {
-    path: "/donutgraph",
-    name: "donutgraph",
-    component: () => import("../components/DonutGraph.vue"),
-  },
-  {
-    path: "/circulargauge",
-    name: "circulargauge",
-    component: () => import("../components/CircularGauge.vue"),
-  },
   {
     path: "/osmap",
     name: "osmap",
@@ -72,7 +52,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(process.env.BASE_URL),
   routes,
 });
 

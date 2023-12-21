@@ -156,7 +156,6 @@
           density="compact"
           hide-default-footer
           item-key="userName"
-          item-value="name"
           select-strategy="single"
           return-object
           show-select
@@ -192,6 +191,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import axios from "axios";
+import { readUserData, deleteUserData, updateUserData } from "../../api/index.js";
 
 const dialog = ref(false);
 const dialog2 = ref(false);
@@ -287,17 +287,13 @@ const check2 = () => {
   console.log(selectedemail.value);
 };
 
-const deleteData = () => {
+const deleteData = async () => {
   const data = {
     id: selectedId.value,
   };
   try {
-    axios.post("http://192.168.0.73:8080/admin/auth/userinfo/delete", data, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${tokenid.value}`,
-      },
-    });
+    await deleteUserData(tokenid.value, data);
+    
     dialog2.value = false;
     alert("선택된 사용자의 정보 삭제가 완료되었습니다.");
     location.reload();
@@ -330,26 +326,17 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 // 데이터 받아오기
 const fetchData = async () => {
   try {
-    const response = await axios.post(
-      "http://192.168.0.73:8080/admin/auth/userinfo/all",
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-    );
-    console.log(response.data);
-    for (let i = 0; i < response.data.length; i++) {
+    const response = await readUserData(tokenid.value);
+    console.log(response);
+    for (let i = 0; i < response.length; i++) {
       items.value.push({
-        userId: response.data[i].id || "",
-        userName: response.data[i].userName || "",
-        userGroup: response.data[i].userGroup || "",
-        department: response.data[i].department || "",
-        phoneNumber: response.data[i].phoneNumber || "",
-        description: response.data[i].description || "",
-        email: response.data[i].email || "",
+        userId: response[i].id || "",
+        userName: response[i].userName || "",
+        userGroup: response[i].userGroup || "",
+        department: response[i].department || "",
+        phoneNumber: response[i].phoneNumber || "",
+        description: response[i].description || "",
+        email: response[i].email || "",
       });
       // items.value.push(response.data[i]);
     }
@@ -361,7 +348,7 @@ const fetchData = async () => {
 
 fetchData();
 
-const changeData = () => {
+const changeData = async () => {
   if (rulesdepartment.value === true && rulesdescription.value === true) {
     console.log(selectedItems.value);
     try {
@@ -376,16 +363,7 @@ const changeData = () => {
       };
       console.log(data);
       try {
-        axios.post(
-          "http://192.168.0.73:8080/admin/auth/userinfo/update",
-          data,
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenid.value}`,
-            },
-          }
-        );
+        await updateUserData(tokenid.value, data);
         
         alert("선택된 사용자의 정보 수정이 완료되었습니다.");
       } catch (error) {

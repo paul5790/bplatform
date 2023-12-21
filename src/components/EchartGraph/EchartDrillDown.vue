@@ -46,6 +46,7 @@ import {
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted, watch } from "vue";
 import axios from "axios";
+import { readTrialData, readlossData, readTimeData } from "../../api/index.js";
 
 use([
   CanvasRenderer,
@@ -57,14 +58,16 @@ use([
   GraphicComponent,
 ]);
 
+const tokenid = ref(sessionStorage.getItem("token") || "");
+
 const trialrun = ref([]);
 const selectedtrialNum = ref();
 const trialNum = ref(1);
 
 const getTrialDate = async () => {
   try {
-    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
-    for (let i = 0; i < response.data.length; i++) {
+    const response = await readTrialData(tokenid.value);
+    for (let i = 0; i < response.length; i++) {
       trialrun.value.push(`항차 ${i + 1}번`);
       selectedtrialNum.value = trialrun.value[0];
     }
@@ -359,29 +362,8 @@ const axioslist = ref([
   "no2enginepanel/no2engine_panel_65376",
   "no2enginepanel/no2engine_panel_65379",
 ]);
-const tokenid = ref(sessionStorage.getItem("token") || "");
+
 const settingTime = ref(5);
-
-// lossdata 시간 설정
-const lossdataTime = async () => {
-  try {
-    const response = await axios.post(
-      `http://192.168.0.73:8080/info/lossdata`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-    );
-    settingTime.value = response.data.countDelay;
-  } catch (error) {
-    // console.error(error);
-    // console.log(`${endpoint} 데이터가 없음`);
-  }
-};
-
 
 const loading = ref(true);
 const fetchData = async () => {
@@ -389,32 +371,16 @@ const fetchData = async () => {
   try {
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
-        const timedata = await axios.post(
-          "http://192.168.0.73:8080/info/get/settime",
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenid.value}`,
-            },
-          }
-        );
-        await (settingTime.value = timedata.data.lossTime);
-        const response = await axios.post(
-          `http://192.168.0.73:8080/info/lossdata/${endpoint}/${trialNum.value}/${settingTime.value}`,
-          {},
-          {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenid.value}`, // response 변수의 정의가 필요함
-            },
-          }
-        );
+        const timedata = await readTimeData(tokenid.value);
 
+        await (settingTime.value = timedata.lossTime);
+
+        const response = await readlossData(tokenid.value, endpoint, trialNum.value, settingTime.value);
+        
         dataRefs[i].value = 0;
-        dataRefs[i].value += Number(response.data.countDelay);
+        dataRefs[i].value += Number(response.countDelay);
         alldataRefs[i].value = 0;
-        alldataRefs[i].value += Number(response.data.numOfData);
+        alldataRefs[i].value += Number(response.numOfData);
       } catch (error) {
         //console.error(error);
       }

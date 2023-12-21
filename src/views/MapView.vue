@@ -44,7 +44,16 @@ const initializeMap = (waypoints, ais, startlocation, endlocation) => {
 
   // 마커 추가 (예제 마커)
   L.marker(startlocation.value).addTo(state.map).bindPopup("start").openPopup();
-  L.marker(endlocation.value).addTo(state.map).bindPopup("end");
+
+    const redIcon = new L.Icon({
+    iconUrl: "/image/marker-icon-2x-red.png",
+    shadowUrl: "/image/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });
+  L.marker(endlocation.value, { icon: redIcon }).addTo(state.map).bindPopup("end");
 
   const greenIcon = new L.Icon({
     iconUrl: "/image/marker-icon-2x-green.png",

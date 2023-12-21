@@ -19,7 +19,6 @@
       :items-per-page="itemsPerPage"
       density="dense"
       hide-default-footer
-      item-value="name"
       return-object
     >
       <template v-slot:[`item.actions`]="{ item }">
@@ -72,6 +71,7 @@
 import MapView from "../views/MapView.vue";
 import { ref, computed, watch, defineEmits, onMounted } from "vue";
 import axios from "axios";
+import { readTrialData } from "../api/index.js";
 
 const emits = defineEmits(["trial"]);
 const page = ref(1);
@@ -89,7 +89,7 @@ const headers = ref([
   { title: "해역 위치", align: "start", key: "location" },
   { title: "저장 용량", align: "start", key: "storage" },
   
-  // { title: "설명", align: "start", key: "description" },
+  { title: "설명", align: "start", key: "description" },
 ]);
 
 const items = ref([]);
@@ -112,20 +112,12 @@ watch(dialog, (val) => {
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const fetchData = async () => {
   try {
-    const response = await axios.post(
-      "http://192.168.0.73:8080/info/seatrial",
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid.value}`,
-        },
-      }
-    );
+    const response = await readTrialData(tokenid.value);
+    
     const newItems = [];
-    for (let i = 0; i < response.data.length; i++) {
-      const startTime = new Date(response.data[i].startTimeUtc);
-      const endTime = new Date(response.data[i].endTimeUtc);
+    for (let i = 0; i < response.length; i++) {
+      const startTime = new Date(response[i].startTimeUtc);
+      const endTime = new Date(response[i].endTimeUtc);
 
       const timeDiff = endTime - startTime;
       const hours = Math.floor(timeDiff / (1000 * 60 * 60));
@@ -136,15 +128,15 @@ const fetchData = async () => {
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       newItems.push({
-        division: response.data[i].seatrialId,
-        name: response.data[i].name,
-        shipid: response.data[i].shipId,
-        startdate: response.data[i].startTimeUtc,
-        purpose: response.data[i].testPurpose,
-        location: response.data[i].navigationArea,
-        storage: response.data[i].storageSize + "MB",
-        enddate: response.data[i].endTimeUtc,
-        description: response.data[i].description,
+        division: response[i].seatrialId,
+        name: response[i].name,
+        shipid: response[i].shipId,
+        startdate: response[i].startTimeUtc,
+        purpose: response[i].testPurpose,
+        location: response[i].navigationArea,
+        storage: response[i].storageSize,
+        enddate: response[i].endTimeUtc,
+        description: response[i].description,
         time: formattedTime,
       });
     }

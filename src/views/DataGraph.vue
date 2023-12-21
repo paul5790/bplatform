@@ -116,7 +116,6 @@
                     style=""
                     :headers="headers"
                     :items="analysis"
-                    item-value="name"
                   >
                   </v-data-table-virtual>
                 </v-card-item>

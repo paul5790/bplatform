@@ -3,6 +3,7 @@
     <v-tabs style="height: 5vh; margin-left: 15px;" v-model="tab" color="#009dff" align-tabs="start">
       <v-tab :value="1">항차 설정</v-tab>
       <v-tab :value="2">사용자 설정</v-tab>
+      <v-tab :value="3">로그 설정</v-tab>
     </v-tabs>
     <v-window v-model="tab" style="box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); border-radius: 8px; margin-top: 8px;">
       <v-window-item v-for="n in 3" :key="n" :value="n">
@@ -11,7 +12,7 @@
         <div v-if="tab === 1">
           <!-- Move v-if here -->
           <div class="component-container">
-            <VoyageManage />
+            <VoyageManage @overlayemit="overlayEmit"/>
             
           </div>
         </div>
@@ -21,17 +22,25 @@
             <UserSetting />
           </div>
         </div>
-        <!-- <div v-if="tab === 3">
+        <div v-if="tab === 3">
            Move v-if here
           <div class="component-container">
             <LogViewing />
-            <SettingAll/>
+            <!-- <SettingAll/> -->
           </div>
-        </div> -->
+        </div>
         </v-card-item>
         </v-card>
       </v-window-item>
     </v-window>
+    <!-- 로딩 오버레이 설정 -->
+    <v-overlay v-model="overlay" contained class="align-center justify-center">
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+    </v-overlay>
   </div>
 </template>
 
@@ -42,13 +51,18 @@ import VoyageManage from "../components/Manage/VoyageManage";
 import UserSetting from "../components/Manage/UserSetting";
 import LogViewing from "../components/Manage/LogViewing";
 
-
+const overlay = ref(false);
 const tab = ref(Number(sessionStorage.getItem("admintab")) || null);
 watch(tab, (newValue, oldValue) => {
   console.log(`Tab changed from ${oldValue} to ${newValue}`);
   sessionStorage.setItem("admintab", newValue.toString());
 });
 
+const overlayEmit = (dataFromChild) => {
+  console.log(3);
+  // 여기서 다른 로직을 수행하거나 최상위 부모로 다시 데이터를 전달할 수 있음
+  console.log(dataFromChild);
+};
 
 </script>
 

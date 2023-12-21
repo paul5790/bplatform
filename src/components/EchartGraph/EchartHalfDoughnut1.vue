@@ -14,6 +14,7 @@ import {
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, computed, onMounted, watch } from "vue";
 import axios from "axios";
+import { serverStorage } from "../../api/index.js";
 use([
   CanvasRenderer,
   PieChart,
@@ -22,25 +23,25 @@ use([
   LegendComponent,
 ]);
 
+const tokenid = ref(sessionStorage.getItem("token") || "");
+
 const serverInUsedSize = ref(0);
 const dbSize = ref(0);
 const serverRemainingSize = ref(0);
 
 const fetchData = async () => {
   try {
-    const response = await axios.post(
-      "http://192.168.0.73:8080/info/storage/db"
-    );
-    console.log(`${parseFloat(response.data.serverInUsedSize)} serversize`);
-    console.log(`${parseFloat(response.data.dbSize)} serversize`);
-    console.log(`${parseFloat(response.data.serverRemainingSize)} serversize`);
+    const response = await serverStorage(tokenid.value);
+    console.log(`${parseFloat(response.serverInUsedSize)} serversize`);
+    console.log(`${parseFloat(response.dbSize)} serversize`);
+    console.log(`${parseFloat(response.serverRemainingSize)} serversize`);
 
-    serverInUsedSize.value = parseFloat(response.data.serverInUsedSize).toFixed(
+    serverInUsedSize.value = parseFloat(response.serverInUsedSize).toFixed(
       2
     );
-    dbSize.value = parseFloat(response.data.dbSize).toFixed(2);
+    dbSize.value = parseFloat(response.dbSize).toFixed(2);
     serverRemainingSize.value = parseFloat(
-      response.data.serverRemainingSize
+      response.serverRemainingSize
     ).toFixed(2);
   } catch (error) {
     console.error(error);

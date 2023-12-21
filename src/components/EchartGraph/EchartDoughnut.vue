@@ -14,6 +14,7 @@ import {
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide } from "vue";
 import axios from "axios";
+import { readDataStorage } from "../../api/index.js";
 
 const DGPS = ref({ value: 0, name: "DGPS", itemStyle: { color: "#2Fe7b3" }  });
 const GYRO = ref({ value: 0, name: "GYRO" });
@@ -28,10 +29,11 @@ const AUTOPILOTCONTACT = ref({ value: 0, name: "AUTOPILOTCONTACT", itemStyle: { 
 const NO1ENGINEPANEL = ref({ value: 0, name: "NO.1ENGINEPANEL" });
 const NO2ENGINEPANEL = ref({ value: 0, name: "NO.2ENGINEPANEL" });
 
+const tokenid = ref(sessionStorage.getItem("token") || "");
+
 const fetchData = async () => {
   try {
-    const response = await axios.post('http://192.168.0.73:8080/info/storage/table');
-    const data = response.data;
+    const data = await readDataStorage(tokenid.value);
 
     data.forEach((item) => {
       // Extracting the prefix before the underscore

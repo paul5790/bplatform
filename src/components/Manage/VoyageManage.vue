@@ -13,7 +13,7 @@
       <v-card-item>
         <v-row class="dialog-row">
           <!-- 종료 후 저장 -->
-          <div class="dialog-div">
+          <div class="dialog-div" style="display: flex; margin-right: 0">
             <v-btn
               v-if="startstate"
               color="blue"
@@ -23,7 +23,7 @@
               시운전 진행중..(종료하기)
             </v-btn>
             <v-dialog v-model="dialog1_1" persistent width="800">
-              <v-card>
+              <v-card style="background-color: #fdfdfd;">
                 <v-card-title>
                   <span class="text-h5">항차 측정 종료</span>
                 </v-card-title>
@@ -57,11 +57,18 @@
                 <v-card-actions style="margin-top: 0px">
                   <v-spacer></v-spacer>
                   <v-btn
-                    color="blue-darken-1"
+                    color="grey-darken-1"
                     variant="text"
                     @click="nullDialog1_1()"
                   >
                     뒤로가기
+                  </v-btn>
+                  <v-btn
+                    color="deep-orange-lighten-2"
+                    variant="text"
+                    @click="cancelData()"
+                  >
+                    측정취소
                   </v-btn>
                   <v-btn
                     color="blue-darken-1"
@@ -579,6 +586,7 @@
               </v-card>
             </v-dialog>
           </div>
+          <!-- 삭제하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
             <v-btn color="blue" @click="openDialog4()"> 삭제하기 </v-btn>
 
@@ -617,7 +625,6 @@
           :items-per-page="itemsPerPage"
           density="compact"
           hide-default-footer
-          item-value="name"
           select-strategy="single"
           return-object
           show-select
@@ -647,12 +654,20 @@
         </v-data-table>
       </v-card-item>
     </v-card>
+    <v-overlay v-model="overlay" contained class="align-center justify-center overlay">
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+    </v-overlay>
   </v-sheet>
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watchEffect } from "vue";
+import { computed, ref, onMounted, watchEffect, defineEmits } from "vue";
 import axios from "axios";
+import { createTrialData, updateTrialData, deleteTrialData, readTrialData } from "../../api/index.js";
 
 // 데이트 피커 제한
 const currentDate = new Date();
@@ -660,6 +675,8 @@ const currentTime = {
   hours: new Date().getHours(),
   minutes: new Date().getMinutes(),
 };
+
+const emit = defineEmits(["overlay"])
 
 // 데이터 테이블 하단 바 설정
 const page = ref(1);
@@ -670,6 +687,8 @@ const dialog2 = ref(false);
 const dialog3 = ref(false);
 const dialog4 = ref(false);
 const message = ref("항차 테이블 정보 로딩중...");
+
+const overlay = ref(false);
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
@@ -847,18 +866,6 @@ const openDialog4 = () => {
   }
 };
 
-const username = ref("홍길동");
-
-const selectItem = (item) => {
-  alert(item.name);
-  selectedData.value = item;
-  name.value = item.name;
-  startdate.value = item.startdate;
-  enddate.value = item.enddate;
-  description.value = item.description;
-  modifieduser.value = item.username;
-};
-
 const nullDialog1 = () => {
   dialog1.value = false;
   startname.value = null;
@@ -936,7 +943,9 @@ const waitStart = () => {
 };
 
 // 종료하기 후 저장
-const startData = () => {
+const startData = async () => {
+  overlay.value = true;
+  dialog1_1.value = false;
   sessionStorage.setItem("startstate", "false");
   startstate.value = false;
 
@@ -962,12 +971,8 @@ const startData = () => {
   };
   console.log(data);
   try {
-    axios.post("http://192.168.0.73:8080/admin/set/info/seatrial", data, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${tokenid.value}`,
-      },
-    });
+    await createTrialData(tokenid.value, data);
+
     sessionStorage.removeItem("name");
     sessionStorage.removeItem("testPurpose");
     sessionStorage.removeItem("navigationArea");
@@ -975,6 +980,8 @@ const startData = () => {
     sessionStorage.removeItem("endTimeUtc");
     sessionStorage.removeItem("description");
 
+    // console.log(response.data);
+    overlay.value = false;
     alert("항차 측정이 종료됩니다.");
     location.reload();
   } catch (error) {
@@ -985,8 +992,23 @@ const startData = () => {
   nullDialog1_1();
 };
 
+// 종료하기 후 취소
+const cancelData= async () => {
+    sessionStorage.removeItem("name");
+    sessionStorage.removeItem("testPurpose");
+    sessionStorage.removeItem("navigationArea");
+    sessionStorage.removeItem("startTimeUtc");
+    sessionStorage.removeItem("endTimeUtc");
+    sessionStorage.removeItem("description");
+    sessionStorage.setItem("startstate", "false");
+    startstate.value = false;
+    alert("항차 측정이 종료됩니다.");
+    location.reload();
+    nullDialog1_1();
+}
+
 //추가하기
-const editData = () => {
+const editData = async () => {
   console.log(items.value.division);
   console.log(editstartdate.value.getTime(), editenddate.value.getTime());
   console.log(editstartdate.value.getTime() === editenddate.value.getTime());
@@ -1019,6 +1041,8 @@ const editData = () => {
       alert("선택된 날짜에 항차가 이미 존재합니다.");
     } else {
       try {
+        overlay.value = true;
+        dialog2.value = false;
         const division = sessionStorage.getItem("division") || null;
         const data = {
           seatrialId: division,
@@ -1034,16 +1058,11 @@ const editData = () => {
         };
         console.log(data);
         try {
-          axios.post("http://192.168.0.73:8080/admin/set/info/seatrial", data, {
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${tokenid.value}`,
-            },
-          });
-
+          await createTrialData(tokenid.value, data);
+          overlay.value = false;
           alert("항차 추가가 완료되었습니다.");
-          dialog2.value = false;
           nullDialog2();
+          // console.log("API 응답 데이터:", response.data);
           location.reload();
         } catch (error) {
           // 특정 에러인 경우에 따라 다르게 처리합니다.
@@ -1068,7 +1087,9 @@ const editData = () => {
 };
 
 // 수정하기
-const changeData = () => {
+const changeData = async () => {
+  overlay.value = true;
+  dialog3.value = false;
   const startDate = new Date(selectedstartdate.value);
   const endDate = new Date(selectedenddate.value);
 
@@ -1126,18 +1147,10 @@ const changeData = () => {
         };
         console.log(data);
         try {
-          axios.post(
-            "http://192.168.0.73:8080/admin/update/info/seatrial",
-            data,
-            {
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${tokenid.value}`,
-              },
-            }
-          );
+          await updateTrialData(tokenid.value, data);
+          
           alert("선택된 항차의 수정이 완료되었습니다.");
-          dialog3.value = false;
+          overlay.value = false;
           nullDialog3();
           location.reload();
         } catch (error) {
@@ -1168,36 +1181,46 @@ const changeData = () => {
 };
 
 // 삭제하기
-const deleteData = () => {
+const deleteData = async () => {
+  // overlay.value = true;
+  overlayemit(true);
+  dialog4.value = false;
   const data = {
     seatrialId: selecteddivision.value,
   };
   try {
-    axios.post("http://192.168.0.73:8080/admin/delete/info/seatrial", data, {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${tokenid.value}`,
-      },
-    });
-    dialog4.value = false;
+    await deleteTrialData(tokenid.value, data);
+
     alert("선택한 항차의 삭제가 완료되었습니다.");
+    overlayemit(false);
+    overlay.value = false;
     location.reload();
   } catch (error) {
     console.error("An error occurred in waitStart:", error);
   }
 };
 
+// emits
+const overlayemit = (data) => {
+  // 로그아웃 로직을 구현
+  console.log(1);
+  emit("overlay", data);
+  console.log(2);
+};
+
+
+
 // 데이터 테이블 헤더
 const headers = ref([
   { title: "항차", align: "start", key: "division" },
-  { title: "Ship ID", align: "start", key: "shipid" },
-  { title: "진행 시간", align: "start", key: "time" },
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "끝시간", align: "start", key: "enddate" },
+  { title: "진행 시간", align: "start", key: "time" },
+  { title: "Ship ID", align: "start", key: "shipid" },
   { title: "이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
   { title: "해역 위치", align: "start", key: "location" },
-  // { title: "저장 용량", align: "start", key: "storage" },
+  { title: "저장 용량", align: "start", key: "storage" },
   { title: "설명", align: "start", key: "description" },
   // { title: "입력자", align: "end", key: "user" },
 ]);
@@ -1206,10 +1229,11 @@ const items = ref([]);
 // 데이터 받아오기
 const fetchData = async () => {
   try {
-    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
-    for (let i = 0; i < response.data.length; i++) {
-      const startTime = new Date(response.data[i].startTimeUtc);
-      const endTime = new Date(response.data[i].endTimeUtc);
+    items.value = [];
+    const response = await readTrialData(tokenid.value);
+    for (let i = 0; i < response.length; i++) {
+      const startTime = new Date(response[i].startTimeUtc);
+      const endTime = new Date(response[i].endTimeUtc);
 
       const timeDiff = endTime - startTime;
       const hours = Math.floor(timeDiff / (1000 * 60 * 60));
@@ -1217,7 +1241,7 @@ const fetchData = async () => {
       const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
 
       timeRange.value.push(
-        `${response.data[i].startTimeUtc.slice(0, 19)}~${response.data[
+        `${response[i].startTimeUtc.slice(0, 19)}~${response[
           i
         ].endTimeUtc.slice(0, 19)}`
       );
@@ -1226,25 +1250,31 @@ const fetchData = async () => {
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       items.value.push({
         index: i,
-        division: response.data[i].seatrialId,
-        name: response.data[i].name,
-        shipid: response.data[i].shipId,
-        startdate: response.data[i].startTimeUtc,
-        purpose: response.data[i].testPurpose,
-        location: response.data[i].navigationArea,
-        // storage: response.data[i].storageSize + "MB",
-        enddate: response.data[i].endTimeUtc,
-        description: response.data[i].description,
+        division: response[i].seatrialId,
+        name: response[i].name,
+        shipid: response[i].shipId,
+        startdate: response[i].startTimeUtc,
+        purpose: response[i].testPurpose,
+        location: response[i].navigationArea,
+        storage: response[i].storageSize + "MB",
+        enddate: response[i].endTimeUtc,
+        description: response[i].description,
         time: formattedTime,
       });
-      if (i === response.data.length - 1) {
+      if (i === response.length - 1) {
         sessionStorage.setItem(
           "division",
-          Number(response.data[i].seatrialId) + 1
+          Number(response[i].seatrialId) + 1
         );
       }
     }
-    division.value = Number(response.data.length);
+    items.value.sort((a, b) => {
+      const dateA = new Date(a.startdate);
+      const dateB = new Date(b.startdate);
+      return dateB - dateA;
+    });
+    
+    division.value = Number(response.length);
     console.log(timeRange.value);
     // sessionStorage.setItem("division", division.value.toString());
   } catch (error) {
@@ -1256,15 +1286,6 @@ const fetchData = async () => {
 onMounted(() => {
   fetchData();
 });
-
-const handleButtonClick = () => {
-  let check = checkIfRangeExists();
-  if (check) {
-    console.log("존재합니다");
-  } else {
-    console.log("존재하지 않습니다");
-  }
-};
 
 const checkIfRangeExists = (range) => {
   // 선택한 범위와 시련 기간을 비교하여 겹치는 부분이 있는지 확인하는 함수
@@ -1294,14 +1315,12 @@ const checkIfRangeExists = (range) => {
     isOverlap(selectedRange, trialRange)
   );
 
-  // if (checkrange === range){
-  //   return false;
-  // }else{
   return isExist;
-  //}
 };
 
 console.log(items);
 </script>
 
-<style scoped></style>
+<style scoped>
+
+</style>

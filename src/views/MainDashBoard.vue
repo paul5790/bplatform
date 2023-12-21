@@ -107,13 +107,21 @@
 
             <v-list>
               <v-list-item
-                v-for="(item, index) in list_item"
                 :key="index"
                 :value="index"
-                @click="handleListItemClick(item.title)"
+                :to="`/setting`"
+                @click="handleListItemClick(`사용자 환경설정`)"
               >
-                <v-list-item-title>{{ item.title }}</v-list-item-title>
+                <v-list-item-title>사용자 환경설정</v-list-item-title>
               </v-list-item>
+              <v-list-item
+                :key="index"
+                :value="index"
+                @click="logoutDialog = true"
+              >
+                <v-list-item-title>로그아웃</v-list-item-title>
+              </v-list-item>
+      
             </v-list>
           </v-menu>
         </v-app-bar>
@@ -344,6 +352,7 @@ const settimeDialog = ref(false);
 const selected_item = ref(sessionStorage.getItem("page") || "대시보드");
 const change = ref(true);
 const passwordchangeDialog = ref(false);
+const overlay = ref(false);
 
 watchEffect(() => {
   //
@@ -356,16 +365,7 @@ const getSelectedMenuItemFromURL = () => {
 const handleListItemClick = (itemTitle) => {
   if (itemTitle === "로그 아웃") {
     logoutDialog.value = true;
-  } else if (itemTitle === "개인정보 변경") {
-    fetchData();
-    privacyDialog.value = true;
-  } else if (itemTitle === "소실주기 설정") {
-    fetchData();
-    settimeDialog.value = true;
-  } else if (itemTitle === "비밀번호 변경") {
-    fetchData();
-    passwordchangeDialog.value = true;
-  } else {
+  }else {
     selected_item.value = itemTitle;
     sessionStorage.setItem("page", itemTitle.toString());
 
@@ -641,7 +641,6 @@ const fetchData = async () => {
   }
 };
 
-
 onMounted(() => {
   checkScreenSize();
   fetchData();
@@ -676,19 +675,5 @@ const permission = ref(sessionStorage.getItem("isAdmin"));
 const userid = ref(sessionStorage.getItem("userid"));
 const toolbarname = ref(`${userid.value}(${permission.value})`);
 
-const list_item = ref([]);
-if (permission.value === "GUEST") {
-  list_item.value = [
-    { title: "개인정보 변경" },
-    { title: "비밀번호 변경" },
-    { title: "로그 아웃" },
-  ];
-} else {
-  list_item.value = [
-    { title: "소실주기 설정" },
-    { title: "개인정보 변경" },
-    { title: "비밀번호 변경" },
-    { title: "로그 아웃" },
-  ];
-}
+
 </script>

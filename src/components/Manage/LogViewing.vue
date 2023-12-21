@@ -9,7 +9,6 @@
       :items-per-page="itemsPerPage"
       hide-default-footer
       density="compact"
-      item-value="name"
     >
       <template v-slot:bottom>
         <div class="text-center pt-2">

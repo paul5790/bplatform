@@ -1,4 +1,4 @@
-import { createApp} from "vue";
+import { createApp } from "vue";
 import App from "./App.vue";
 import router from "./router";
 import vuetify from "./plugins/vuetify";
@@ -15,7 +15,11 @@ loadFonts();
 createApp(App)
   .use(Vue3Lottie)
   .use(router)
-  .use(vuetify)
+  .use(vuetify, {
+    theme: {
+      dark: true,
+    },
+  })
   .use(VueApexCharts)
   .use(socket, "ws://192.168.0.73:8080/ws/shipinfo")
   .component("VueDatePicker", VueDatePicker)

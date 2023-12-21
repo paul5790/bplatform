@@ -205,12 +205,10 @@
               <v-data-table
                 v-if="!loading"
                 v-model="selectedData"
-                v-model:page="page"
                 :items-per-page="itemsPerPage"
                 :density="'dense'"
                 :headers="headerName"
                 :items="dataSet"
-                item-value="name"
                 return-object
                 style="padding-top: 5px"
               >
@@ -227,12 +225,13 @@
                   </v-sheet>
                 </template>
                 <template v-slot:bottom>
-                  <div class="text-center pt-2">
+                  <div class="text-center pt-2 mb-5">
                     <v-pagination
                       v-model="page"
                       :length="pageCount"
                       :total-visible="8"
-                    ></v-pagination>
+                    >
+                    </v-pagination>
                   </div>
                 </template>
               </v-data-table>
@@ -243,15 +242,25 @@
       <!-- 데이터 다운로드 -->
       <v-card-actions>
         <v-spacer></v-spacer>
+        <v-select
+          v-model="selectDownlodFormat"
+          :items="downloadFormat"
+          density="compact"
+          label="format"
+          style="max-width: 150px; margin-top: 20px"
+          variant="solo"
+        ></v-select>
         <!-- <select v-model="selectDownlodFormat">
           <option value="xlsx">Excel (xlsx)</option>
           <option value="txt">Text (txt)</option>
           <option value="csv">CSV (csv)</option>
         </select> -->
         <v-btn
+          :loading="downloadBtnLoading"
           color="white"
-          style="background-color: #009dff; margin-top: 10px"
+          style="background-color: #009dff; margin-top: 0px; margin-left: 20px"
           @click="dataDownload()"
+          :disabled="downloadBtnDisabled"
           >데이터 다운로드</v-btn
         >
       </v-card-actions>
@@ -265,6 +274,8 @@ import axios from "axios";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
+import { readTrialData, readDataTrial, readDataDate } from "../api/index.js";
+import JSZip from "jszip";
 
 const tab = ref(0);
 // const initializeData = () => {
@@ -272,23 +283,25 @@ const tab = ref(0);
 //   fetchData();
 // };
 const tokenid = ref(sessionStorage.getItem("token") || "");
-const itemsPerPage = ref(11);
+const itemsPerPage = ref(20);
 const page = ref(1);
 const headerName = ref([]); // 빈 배열로 초기화
 const dataSet = ref([]); // 빈 배열로 초기화
+const backDataSet = ref([]); // 빈 배열로 초기화
 const selectedData = ref([]); //
 const message = ref("데이터가 존재하지 않습니다.");
 const searchstart = ref(false);
 const loading = ref(false);
 const loadingpercent = ref(0);
+const beforePage = ref("GLL");
+const downloadBtnDisabled = ref(true);
+const downloadBtnLoading = ref(false);
 
 watch(selectedData, (newVal, oldVal) => {
   tab.value = 0;
 });
 
-const pageCount = computed(() => {
-  return Math.ceil(dataSet.value.length / itemsPerPage.value);
-});
+const pageCount = ref(0);
 
 // 셀렉바 메뉴
 const firstSelect = ref([
@@ -426,10 +439,10 @@ const selectedtrialNum = ref();
 
 const getTrialDate = async () => {
   try {
-    const response = await axios.post("http://192.168.0.73:8080/info/seatrial");
-    for (let i = 0; i < response.data.length; i++) {
-      setStartTime.value.push(`${response.data[i].startTimeUtc}`);
-      setEndTime.value.push(`${response.data[i].endTimeUtc}`);
+    const response = await readTrialData(tokenid.value);
+    for (let i = 0; i < response.length; i++) {
+      setStartTime.value.push(`${response[i].startTimeUtc}`);
+      setEndTime.value.push(`${response[i].endTimeUtc}`);
       voyage.value.push(`항차 ${i + 1}번`);
     }
   } catch (error) {
@@ -502,30 +515,93 @@ watchEffect(() => {
   }
 });
 let dataValues1 = [];
+
+const downloadFormat = ref(["xlsx", "csv", "txt"]);
 const selectDownlodFormat = ref("xlsx");
 // 데이터 다운로드
-const dataDownload = () => {
+const dataDownload = async () => {
   if (!selectedData.value || selectedData.value.length === 0) {
     alert("선택안됌");
   } else {
     try {
-      const workbook = XLSX.utils.book_new();
+      const zip = new JSZip();
       const dataValues = Object.values(selectedData.value);
-      console.log(dataValues1);
-      for (let i = 0; i < downloadData.length; i++) {
-        const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-        XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+
+      if (selectDownlodFormat.value === "xlsx") {
+        // xlsx 선택 시
+        const workbook = XLSX.utils.book_new();
+        for (let i = 0; i < downloadData.length; i++) {
+          const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+          XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+        }
+        XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
+      } else {
+        for (let i = 0; i < downloadData.length; i++) {
+          let content, fileName;
+
+          if (selectDownlodFormat.value === "csv") {
+            // csv 선택 시
+            content = Papa.unparse(downloadData[i].value);
+            fileName = `${dataValues[i]}_csv.csv`;
+          } else if (selectDownlodFormat.value === "txt") {
+            // txt 선택 시
+            content = JSON.stringify(downloadData[i].value, null, 2);
+            fileName = `${dataValues[i]}_txt.txt`;
+          }
+
+          // xlsx가 아닌 경우 파일을 zip에 추가
+          if (selectDownlodFormat.value !== "xlsx") {
+            zip.file(fileName, content);
+          }
+        }
+        // zip 파일 다운로드
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        saveAs(zipBlob, `${daterange.value}_${selectDownlodFormat.value}.zip`);
       }
-      XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
     } catch (error) {
       alert(
-        selectDownlodFormat.value,
-        "다운로드 할 데이터가 존재하지 않습니다."
+        `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
       );
-      console.log(error);
+      console.error(error);
     }
   }
 };
+
+// // 데이터 다운로드
+// const dataDownload = async () => {
+//   downloadBtnLoading.value = true;
+
+//   if (!selectedData.value || selectedData.value.length === 0) {
+//     alert("선택안됌");
+//     downloadBtnLoading.value = false;
+//   } else {
+//     setTimeout(async () => {
+//       await selectedDataDownload();
+//       await additionalAsyncOperation();
+//     }, 500);
+//   }
+// };
+
+// const selectedDataDownload = async () => {
+//   try {
+//     const workbook = XLSX.utils.book_new();
+//     console.log(dataValues1);
+//     for (let i = 0; i < downloadData.length; i++) {
+//       const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+//       XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+//     }
+//     XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
+//   } catch (error) {
+//     alert("다운로드 할 데이터가 존재하지 않습니다.");
+//     console.log(error);
+//   }
+// };
+
+// const additionalAsyncOperation = async () => {
+//   // 파일 다운로드 완료 후 수행되어야 할 비동기 작업
+//   console.log("Additional async operation after file download");
+//   downloadBtnLoading.value = false;
+// };
 
 // const selectDownlodFormat = ref("xlsx");
 
@@ -577,45 +653,18 @@ const dataDownload = () => {
 
 // 검색 이벤트
 const searchData = () => {
-  // if (selectedvoyage.value === "직접 선택") {
-  //   date_readonly.value = false;
-  //   voyagesearch.value = false;
-  //   console.log(dateRange.value);
-  //   let start1, end1;
-  //   if (dateRange.value[0] instanceof Date && dateRange.value[1] instanceof Date) {
-  //     start1 = dateRange.value[0].toISOString();
-  //     end1 = dateRange.value[1].toISOString();
-  //     console.log(start1);
-  //     console.log(end1);
-  //   } else {
-  //     // 예외처리: dateRange.value[0] 또는 dateRange.value[1]이 Invalid Date인 경우
-  //     console.error("Invalid date values in dateRange");
-  //     // 여기에서 적절한 대체 값이나 오류 처리를 추가할 수 있습니다.
-  //   }
-  //   searchStart.value = start1;
-  //   searchEnd.value = end1;
-  // }
   loading.value = true;
-  console.log(selectedData.value);
   headerVariables.forEach((variable) => (variable.value = []));
   dataVariables.forEach((variable) => (variable.value = []));
   downloadData = [];
   dataValues1 = [];
-  console.log(startDate.value);
-  console.log(endDate.value);
   selectedData.value = contentsSelectedItems.value;
-  console.log(selectedData.value[0]);
   let variableName = getVariableName(selectedData.value).value;
-  console.log(variableName);
 
   let start = new Date(dateRange.value[0]);
   let end = new Date(dateRange.value[1]);
   start.setHours(start.getHours() + 9);
   end.setHours(end.getHours() + 9);
-
-  console.log(start);
-  console.log(end);
-
   startDate.value = start.toISOString();
   endDate.value = end.toISOString();
   tab.value = 0;
@@ -639,13 +688,7 @@ const searchData = () => {
   } else {
     console.error("Invalid date values in dateRange.value");
   }
-
-  console.log("fetch");
   searchstart.value = true;
-
-  tabAction();
-  console.log("ftch");
-  // Fetch data when selected items change
 };
 
 const getVariableName = (item) => {
@@ -655,22 +698,13 @@ const getVariableName = (item) => {
     RMC: "dgps/rmc",
     VTG: "dgps/vtg",
     ZDA: "dgps/zda",
-    // DTM: "dgps/dtm",
     GSV: "dgps/gsv",
     GSA: "dgps/gsa",
 
-    // THS: "gyro/ths",
     HDT: "gyro/hdt",
     ROT: "gyro/rot",
 
     MWV: "anemometer/mwv",
-    // MWD: "anemometer/mwd",
-    // VWR: "anemometer/vwr",
-    // MTW: "anemometer/mtw",
-    // VWT: "anemometer/vwt",
-
-    // TTM: "radar/ttm",
-    // TLL: "radar/tll",
     RADAR_SCREEN: "radar/radarscreen",
 
     VDM: "ais/vdm",
@@ -682,7 +716,6 @@ const getVariableName = (item) => {
     ECDIS_SCREEN: "ecdis/ecdisscreen",
 
     RSA: "autopilot/rsa",
-    // MODE: "autopilot/mode",
     HTD: "autopilot/htd",
 
     VBW: "speedlog/vbw",
@@ -741,6 +774,8 @@ const getVariableName = (item) => {
 };
 
 const fetchData = async (data) => {
+  downloadBtnDisabled.value = true;
+  loadingpercent.value = 0.0;
   console.log(data);
   if (voyagesearch.value) {
     for (let i = 0; i < data.length; i++) {
@@ -753,7 +788,14 @@ const fetchData = async (data) => {
           const dataheader = ref(
             Object.keys(response.data[0]).reduce((acc, key) => {
               if (key.toLowerCase() !== "id") {
-                acc.push({ title: key, align: "start", key });
+                let modifiedKey = key;
+                if (key === "timestamp_PUBLISH") {
+                  modifiedKey = "timestamp_PUBLISH(UTC+9)";
+                } else if (key === "timestamp_EQUIPMENT") {
+                  modifiedKey = "timestamp_EQUIPMENT(UTC+9)";
+                }
+
+                acc.push({ title: modifiedKey, align: "start", key });
               }
               return acc;
             }, [])
@@ -762,24 +804,23 @@ const fetchData = async (data) => {
           if (dataheader.value == null) {
             console.log("null");
           } else {
-            console.log(data[i]);
-            console.log(response.data);
-            console.log(dataheader.value);
-            console.log(data.length);
+            updateTable();
             switchValue(data[i], dataheader, response);
-            await tabAction();
-            
           }
         } else {
+          updateTable();
           console.log("Response data is empty or undefined");
         }
-        loadingpercent.value = ((i / (data.length)) * 100).toFixed(1);
-            if (i === data.length - 1) {
-              loading.value = false;
-            }
-
-        // console.log(`${response.data[0]} dataheaderdata!!`);
-        // console.log(`${response.data} responsedata!!`);
+        loadingpercent.value = ((i + 1) / 1) * 100;
+        if (data.length === 1) {
+          loading.value = false;
+        } else {
+          if (i === 1) {
+            loading.value = false;
+          } else if (i == data.length - 1) {
+            downloadBtnDisabled.value = false;
+          }
+        }
       } catch (error) {
         console.error(error);
       }
@@ -819,26 +860,34 @@ const fetchData = async (data) => {
             // }))
             Object.keys(response.data[0]).reduce((acc, key) => {
               if (key.toLowerCase() !== "id") {
-                acc.push({ title: key, align: "start", key });
+                let modifiedKey = key;
+                if (key === "timestamp_PUBLISH") {
+                  modifiedKey = "timestamp_PUBLISH(UTC+9)";
+                } else if (key === "timestamp_EQUIPMENT") {
+                  modifiedKey = "timestamp_EQUIPMENT(UTC+9)";
+                }
+                acc.push({ title: modifiedKey, align: "start", key });
               }
               return acc;
             }, [])
           );
 
-          console.log(data[i]);
+          updateTable();
           switchValue(data[i], dataheader, response);
-          await tabAction();
-          
         } else {
+          updateTable();
           console.log("Response data is empty or undefined");
         }
         loadingpercent.value = ((i / (data.length - 1)) * 100).toFixed(1);
-          if (i === data.length - 1) {
+        if (data.length === 1) {
+          loading.value = false;
+        } else {
+          if (i === 1) {
             loading.value = false;
+          } else if (i == data.length - 1) {
+            downloadBtnDisabled.value = false;
           }
-
-        // console.log(`${response.data[0]} dataheaderdata!!`);
-        // console.log(`${response.data} responsedata!!`);
+        }
       } catch (error) {
         console.error(error);
       }
@@ -846,422 +895,495 @@ const fetchData = async (data) => {
   }
 };
 
-const axioslist = ref([
-  "dgps/gll",
-  "dgps/gga",
-  "dgps/rmc",
-  "dgps/vtg",
-  "dgps/zda",
-  "dgps/dtm",
-  "dgps/gsv",
-  "dgps/gsa",
-  "gyro/ths",
-  "gyro/hdt",
-  "gyro/rot",
-  "anemometer/mwv",
-  "anemometer/mwd",
-  "anemometer/vwr",
-  "anemometer/mtw",
-  "anemometer/vwt",
-  "radar/ttm",
-  "radar/tll",
-  "radar/screen",
-  "ais/vdm",
-  "ais/vdo",
-  "ecdis/routeinfo",
-  "ecdis/waypoints",
-  "ecdis/rtz",
-  "ecdis/ecdisscreen",
-  "autopilot/rsa",
-  "autopilot/mode",
-  "autopilot/htd",
-  "speedlog/vbw",
-  "speedlog/vhw",
-  "speedlog/vlw",
-  "no1enginepanel/no1engine_panel_61444",
-  "no1enginepanel/no1engine_panel_65262",
-  "no1enginepanel/no1engine_panel_65263",
-  "no1enginepanel/no1engine_panel_65272",
-  "no1enginepanel/no1engine_panel_65271",
-  "no1enginepanel/no1engine_panel_65253",
-  "no1enginepanel/no1engine_panel_65270",
-  "no1enginepanel/no1engine_panel_65276",
-  "no1enginepanel/no1engine_panel_65360",
-  "no1enginepanel/no1engine_panel_65361_lamp",
-  "no1enginepanel/no1engine_panel_65361_status",
-  "no1enginepanel/no1engine_panel_65378",
-  "no1enginepanel/no1engine_panel_65376",
-  "no1enginepanel/no1engine_panel_65379",
-  "no2enginepanel/no2engine_panel_61444",
-  "no2enginepanel/no2engine_panel_65262",
-  "no2enginepanel/no2engine_panel_65263",
-  "no2enginepanel/no2engine_panel_65272",
-  "no2enginepanel/no2engine_panel_65271",
-  "no2enginepanel/no2engine_panel_65253",
-  "no2enginepanel/no2engine_panel_65270",
-  "no2enginepanel/no2engine_panel_65276",
-  "no2enginepanel/no2engine_panel_65360",
-  "no2enginepanel/no2engine_panel_65361_lamp",
-  "no2enginepanel/no2engine_panel_65361_status",
-  "no2enginepanel/no2engine_panel_65378",
-  "no2enginepanel/no2engine_panel_65376",
-  "no2enginepanel/no2engine_panel_65379",
-]);
+const updateData = async (data, header, page) => {
+  // 미리 보여질 일부 데이터를 설정
+  const initialData = data.slice(0 + (page - 1) * 21, 21 + (page - 1) * 21);
+  headerName.value = header;
+  dataSet.value = initialData;
+};
 
-// 초기 데이터 요청 및 주기적 데이터 업데이트 설정
-// onMounted(fetchData); // 초기 데이터 요청
-
-// 데이터 셋에 저장된 데이터 넣기
-const tabAction = async () => {
+const updateTable = async () => {
   const selectedTab = selectedData.value[tab.value];
-  console.log(selectedTab);
-  page.value = 1;
-
-  const fetchDataForTab = async (data, header) => {
-    // 여기서 비동기 작업을 처리하고, 예를 들어 axios를 사용할 경우
-    // await axios.post(...)와 같이 사용합니다.
-    // dataSet.value와 headerName.value에 값을 할당하는 부분이 들어가야 합니다.
-    dataSet.value = data;
-    headerName.value = header;
-  };
-
-  // Find the selected data based on the tab value
+  // page.value = 1;
+  itemsPerPage.value = 21;
+  if (beforePage.value != selectedTab) {
+    page.value = 1;
+    beforePage.value = selectedTab;
+  }
   switch (selectedTab) {
     case "GLL":
-      console.log(GLL.value);
-      itemsPerPage.value = 11;
-      dataSet.value = GLL.value;
-      console.log(dataSet.value);
-      headerName.value = GLLheader.value;
-      console.log(headerName.value);
+      backDataSet.value = GLL.value;
+      pageCount.value = Math.ceil(GLL.value.length / itemsPerPage.value);
+      updateData(GLL.value, GLLheader.value, page.value);
       break;
     case "GGA":
-      itemsPerPage.value = 11;
-      await fetchDataForTab(GGA.value, GGAheader.value);
-      // dataSet.value = GGA.value;
-      // headerName.value = GGAheader.value;
+      backDataSet.value = GGA.value;
+      pageCount.value = Math.ceil(GGA.value.length / itemsPerPage.value);
+      updateData(GGA.value, GGAheader.value, page.value);
       break;
     case "RMC":
-      itemsPerPage.value = 11;
-      dataSet.value = RMC.value;
-      headerName.value = RMCheader.value;
+      backDataSet.value = RMC.value;
+      pageCount.value = Math.ceil(RMC.value.length / itemsPerPage.value);
+      updateData(RMC.value, RMCheader.value, page.value);
       break;
     case "VTG":
-      itemsPerPage.value = 11;
-      dataSet.value = VTG.value;
-      headerName.value = VTGheader.value;
+      backDataSet.value = VTG.value;
+      pageCount.value = Math.ceil(VTG.value.length / itemsPerPage.value);
+      updateData(VTG.value, VTGheader.value, page.value);
       break;
     case "ZDA":
-      itemsPerPage.value = 22;
-      dataSet.value = ZDA.value;
-      headerName.value = ZDAheader.value;
+      backDataSet.value = ZDA.value;
+      pageCount.value = Math.ceil(ZDA.value.length / itemsPerPage.value);
+      updateData(ZDA.value, ZDAheader.value, page.value);
       break;
-    // case "DTM":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = DTM.value;
-    //   headerName.value = DTMheader.value;
-    //   break;
     case "GSV":
-      itemsPerPage.value = 11;
-      dataSet.value = GSV.value;
-      headerName.value = GSVheader.value;
+      backDataSet.value = GSV.value;
+      pageCount.value = Math.ceil(GSV.value.length / itemsPerPage.value);
+      updateData(GSV.value, GSVheader.value, page.value);
       break;
     case "GSA":
-      itemsPerPage.value = 11;
-      dataSet.value = GSA.value;
-      headerName.value = GSAheader.value;
+      backDataSet.value = GSA.value;
+      pageCount.value = Math.ceil(GSA.value.length / itemsPerPage.value);
+      updateData(GSA.value, GSAheader.value, page.value);
       break;
-    // case "THS":
-    //   itemsPerPage.value = 22;
-    //   dataSet.value = THS.value;
-    //   headerName.value = THSheader.value;
-    //   break;
     case "HDT":
-      itemsPerPage.value = 22;
-      dataSet.value = HDT.value;
-      headerName.value = HDTheader.value;
+      backDataSet.value = HDT.value;
+      pageCount.value = Math.ceil(HDT.value.length / itemsPerPage.value);
+      updateData(HDT.value, HDTheader.value, page.value);
       break;
     case "ROT":
-      itemsPerPage.value = 22;
-      dataSet.value = ROT.value;
-      headerName.value = ROTheader.value;
+      backDataSet.value = ROT.value;
+      pageCount.value = Math.ceil(ROT.value.length / itemsPerPage.value);
+      updateData(ROT.value, ROTheader.value, page.value);
       break;
     case "MWV":
-      itemsPerPage.value = 11;
-      dataSet.value = MWV.value;
-      headerName.value = MWVheader.value;
+      backDataSet.value = MWV.value;
+      pageCount.value = Math.ceil(MWV.value.length / itemsPerPage.value);
+      updateData(MWV.value, MWVheader.value, page.value);
       break;
-    // case "MWD":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = MWD.value;
-    //   headerName.value = MWDheader.value;
-    //   break;
-    // case "VWR":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = VWR.value;
-    //   headerName.value = VWRheader.value;
-    //   break;
-    // case "MTW":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = MTW.value;
-    //   headerName.value = MTWheader.value;
-    //   break;
-    // case "VWT":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = VWT.value;
-    //   headerName.value = VWTheader.value;
-    //   break;
-    // case "TTM":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = TTM.value;
-    //   headerName.value = TTMheader.value;
-    //   break;
-    // case "TLL":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = TLL.value;
-    //   headerName.value = TLLheader.value;
-    //   break;
     case "RADAR_SCREEN":
-      itemsPerPage.value = 11;
-      dataSet.value = RADAR_SCREEN.value;
-      headerName.value = RADAR_SCREENheader.value;
+      backDataSet.value = RADAR_SCREEN.value;
+      pageCount.value = Math.ceil(
+        RADAR_SCREEN.value.length / itemsPerPage.value
+      );
+      updateData(RADAR_SCREEN.value, RADAR_SCREENheader.value, page.value);
       break;
     case "VDM":
-      itemsPerPage.value = 11;
-      dataSet.value = VDM.value;
-      headerName.value = VDMheader.value;
+      backDataSet.value = VDM.value;
+      pageCount.value = Math.ceil(VDM.value.length / itemsPerPage.value);
+      updateData(VDM.value, VDMheader.value, page.value);
       break;
     case "VDO":
-      itemsPerPage.value = 11;
-      dataSet.value = VDO.value;
-      headerName.value = VDOheader.value;
+      backDataSet.value = VDO.value;
+      pageCount.value = Math.ceil(VDO.value.length / itemsPerPage.value);
+      updateData(VDO.value, VDOheader.value, page.value);
       break;
     case "ROUTEINFO":
-      itemsPerPage.value = 11;
-      dataSet.value = ROUTEINFO.value;
-      headerName.value = ROUTEINFOheader.value;
+      backDataSet.value = ROUTEINFO.value;
+      pageCount.value = Math.ceil(ROUTEINFO.value.length / itemsPerPage.value);
+      updateData(ROUTEINFO.value, ROUTEINFOheader.value, page.value);
       break;
     case "WAYPOINTS":
-      itemsPerPage.value = 11;
-      dataSet.value = WAYPOINTS.value;
-      headerName.value = WAYPOINTSheader.value;
+      backDataSet.value = WAYPOINTS.value;
+      pageCount.value = Math.ceil(WAYPOINTS.value.length / itemsPerPage.value);
+      updateData(WAYPOINTS.value, WAYPOINTSheader.value, page.value);
       break;
     case "RTZ":
-      itemsPerPage.value = 11;
-      dataSet.value = RTZ.value;
-      headerName.value = RTZheader.value;
+      backDataSet.value = RTZ.value;
+      pageCount.value = Math.ceil(RTZ.value.length / itemsPerPage.value);
+      updateData(RTZ.value, RTZheader.value, page.value);
       break;
     case "ECDIS_SCREEN":
-      itemsPerPage.value = 11;
-      dataSet.value = ECDIS_SCREEN.value;
-      headerName.value = ECDIS_SCREENheader.value;
+      backDataSet.value = ECDIS_SCREEN.value;
+      pageCount.value = Math.ceil(
+        ECDIS_SCREEN.value.length / itemsPerPage.value
+      );
+      updateData(ECDIS_SCREEN.value, ECDIS_SCREENheader.value, page.value);
       break;
     case "RSA":
-      itemsPerPage.value = 22;
-      dataSet.value = RSA.value;
-      headerName.value = RSAheader.value;
+      backDataSet.value = RSA.value;
+      pageCount.value = Math.ceil(RSA.value.length / itemsPerPage.value);
+      updateData(RSA.value, RSAheader.value, page.value);
       break;
-    // case "MODE":
-    //   itemsPerPage.value = 11;
-    //   dataSet.value = MODE.value;
-    //   headerName.value = MODEheader.value;
-    //   break;
     case "HTD":
-      itemsPerPage.value = 11;
-      dataSet.value = HTD.value;
-      headerName.value = HTDheader.value;
+      backDataSet.value = HTD.value;
+      pageCount.value = Math.ceil(HTD.value.length / itemsPerPage.value);
+      updateData(HTD.value, HTDheader.value, page.value);
       break;
     case "VBW":
-      itemsPerPage.value = 11;
-      dataSet.value = VBW.value;
-      headerName.value = VBWheader.value;
+      backDataSet.value = VBW.value;
+      pageCount.value = Math.ceil(VBW.value.length / itemsPerPage.value);
+      updateData(VBW.value, VBWheader.value, page.value);
       break;
     case "VHW":
-      itemsPerPage.value = 11;
-      dataSet.value = VHW.value;
-      headerName.value = VHWheader.value;
+      backDataSet.value = VHW.value;
+      pageCount.value = Math.ceil(VHW.value.length / itemsPerPage.value);
+      updateData(VHW.value, VHWheader.value, page.value);
       break;
     case "VLW":
-      itemsPerPage.value = 11;
-      dataSet.value = VLW.value;
-      headerName.value = VLWheader.value;
+      backDataSet.value = VLW.value;
+      pageCount.value = Math.ceil(VLW.value.length / itemsPerPage.value);
+      updateData(VLW.value, VLWheader.value, page.value);
       break;
     case "CAN_Online_State":
-      itemsPerPage.value = 11;
-      dataSet.value = CAN_Online_State.value;
-      headerName.value = CAN_Online_Stateheader.value;
+      backDataSet.value = CAN_Online_State.value;
+      pageCount.value = Math.ceil(
+        CAN_Online_State.value.length / itemsPerPage.value
+      );
+      updateData(
+        CAN_Online_State.value,
+        CAN_Online_Stateheader.value,
+        page.value
+      );
       break;
     case "Engine_RPM":
-      itemsPerPage.value = 11;
-      dataSet.value = Engine_RPM.value;
-      headerName.value = Engine_RPMheader.value;
+      backDataSet.value = Engine_RPM.value;
+      pageCount.value = Math.ceil(Engine_RPM.value.length / itemsPerPage.value);
+      updateData(Engine_RPM.value, Engine_RPMheader.value, page.value);
       break;
     case "Rudder":
-      itemsPerPage.value = 11;
-      dataSet.value = Rudder.value;
-      headerName.value = Rudderheader.value;
+      backDataSet.value = Rudder.value;
+      pageCount.value = Math.ceil(Rudder.value.length / itemsPerPage.value);
+      updateData(Rudder.value, Rudderheader.value, page.value);
       break;
     case "Rudder_Scale":
-      itemsPerPage.value = 11;
-      dataSet.value = Rudder_Scale.value;
-      headerName.value = Rudder_Scaleheader.value;
+      backDataSet.value = Rudder_Scale.value;
+      pageCount.value = Math.ceil(
+        Rudder_Scale.value.length / itemsPerPage.value
+      );
+      updateData(Rudder_Scale.value, Rudder_Scaleheader.value, page.value);
       break;
     case "AUTOPILOTCONTACT":
-      itemsPerPage.value = 11;
-      dataSet.value = AUTOPILOTCONTACT.value;
-      headerName.value = AUTOPILOTCONTACTheader.value;
+      backDataSet.value = AUTOPILOTCONTACT.value;
+      pageCount.value = Math.ceil(
+        AUTOPILOTCONTACT.value.length / itemsPerPage.value
+      );
+      updateData(
+        AUTOPILOTCONTACT.value,
+        AUTOPILOTCONTACTheader.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_61444":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_61444.value;
-      headerName.value = NO1ENGINE_PANEL_61444header.value;
+      backDataSet.value = NO1ENGINE_PANEL_61444.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_61444.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_61444.value,
+        NO1ENGINE_PANEL_61444header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65262":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65262.value;
-      headerName.value = NO1ENGINE_PANEL_65262header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65262.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65262.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65262.value,
+        NO1ENGINE_PANEL_65262header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65263":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65263.value;
-      headerName.value = NO1ENGINE_PANEL_65263header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65263.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65263.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65263.value,
+        NO1ENGINE_PANEL_65263header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65272":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65272.value;
-      headerName.value = NO1ENGINE_PANEL_65272header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65272.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65272.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65272.value,
+        NO1ENGINE_PANEL_65272header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65271":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65271.value;
-      headerName.value = NO1ENGINE_PANEL_65271header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65271.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65271.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65271.value,
+        NO1ENGINE_PANEL_65271header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65253":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65253.value;
-      headerName.value = NO1ENGINE_PANEL_65253header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65253.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65253.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65253.value,
+        NO1ENGINE_PANEL_65253header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65270":
-      itemsPerPage.value = 11;
-      dataSet.value = NO1ENGINE_PANEL_65270.value;
-      headerName.value = NO1ENGINE_PANEL_65270header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65270.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65270.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65270.value,
+        NO1ENGINE_PANEL_65270header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65276":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65276.value;
-      headerName.value = NO1ENGINE_PANEL_65276header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65276.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65276.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65276.value,
+        NO1ENGINE_PANEL_65276header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65360":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65360.value;
-      headerName.value = NO1ENGINE_PANEL_65360header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65360.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65360.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65360.value,
+        NO1ENGINE_PANEL_65360header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65361_LAMP":
-      itemsPerPage.value = 11;
-      dataSet.value = NO1ENGINE_PANEL_65361_LAMP.value;
-      headerName.value = NO1ENGINE_PANEL_65361_LAMPheader.value;
+      backDataSet.value = NO1ENGINE_PANEL_65361_LAMP.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65361_LAMP.value,
+        NO1ENGINE_PANEL_65361_LAMPheader.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65361_STATUS":
-      itemsPerPage.value = 11;
-      dataSet.value = NO1ENGINE_PANEL_65361_STATUS.value;
-      headerName.value = NO1ENGINE_PANEL_65361_STATUSheader.value;
+      backDataSet.value = NO1ENGINE_PANEL_65361_STATUS.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65361_STATUS.value,
+        NO1ENGINE_PANEL_65361_STATUSheader.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65378":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65378.value;
-      headerName.value = NO1ENGINE_PANEL_65378header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65378.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65378.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65378.value,
+        NO1ENGINE_PANEL_65378header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65376":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65376.value;
-      headerName.value = NO1ENGINE_PANEL_65376header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65376.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65376.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65376.value,
+        NO1ENGINE_PANEL_65376header.value,
+        page.value
+      );
       break;
     case "NO.1ENGINE_PANEL_65379":
-      itemsPerPage.value = 22;
-      dataSet.value = NO1ENGINE_PANEL_65379.value;
-      headerName.value = NO1ENGINE_PANEL_65379header.value;
+      backDataSet.value = NO1ENGINE_PANEL_65379.value;
+      pageCount.value = Math.ceil(
+        NO1ENGINE_PANEL_65379.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO1ENGINE_PANEL_65379.value,
+        NO1ENGINE_PANEL_65379header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_61444":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_61444.value;
-      headerName.value = NO2ENGINE_PANEL_61444header.value;
+      backDataSet.value = NO2ENGINE_PANEL_61444.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_61444.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_61444.value,
+        NO2ENGINE_PANEL_61444header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65262":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65262.value;
-      headerName.value = NO2ENGINE_PANEL_65262header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65262.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65262.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65262.value,
+        NO2ENGINE_PANEL_65262header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65263":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65263.value;
-      headerName.value = NO2ENGINE_PANEL_65263header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65263.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65263.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65263.value,
+        NO2ENGINE_PANEL_65263header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65272":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65272.value;
-      headerName.value = NO2ENGINE_PANEL_65272header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65272.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65272.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65272.value,
+        NO2ENGINE_PANEL_65272header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65271":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65271.value;
-      headerName.value = NO2ENGINE_PANEL_65271header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65271.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65271.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65271.value,
+        NO2ENGINE_PANEL_65271header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65253":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65253.value;
-      headerName.value = NO2ENGINE_PANEL_65253header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65253.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65253.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65253.value,
+        NO2ENGINE_PANEL_65253header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65270":
-      itemsPerPage.value = 11;
-      dataSet.value = NO2ENGINE_PANEL_65270.value;
-      headerName.value = NO2ENGINE_PANEL_65270header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65270.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65270.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65270.value,
+        NO2ENGINE_PANEL_65270header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65276":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65276.value;
-      headerName.value = NO2ENGINE_PANEL_65276header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65276.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65276.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65276.value,
+        NO2ENGINE_PANEL_65276header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65360":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65360.value;
-      headerName.value = NO2ENGINE_PANEL_65360header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65360.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65360.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65360.value,
+        NO2ENGINE_PANEL_65360header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65361_LAMP":
-      itemsPerPage.value = 11;
-      dataSet.value = NO2ENGINE_PANEL_65361_LAMP.value;
-      headerName.value = NO2ENGINE_PANEL_65361_LAMPheader.value;
+      backDataSet.value = NO2ENGINE_PANEL_65361_LAMP.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65361_LAMP.value,
+        NO2ENGINE_PANEL_65361_LAMPheader.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65361_STATUS":
-      itemsPerPage.value = 11;
-      dataSet.value = NO2ENGINE_PANEL_65361_STATUS.value;
-      headerName.value = NO2ENGINE_PANEL_65361_STATUSheader.value;
+      backDataSet.value = NO2ENGINE_PANEL_65361_STATUS.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65361_STATUS.value,
+        NO2ENGINE_PANEL_65361_STATUSheader.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65378":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65378.value;
-      headerName.value = NO2ENGINE_PANEL_65378header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65378.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65378.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65378.value,
+        NO2ENGINE_PANEL_65378header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65376":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65376.value;
-      headerName.value = NO2ENGINE_PANEL_65376header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65376.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65376.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65376.value,
+        NO2ENGINE_PANEL_65376header.value,
+        page.value
+      );
       break;
     case "NO.2ENGINE_PANEL_65379":
-      itemsPerPage.value = 22;
-      dataSet.value = NO2ENGINE_PANEL_65379.value;
-      headerName.value = NO2ENGINE_PANEL_65379header.value;
+      backDataSet.value = NO2ENGINE_PANEL_65379.value;
+      pageCount.value = Math.ceil(
+        NO2ENGINE_PANEL_65379.value.length / itemsPerPage.value
+      );
+      updateData(
+        NO2ENGINE_PANEL_65379.value,
+        NO2ENGINE_PANEL_65379header.value,
+        page.value
+      );
       break;
     default:
       console.error("Invalid tab value:", selectedTab);
   }
+  console.log("updateTable");
 };
 
 const initializeData = () => {
   // dataSet.value = []; // dataSet 초기화
 };
 watchEffect(() => {
-  tabAction();
   initializeData();
+  updateTable();
 });
 
 const GLLheader = ref([]);
@@ -1269,19 +1391,11 @@ const GGAheader = ref([]);
 const RMCheader = ref([]);
 const VTGheader = ref([]);
 const ZDAheader = ref([]);
-// const DTMheader = ref([]);
 const GSVheader = ref([]);
 const GSAheader = ref([]);
-// const THSheader = ref([]);
 const HDTheader = ref([]);
 const ROTheader = ref([]);
 const MWVheader = ref([]);
-// const MWDheader = ref([]);
-// const VWRheader = ref([]);
-// const MTWheader = ref([]);
-// const VWTheader = ref([]);
-// const TTMheader = ref([]);
-// const TLLheader = ref([]);
 const RADAR_SCREENheader = ref([]);
 const VDMheader = ref([]);
 const VDOheader = ref([]);
@@ -1290,7 +1404,6 @@ const WAYPOINTSheader = ref([]);
 const RTZheader = ref([]);
 const ECDIS_SCREENheader = ref([]);
 const RSAheader = ref([]);
-// const MODEheader = ref([]);
 const HTDheader = ref([]);
 const VBWheader = ref([]);
 const VHWheader = ref([]);
@@ -1335,19 +1448,11 @@ const GGA = ref([]);
 const RMC = ref([]);
 const VTG = ref([]);
 const ZDA = ref([]);
-// const DTM = ref([]);
 const GSV = ref([]);
 const GSA = ref([]);
-// const THS = ref([]);
 const HDT = ref([]);
 const ROT = ref([]);
 const MWV = ref([]);
-// const MWD = ref([]);
-// const VWR = ref([]);
-// const MTW = ref([]);
-// const VWT = ref([]);
-// const TTM = ref([]);
-// const TLL = ref([]);
 const RADAR_SCREEN = ref([]);
 const VDM = ref([]);
 const VDO = ref([]);
@@ -1356,7 +1461,6 @@ const WAYPOINTS = ref([]);
 const RTZ = ref([]);
 const ECDIS_SCREEN = ref([]);
 const RSA = ref([]);
-// const MODE = ref([]);
 const HTD = ref([]);
 const VBW = ref([]);
 const VHW = ref([]);
@@ -1401,19 +1505,11 @@ const headerVariables = [
   RMCheader,
   VTGheader,
   ZDAheader,
-  // DTMheader,
   GSVheader,
   GSAheader,
-  // THSheader,
   HDTheader,
   ROTheader,
   MWVheader,
-  // MWDheader,
-  // VWRheader,
-  // MTWheader,
-  // VWTheader,
-  // TTMheader,
-  // TLLheader,
   RADAR_SCREENheader,
   VDMheader,
   VDOheader,
@@ -1422,7 +1518,6 @@ const headerVariables = [
   RTZheader,
   ECDIS_SCREENheader,
   RSAheader,
-  // MODEheader,
   HTDheader,
   VBWheader,
   VHWheader,
@@ -1468,19 +1563,11 @@ const dataVariables = [
   RMC,
   VTG,
   ZDA,
-  // DTM,
   GSV,
   GSA,
-  // THS,
   HDT,
   ROT,
   MWV,
-  // MWD,
-  // VWR,
-  // MTW,
-  // VWT,
-  // TTM,
-  // TLL,
   RADAR_SCREEN,
   VDM,
   VDO,
@@ -1489,7 +1576,6 @@ const dataVariables = [
   RTZ,
   ECDIS_SCREEN,
   RSA,
-  // MODE,
   HTD,
   VBW,
   VHW,
@@ -1563,12 +1649,6 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(ZDA);
       dataValues1.push("ZDA");
       break;
-    // case "dgps/dtm":
-    //   DTMheader.value = dataheader.value;
-    //   DTM.value = response.data;
-    //   downloadData.push(DTM);
-    //   dataValues1.push("DTM");
-    //   break;
     case "dgps/gsv":
       GSVheader.value = dataheader.value;
       GSV.value = response.data;
@@ -1581,12 +1661,6 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(GSA);
       dataValues1.push("GSA");
       break;
-    // case "gyro/ths":
-    //   THSheader.value = dataheader.value;
-    //   THS.value = response.data;
-    //   downloadData.push(THS);
-    //   dataValues1.push("THS");
-    //   break;
     case "gyro/hdt":
       HDTheader.value = dataheader.value;
       HDT.value = response.data;
@@ -1605,44 +1679,6 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(MWV);
       dataValues1.push("MWV");
       break;
-    // case "anemometer/mwd":
-    //   MWDheader.value = dataheader.value;
-    //   MWD.value = response.data;
-    //   downloadData.push(MWD);
-    //   dataValues1.push("MWD");
-    //   break;
-    // case "anemometer/vwr":
-    //   VWRheader.value = dataheader.value;
-    //   VWR.value = response.data;
-    //   downloadData.push(VWR);
-    //   dataValues1.push("VWR");
-    //   break;
-    // case "anemometer/mtw":
-    //   MTWheader.value = dataheader.value;
-    //   MTW.value = response.data;
-    //   downloadData.push(MTW);
-    //   dataValues1.push("MTW");
-    //   break;
-    // case "anemometer/vwt":
-    //   VWTheader.value = dataheader.value;
-    //   VWT.value = response.data;
-    //   downloadData.push(VWT);
-    //   dataValues1.push("VWT");
-    //   break;
-    // case "radar/ttm":
-    //   TTMheader.value = dataheader.value;
-
-    //   TTM.value = response.data;
-    //   downloadData.push(TTM);
-    //   dataValues1.push("TTM");
-    //   break;
-    // case "radar/tll":
-    //   TLLheader.value = dataheader.value;
-
-    //   TLL.value = response.data;
-    //   downloadData.push(TLL);
-    //   dataValues1.push("TLL");
-    //   break;
     case "radar/screen":
       RADAR_SCREENheader.value = dataheader.value;
 
@@ -1692,12 +1728,6 @@ const switchValue = (axiosItem, dataheader, response) => {
       downloadData.push(RSA);
       dataValues1.push("RSA");
       break;
-    // case "autopilot/mode":
-    //   MODEheader.value = dataheader.value;
-    //   MODE.value = response.data;
-    //   downloadData.push(MODE);
-    //   dataValues1.push("MODE");
-    //   break;
     case "autopilot/htd":
       HTDheader.value = dataheader.value;
       HTD.value = response.data;
