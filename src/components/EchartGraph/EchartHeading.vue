@@ -12,7 +12,15 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted, defineProps } from "vue";
+import { ref, provide, onMounted, defineProps, watch } from "vue";
+import { darkText, lightText } from "../../color/color.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const textColor = ref(themeMode.value === "light" ? lightText : darkText);
+watch(themeMode, (newValue) => {
+  textColor.value = newValue === "light" ? lightText : darkText;
+});
 
 const props = defineProps({
   // #2 props 정의
@@ -39,6 +47,7 @@ const option = ref({
     left: "center",
     textStyle: {
       fontSize: 10, // 폰트 크기 설정
+      color: textColor.value,
     },
   },
   series: [
@@ -46,7 +55,7 @@ const option = ref({
       type: "gauge",
       startAngle: 90,
       endAngle: 450,
-      center: ["50%", "52%"],
+      center: ["50%", "50%"],
       radius: "75%",
       splitNumber: 8,
       min: 0,
@@ -64,7 +73,7 @@ const option = ref({
         },
       },
       pointer: {
-        length: "40%",
+        length: "45%",
         width: 3,
         offsetCenter: [0, 0],
         itemStyle: {
@@ -89,7 +98,7 @@ const option = ref({
       },
       axisLabel: {
         show: false,
-        color: "#464646",
+        color: textColor.value,
         fontSize: 7,
         distance: -35,
         rotate: "tangential",
@@ -116,6 +125,9 @@ const option = ref({
         },
         offsetCenter: ["0%", "115%"],
         valueAnimation: true,
+                textStyle: {
+          color: textColor.value, // 텍스트 컬러 설정
+        },
         color: "#464646",
       },
       data: [
@@ -149,8 +161,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 16vh;
-  padding: 0px;
+  padding: 7px;
 }
 body {
   margin: 0;

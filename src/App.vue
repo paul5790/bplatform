@@ -1,5 +1,9 @@
 <template>
-  <div>
+  <div
+    :style="{
+      'background-color': themeColor,
+    }"
+  >
     <!-- 사용자 이름이 'a' 일 때 대시보드를 보여줌 -->
     <div v-if="showDashboard">
       <Dashboard :username="userid" @logout="logout" />
@@ -15,28 +19,12 @@
           width="200"
           style="margin-bottom: 30px"
         />
-        <!-- <v-row>
-          <v-col cols="9"> -->
         <v-text-field
           variant="outlined"
           v-model="newid"
           :rules="rules.ID"
           label="아이디"
         ></v-text-field>
-        <!-- </v-col>
-          <v-col cols="3">
-            <v-btn
-              color="blue"
-              block
-              size="large"
-              variant="tonal"
-              @click="checkid()"
-              style="height: 55px"
-            >
-              중복확인
-            </v-btn>
-          </v-col>
-        </v-row> -->
 
         <v-text-field
           :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
@@ -90,7 +78,7 @@
           <v-col cols="6">
             <v-btn
               block
-              color="blue"
+              :color="btnColor"
               size="large"
               variant="tonal"
               class="halfbtn"
@@ -102,7 +90,7 @@
           </v-col>
           <v-col cols="6">
             <v-btn
-              color="blue"
+              :color="btnColor"
               size="large"
               variant="tonal"
               class="halfbtn"
@@ -155,7 +143,7 @@
           <v-btn
             @click="login()"
             block
-            color="blue"
+            :color="btnColor"
             size="large"
             variant="tonal"
             class="mb-8"
@@ -166,8 +154,9 @@
           <v-card-text class="text-center">
             <router-link
               to="/"
+              :style="{ color: btnColor }"
               @click="movesignup()"
-              class="text-blue text-decoration-none"
+              class="text-decoration-none"
             >
               회원가입 <v-icon icon="mdi-chevron-right"></v-icon>
             </router-link>
@@ -179,10 +168,30 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import axios from "axios";
 import Dashboard from "../src/views/MainDashBoard.vue";
 import { checkLogin, createMineData, readMineData } from "./api/index.js";
+import {
+  darkbackcolor,
+  whitebackcolor,
+  darkbtn,
+  lightbtn,
+} from "./color/color.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
+});
+
+const themeColor = ref(
+  themeMode.value === "light" ? whitebackcolor : darkbackcolor
+);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
+});
 
 const visible = ref(false);
 const decodedTokenData = ref(null);
@@ -190,17 +199,19 @@ const decodedTokenData = ref(null);
 axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    
     const alertShow = ref(sessionStorage.getItem("showDashboard") === "true");
-    if ((error.response.status === 401 || error.response.status === 500) && alertShow.value) {
+    if (
+      (error.response.status === 401 || error.response.status === 500) &&
+      alertShow.value
+    ) {
       // 401 또는 500 상태 코드가 발생한 경우 로그아웃 처리
-      logout();  // 로그아웃 처리 함수 호출
+      logout(); // 로그아웃 처리 함수 호출
       location.reload();
       // alert("토큰 시간 만료\n다시 로그인 해주세요.")
       alert(error.response?.data || error.message);
     }
     return Promise.reject(error);
-  },
+  }
 );
 
 // 사용자 로그인 상태를 세션 스토리지에서 가져옵니다.
@@ -241,13 +252,12 @@ const signupBtn = async () => {
   console.log(newid.value);
 
   if (
-      rulesid.value &&
-      rulespw.value &&
-      rulescpw.value &&
-      rulesemail.value &&
-      rulesname.value &&
-      rulesaf.value
-     === true
+    rulesid.value &&
+    rulespw.value &&
+    rulescpw.value &&
+    rulesemail.value &&
+    rulesname.value &&
+    rulesaf.value === true
   ) {
     // 유효성 검사를 모두 통과한 경우
 
@@ -397,7 +407,7 @@ const login = async () => {
   try {
     // 로그인 요청
     const response = await checkLogin(data);
-   
+
     sessionStorage.setItem("token", response);
 
     // 사용자 정보 요청
@@ -432,7 +442,7 @@ const login = async () => {
     // 세션 스토리지에 사용자 로그인 상태를 저장
     sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   } catch (error) {
-    alert(error.response?.data || error.message)
+    alert(error.response?.data || error.message);
     console.error(error.response?.data || error.message);
 
     // userid.value = "";
@@ -476,7 +486,6 @@ const logout = () => {
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);
   sessionStorage.setItem("isAdmin", userid.value);
-
 };
 </script>
 
@@ -530,14 +539,16 @@ const logout = () => {
   text-align: center;
   max-width: 400px;
   margin: 0 auto;
-  margin-top: 150px;
+  padding-top: 150px;
+  height: 100vh;
 }
 
 .form-signup {
   text-align: center;
   max-width: 500px;
   margin: 0 auto;
-  margin-top: 100px;
+  padding-top: 100px;
+  height: 100vh;
 }
 
 #logintext {

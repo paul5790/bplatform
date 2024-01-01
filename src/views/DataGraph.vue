@@ -1,7 +1,7 @@
 <template>
   <v-card
     height="93vh"
-    style="background-color: #f7f7f7"
+    :style="{ backgroundColor: themeColor }"
     class="pa-1 d-flex justify-center align-center"
   >
     <v-row>
@@ -11,14 +11,14 @@
             <v-sheet
               v-if="nodata"
               :elevation="elevation"
-              style="
-                height: 75vh;
-                padding: 30px;
-                padding-bottom: 0px;
-                padding-right: 0;
-                display: flex;
-                background-color: #f7f7f7;
-              "
+              :style="{
+                height: '75vh',
+                padding: '30px',
+                paddingBottom: '0px',
+                paddingRight: '0',
+                display: 'flex',
+                backgroundColor: themeColor,
+              }"
             >
               <v-card style="flex: 1">
                 <v-card-title>
@@ -30,13 +30,13 @@
                     <v-sheet
                       v-if="!first"
                       :elevation="elevation"
-                      style="
-                        height: 67vh;
-                        display: flex;
-                        flex-direction: column;
-                        align-items: center;
-                        justify-content: center;
-                      "
+                      :style="{
+                        height: '67vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }"
                     >
                       <p
                         style="
@@ -52,13 +52,13 @@
                   <v-sheet
                     v-if="loading"
                     :elevation="elevation"
-                    style="
-                      height: 67vh;
-                      display: flex;
-                      flex-direction: column;
-                      align-items: center;
-                      justify-content: center;
-                    "
+                    :style="{
+                      height: '67vh',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }"
                   >
                     <v-progress-circular
                       :size="50"
@@ -80,14 +80,14 @@
             </v-sheet>
             <v-sheet
               v-if="!nodata"
-              style="
-                height: 75vh;
-                padding: 30px;
-                padding-bottom: 0px;
-                padding-right: 0;
-                display: flex;
-                background-color: #f7f7f7;
-              "
+              :style="{
+                height: '75vh',
+                padding: '30px',
+                paddingBottom: '0',
+                paddingRight: '0',
+                display: 'flex',
+                backgroundColor: themeColor,
+              }"
             >
               <v-card style="flex: 1">
                 <v-card-item id="graph">
@@ -103,14 +103,14 @@
         <v-row>
           <v-col cols="12" no-gutters style="padding: 3px">
             <v-sheet
-              style="
-                height: 20vh;
-                padding: 30px;
-                padding-top: 10px;
-                padding-right: 0;
-                display: flex;
-                background-color: #f7f7f7;
-              "
+              :style="{
+                height: '20vh',
+                padding: '30px',
+                paddingTop: '10px',
+                paddingRight: '0',
+                display: 'flex',
+                backgroundColor: themeColor,
+              }"
             >
               <v-card style="flex: 1">
                 <v-card-item>
@@ -131,14 +131,14 @@
         <v-row>
           <v-col cols="12" no-gutters style="padding: 3px">
             <v-sheet
-              style="
-                height: 93vh;
-                padding: 30px;
-                padding-bottom: 5px;
-                padding-left: 10;
-                display: flex;
-                background-color: #f7f7f7;
-              "
+              :style="{
+                height: '93vh',
+                padding: '30px',
+                paddingBottom: '5px',
+                paddingLeft: '10px',
+                display: 'flex',
+                backgroundColor: themeColor,
+              }"
             >
               <v-card style="flex: 1">
                 <v-card-item>
@@ -168,9 +168,15 @@
                       class="custom-select"
                     ></v-select>
                     <VueDatePicker
+                      :class="
+                        themeMode === 'dark'
+                          ? 'dp__theme_dark'
+                          : 'dp__theme_light'
+                      "
                       style="--dp-input-padding: 15px"
                       v-model="dateRange"
                       range
+                      :dark="themeMode === 'dark'"
                       :readonly="date_readonly"
                     />
                     <p style="font-size: 12px; font-weight: bold">
@@ -183,7 +189,7 @@
                     <v-btn
                       style="margin-top: 30px"
                       width="500px"
-                      color="blue"
+                      :color = btnColor
                       @click="searchData()"
                     >
                       조회하기
@@ -192,7 +198,7 @@
                       style="margin-top: 355px"
                       height="50px"
                       width="500px"
-                      color="blue"
+                      :color = btnColor
                       @click="captureImage()"
                     >
                       그래프 캡쳐하기
@@ -210,7 +216,7 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted, watchEffect } from "vue";
+import { ref, provide, onMounted, watchEffect, watch } from "vue";
 import axios from "axios";
 import html2canvas from "html2canvas";
 import { use } from "echarts/core";
@@ -218,6 +224,14 @@ import { CanvasRenderer } from "echarts/renderers";
 import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
 import { readTrialData, readDataTrial, readDataDate } from "../api/index.js";
+import {
+  darkbackcolor,
+  whitebackcolor,
+  darkText,
+  lightText,
+  darkbtn,
+  lightbtn,
+} from "../color/color.js";
 import {
   DatasetComponent,
   TitleComponent,
@@ -243,6 +257,27 @@ use([
   DataZoomComponent,
 ]);
 provide(THEME_KEY);
+
+// 다크모드
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
+});
+
+const textColor = ref(themeMode.value === "light" ? lightText : darkText);
+watch(themeMode, (newValue) => {
+  textColor.value = newValue === "light" ? lightText : darkText;
+});
+
+const themeColor = ref(
+  themeMode.value === "light" ? whitebackcolor : darkbackcolor
+);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
+});
+
 // 왼쪽 셀렉바 설정
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const analysisData = ref([]);
@@ -861,7 +896,7 @@ const searchData = async () => {
               `${endDate2.value}`
             );
           }
-          
+
           let no1engine_panel_65272;
           if (voyagesearch.value) {
             no1engine_panel_65272 = await readDataTrial(
@@ -920,7 +955,7 @@ const searchData = async () => {
               "no1enginepanel/no1engine_panel_65270",
               selectedtrialNum.value
             );
-            console.log('여깁니다용',no1engine_panel_65270);
+            console.log("여깁니다용", no1engine_panel_65270);
           } else {
             no1engine_panel_65270 = await readDataDate(
               tokenid.value,
@@ -1602,6 +1637,9 @@ const searchData = async () => {
           type: "category",
           nameLocation: "middle",
           data: analysisTime.value, // x축 데이터를 times 배열로 설정
+          axisLabel: {
+            color: textColor.value, // 텍스트 색상을 흰색으로 설정
+          },
         },
         yAxis: {},
         series: [
@@ -1775,6 +1813,9 @@ const option = ref({
     type: "category",
     nameLocation: "middle",
     data: times.value, // x축 데이터를 times 배열로 설정
+    axisLabel: {
+      color: textColor.value, // 텍스트 색상을 흰색으로 설정
+    },
   },
   yAxis: {},
   series: [
@@ -1831,5 +1872,63 @@ const captureImage = async () => {
 }
 body {
   margin: 0;
+}
+
+.dp__theme_dark {
+  --dp-background-color: #424242;
+  --dp-text-color: #fff;
+  --dp-hover-color: #484848;
+  --dp-hover-text-color: #fff;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #005cb2;
+  --dp-primary-disabled-color: #61a8ea;
+  --dp-primary-text-color: #fff;
+  --dp-secondary-color: #a9a9a9;
+  --dp-border-color: #999;
+  --dp-menu-border-color: #2d2d2d;
+  --dp-border-color-hover: #aaaeb7;
+  --dp-disabled-color: #737373;
+  --dp-disabled-color-text: #d0d0d0;
+  --dp-scroll-bar-background: #212121;
+  --dp-scroll-bar-color: #484848;
+  --dp-success-color: #00701a;
+  --dp-success-color-disabled: #428f59;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #e53935;
+  --dp-marker-color: #e53935;
+  --dp-tooltip-color: #3e3e3e;
+  --dp-highlight-color: rgb(0 92 178 / 20%);
+  --dp-range-between-dates-background-color: var(--dp-hover-color, #484848);
+  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #fff);
+  --dp-range-between-border-color: var(--dp-hover-color, #fff);
+}
+
+.dp__theme_light {
+  --dp-background-color: #fff;
+  --dp-text-color: #212121;
+  --dp-hover-color: #f3f3f3;
+  --dp-hover-text-color: #212121;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #1976d2;
+  --dp-primary-disabled-color: #6bacea;
+  --dp-primary-text-color: #f8f5f5;
+  --dp-secondary-color: #c0c4cc;
+  --dp-border-color: #ddd;
+  --dp-menu-border-color: #ddd;
+  --dp-border-color-hover: #aaaeb7;
+  --dp-disabled-color: #f6f6f6;
+  --dp-scroll-bar-background: #f3f3f3;
+  --dp-scroll-bar-color: #959595;
+  --dp-success-color: #76d275;
+  --dp-success-color-disabled: #a3d9b1;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #ff6f60;
+  --dp-marker-color: #ff6f60;
+  --dp-tooltip-color: #fafafa;
+  --dp-disabled-color-text: #8e8e8e;
+  --dp-highlight-color: rgb(25 118 210 / 10%);
+  --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
+  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
+  --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
 }
 </style>

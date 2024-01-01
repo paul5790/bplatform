@@ -1,29 +1,36 @@
 <template>
   <v-card
-    height="93vh"
-    style="background-color: #f7f7f7"
-    class="pa-1 d-flex justify-center align-center"
+    :style="{ backgroundColor: themeColor }"
+    class="d-flex justify-center align-center"
   >
     <v-row>
       <!-- 왼쪽 큰 박스 -->
-      <v-col cols="10" style="padding: 30px; padding-right: 5px">
+      <v-col cols="10" style="">
         <v-row>
           <!-- (최) 지도 뷰 -->
-          <v-col cols="3" no-gutters style="padding: 3px">
+          <v-col
+            :cols="getColsValue1()"
+            no-gutters
+            :style="{ padding: '0px', paddingLeft: '16px', paddingTop: '20px' }"
+          >
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <OSMap
+                  <!-- <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
                     :state="mapstart"
-                  />
+                  /> -->
                 </v-card-item>
               </v-card>
             </v-sheet>
           </v-col>
           <!-- port rudder -->
-          <v-col cols="3" no-gutters style="padding: 3px">
+          <v-col
+            :cols="getColsValue1()"
+            no-gutters
+            :style="{ padding: '0px', paddingLeft: '4px', paddingTop: '20px' }"
+          >
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
@@ -36,18 +43,18 @@
             </v-sheet>
           </v-col>
           <!-- starboard rudder -->
-          <v-col cols="3" no-gutters style="padding: 3px">
+          <v-col
+            :cols="getColsValue1()"
+            no-gutters
+            :style="{
+              padding: '0px',
+              paddingLeft: '4px',
+              paddingTop: '20px',
+            }"
+          >
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <!-- <EchartGauge
-                    :name="'Speed (SPEEDLOG)'"
-                    :left="'left'"
-                    :unit="'kt'"
-                    :center_y="'45%'"
-                    :max_speed="200"
-                    :value="parseFloat(speed)"
-                  /> -->
                   <EchartStarPort
                     :starport="parseFloat(star)"
                     :name="'StarboardRudder'"
@@ -57,85 +64,97 @@
             </v-sheet>
           </v-col>
           <!-- .. -->
-          <v-col cols="3" no-gutters style="padding: 3px">
-            <!-- <v-sheet style="height: 34vh; display: flex">
-              <v-card style="flex: 1">
-                <v-card-item>
-                  <EchartStarPort  
-                  :star="parseFloat(star)"
-                  :port="parseFloat(port)"
-                  />
-                </v-card-item>
-              </v-card>
-            </v-sheet> -->
+          <v-col
+            :cols="getColsValue2()"
+            no-gutters
+            :style="{
+              padding: '0px',
+              paddingLeft: `${getPaddingLeftValue()}px`,
+              paddingTop: `${getOtherPaddingTop()}px`,
+            }"
+          >
             <v-sheet style="display: flex">
               <v-row>
                 <v-col cols="12" no-gutters>
                   <v-card style="flex: 1">
                     <v-card-item>
                       <v-row>
-                        <v-col cols="6" no-gutters style="padding: 3px">
-                          <!-- 스피드 -->
-                          <v-row>
-                            <v-col
-                              cols="12"
-                              no-gutters
-                              style="padding-bottom: 0px"
-                            >
-                              <v-sheet style="height: 17vh; display: flex">
-                                <EchartGaugeVolt
-                                  :name="'SpeedN'"
-                                  :unit="'kt'"
-                                  :max_value="200"
-                                  :value="parseFloat(speed)"
-                                />
-                              </v-sheet>
-                            </v-col>
-                          </v-row>
-                          <!-- 헤딩 -->
-                          <v-row>
-                            <v-col cols="12" no-gutters style="padding-top: 0px"
-                              ><v-sheet style="height: 17vh; display: flex">
-                                <EchartHeading
-                                  :value="parseFloat(heading)"
-                                  :name="'Heading'"
-                                /> </v-sheet
-                            ></v-col>
-                          </v-row>
+                        <v-col
+                          :cols="getColsValue3()"
+                          no-gutters
+                          :style="{ paddingTop: '5px', paddingBottom: '0px' }"
+                        >
+                          <v-sheet
+                            :style="{
+                              height: `${getheightValue1()}vh`,
+                              display: flex,
+                            }"
+                          >
+                            <EchartGaugeVolt
+                              :name="'SpeedN'"
+                              :unit="'kt'"
+                              :max_value="200"
+                              :value="parseFloat(speed)"
+                            />
+                          </v-sheet>
                         </v-col>
-                        <v-col cols="6" no-gutters style="padding: 3px">
-                          <!-- 풍속 -->
-                          <v-row>
-                            <v-col
-                              cols="12"
-                              no-gutters
-                              style="padding-bottom: 0px"
-                            >
-                              <v-sheet style="height: 17vh; display: flex">
-                                <EchartGaugeVolt
-                                  :name="'Anemometer Speed'"
-                                  :value="parseFloat(windspeed)"
-                                  :unit="'m/s'"
-                                  :max_value="40"
-                                />
-                              </v-sheet>
-                            </v-col>
-                          </v-row>
-                          <!-- 풍향 -->
-                          <v-row>
-                            <v-col
-                              cols="12"
-                              no-gutters
-                              style="padding-top: 0px"
-                            >
-                              <v-sheet style="height: 17vh; display: flex">
-                                <EchartHeading
-                                  :value="parseFloat(windangle)"
-                                  :name="'Anemometer Angle'"
-                                />
-                              </v-sheet>
-                            </v-col>
-                          </v-row>
+                        <v-col
+                          :cols="getColsValue3()"
+                          no-gutters
+                          :style="{ paddingTop: '5px', paddingBottom: '0px' }"
+                        >
+                          <v-sheet
+                            :style="{
+                              height: `${getheightValue1()}vh`,
+                              display: flex,
+                            }"
+                          >
+                            <EchartGaugeVolt
+                              :name="'Anemometer Speed'"
+                              :value="parseFloat(windspeed)"
+                              :unit="'m/s'"
+                              :max_value="40"
+                            />
+                          </v-sheet>
+                        </v-col>
+                        <v-col
+                          :cols="getColsValue3()"
+                          no-gutters
+                          :style="{
+                            paddingTop: `${getheadingPaddingTop()}px`,
+                            paddingBottom: '0px',
+                          }"
+                          ><v-sheet
+                            :style="{
+                              height: `${getheightValue1()}vh`,
+                              display: flex,
+                            }"
+                          >
+                            <EchartHeading
+                              :value="parseFloat(heading)"
+                              :name="'Heading'"
+                            /> </v-sheet
+                        ></v-col>
+
+                        <v-col
+                          :cols="getColsValue3()"
+                          no-gutters
+                          :style="{
+                            paddingTop: `${getheadingPaddingTop()}px`,
+                            paddingBottom: '0px',
+                          }"
+                        >
+                          <v-sheet
+                            :style="{
+                              height: `${getheightValue1()}vh`,
+                              display: flex,
+                            }"
+                          >
+                            <EchartHeading
+                              :value="parseFloat(windangle)"
+                              :name="'Anemometer Angle'"
+                            />
+                          </v-sheet>
                         </v-col>
                       </v-row>
                     </v-card-item>
@@ -148,7 +167,11 @@
 
         <v-row>
           <!-- 엔진1 -->
-          <v-col cols="6" no-gutters style="padding: 3px">
+          <v-col
+            :cols="getEngineColsValue()"
+            no-gutters
+            :style="{ padding: '0px', paddingLeft: '16px', paddingTop: '4px' }"
+          >
             <v-card style="flex: 1">
               <v-card-item>
                 <v-row>
@@ -223,21 +246,13 @@
                 </v-row>
               </v-card-item>
             </v-card>
-            <!-- (최) Lamp뷰 -->
-            <v-row>
-              <v-col cols="12" no-gutters style="padding-top: 15px">
-                <v-sheet style="height: 20vh; display: flex">
-                  <v-card style="flex: 1">
-                    <v-card-item>
-                      <EngineLampChecking :checkdata="checkdata1" />
-                    </v-card-item>
-                  </v-card>
-                </v-sheet>
-              </v-col>
-            </v-row>
           </v-col>
           <!-- 엔진2 -->
-          <v-col cols="6" no-gutters style="padding: 3px">
+          <v-col
+            :cols="getEngineColsValue()"
+            no-gutters
+            :style="{ padding: '0px', paddingLeft: `${getLampPaddingLeft()}px`, paddingTop: '4px' }"
+          >
             <v-card style="flex: 1">
               <v-card-item>
                 <v-row>
@@ -312,28 +327,78 @@
                 </v-row>
               </v-card-item>
             </v-card>
-            <!-- (최) Lamp뷰 -->
-            <v-row>
-              <v-col cols="12" no-gutters style="padding-top: 15px">
-                <v-sheet style="height: 20vh; display: flex">
-                  <v-card style="flex: 1">
-                    <v-card-item>
-                      <EngineLampChecking :checkdata="checkdata2" />
-                    </v-card-item>
-                  </v-card>
-                </v-sheet>
-              </v-col>
-            </v-row>
+          </v-col>
+        </v-row>
+
+        <!-- (최) Lamp뷰 -->
+        <v-row>
+          <v-col :cols="getLampColsValue()" no-gutters :style="{ padding: '0px'}">
+            <v-sheet
+              :style="{
+                height: `${getLampheightValueALL1()}vh`,
+                backgroundColor: themeColor,
+                paddingTop: `${getLampPaddingTop()}px`,
+                paddingLeft: `16px`,
+                paddingBottom: `${getLampPaddingBottom1()}px`,
+                display: 'flex',
+              }"
+            >
+              <v-card style="flex: 1">
+                <v-card-item>
+                  <EngineLampChecking
+                    :checkdata="checkdata1"
+                    :height="getLampheightValue1()"
+                  />
+                </v-card-item>
+              </v-card>
+            </v-sheet>
+          </v-col>
+
+          <!-- (최) Lamp뷰 -->
+
+          <v-col :cols="getLampColsValue()" no-gutters :style="{ padding: '0px' }">
+            <v-sheet
+              :style="{
+                height: `${getLampheightValueALL2()}vh`,
+                backgroundColor: themeColor,
+                paddingTop: `${getLampPaddingTop()}px`,
+                paddingLeft: `${getLampPaddingLeft()}px`,
+                paddingBottom: `${getLampPaddingBottom2()}px`,
+                display: 'flex',
+              }"
+            >
+              <v-card style="flex: 1">
+                <v-card-item>
+                  <EngineLampChecking
+                    :checkdata="checkdata2"
+                    :height="getLampheightValue2()"
+                  />
+                </v-card-item>
+              </v-card>
+            </v-sheet>
           </v-col>
         </v-row>
       </v-col>
 
       <!-- (최)데이터 확인 박스 -->
       <v-col cols="2">
-        <v-sheet style="height: 92vh; padding-right: 0; display: flex">
-          <v-card style="flex: 1">
+        <v-sheet
+          :style="{
+            backgroundColor: themeColor,
+            paddingTop: '8px',
+            paddingBottom: '8px',
+            paddingLeft: '0px',
+            paddingRight: '9px',
+            height: `${getheightValue2()}vh`,
+            display: 'flex',
+          }"
+        >
+          <v-card style="width: 100%; height: 100%">
             <v-card-item>
-              <SocketChecking :checkdata="checkdata" />
+              <SocketChecking
+                :checkdata="checkdata"
+                :height="getheightValue2()"
+              />
             </v-card-item>
           </v-card>
         </v-sheet>
@@ -351,18 +416,23 @@ import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 import { timeData } from "../api/index.js";
+import { darkbackcolor, whitebackcolor } from "../color/color.js";
 // 웹소켓 관련, Web Socket
-import { ref, inject, onMounted } from "vue";
+import { ref, inject, onMounted, onBeforeUnmount, onUnmounted, watch } from "vue";
 import { onMessage, onOpen, onClose, onError } from "vue3-websocket";
-import axios from "axios";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const themeColor = ref(themeMode.value === "light" ? whitebackcolor : darkbackcolor);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
+});
 
 const text = ref(""); // 보낼 데이터
 const responseMsg = ref(""); // 받아온 데이터
 const checktime = ref(3000);
 
-
 const tokenid = ref(sessionStorage.getItem("token") || "");
-
 
 const checkTime = ref();
 const fetchData = async () => {
@@ -1543,6 +1613,111 @@ const getVariableName = (headerName) => {
 
   return nameMappings[headerName];
 };
+
+const screenWidth = ref(window.innerWidth);
+
+const getColsValue1 = () => {
+  return screenWidth.value <= 1800 ? 4 : 3;
+};
+
+const getColsValue2 = () => {
+  return screenWidth.value <= 1800 ? 12 : 3;
+};
+
+const getColsValue3 = () => {
+  return screenWidth.value <= 1800 ? 3 : 6;
+};
+
+const getEngineColsValue = () => {
+  return screenWidth.value <= 1800 ? 12 : 6;
+};
+
+const getLampColsValue = () => {
+  return screenWidth.value <= 1890 ? 12 : 6;
+};
+
+const getheightValue1 = () => {
+  return screenWidth.value <= 1800 ? 27 : 17;
+};
+
+const getheightValue2 = () => {
+    return screenWidth.value <= 1800
+    ? 184  // 1800 이하일 경우 130 반환
+    : screenWidth.value <= 1890
+    ? 120  // 1800 초과이면서 1890 이하일 경우 120 반환
+    : 93;  // 그 외의 경우 93 반환
+};
+
+const getLampheightValue1 = () => {
+  return screenWidth.value <= 1890 ? 24 : 21;
+};
+const getLampheightValue2 = () => {
+  return screenWidth.value <= 1890 ? 25 : 21;
+};
+const getLampheightValueALL1 = () => {
+  return screenWidth.value <= 1890 ? 24 : 21;
+};
+const getLampheightValueALL2 = () => {
+  return screenWidth.value <= 1890 ? 25 : 21;
+};
+
+const getStarboardPaddingLeft = () => {
+  return screenWidth.value <= 1800 ? 16 : 4;
+};
+
+const getLampPaddingLeft = () => {
+  return screenWidth.value <= 1890 ? 16 : 4;
+};
+
+const getLampPaddingTop = () => {
+  return screenWidth.value <= 1890 ? 4 : 4;
+};
+
+const getLampPaddingBottom1 = () => {
+  return screenWidth.value <= 1890 ? 0 : 4;
+};
+
+const getLampPaddingBottom2 = () => {
+  return screenWidth.value <= 1890 ? 15 : 4;
+};
+
+const getSocketCheckHeight = () => {
+  return screenWidth.value <= 1890 ? 15 : 4;
+};
+
+const getheadingPaddingTop = () => {
+  return screenWidth.value <= 1800 ? 5 : 0;
+};
+
+const getOtherPaddingTop = () => {
+  return screenWidth.value <= 1800 ? 4 : 20;
+};
+
+const getPaddingTopValue = () => {
+  return screenWidth.value <= 1800 ? 105 : 15;
+};
+
+const getPaddingLeftValue = () => {
+  return screenWidth.value <= 1800 ? 16 : 4;
+};
+
+const getPaddingRightValue = () => {
+  return screenWidth.value <= 1800 ? 15 : 0;
+};
+
+const handleResize = () => {
+  screenWidth.value = window.innerWidth;
+};
+
+// 컴포넌트가 마운트될 때 이벤트 리스너 등록
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  // 초기에도 업데이트 수행
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
 </script>
 
 <style scoped></style>

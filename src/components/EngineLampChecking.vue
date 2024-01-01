@@ -1,9 +1,13 @@
 <template>
   <div
-    style="height: 21vh; overflow-x: auto; display: flex"
+    :style="{
+      display: 'flex',
+      height: `${getheightValue()}vh`,
+      overflowY: 'auto',
+    }"
     class="scrollable-card-1"
   >
-    <v-sheet style="flex:20%">
+    <v-sheet style="flex: 20%">
       <v-sheet v-for="item in data.slice(0, 4)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"
@@ -15,7 +19,7 @@
       </v-sheet>
     </v-sheet>
 
-    <v-sheet style="flex:22%">
+    <v-sheet style="flex: 22%">
       <v-sheet v-for="item in data.slice(4, 8)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"
@@ -27,7 +31,7 @@
       </v-sheet>
     </v-sheet>
 
-    <v-sheet style="flex:28%">
+    <v-sheet style="flex: 28%">
       <v-sheet v-for="item in data.slice(8, 12)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"
@@ -39,7 +43,7 @@
       </v-sheet>
     </v-sheet>
 
-    <v-sheet style="flex:30%">
+    <v-sheet style="flex: 30%">
       <v-sheet v-for="item in data.slice(12, 16)" :key="item.key">
         <v-icon
           :color="getIconColor(item.key)"
@@ -54,10 +58,28 @@
 </template>
 
 <script setup props>
-import { defineProps } from "vue";
+import { ref, defineProps, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   checkdata: Object, // checkdata를 객체로 받음
+  height: Number,
+});
+
+const screenheight = ref(props.height);
+const handleResize = () => {
+  screenheight.value = props.height;
+};
+const getheightValue = () => {
+  return (screenheight.value = props.height);
+};
+
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  // 초기에도 업데이트 수행
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
 });
 
 const data = [
@@ -71,12 +93,12 @@ const data = [
   { key: 8, name: " Low Engine Speed" },
   { key: 9, name: " Water Temperature" },
   { key: 10, name: " Engine Oil Over Heat" },
-  { key: 11, name: " Low Boost Air Pressure"},
-  { key: 12, name: " Low Engine Oil Pressure"},
-  { key: 13, name: " High Boost Air Pressure"},
-  { key: 14, name: " Low Gearbox Oil Pressure"},
-  { key: 15, name: " Main connector Removed"},
-  { key: 16, name: " High Exhaust Gas Temperature"},
+  { key: 11, name: " Low Boost Air Pressure" },
+  { key: 12, name: " Low Engine Oil Pressure" },
+  { key: 13, name: " High Boost Air Pressure" },
+  { key: 14, name: " Low Gearbox Oil Pressure" },
+  { key: 15, name: " Main connector Removed" },
+  { key: 16, name: " High Exhaust Gas Temperature" },
 ];
 const getIconColor = (key) =>
   props.checkdata[key] === "ok" ? "error" : "grey-lighten-1";

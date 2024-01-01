@@ -22,6 +22,15 @@ use([
   LegendComponent,
 ]);
 
+import { darkText, lightText } from "../../color/color.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const textColor = ref(themeMode.value === "light" ? lightText : darkText);
+watch(themeMode, (newValue) => {
+  textColor.value = newValue === "light" ? lightText : darkText;
+});
+
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
 const serverInUsedSize = ref(0);
@@ -35,9 +44,7 @@ const fetchData = async () => {
     console.log(`${parseFloat(response.dbSize)} serversize`);
     console.log(`${parseFloat(response.serverRemainingSize)} serversize`);
 
-    serverInUsedSize.value = parseFloat(response.serverInUsedSize).toFixed(
-      2
-    );
+    serverInUsedSize.value = parseFloat(response.serverInUsedSize).toFixed(2);
     dbSize.value = parseFloat(response.dbSize).toFixed(2);
     serverRemainingSize.value = parseFloat(
       response.serverRemainingSize
@@ -66,6 +73,7 @@ const option = ref({
     textStyle: {
       fontSize: 19, // 폰트 크기 설정
       fontWeight: 550,
+      color: textColor.value,
     },
   },
   tooltip: {
@@ -76,6 +84,9 @@ const option = ref({
     orient: "vertical", // 수직 방향으로 표시
     top: "15%", // 수직 정렬을 중앙으로 설정
     right: "0%",
+    textStyle: {
+      color: textColor.value, // 텍스트 컬러 설정
+    },
   },
   series: [
     {

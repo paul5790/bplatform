@@ -16,7 +16,7 @@
   </v-card>
   <v-card
     v-else
-    style="background-color: #f7f7f7"
+    :style="{ backgroundColor: themeColor }"
     class="pa-1 d-flex justify-center align-center"
   >
     <v-row>
@@ -28,7 +28,7 @@
             :key="chart.id"
             :cols="chart.cols"
             no-gutters
-            style="padding: 3px"
+            style="padding: 0px"
           >
             <v-sheet
               :style="{
@@ -48,48 +48,18 @@
               </v-card>
             </v-sheet>
           </v-col>
-          <!-- 드릴다운 -->
-          <!-- <v-col cols="12" no-gutters style="padding: 3px">
-            <v-sheet style="height: 43vh; padding-left: 10px; padding-top: 15px; background-color: #f7f7f7; display: flex;">
-              <v-card style="flex: 1;">
-                <v-card-item>
-                  <EchartDrillDown />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col> -->
-          <!-- 도넛 -->
-          <!-- <v-col cols="6" no-gutters style="padding: 3px">
-            <v-sheet style="height: 43vh; padding-left: 10px; background-color: #f7f7f7; display: flex">
-              <v-card style="flex: 1">
-                <v-card-item>
-                  <EchartDoughnut />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col> -->
-          <!-- 반도넛 -->
-          <!-- <v-col cols="6" no-gutters style="padding: 3px">
-            <v-sheet style="height: 43vh; padding-right: 10px; background-color: #f7f7f7; display: flex">
-              <v-card style="flex: 1">
-                <v-card-item>
-                  <EchartHalfDoughnut />
-                </v-card-item>
-              </v-card>
-            </v-sheet>
-          </v-col> -->
         </v-row>
 
         <v-row>
           <v-col cols="12" no-gutters style="padding: 3px">
             <v-sheet
-              style="
-                background-color: #f7f7f7;
-                display: flex;
-                padding-left: 10px;
-                padding-right: 10px;
-                padding-bottom: 10px;
-              "
+              :style="{
+                backgroundColor: themeColor,
+                display: 'flex',
+                paddingLeft: '10px',
+                paddingRight: '10px',
+                paddingBottom: '10px',
+              }"
             >
               <v-card style="flex: 1">
                 <v-card-item>
@@ -105,16 +75,24 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref, onMounted, onBeforeUnmount, watch } from "vue";
 import VoyageTable from "../components/VoyageTable.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut1";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
+import { darkbackcolor, whitebackcolor } from "../color/color.js";
 const guest = ref(true);
 const userid = ref(sessionStorage.getItem("isAdmin"));
 if (userid.value === "GUEST") guest.value = true;
 else guest.value = false;
 
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const themeColor = ref(themeMode.value === "light" ? whitebackcolor : darkbackcolor);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
+  
+});
 const charts = ref([
   {
     id: 1,
@@ -122,10 +100,10 @@ const charts = ref([
     component: EchartDrillDown,
     style: {
       height: "43vh",
-      backgroundColor: "#f7f7f7",
-      paddingLeft: "10px",
+      backgroundColor: themeColor.value,
+      paddingLeft: "13px",
       paddingTop: "15px",
-      paddingRight: "0",
+      paddingRight: "3px",
     },
   },
   {
@@ -134,10 +112,10 @@ const charts = ref([
     component: EchartDoughnut,
     style: {
       height: "43vh",
-      backgroundColor: "#f7f7f7",
-      paddingLeft: "0",
+      backgroundColor: themeColor.value,
+      paddingLeft: "3px",
       paddingTop: "15px",
-      paddingRight: "0",
+      paddingRight: "3px",
     },
   },
   {
@@ -146,10 +124,10 @@ const charts = ref([
     component: EchartHalfDoughnut,
     style: {
       height: "43vh",
-      backgroundColor: "#f7f7f7",
-      paddingLeft: "",
+      backgroundColor: themeColor.value,
+      paddingLeft: "3px",
       paddingTop: "15px",
-      paddingRight: "10px",
+      paddingRight: "13px",
     },
   },
 ]);
@@ -157,23 +135,24 @@ const charts = ref([
 const updateCols = () => {
   const screenWidth = window.innerWidth;
   charts.value.forEach((chart) => {
-    // 화면 크기에 따라 cols 값을 업데이트
-    
-
     if (chart.id === 1) {
       chart.cols = screenWidth <= 1700 ? 12 : 4;
-      chart.style.paddingLeft = chart.cols === 12 ? '10px' : '10px';
-      chart.style.paddingRight = chart.cols === 12 ? '10px' : '0';
-      chart.style.paddingTop = chart.cols === 12 ? '0px' : '15px';
-    }
-    else if (chart.id === 2) {
-      chart.cols = screenWidth <= 1700 ? 6 : 4;
-      chart.style.paddingLeft = chart.cols === 6 ? '10px' : '0';
-      chart.style.paddingTop = chart.cols === 6 ? '0px' : '15px';
+      chart.style.paddingLeft = chart.cols === 12 ? "13px" : "13px";
+      chart.style.paddingRight = chart.cols === 12 ? "13px" : "3px";
+      chart.style.paddingTop = chart.cols === 12 ? "3px" : "15px";
+    } else if (chart.id === 2) {
+      chart.cols = screenWidth <= 1100 ? 12 : screenWidth <= 1700 ? 6 : 4;
+      chart.style.paddingLeft =
+        chart.cols === 6 || chart.cols === 12 ? "13px" : "3px";
+      chart.style.paddingTop =
+        chart.cols === 6 || chart.cols === 12 ? "3px" : "15px";
+      chart.style.paddingRight = chart.cols === 12 ? "13px" : "3px";
     } else if (chart.id === 3) {
-      chart.cols = screenWidth <= 1700 ? 6 : 4;
-      chart.style.paddingRight = chart.cols === 6 ? '10px' : '10px';
-      chart.style.paddingTop = chart.cols === 6 ? '0px' : '15px';
+      chart.cols = screenWidth <= 1100 ? 12 : screenWidth <= 1700 ? 6 : 4;
+      chart.style.paddingLeft = chart.cols === 12 ? "13px" : "3px";
+      chart.style.paddingRight = chart.cols === 6 ? "13px" : "13px";
+      chart.style.paddingTop =
+        chart.cols === 6 || chart.cols === 12 ? "3px" : "15px";
     }
   });
 };
@@ -191,4 +170,11 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.custom-card {
+  display: flex;
+  padding-left: 10px;
+  padding-right: 10px;
+  padding-bottom: 10px;
+}
+</style>

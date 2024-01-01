@@ -41,6 +41,16 @@
             실시간 모니터링에서 들어오는 시간 주기를 설정함
           </v-list-item-subtitle>
         </v-list-item>
+
+        <v-divider></v-divider>
+
+        <v-list-subheader>테마 설정</v-list-subheader>
+        <v-list-item>
+  <v-btn-toggle v-model="themeMode" mandatory divided variant="outlined">
+    <v-btn @click="lightMode()" value="light">light mode</v-btn>
+    <v-btn @click="darkMode()" value="dark">dark mode</v-btn>
+  </v-btn-toggle>
+        </v-list-item>
       </v-list>
 
       <!-- 개인정보 변경 -->
@@ -1430,7 +1440,24 @@
 
 <script setup>
 import { ref, onMounted } from "vue";
-import { readMineData, updateMineData, updatePassword, updateSetTime } from "../api/index.js";
+import {
+  readMineData,
+  updateMineData,
+  updatePassword,
+  updateSetTime,
+} from "../api/index.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const lightMode = () => {
+  localStorage.setItem("themeMode", "light");
+  location.reload();
+}
+
+const darkMode = () => {
+  localStorage.setItem("themeMode", "dark");
+  location.reload();
+}
 
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
@@ -1453,7 +1480,7 @@ const newpwcheck = ref();
 const privacyDialog = ref(false);
 const passwordchangeDialog = ref(false);
 const losstimeDialog = ref(false);
-const ALLlosstimeDialog = ref(true);
+const ALLlosstimeDialog = ref(false); // 소실주기 전체
 const realtimeDialog = ref(false);
 
 // 데이터 소실주기 설정

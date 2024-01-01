@@ -1,15 +1,15 @@
 <template>
   <div class="scrollable-card-1 item-wrapper">
     <v-sheet
-      style="
-        height: 90vh;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-        align-items: center;
-      "
+      :style="{
+        display: 'flex',
+        height: `${getheightValue()}vh`,
+        flexDirection: 'column',
+        overflowY: 'auto',
+        alignItems: 'center'
+      }"
     >
-      <v-list class="scrollable-card-1">
+      <v-list class="scrollable-card-1" :style="{ width: `${getwidth()}px` }">
         <!-- DGPS -->
         <v-list-group>
           <template v-slot:activator="{ props }">
@@ -333,18 +333,6 @@
                   ><br /><br />
                 </v-sheet>
               </v-sheet>
-              <v-sheet style="flex: 0 0 50%">
-                <v-sheet v-for="item in data.slice(10, 11)" :key="item.key">
-                  <v-icon
-                    :color="getIconColor(item.key)"
-                    :icon="getIconIcon(item.key)"
-                    size="small"
-                  ></v-icon>
-                  <span style="font-size: 14px"
-                    >&nbsp;&nbsp;&nbsp;{{ item.key }}</span
-                  ><br /><br />
-                </v-sheet>
-              </v-sheet>
             </div>
           </v-list-item>
         </v-list-group>
@@ -354,10 +342,35 @@
 </template>
 
 <script setup props>
-import { ref, defineProps } from "vue";
+import { ref, defineProps, onMounted, onUnmounted } from "vue";
 
 const props = defineProps({
   checkdata: Object, // checkdata를 객체로 받음
+  height: Number,
+});
+const screenheight = ref(props.height);
+const screenWidth = ref(window.innerWidth);
+const handleResize = () => {
+  screenheight.value = props.height;
+  screenWidth.value = window.innerWidth;
+};
+const getheightValue = () => {
+  return screenheight.value = props.height;
+};
+
+const getwidth = () => {
+  console.log((1980*270) / screenWidth.value)
+  return (screenWidth.value*270) / 1980;
+};
+
+
+onMounted(() => {
+  window.addEventListener("resize", handleResize);
+  // 초기에도 업데이트 수행
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
 });
 
 const groupDGPS = ref(true);
@@ -461,6 +474,7 @@ const getIconIcon = (key) =>
 
 <style>
 .item-wrapper {
+  padding: 0;
   width: 100%;
   display: flex;
   align-items: center; /* 교차 축 정렬: 세로 중앙 정렬 */

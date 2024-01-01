@@ -12,7 +12,15 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted, defineProps } from "vue";
+import { ref, provide, onMounted, defineProps, watch } from "vue";
+import { darkText, lightText } from "../../color/color.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const textColor = ref(themeMode.value === "light" ? lightText : darkText);
+watch(themeMode, (newValue) => {
+  textColor.value = newValue === "light" ? lightText : darkText;
+});
 
 use([
   CanvasRenderer,
@@ -40,6 +48,7 @@ const option = ref({
     left: props.left,
     textStyle: {
       fontSize: 14, // 폰트 크기 설정
+      color: textColor.value,
     },
   },
   tooltip: {
@@ -64,6 +73,13 @@ const option = ref({
         valueAnimation: true,
         formatter: `{value} ${props.unit}`,
         fontSize: 14,
+        textStyle: {
+          color: textColor.value, // 텍스트 컬러 설정
+        },
+      },
+      axisLabel: {
+        // 여기에 axisLabel 속성 추가
+        color: textColor.value, // 눈금 텍스트 색상을 흰색으로 설정
       },
       data: [
         {
@@ -85,8 +101,6 @@ const updateValue = () => {
     }
   }
 };
-
-
 
 onMounted(() => {
   setInterval(updateValue, 1000);

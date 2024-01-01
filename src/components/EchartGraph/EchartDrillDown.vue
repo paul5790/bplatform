@@ -5,18 +5,28 @@
       label="select"
       :items="trialrun"
       variant="underlined"
-      style="width: 120px; height: 5vh;"
+      style="width: 120px; height: 5vh"
       position="top right"
       density="compact"
     ></v-select>
-  <v-sheet
-    v-if="loading"
-    :elevation="elevation"
-    style="height: 50vh; display: flex; flex-direction: column; align-items: center; justify-content: center;"
-  >
-    <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
-    <p style="margin-top: 10px; font-weight: 400; font-size: 18px">loading</p>
-  </v-sheet>
+    <v-sheet
+      v-if="loading"
+      :elevation="elevation"
+      style="
+        height: 50vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      "
+    >
+      <v-progress-circular
+        :size="50"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+      <p style="margin-top: 10px; font-weight: 400; font-size: 18px">loading</p>
+    </v-sheet>
     <v-sheet
       :elevation="elevation"
       style="display: flex; flex-direction: column; align-items: center"
@@ -46,6 +56,14 @@ import {
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted, watch } from "vue";
 import { readTrialData, readlossData, readTimeData } from "../../api/index.js";
+import { darkText, lightText } from "../../color/color.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const textColor = ref(themeMode.value === "light" ? lightText : darkText);
+watch(themeMode, (newValue) => {
+  textColor.value = newValue === "light" ? lightText : darkText;
+});
 
 use([
   CanvasRenderer,
@@ -374,8 +392,13 @@ const fetchData = async () => {
 
         await (settingTime.value = timedata.lossTime);
 
-        const response = await readlossData(tokenid.value, endpoint, trialNum.value, settingTime.value);
-        
+        const response = await readlossData(
+          tokenid.value,
+          endpoint,
+          trialNum.value,
+          settingTime.value
+        );
+
         dataRefs[i].value = 0;
         dataRefs[i].value += Number(response.countDelay);
         alldataRefs[i].value = 0;
@@ -384,7 +407,7 @@ const fetchData = async () => {
         //console.error(error);
       }
     });
-    
+
     // 모든 axios 호출이 완료될 때까지 기다림
     await Promise.all(axiosPromises);
     loading.value = false;
@@ -447,7 +470,13 @@ const option = ref({
   },
   xAxis: {
     type: "category",
-    axisLabel: { interval: 0, rotate: 20, align: "center", margin: 30 },
+    axisLabel: {
+      color: textColor.value,
+      interval: 0,
+      rotate: 20,
+      align: "center",
+      margin: 30,
+    },
     data: [
       "DGPS",
       "GYRO",
@@ -711,6 +740,9 @@ const handleChartClick = async (event) => {
       const updatedOption = {
         xAxis: {
           data: xAxisData,
+          axisLabel: {
+            color: textColor.value, // 텍스트 색상을 흰색으로 설정
+          },
         },
         series: {
           type: "bar",
@@ -735,6 +767,9 @@ const handleChartClick = async (event) => {
               // 'Back' 버튼 클릭 시 최상위 그래프로 이동하는 옵션 설정
               const backToTopOption = {
                 xAxis: {
+                  axisLabel: {
+                    color: textColor.value, // 텍스트 색상을 흰색으로 설정
+                  },
                   data: [
                     "DGPS",
                     "GYRO",
@@ -1018,150 +1053,135 @@ const handleChartClick = async (event) => {
 };
 const updateChart = () => {
   if (chart.value) {
-  // 차트 데이터 업데이트 로직
-  const updatedOption = {
-    series: {
-      name: "바바",
-      type: "bar",
-      id: "sales",
-      data: [
-        {
-          value:
-            GLL.value +
-            GGA.value +
-            RMC.value +
-            VTG.value +
-            ZDA.value +
-            GSV.value +
-            GSA.value,
-          groupId: "DGPS",
-          percent: (
-            ((GLL.value +
+    // 차트 데이터 업데이트 로직
+    const updatedOption = {
+      series: {
+        name: "바바",
+        type: "bar",
+        id: "sales",
+        data: [
+          {
+            value:
+              GLL.value +
               GGA.value +
               RMC.value +
               VTG.value +
               ZDA.value +
               GSV.value +
-              GSA.value) /
-              (ALLGLL.value +
-                ALLGGA.value +
-                ALLRMC.value +
-                ALLVTG.value +
-                ALLZDA.value +
-                ALLGSV.value +
-                ALLGSA.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value:
-            // THS.value +
-            HDT.value + ROT.value,
-          groupId: "GYRO",
-          percent: (
-            ((HDT.value + ROT.value) / (ALLHDT.value + ALLROT.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value: MWV.value,
-          // MWD.value +
-          // VWR.value +
-          // MTW.value +
-          // VWT.value,
-          groupId: "ANEMOMETER",
-          percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
-        },
-        {
-          // TTM.value + TLL.value +
-          value: RSCREEN.value,
-          groupId: "RADAR",
-          percent: ((RSCREEN.value / ALLRSCREEN.value) * 100).toFixed(2),
-        },
-        {
-          value: VDM.value + VDO.value,
-          groupId: "AIS",
-          percent: (
-            ((VDM.value + VDO.value) / (ALLVDM.value + ALLVDO.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value: ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value,
-          groupId: "ECDIS",
-          percent: (
-            ((ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value) /
-              (ALLROUTEINFO.value +
-                ALLWAYPOINTS.value +
-                ALLRTZ.value +
-                ALLESCREEN.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value: RSA.value + HTD.value,
-          //+ MODE.value,
-          groupId: "AUTOPILOT",
-          percent: (
-            ((RSA.value + HTD.value) / (ALLRSA.value + ALLHTD.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value: VBW.value + VHW.value + VLW.value,
-          groupId: "SPEEDLOG",
-          percent: (
-            ((VBW.value + VHW.value + VLW.value) /
-              (ALLVBW.value + ALLVHW.value + ALLVLW.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value:
-            CAN_Online_State.value +
-            Engine_RPM.value +
-            Rudder.value +
-            Rudder_Scale.value,
-          groupId: "CanThrottle",
-          percent: (
-            ((CAN_Online_State.value +
+              GSA.value,
+            groupId: "DGPS",
+            percent: (
+              ((GLL.value +
+                GGA.value +
+                RMC.value +
+                VTG.value +
+                ZDA.value +
+                GSV.value +
+                GSA.value) /
+                (ALLGLL.value +
+                  ALLGGA.value +
+                  ALLRMC.value +
+                  ALLVTG.value +
+                  ALLZDA.value +
+                  ALLGSV.value +
+                  ALLGSA.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value:
+              // THS.value +
+              HDT.value + ROT.value,
+            groupId: "GYRO",
+            percent: (
+              ((HDT.value + ROT.value) / (ALLHDT.value + ALLROT.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value: MWV.value,
+            // MWD.value +
+            // VWR.value +
+            // MTW.value +
+            // VWT.value,
+            groupId: "ANEMOMETER",
+            percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
+          },
+          {
+            // TTM.value + TLL.value +
+            value: RSCREEN.value,
+            groupId: "RADAR",
+            percent: ((RSCREEN.value / ALLRSCREEN.value) * 100).toFixed(2),
+          },
+          {
+            value: VDM.value + VDO.value,
+            groupId: "AIS",
+            percent: (
+              ((VDM.value + VDO.value) / (ALLVDM.value + ALLVDO.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value:
+              ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value,
+            groupId: "ECDIS",
+            percent: (
+              ((ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value) /
+                (ALLROUTEINFO.value +
+                  ALLWAYPOINTS.value +
+                  ALLRTZ.value +
+                  ALLESCREEN.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value: RSA.value + HTD.value,
+            //+ MODE.value,
+            groupId: "AUTOPILOT",
+            percent: (
+              ((RSA.value + HTD.value) / (ALLRSA.value + ALLHTD.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value: VBW.value + VHW.value + VLW.value,
+            groupId: "SPEEDLOG",
+            percent: (
+              ((VBW.value + VHW.value + VLW.value) /
+                (ALLVBW.value + ALLVHW.value + ALLVLW.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value:
+              CAN_Online_State.value +
               Engine_RPM.value +
               Rudder.value +
-              Rudder_Scale.value) /
-              (ALLCAN_Online_State.value +
-                ALLEngine_RPM.value +
-                ALLRudder.value +
-                ALLRudder_Scale.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value: AUTOPILOTCONTACT.value,
-          groupId: "AUTOPILOTCONTACT",
-          percent: (
-            (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value:
-            NO1ENGINE_PANEL_61444.value +
-            NO1ENGINE_PANEL_65262.value +
-            NO1ENGINE_PANEL_65263.value +
-            NO1ENGINE_PANEL_65272.value +
-            NO1ENGINE_PANEL_65271.value +
-            NO1ENGINE_PANEL_65253.value +
-            NO1ENGINE_PANEL_65270.value +
-            NO1ENGINE_PANEL_65276.value +
-            NO1ENGINE_PANEL_65360.value +
-            NO1ENGINE_PANEL_65361_LAMP.value +
-            NO1ENGINE_PANEL_65361_STATUS.value +
-            NO1ENGINE_PANEL_65378.value +
-            NO1ENGINE_PANEL_65376.value +
-            NO1ENGINE_PANEL_65379.value,
-          groupId: "NO.1ENGINE",
-          percent: (
-            ((NO1ENGINE_PANEL_61444.value +
+              Rudder_Scale.value,
+            groupId: "CanThrottle",
+            percent: (
+              ((CAN_Online_State.value +
+                Engine_RPM.value +
+                Rudder.value +
+                Rudder_Scale.value) /
+                (ALLCAN_Online_State.value +
+                  ALLEngine_RPM.value +
+                  ALLRudder.value +
+                  ALLRudder_Scale.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value: AUTOPILOTCONTACT.value,
+            groupId: "AUTOPILOTCONTACT",
+            percent: (
+              (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value:
+              NO1ENGINE_PANEL_61444.value +
               NO1ENGINE_PANEL_65262.value +
               NO1ENGINE_PANEL_65263.value +
               NO1ENGINE_PANEL_65272.value +
@@ -1174,43 +1194,43 @@ const updateChart = () => {
               NO1ENGINE_PANEL_65361_STATUS.value +
               NO1ENGINE_PANEL_65378.value +
               NO1ENGINE_PANEL_65376.value +
-              NO1ENGINE_PANEL_65379.value) /
-              (ALLNO1ENGINE_PANEL_61444.value +
-                ALLNO1ENGINE_PANEL_65262.value +
-                ALLNO1ENGINE_PANEL_65263.value +
-                ALLNO1ENGINE_PANEL_65272.value +
-                ALLNO1ENGINE_PANEL_65271.value +
-                ALLNO1ENGINE_PANEL_65253.value +
-                ALLNO1ENGINE_PANEL_65270.value +
-                ALLNO1ENGINE_PANEL_65276.value +
-                ALLNO1ENGINE_PANEL_65360.value +
-                ALLNO1ENGINE_PANEL_65361_LAMP.value +
-                ALLNO1ENGINE_PANEL_65361_STATUS.value +
-                ALLNO1ENGINE_PANEL_65378.value +
-                ALLNO1ENGINE_PANEL_65376.value +
-                ALLNO1ENGINE_PANEL_65379.value)) *
-            100
-          ).toFixed(2),
-        },
-        {
-          value:
-            NO2ENGINE_PANEL_61444.value +
-            NO2ENGINE_PANEL_65262.value +
-            NO2ENGINE_PANEL_65263.value +
-            NO2ENGINE_PANEL_65272.value +
-            NO2ENGINE_PANEL_65271.value +
-            NO2ENGINE_PANEL_65253.value +
-            NO2ENGINE_PANEL_65270.value +
-            NO2ENGINE_PANEL_65276.value +
-            NO2ENGINE_PANEL_65360.value +
-            NO2ENGINE_PANEL_65361_LAMP.value +
-            NO2ENGINE_PANEL_65361_STATUS.value +
-            NO2ENGINE_PANEL_65378.value +
-            NO2ENGINE_PANEL_65376.value +
-            NO2ENGINE_PANEL_65379.value,
-          groupId: "NO.2ENGINE",
-          percent: (
-            ((NO2ENGINE_PANEL_61444.value +
+              NO1ENGINE_PANEL_65379.value,
+            groupId: "NO.1ENGINE",
+            percent: (
+              ((NO1ENGINE_PANEL_61444.value +
+                NO1ENGINE_PANEL_65262.value +
+                NO1ENGINE_PANEL_65263.value +
+                NO1ENGINE_PANEL_65272.value +
+                NO1ENGINE_PANEL_65271.value +
+                NO1ENGINE_PANEL_65253.value +
+                NO1ENGINE_PANEL_65270.value +
+                NO1ENGINE_PANEL_65276.value +
+                NO1ENGINE_PANEL_65360.value +
+                NO1ENGINE_PANEL_65361_LAMP.value +
+                NO1ENGINE_PANEL_65361_STATUS.value +
+                NO1ENGINE_PANEL_65378.value +
+                NO1ENGINE_PANEL_65376.value +
+                NO1ENGINE_PANEL_65379.value) /
+                (ALLNO1ENGINE_PANEL_61444.value +
+                  ALLNO1ENGINE_PANEL_65262.value +
+                  ALLNO1ENGINE_PANEL_65263.value +
+                  ALLNO1ENGINE_PANEL_65272.value +
+                  ALLNO1ENGINE_PANEL_65271.value +
+                  ALLNO1ENGINE_PANEL_65253.value +
+                  ALLNO1ENGINE_PANEL_65270.value +
+                  ALLNO1ENGINE_PANEL_65276.value +
+                  ALLNO1ENGINE_PANEL_65360.value +
+                  ALLNO1ENGINE_PANEL_65361_LAMP.value +
+                  ALLNO1ENGINE_PANEL_65361_STATUS.value +
+                  ALLNO1ENGINE_PANEL_65378.value +
+                  ALLNO1ENGINE_PANEL_65376.value +
+                  ALLNO1ENGINE_PANEL_65379.value)) *
+              100
+            ).toFixed(2),
+          },
+          {
+            value:
+              NO2ENGINE_PANEL_61444.value +
               NO2ENGINE_PANEL_65262.value +
               NO2ENGINE_PANEL_65263.value +
               NO2ENGINE_PANEL_65272.value +
@@ -1223,664 +1243,684 @@ const updateChart = () => {
               NO2ENGINE_PANEL_65361_STATUS.value +
               NO2ENGINE_PANEL_65378.value +
               NO2ENGINE_PANEL_65376.value +
-              NO2ENGINE_PANEL_65379.value) /
-              (ALLNO2ENGINE_PANEL_61444.value +
-                ALLNO2ENGINE_PANEL_65262.value +
-                ALLNO2ENGINE_PANEL_65263.value +
-                ALLNO2ENGINE_PANEL_65272.value +
-                ALLNO2ENGINE_PANEL_65271.value +
-                ALLNO2ENGINE_PANEL_65253.value +
-                ALLNO2ENGINE_PANEL_65270.value +
-                ALLNO2ENGINE_PANEL_65276.value +
-                ALLNO2ENGINE_PANEL_65360.value +
-                ALLNO2ENGINE_PANEL_65361_LAMP.value +
-                ALLNO2ENGINE_PANEL_65361_STATUS.value +
-                ALLNO2ENGINE_PANEL_65378.value +
-                ALLNO2ENGINE_PANEL_65376.value +
-                ALLNO2ENGINE_PANEL_65379.value)) *
-            100
-          ).toFixed(2),
+              NO2ENGINE_PANEL_65379.value,
+            groupId: "NO.2ENGINE",
+            percent: (
+              ((NO2ENGINE_PANEL_61444.value +
+                NO2ENGINE_PANEL_65262.value +
+                NO2ENGINE_PANEL_65263.value +
+                NO2ENGINE_PANEL_65272.value +
+                NO2ENGINE_PANEL_65271.value +
+                NO2ENGINE_PANEL_65253.value +
+                NO2ENGINE_PANEL_65270.value +
+                NO2ENGINE_PANEL_65276.value +
+                NO2ENGINE_PANEL_65360.value +
+                NO2ENGINE_PANEL_65361_LAMP.value +
+                NO2ENGINE_PANEL_65361_STATUS.value +
+                NO2ENGINE_PANEL_65378.value +
+                NO2ENGINE_PANEL_65376.value +
+                NO2ENGINE_PANEL_65379.value) /
+                (ALLNO2ENGINE_PANEL_61444.value +
+                  ALLNO2ENGINE_PANEL_65262.value +
+                  ALLNO2ENGINE_PANEL_65263.value +
+                  ALLNO2ENGINE_PANEL_65272.value +
+                  ALLNO2ENGINE_PANEL_65271.value +
+                  ALLNO2ENGINE_PANEL_65253.value +
+                  ALLNO2ENGINE_PANEL_65270.value +
+                  ALLNO2ENGINE_PANEL_65276.value +
+                  ALLNO2ENGINE_PANEL_65360.value +
+                  ALLNO2ENGINE_PANEL_65361_LAMP.value +
+                  ALLNO2ENGINE_PANEL_65361_STATUS.value +
+                  ALLNO2ENGINE_PANEL_65378.value +
+                  ALLNO2ENGINE_PANEL_65376.value +
+                  ALLNO2ENGINE_PANEL_65379.value)) *
+              100
+            ).toFixed(2),
+          },
+          // 다른 데이터도 추가 가능
+        ],
+        universalTransition: {
+          enabled: true,
+          divideShape: "clone",
         },
-        // 다른 데이터도 추가 가능
-      ],
-      universalTransition: {
-        enabled: true,
-        divideShape: "clone",
       },
-    },
-  };
-  // 하위 그래프 데이터
-  drilldownData = [
-    {
-      dataGroupId: "DGPS",
-      data: [
-        [
-          "GLL",
-          {
-            value: GLL.value,
-            groupId: "GLL",
-            percent: ((GLL.value / ALLGLL.value) * 100).toFixed(2),
-          },
+    };
+    // 하위 그래프 데이터
+    drilldownData = [
+      {
+        dataGroupId: "DGPS",
+        data: [
+          [
+            "GLL",
+            {
+              value: GLL.value,
+              groupId: "GLL",
+              percent: ((GLL.value / ALLGLL.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "GGA",
+            {
+              value: GGA.value,
+              groupId: "GGA",
+              percent: ((GGA.value / ALLGGA.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "RMC",
+            {
+              value: RMC.value,
+              groupId: "RMC",
+              percent: ((RMC.value / ALLRMC.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "VTG",
+            {
+              value: VTG.value,
+              groupId: "VTG",
+              percent: ((VTG.value / ALLVTG.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "ZDA",
+            {
+              value: ZDA.value,
+              groupId: "ZDA",
+              percent: ((ZDA.value / ALLZDA.value) * 100).toFixed(2),
+            },
+          ],
+          // ["DTM", DTM.value],
+          [
+            "GSV",
+            {
+              value: GSV.value,
+              groupId: "GSV",
+              percent: ((GSV.value / ALLGSV.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "GSA",
+            {
+              value: GSA.value,
+              groupId: "GSA",
+              percent: ((GSA.value / ALLGSA.value) * 100).toFixed(2),
+            },
+          ],
         ],
-        [
-          "GGA",
-          {
-            value: GGA.value,
-            groupId: "GGA",
-            percent: ((GGA.value / ALLGGA.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "GYRO",
+        data: [
+          //["THS", THS.value],
+          [
+            "HDT",
+            {
+              value: HDT.value,
+              groupId: "HDT",
+              percent: ((HDT.value / ALLHDT.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "ROT",
+            {
+              value: ROT.value,
+              groupId: "ROT",
+              percent: ((ROT.value / ALLROT.value) * 100).toFixed(2),
+            },
+          ],
         ],
-        [
-          "RMC",
-          {
-            value: RMC.value,
-            groupId: "RMC",
-            percent: ((RMC.value / ALLRMC.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "ANEMOMETER",
+        data: [
+          [
+            "MWV",
+            {
+              value: MWV.value,
+              groupId: "MWV",
+              percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
+            },
+          ],
+          // ["MWD", MWD.value],
+          // ["VWR", VWR.value],
+          // ["MTW", MTW.value],
+          // ["VWT", VWT.value],
         ],
-        [
-          "VTG",
-          {
-            value: VTG.value,
-            groupId: "VTG",
-            percent: ((VTG.value / ALLVTG.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "RADAR",
+        data: [
+          // ["TTM", TTM.value],
+          // ["TLL", TLL.value],
+          [
+            "RSCREEN",
+            {
+              value: RSCREEN.value,
+              groupId: "RSCREEN",
+              percent: ((RSCREEN.value / ALLRSCREEN.value) * 100).toFixed(2),
+            },
+          ],
         ],
-        [
-          "ZDA",
-          {
-            value: ZDA.value,
-            groupId: "ZDA",
-            percent: ((ZDA.value / ALLZDA.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "AIS",
+        data: [
+          [
+            "VDM",
+            {
+              value: VDM.value,
+              groupId: "VDM",
+              percent: ((VDM.value / ALLVDM.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "VDO",
+            {
+              value: VDO.value,
+              groupId: "VDO",
+              percent: ((VDO.value / ALLVDO.value) * 100).toFixed(2),
+            },
+          ],
         ],
-        // ["DTM", DTM.value],
-        [
-          "GSV",
-          {
-            value: GSV.value,
-            groupId: "GSV",
-            percent: ((GSV.value / ALLGSV.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "ECDIS",
+        data: [
+          [
+            "ROUTEINFO",
+            {
+              value: ROUTEINFO.value,
+              groupId: "ROUTEINFO",
+              percent: ((ROUTEINFO.value / ALLROUTEINFO.value) * 100).toFixed(
+                2
+              ),
+            },
+          ],
+          [
+            "WAYPOINTS",
+            {
+              value: WAYPOINTS.value,
+              groupId: "WAYPOINTS",
+              percent: ((WAYPOINTS.value / ALLWAYPOINTS.value) * 100).toFixed(
+                2
+              ),
+            },
+          ],
+          [
+            "RTZ",
+            {
+              value: RTZ.value,
+              groupId: "RTZ",
+              percent: ((RTZ.value / ALLRTZ.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "ESCREEN",
+            {
+              value: ESCREEN.value,
+              groupId: "ESCREEN",
+              percent: ((ESCREEN.value / ALLESCREEN.value) * 100).toFixed(2),
+            },
+          ],
         ],
-        [
-          "GSA",
-          {
-            value: GSA.value,
-            groupId: "GSA",
-            percent: ((GSA.value / ALLGSA.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "AUTOPILOT",
+        data: [
+          [
+            "RSA",
+            {
+              value: RSA.value,
+              groupId: "RSA",
+              percent: ((RSA.value / ALLRSA.value) * 100).toFixed(2),
+            },
+          ],
+          // ["MODE", MODE.value],
+          [
+            "HTD",
+            {
+              value: HTD.value,
+              groupId: "HTD",
+              percent: ((HTD.value / ALLHTD.value) * 100).toFixed(2),
+            },
+          ],
         ],
-      ],
-    },
-    {
-      dataGroupId: "GYRO",
-      data: [
-        //["THS", THS.value],
-        [
-          "HDT",
-          {
-            value: HDT.value,
-            groupId: "HDT",
-            percent: ((HDT.value / ALLHDT.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "SPEEDLOG",
+        data: [
+          [
+            "VBW",
+            {
+              value: VBW.value,
+              groupId: "VBW",
+              percent: ((VBW.value / ALLVBW.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "VHW",
+            {
+              value: VHW.value,
+              groupId: "VHW",
+              percent: ((VHW.value / ALLVHW.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "VLW",
+            {
+              value: VLW.value,
+              groupId: "VLW",
+              percent: ((VLW.value / ALLVLW.value) * 100).toFixed(2),
+            },
+          ],
         ],
-        [
-          "ROT",
-          {
-            value: ROT.value,
-            groupId: "ROT",
-            percent: ((ROT.value / ALLROT.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "CanThrottle",
+        data: [
+          [
+            "CAN_Online_State,",
+            {
+              value: CAN_Online_State.value,
+              groupId: "CAN_Online_State",
+              percent: (
+                (CAN_Online_State.value / ALLCAN_Online_State.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "Engine_RPM,",
+            {
+              value: Engine_RPM.value,
+              groupId: "Engine_RPM",
+              percent: ((Engine_RPM.value / ALLEngine_RPM.value) * 100).toFixed(
+                2
+              ),
+            },
+          ],
+          [
+            "Rudder,",
+            {
+              value: Rudder.value,
+              groupId: "Rudder",
+              percent: ((Rudder.value / ALLRudder.value) * 100).toFixed(2),
+            },
+          ],
+          [
+            "Rudder_Scale,",
+            {
+              value: Rudder_Scale.value,
+              groupId: "Rudder_Scale",
+              percent: (
+                (Rudder_Scale.value / ALLRudder_Scale.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
         ],
-      ],
-    },
-    {
-      dataGroupId: "ANEMOMETER",
-      data: [
-        [
-          "MWV",
-          {
-            value: MWV.value,
-            groupId: "MWV",
-            percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "AUTOPILOTCONTACT",
+        data: [
+          [
+            "AUTOPILOTCONTACT",
+            {
+              value: AUTOPILOTCONTACT.value,
+              groupId: "AUTOPILOTCONTACT",
+              percent: (
+                (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
         ],
-        // ["MWD", MWD.value],
-        // ["VWR", VWR.value],
-        // ["MTW", MTW.value],
-        // ["VWT", VWT.value],
-      ],
-    },
-    {
-      dataGroupId: "RADAR",
-      data: [
-        // ["TTM", TTM.value],
-        // ["TLL", TLL.value],
-        [
-          "RSCREEN",
-          {
-            value: RSCREEN.value,
-            groupId: "RSCREEN",
-            percent: ((RSCREEN.value / ALLRSCREEN.value) * 100).toFixed(2),
-          },
-        ],
-      ],
-    },
-    {
-      dataGroupId: "AIS",
-      data: [
-        [
-          "VDM",
-          {
-            value: VDM.value,
-            groupId: "VDM",
-            percent: ((VDM.value / ALLVDM.value) * 100).toFixed(2),
-          },
-        ],
-        [
-          "VDO",
-          {
-            value: VDO.value,
-            groupId: "VDO",
-            percent: ((VDO.value / ALLVDO.value) * 100).toFixed(2),
-          },
-        ],
-      ],
-    },
-    {
-      dataGroupId: "ECDIS",
-      data: [
-        [
-          "ROUTEINFO",
-          {
-            value: ROUTEINFO.value,
-            groupId: "ROUTEINFO",
-            percent: ((ROUTEINFO.value / ALLROUTEINFO.value) * 100).toFixed(2),
-          },
-        ],
-        [
-          "WAYPOINTS",
-          {
-            value: WAYPOINTS.value,
-            groupId: "WAYPOINTS",
-            percent: ((WAYPOINTS.value / ALLWAYPOINTS.value) * 100).toFixed(2),
-          },
-        ],
-        [
-          "RTZ",
-          {
-            value: RTZ.value,
-            groupId: "RTZ",
-            percent: ((RTZ.value / ALLRTZ.value) * 100).toFixed(2),
-          },
-        ],
-        [
-          "ESCREEN",
-          {
-            value: ESCREEN.value,
-            groupId: "ESCREEN",
-            percent: ((ESCREEN.value / ALLESCREEN.value) * 100).toFixed(2),
-          },
-        ],
-      ],
-    },
-    {
-      dataGroupId: "AUTOPILOT",
-      data: [
-        [
-          "RSA",
-          {
-            value: RSA.value,
-            groupId: "RSA",
-            percent: ((RSA.value / ALLRSA.value) * 100).toFixed(2),
-          },
-        ],
-        // ["MODE", MODE.value],
-        [
-          "HTD",
-          {
-            value: HTD.value,
-            groupId: "HTD",
-            percent: ((HTD.value / ALLHTD.value) * 100).toFixed(2),
-          },
-        ],
-      ],
-    },
-    {
-      dataGroupId: "SPEEDLOG",
-      data: [
-        [
-          "VBW",
-          {
-            value: VBW.value,
-            groupId: "VBW",
-            percent: ((VBW.value / ALLVBW.value) * 100).toFixed(2),
-          },
-        ],
-        [
-          "VHW",
-          {
-            value: VHW.value,
-            groupId: "VHW",
-            percent: ((VHW.value / ALLVHW.value) * 100).toFixed(2),
-          },
-        ],
-        [
-          "VLW",
-          {
-            value: VLW.value,
-            groupId: "VLW",
-            percent: ((VLW.value / ALLVLW.value) * 100).toFixed(2),
-          },
-        ],
-      ],
-    },
-    {
-      dataGroupId: "CanThrottle",
-      data: [
-        [
-          "CAN_Online_State,",
-          {
-            value: CAN_Online_State.value,
-            groupId: "CAN_Online_State",
-            percent: (
-              (CAN_Online_State.value / ALLCAN_Online_State.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "Engine_RPM,",
-          {
-            value: Engine_RPM.value,
-            groupId: "Engine_RPM",
-            percent: ((Engine_RPM.value / ALLEngine_RPM.value) * 100).toFixed(
-              2
-            ),
-          },
-        ],
-        [
-          "Rudder,",
-          {
-            value: Rudder.value,
-            groupId: "Rudder",
-            percent: ((Rudder.value / ALLRudder.value) * 100).toFixed(2),
-          },
-        ],
-        [
-          "Rudder_Scale,",
-          {
-            value: Rudder_Scale.value,
-            groupId: "Rudder_Scale",
-            percent: (
-              (Rudder_Scale.value / ALLRudder_Scale.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-      ],
-    },
-    {
-      dataGroupId: "AUTOPILOTCONTACT",
-      data: [
-        [
-          "AUTOPILOTCONTACT",
-          {
-            value: AUTOPILOTCONTACT.value,
-            groupId: "AUTOPILOTCONTACT",
-            percent: (
-              (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-      ],
-    },
+      },
 
-    {
-      dataGroupId: "NO.1ENGINE",
-      data: [
-        [
-          "61444",
-          {
-            value: NO1ENGINE_PANEL_61444.value,
-            groupId: "NO1ENGINE_PANEL_61444",
-            percent: (
-              (NO1ENGINE_PANEL_61444.value / ALLNO1ENGINE_PANEL_61444.value) *
-              100
-            ).toFixed(2),
-          },
+      {
+        dataGroupId: "NO.1ENGINE",
+        data: [
+          [
+            "61444",
+            {
+              value: NO1ENGINE_PANEL_61444.value,
+              groupId: "NO1ENGINE_PANEL_61444",
+              percent: (
+                (NO1ENGINE_PANEL_61444.value / ALLNO1ENGINE_PANEL_61444.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65262",
+            {
+              value: NO1ENGINE_PANEL_65262.value,
+              groupId: "NO1ENGINE_PANEL_65262",
+              percent: (
+                (NO1ENGINE_PANEL_65262.value / ALLNO1ENGINE_PANEL_65262.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65263",
+            {
+              value: NO1ENGINE_PANEL_65263.value,
+              groupId: "NO1ENGINE_PANEL_65263",
+              percent: (
+                (NO1ENGINE_PANEL_65263.value / ALLNO1ENGINE_PANEL_65263.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65272",
+            {
+              value: NO1ENGINE_PANEL_65272.value,
+              groupId: "NO1ENGINE_PANEL_65272",
+              percent: (
+                (NO1ENGINE_PANEL_65272.value / ALLNO1ENGINE_PANEL_65272.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65271",
+            {
+              value: NO1ENGINE_PANEL_65271.value,
+              groupId: "NO1ENGINE_PANEL_65271",
+              percent: (
+                (NO1ENGINE_PANEL_65271.value / ALLNO1ENGINE_PANEL_65271.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65253",
+            {
+              value: NO1ENGINE_PANEL_65253.value,
+              groupId: "NO1ENGINE_PANEL_65253",
+              percent: (
+                (NO1ENGINE_PANEL_65253.value / ALLNO1ENGINE_PANEL_65253.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65270",
+            {
+              value: NO1ENGINE_PANEL_65270.value,
+              groupId: "NO1ENGINE_PANEL_65270",
+              percent: (
+                (NO1ENGINE_PANEL_65270.value / ALLNO1ENGINE_PANEL_65270.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65276",
+            {
+              value: NO1ENGINE_PANEL_65276.value,
+              groupId: "NO1ENGINE_PANEL_65276",
+              percent: (
+                (NO1ENGINE_PANEL_65276.value / ALLNO1ENGINE_PANEL_65276.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65360",
+            {
+              value: NO1ENGINE_PANEL_65360.value,
+              groupId: "NO1ENGINE_PANEL_65360",
+              percent: (
+                (NO1ENGINE_PANEL_65360.value / ALLNO1ENGINE_PANEL_65360.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65361_LAMP",
+            {
+              value: NO1ENGINE_PANEL_65361_LAMP.value,
+              groupId: "NO1ENGINE_PANEL_65361_LAMP",
+              percent: (
+                (NO1ENGINE_PANEL_65361_LAMP.value /
+                  ALLNO1ENGINE_PANEL_65361_LAMP.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65361_STATUS",
+            {
+              value: NO1ENGINE_PANEL_65361_STATUS.value,
+              groupId: "NO1ENGINE_PANEL_65361_STATUS",
+              percent: (
+                (NO1ENGINE_PANEL_65361_STATUS.value /
+                  ALLNO1ENGINE_PANEL_65361_STATUS.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65378",
+            {
+              value: NO1ENGINE_PANEL_65378.value,
+              groupId: "NO1ENGINE_PANEL_65378",
+              percent: (
+                (NO1ENGINE_PANEL_65378.value / ALLNO1ENGINE_PANEL_65378.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65376",
+            {
+              value: NO1ENGINE_PANEL_65376.value,
+              groupId: "NO1ENGINE_PANEL_65376",
+              percent: (
+                (NO1ENGINE_PANEL_65376.value / ALLNO1ENGINE_PANEL_65376.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65379",
+            {
+              value: NO1ENGINE_PANEL_65379.value,
+              groupId: "NO1ENGINE_PANEL_65379",
+              percent: (
+                (NO1ENGINE_PANEL_65379.value / ALLNO1ENGINE_PANEL_65379.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
         ],
-        [
-          "65262",
-          {
-            value: NO1ENGINE_PANEL_65262.value,
-            groupId: "NO1ENGINE_PANEL_65262",
-            percent: (
-              (NO1ENGINE_PANEL_65262.value / ALLNO1ENGINE_PANEL_65262.value) *
-              100
-            ).toFixed(2),
-          },
+      },
+      {
+        dataGroupId: "NO.2ENGINE",
+        data: [
+          [
+            "61444",
+            {
+              value: NO2ENGINE_PANEL_61444.value,
+              groupId: "NO2ENGINE_PANEL_61444",
+              percent: (
+                (NO2ENGINE_PANEL_61444.value / ALLNO2ENGINE_PANEL_61444.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65262",
+            {
+              value: NO2ENGINE_PANEL_65262.value,
+              groupId: "NO2ENGINE_PANEL_65262",
+              percent: (
+                (NO2ENGINE_PANEL_65262.value / ALLNO2ENGINE_PANEL_65262.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65263",
+            {
+              value: NO2ENGINE_PANEL_65263.value,
+              groupId: "NO2ENGINE_PANEL_65263",
+              percent: (
+                (NO2ENGINE_PANEL_65263.value / ALLNO2ENGINE_PANEL_65263.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65272",
+            {
+              value: NO2ENGINE_PANEL_65272.value,
+              groupId: "NO2ENGINE_PANEL_65272",
+              percent: (
+                (NO2ENGINE_PANEL_65272.value / ALLNO2ENGINE_PANEL_65272.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65271",
+            {
+              value: NO2ENGINE_PANEL_65271.value,
+              groupId: "NO2ENGINE_PANEL_65271",
+              percent: (
+                (NO2ENGINE_PANEL_65271.value / ALLNO2ENGINE_PANEL_65271.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65253",
+            {
+              value: NO2ENGINE_PANEL_65253.value,
+              groupId: "NO2ENGINE_PANEL_65253",
+              percent: (
+                (NO2ENGINE_PANEL_65253.value / ALLNO2ENGINE_PANEL_65253.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65270",
+            {
+              value: NO2ENGINE_PANEL_65270.value,
+              groupId: "NO2ENGINE_PANEL_65270",
+              percent: (
+                (NO2ENGINE_PANEL_65270.value / ALLNO2ENGINE_PANEL_65270.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65276",
+            {
+              value: NO2ENGINE_PANEL_65276.value,
+              groupId: "NO2ENGINE_PANEL_65276",
+              percent: (
+                (NO2ENGINE_PANEL_65276.value / ALLNO2ENGINE_PANEL_65276.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65360",
+            {
+              value: NO2ENGINE_PANEL_65360.value,
+              groupId: "NO2ENGINE_PANEL_65360",
+              percent: (
+                (NO2ENGINE_PANEL_65360.value / ALLNO2ENGINE_PANEL_65360.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65361_LAMP",
+            {
+              value: NO2ENGINE_PANEL_65361_LAMP.value,
+              groupId: "NO2ENGINE_PANEL_65361_LAMP",
+              percent: (
+                (NO2ENGINE_PANEL_65361_LAMP.value /
+                  ALLNO2ENGINE_PANEL_65361_LAMP.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65361_STATUS",
+            {
+              value: NO2ENGINE_PANEL_65361_STATUS.value,
+              groupId: "NO2ENGINE_PANEL_65361_STATUS",
+              percent: (
+                (NO2ENGINE_PANEL_65361_STATUS.value /
+                  ALLNO2ENGINE_PANEL_65361_STATUS.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65378",
+            {
+              value: NO2ENGINE_PANEL_65378.value,
+              groupId: "NO2ENGINE_PANEL_65378",
+              percent: (
+                (NO2ENGINE_PANEL_65378.value / ALLNO2ENGINE_PANEL_65378.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65376",
+            {
+              value: NO2ENGINE_PANEL_65376.value,
+              groupId: "NO2ENGINE_PANEL_65376",
+              percent: (
+                (NO2ENGINE_PANEL_65376.value / ALLNO2ENGINE_PANEL_65376.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
+          [
+            "65379",
+            {
+              value: NO2ENGINE_PANEL_65379.value,
+              groupId: "NO2ENGINE_PANEL_65379",
+              percent: (
+                (NO2ENGINE_PANEL_65379.value / ALLNO2ENGINE_PANEL_65379.value) *
+                100
+              ).toFixed(2),
+            },
+          ],
         ],
-        [
-          "65263",
-          {
-            value: NO1ENGINE_PANEL_65263.value,
-            groupId: "NO1ENGINE_PANEL_65263",
-            percent: (
-              (NO1ENGINE_PANEL_65263.value / ALLNO1ENGINE_PANEL_65263.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65272",
-          {
-            value: NO1ENGINE_PANEL_65272.value,
-            groupId: "NO1ENGINE_PANEL_65272",
-            percent: (
-              (NO1ENGINE_PANEL_65272.value / ALLNO1ENGINE_PANEL_65272.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65271",
-          {
-            value: NO1ENGINE_PANEL_65271.value,
-            groupId: "NO1ENGINE_PANEL_65271",
-            percent: (
-              (NO1ENGINE_PANEL_65271.value / ALLNO1ENGINE_PANEL_65271.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65253",
-          {
-            value: NO1ENGINE_PANEL_65253.value,
-            groupId: "NO1ENGINE_PANEL_65253",
-            percent: (
-              (NO1ENGINE_PANEL_65253.value / ALLNO1ENGINE_PANEL_65253.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65270",
-          {
-            value: NO1ENGINE_PANEL_65270.value,
-            groupId: "NO1ENGINE_PANEL_65270",
-            percent: (
-              (NO1ENGINE_PANEL_65270.value / ALLNO1ENGINE_PANEL_65270.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65276",
-          {
-            value: NO1ENGINE_PANEL_65276.value,
-            groupId: "NO1ENGINE_PANEL_65276",
-            percent: (
-              (NO1ENGINE_PANEL_65276.value / ALLNO1ENGINE_PANEL_65276.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65360",
-          {
-            value: NO1ENGINE_PANEL_65360.value,
-            groupId: "NO1ENGINE_PANEL_65360",
-            percent: (
-              (NO1ENGINE_PANEL_65360.value / ALLNO1ENGINE_PANEL_65360.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65361_LAMP",
-          {
-            value: NO1ENGINE_PANEL_65361_LAMP.value,
-            groupId: "NO1ENGINE_PANEL_65361_LAMP",
-            percent: (
-              (NO1ENGINE_PANEL_65361_LAMP.value /
-                ALLNO1ENGINE_PANEL_65361_LAMP.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65361_STATUS",
-          {
-            value: NO1ENGINE_PANEL_65361_STATUS.value,
-            groupId: "NO1ENGINE_PANEL_65361_STATUS",
-            percent: (
-              (NO1ENGINE_PANEL_65361_STATUS.value /
-                ALLNO1ENGINE_PANEL_65361_STATUS.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65378",
-          {
-            value: NO1ENGINE_PANEL_65378.value,
-            groupId: "NO1ENGINE_PANEL_65378",
-            percent: (
-              (NO1ENGINE_PANEL_65378.value / ALLNO1ENGINE_PANEL_65378.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65376",
-          {
-            value: NO1ENGINE_PANEL_65376.value,
-            groupId: "NO1ENGINE_PANEL_65376",
-            percent: (
-              (NO1ENGINE_PANEL_65376.value / ALLNO1ENGINE_PANEL_65376.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65379",
-          {
-            value: NO1ENGINE_PANEL_65379.value,
-            groupId: "NO1ENGINE_PANEL_65379",
-            percent: (
-              (NO1ENGINE_PANEL_65379.value / ALLNO1ENGINE_PANEL_65379.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-      ],
-    },
-    {
-      dataGroupId: "NO.2ENGINE",
-      data: [
-        [
-          "61444",
-          {
-            value: NO2ENGINE_PANEL_61444.value,
-            groupId: "NO2ENGINE_PANEL_61444",
-            percent: (
-              (NO2ENGINE_PANEL_61444.value / ALLNO2ENGINE_PANEL_61444.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65262",
-          {
-            value: NO2ENGINE_PANEL_65262.value,
-            groupId: "NO2ENGINE_PANEL_65262",
-            percent: (
-              (NO2ENGINE_PANEL_65262.value / ALLNO2ENGINE_PANEL_65262.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65263",
-          {
-            value: NO2ENGINE_PANEL_65263.value,
-            groupId: "NO2ENGINE_PANEL_65263",
-            percent: (
-              (NO2ENGINE_PANEL_65263.value / ALLNO2ENGINE_PANEL_65263.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65272",
-          {
-            value: NO2ENGINE_PANEL_65272.value,
-            groupId: "NO2ENGINE_PANEL_65272",
-            percent: (
-              (NO2ENGINE_PANEL_65272.value / ALLNO2ENGINE_PANEL_65272.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65271",
-          {
-            value: NO2ENGINE_PANEL_65271.value,
-            groupId: "NO2ENGINE_PANEL_65271",
-            percent: (
-              (NO2ENGINE_PANEL_65271.value / ALLNO2ENGINE_PANEL_65271.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65253",
-          {
-            value: NO2ENGINE_PANEL_65253.value,
-            groupId: "NO2ENGINE_PANEL_65253",
-            percent: (
-              (NO2ENGINE_PANEL_65253.value / ALLNO2ENGINE_PANEL_65253.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65270",
-          {
-            value: NO2ENGINE_PANEL_65270.value,
-            groupId: "NO2ENGINE_PANEL_65270",
-            percent: (
-              (NO2ENGINE_PANEL_65270.value / ALLNO2ENGINE_PANEL_65270.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65276",
-          {
-            value: NO2ENGINE_PANEL_65276.value,
-            groupId: "NO2ENGINE_PANEL_65276",
-            percent: (
-              (NO2ENGINE_PANEL_65276.value / ALLNO2ENGINE_PANEL_65276.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65360",
-          {
-            value: NO2ENGINE_PANEL_65360.value,
-            groupId: "NO2ENGINE_PANEL_65360",
-            percent: (
-              (NO2ENGINE_PANEL_65360.value / ALLNO2ENGINE_PANEL_65360.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65361_LAMP",
-          {
-            value: NO2ENGINE_PANEL_65361_LAMP.value,
-            groupId: "NO2ENGINE_PANEL_65361_LAMP",
-            percent: (
-              (NO2ENGINE_PANEL_65361_LAMP.value /
-                ALLNO2ENGINE_PANEL_65361_LAMP.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65361_STATUS",
-          {
-            value: NO2ENGINE_PANEL_65361_STATUS.value,
-            groupId: "NO2ENGINE_PANEL_65361_STATUS",
-            percent: (
-              (NO2ENGINE_PANEL_65361_STATUS.value /
-                ALLNO2ENGINE_PANEL_65361_STATUS.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65378",
-          {
-            value: NO2ENGINE_PANEL_65378.value,
-            groupId: "NO2ENGINE_PANEL_65378",
-            percent: (
-              (NO2ENGINE_PANEL_65378.value / ALLNO2ENGINE_PANEL_65378.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65376",
-          {
-            value: NO2ENGINE_PANEL_65376.value,
-            groupId: "NO2ENGINE_PANEL_65376",
-            percent: (
-              (NO2ENGINE_PANEL_65376.value / ALLNO2ENGINE_PANEL_65376.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-        [
-          "65379",
-          {
-            value: NO2ENGINE_PANEL_65379.value,
-            groupId: "NO2ENGINE_PANEL_65379",
-            percent: (
-              (NO2ENGINE_PANEL_65379.value / ALLNO2ENGINE_PANEL_65379.value) *
-              100
-            ).toFixed(2),
-          },
-        ],
-      ],
-      // [
-      //   ["61444", NO2ENGINE_PANEL_61444.value],
-      //   ["65262", NO2ENGINE_PANEL_65262.value],
-      //   ["65263", NO2ENGINE_PANEL_65263.value],
-      //   ["65272", NO2ENGINE_PANEL_65272.value],
-      //   ["65271", NO2ENGINE_PANEL_65271.value],
-      //   ["65253", NO2ENGINE_PANEL_65253.value],
-      //   ["65270", NO2ENGINE_PANEL_65270.value],
-      //   ["65276", NO2ENGINE_PANEL_65276.value],
-      //   ["65360", NO2ENGINE_PANEL_65360.value],
-      //   ["65361_LAMP", NO2ENGINE_PANEL_65361_LAMP.value],
-      //   ["65361_STATUS", NO2ENGINE_PANEL_65361_STATUS.value],
-      //   ["65378", NO2ENGINE_PANEL_65378.value],
-      //   ["65376", NO2ENGINE_PANEL_65376.value],
-      //   ["65379", NO2ENGINE_PANEL_65379.value],
-      // ],
-    },
-    // 다른 drilldown 데이터도 추가
-  ];
+        // [
+        //   ["61444", NO2ENGINE_PANEL_61444.value],
+        //   ["65262", NO2ENGINE_PANEL_65262.value],
+        //   ["65263", NO2ENGINE_PANEL_65263.value],
+        //   ["65272", NO2ENGINE_PANEL_65272.value],
+        //   ["65271", NO2ENGINE_PANEL_65271.value],
+        //   ["65253", NO2ENGINE_PANEL_65253.value],
+        //   ["65270", NO2ENGINE_PANEL_65270.value],
+        //   ["65276", NO2ENGINE_PANEL_65276.value],
+        //   ["65360", NO2ENGINE_PANEL_65360.value],
+        //   ["65361_LAMP", NO2ENGINE_PANEL_65361_LAMP.value],
+        //   ["65361_STATUS", NO2ENGINE_PANEL_65361_STATUS.value],
+        //   ["65378", NO2ENGINE_PANEL_65378.value],
+        //   ["65376", NO2ENGINE_PANEL_65376.value],
+        //   ["65379", NO2ENGINE_PANEL_65379.value],
+        // ],
+      },
+      // 다른 drilldown 데이터도 추가
+    ];
 
-  // 차트에 새로운 옵션 적용
-  chart.value.setOption(updatedOption);
+    // 차트에 새로운 옵션 적용
+    chart.value.setOption(updatedOption);
   } else {
     console.warn("Chart object is null. Cannot update chart.");
   }

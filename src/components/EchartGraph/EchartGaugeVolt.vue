@@ -12,7 +12,16 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, onMounted, defineProps } from "vue";
+import { ref, provide, onMounted, defineProps, watch } from "vue";
+
+import { darkText, lightText } from "../../color/color.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const textColor = ref(themeMode.value === "light" ? lightText : darkText);
+watch(themeMode, (newValue) => {
+  textColor.value = newValue === "light" ? lightText : darkText;
+});
 
 const props = defineProps({
   // #2 props 정의
@@ -39,6 +48,7 @@ const option = ref({
     left: "center",
     textStyle: {
       fontSize: 10, // 폰트 크기 설정
+      color: textColor.value,
     },
   },
   tooltip: {
@@ -49,7 +59,7 @@ const option = ref({
       name: props.name,
       type: "gauge", // gauge 타입 사용
       radius: "90%",
-      center: ["50%", "65%"],
+      center: ["50%", "60%"],
       splitNumber: 5,
       min: 0,
       max: props.max_value,
@@ -82,11 +92,15 @@ const option = ref({
       axisLabel: {
         distance: 10,
         fontSize: 9,
+        color: textColor.value,
       },
       detail: {
         valueAnimation: true,
         formatter: `{value} ${props.unit}`,
         fontSize: 12,
+        textStyle: {
+          color: textColor.value, // 텍스트 컬러 설정
+        },
         offsetCenter: [0, "70%"],
       },
       data: [
@@ -110,18 +124,14 @@ const updateValue = () => {
   }
 };
 
-
-
 onMounted(() => {
   setInterval(updateValue, 1000);
   updateValue();
 });
-
 </script>
 
 <style scoped>
 .chart {
-  height: 17vh;
   padding: 5px;
 }
 

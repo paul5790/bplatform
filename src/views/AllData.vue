@@ -38,7 +38,6 @@
                 <v-list-item title="Select All" @click="selectAllItem1">
                   <template v-slot:prepend>
                     <v-checkbox-btn
-                      :color="likesSomeData1 ? 'indigo-darken-4' : undefined"
                       :indeterminate="likesSomeData1 && !likesAllData1"
                       :model-value="likesSomeData1"
                     ></v-checkbox-btn>
@@ -83,7 +82,6 @@
                 <v-list-item title="Select All" @click="selectAllItem2">
                   <template v-slot:prepend>
                     <v-checkbox-btn
-                      :color="likesSomeData2 ? 'indigo-darken-4' : undefined"
                       :indeterminate="likesSomeData2 && !likesAllData2"
                       :model-value="likesSomeData2"
                     ></v-checkbox-btn>
@@ -108,9 +106,13 @@
           <!-- 날짜 설정 -->
           <v-col cols="3">
             <VueDatePicker
+              :class="
+                themeMode === 'dark' ? 'dp__theme_dark' : 'dp__theme_light'
+              "
               style="--dp-input-padding: 15px"
               v-model="dateRange"
               range
+              :dark="themeMode === 'dark'"
               :readonly="date_readonly"
             />
           </v-col>
@@ -119,7 +121,7 @@
           <v-col cols="1">
             <v-btn
               class=""
-              color="blue"
+              :color="btnColor"
               style="display: flex; margin-top: 2px; height: 50px; width: 130px"
               @click="searchData()"
               >검색</v-btn
@@ -144,19 +146,25 @@
       <!-- 탭 기능 구현 -->
       <v-tabs
         v-if="searchstart"
-        style="
-          color: #a8a8a8;
-          height: 5vh;
-          margin-left: 15px;
-          margin-right: 15px;
-        "
+        :style="{
+          color: '#f7f7f7',
+          height: '5vh',
+          marginLeft: '15px',
+          marginRight: '15px',
+        }"
         v-model="tab"
-        color="grey-darken-4"
         align-tabs="start"
       >
         <!-- for문 사용해서 탭 늘리기 -->
         <v-tab
-          :style="{ 'background-color': tab === index ? '#d9d9d9' : '#f7f7f7' }"
+          :style="{
+            'background-color':
+              tab === index ? themeSelectedTabColor : themeNoNSelectedTabColor,
+            color:
+              tab === index
+                ? themeSelectedTabTextColor
+                : themeNoNSelectedTabTextColor,
+          }"
           :value="index"
           v-for="(item, index) in selectedData"
           :key="index"
@@ -217,7 +225,15 @@
                     height="60vh"
                     class="pa-1 d-flex justify-center align-center"
                   >
-                    <div style="text-align: center">
+                    <div v-if="lastloading" style="text-align: center">
+                      <v-progress-circular
+                        :size="50"
+                        color="primary"
+                        indeterminate
+                      ></v-progress-circular>
+                      <p style="font-weight: 500; font-size: 20px">loading</p>
+                    </div>
+                    <div v-if="!lastloading" style="text-align: center">
                       <p style="font-weight: 500; font-size: 20px">
                         {{ message }}
                       </p>
@@ -250,15 +266,26 @@
           style="max-width: 150px; margin-top: 20px"
           variant="solo"
         ></v-select>
-        <!-- <select v-model="selectDownlodFormat">
-          <option value="xlsx">Excel (xlsx)</option>
-          <option value="txt">Text (txt)</option>
-          <option value="csv">CSV (csv)</option>
-        </select> -->
         <v-btn
           :loading="downloadBtnLoading"
-          color="white"
-          style="background-color: #009dff; margin-top: 0px; margin-left: 20px"
+          :color="textColor"
+          :style="{
+            'background-color': btnColor,
+            'margin-top': '0px',
+            'margin-left': '20px',
+          }"
+          @click="dataload()"
+          :disabled="downloadBtnDisabled"
+          >{{ downloadBtnLoadingpercent }}</v-btn
+        >
+        <v-btn
+          :loading="downloadBtnLoading"
+          :color="textColor"
+          :style="{
+            'background-color': btnColor,
+            'margin-top': '0px',
+            'margin-left': '20px',
+          }"
           @click="dataDownload()"
           :disabled="downloadBtnDisabled"
           >데이터 다운로드</v-btn
@@ -276,12 +303,53 @@ import Papa from "papaparse";
 import { saveAs } from "file-saver";
 import { readTrialData, readDataTrial, readDataDate } from "../api/index.js";
 import JSZip from "jszip";
+import {
+  darkbackcolor,
+  whitebackcolor,
+  darkselectedTab,
+  darkNonSelectedTab,
+  darkselectedTabText,
+  darkNoNselectedTabText,
+  lightselectedTab,
+  lightNonSelectedTab,
+  lightselectedTabText,
+  lightNoNselectedTabText,
+  darkbtn,
+  lightbtn,
+  darkbtnText,
+  lightbtnText,
+} from "../color/color.js";
+
+// 다크모드
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
+});
+
+const textColor = ref(themeMode.value === "light" ? lightbtnText : darkbtnText);
+const themeColor = ref(
+  themeMode.value === "light" ? whitebackcolor : darkbackcolor
+);
+const themeSelectedTabColor = ref(
+  themeMode.value === "light" ? lightselectedTab : darkselectedTab
+);
+const themeNoNSelectedTabColor = ref(
+  themeMode.value === "light" ? lightNonSelectedTab : darkNonSelectedTab
+);
+const themeSelectedTabTextColor = ref(
+  themeMode.value === "light" ? lightselectedTabText : darkselectedTabText
+);
+const themeNoNSelectedTabTextColor = ref(
+  themeMode.value === "light" ? lightNoNselectedTabText : darkNoNselectedTabText
+);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
+});
 
 const tab = ref(0);
-// const initializeData = () => {
-//   // contentsSelectedItems에 따라 데이터 초기화
-//   fetchData();
-// };
+
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const itemsPerPage = ref(20);
 const page = ref(1);
@@ -292,10 +360,12 @@ const selectedData = ref([]); //
 const message = ref("데이터가 존재하지 않습니다.");
 const searchstart = ref(false);
 const loading = ref(false);
+const lastloading = ref(false);
 const loadingpercent = ref(0);
 const beforePage = ref("GLL");
 const downloadBtnDisabled = ref(true);
 const downloadBtnLoading = ref(false);
+const downloadBtnLoadingpercent = ref("데이터 다운로드");
 
 watch(selectedData, (newVal, oldVal) => {
   tab.value = 0;
@@ -518,7 +588,85 @@ let dataValues1 = [];
 
 const downloadFormat = ref(["xlsx", "csv", "txt"]);
 const selectDownlodFormat = ref("xlsx");
-// 데이터 다운로드
+let workbook;
+let worksheet;
+// // 데이터 다운로드
+// const dataloadWorker = new Worker("worker.js");
+
+// const dataload = () => {
+//   if (!selectedData.value || selectedData.value.length === 0) {
+//     alert("선택안됌");
+//   } else {
+//     try {
+//       dataloadWorker.postMessage({
+//         selectedData: selectedData.value,
+//         selectDownlodFormat: selectDownlodFormat.value,
+//         downloadData: downloadData.map(item => item.value),
+//         daterange: daterange.value,
+//       });
+
+//       dataloadWorker.onmessage = (event) => {
+//         const { blob, fileName } = event.data;
+
+//         if (blob) {
+//           saveAs(blob, fileName);
+//           alert("완료");
+//         } else {
+//           alert(`다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`);
+//         }
+//       };
+//     } catch (error) {
+//       console.error(error);
+//     }
+//   }
+// };
+// const dataload = async () => {
+//     if (!selectedData.value || selectedData.value.length === 0) {
+//     alert("선택안됌");
+//   } else {
+//     try {
+//       const zip = new JSZip();
+//       const dataValues = Object.values(selectedData.value);
+
+//       if (selectDownlodFormat.value === "xlsx") {
+//         // xlsx 선택 시
+//         workbook = XLSX.utils.book_new();
+//         for (let i = 0; i < downloadData.length; i++) {
+//           worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+//           XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+//         }
+//         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
+//       } else {
+//         for (let i = 0; i < downloadData.length; i++) {
+//           let content, fileName;
+
+//           if (selectDownlodFormat.value === "csv") {
+//             // csv 선택 시
+//             content = Papa.unparse(downloadData[i].value);
+//             fileName = `${dataValues[i]}_csv.csv`;
+//           } else if (selectDownlodFormat.value === "txt") {
+//             // txt 선택 시
+//             content = JSON.stringify(downloadData[i].value, null, 2);
+//             fileName = `${dataValues[i]}_txt.txt`;
+//           }
+
+//           // xlsx가 아닌 경우 파일을 zip에 추가
+//           if (selectDownlodFormat.value !== "xlsx") {
+//             zip.file(fileName, content);
+//           }
+//         }
+//         // zip 파일 다운로드
+//         const zipBlob = await zip.generateAsync({ type: "blob" });
+//         saveAs(zipBlob, `${daterange.value}_${selectDownlodFormat.value}.zip`);
+//       }
+//     } catch (error) {
+//       alert(
+//         `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
+//       );
+//       console.error(error);
+//     }
+//   }
+// }
 const dataDownload = async () => {
   if (!selectedData.value || selectedData.value.length === 0) {
     alert("선택안됌");
@@ -529,9 +677,9 @@ const dataDownload = async () => {
 
       if (selectDownlodFormat.value === "xlsx") {
         // xlsx 선택 시
-        const workbook = XLSX.utils.book_new();
+        workbook = XLSX.utils.book_new();
         for (let i = 0; i < downloadData.length; i++) {
-          const worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
+          worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
           XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
         }
         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
@@ -570,6 +718,7 @@ const dataDownload = async () => {
 // 검색 이벤트
 const searchData = () => {
   loading.value = true;
+  lastloading.value = true;
   headerVariables.forEach((variable) => (variable.value = []));
   dataVariables.forEach((variable) => (variable.value = []));
   downloadData = [];
@@ -723,20 +872,27 @@ const fetchData = async (data) => {
             console.log("null");
           } else {
             updateTable();
-            switchValue(data[i], dataheader, response);
+            await switchValue(data[i], dataheader, response);
+            console.log("ok");
           }
         } else {
           updateTable();
           console.log("Response data is empty or undefined");
         }
-        loadingpercent.value = ((i + 1) / 1) * 100;
+        downloadBtnLoadingpercent.value = ((i + 1) / 1) * 100;
+        if (downloadBtnLoadingpercent.value === 100) {
+          downloadBtnLoadingpercent.value = "데이터 다운로드";
+        }
         if (data.length === 1) {
           loading.value = false;
+          downloadBtnDisabled.value = false;
         } else {
           if (i === 1) {
             loading.value = false;
-          } else if (i == data.length - 1) {
+          }
+          if (i == data.length - 1) {
             downloadBtnDisabled.value = false;
+            lastloading.value = false;
           }
         }
       } catch (error) {
@@ -1883,5 +2039,63 @@ select {
 select:hover,
 select:focus {
   border-color: #007bff;
+}
+
+.dp__theme_dark {
+  --dp-background-color: #424242;
+  --dp-text-color: #fff;
+  --dp-hover-color: #484848;
+  --dp-hover-text-color: #fff;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #005cb2;
+  --dp-primary-disabled-color: #61a8ea;
+  --dp-primary-text-color: #fff;
+  --dp-secondary-color: #a9a9a9;
+  --dp-border-color: #999;
+  --dp-menu-border-color: #2d2d2d;
+  --dp-border-color-hover: #aaaeb7;
+  --dp-disabled-color: #737373;
+  --dp-disabled-color-text: #d0d0d0;
+  --dp-scroll-bar-background: #212121;
+  --dp-scroll-bar-color: #484848;
+  --dp-success-color: #00701a;
+  --dp-success-color-disabled: #428f59;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #e53935;
+  --dp-marker-color: #e53935;
+  --dp-tooltip-color: #3e3e3e;
+  --dp-highlight-color: rgb(0 92 178 / 20%);
+  --dp-range-between-dates-background-color: var(--dp-hover-color, #484848);
+  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #fff);
+  --dp-range-between-border-color: var(--dp-hover-color, #fff);
+}
+
+.dp__theme_light {
+  --dp-background-color: #fff;
+  --dp-text-color: #212121;
+  --dp-hover-color: #f3f3f3;
+  --dp-hover-text-color: #212121;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #1976d2;
+  --dp-primary-disabled-color: #6bacea;
+  --dp-primary-text-color: #f8f5f5;
+  --dp-secondary-color: #c0c4cc;
+  --dp-border-color: #ddd;
+  --dp-menu-border-color: #ddd;
+  --dp-border-color-hover: #aaaeb7;
+  --dp-disabled-color: #f6f6f6;
+  --dp-scroll-bar-background: #f3f3f3;
+  --dp-scroll-bar-color: #959595;
+  --dp-success-color: #76d275;
+  --dp-success-color-disabled: #a3d9b1;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #ff6f60;
+  --dp-marker-color: #ff6f60;
+  --dp-tooltip-color: #fafafa;
+  --dp-disabled-color-text: #8e8e8e;
+  --dp-highlight-color: rgb(25 118 210 / 10%);
+  --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
+  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
+  --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
 }
 </style>

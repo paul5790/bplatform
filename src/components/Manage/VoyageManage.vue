@@ -16,14 +16,14 @@
           <div class="dialog-div" style="display: flex; margin-right: 0">
             <v-btn
               v-if="startstate"
-              color="blue"
+              :color = btnColor
               v-bind="props"
               @click="openDialog1_1()"
             >
               시운전 진행중..(종료하기)
             </v-btn>
             <v-dialog v-model="dialog1_1" persistent width="800">
-              <v-card style="background-color: #fdfdfd;">
+              <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
                   <span class="text-h5">항차 측정 종료</span>
                 </v-card-title>
@@ -85,14 +85,14 @@
           <div class="dialog-div">
             <v-btn
               v-if="!startstate"
-              color="blue"
+              :color = btnColor
               v-bind="props"
               @click="openDialog1()"
             >
               시작하기
             </v-btn>
             <v-dialog v-model="dialog1" persistent width="800">
-              <v-card>
+              <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
                   <span class="text-h5">항차 측정 시작</span>
                 </v-card-title>
@@ -133,9 +133,15 @@
                               <!-- 날짜 설정 -->
 
                               <VueDatePicker
+                                :class="
+                                  themeMode === 'dark'
+                                    ? 'dp__theme_dark'
+                                    : 'dp__theme_light'
+                                "
                                 style="--dp-input-padding: 15px"
                                 v-model="startTimeUtc"
                                 text-input
+                                :dark="themeMode === 'dark'"
                                 :readonly="true"
                               />
                             </v-col>
@@ -245,11 +251,11 @@
           </div>
           <!-- 추가하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn color="blue" v-bind="props" @click="openDialog2()">
+            <v-btn :color = btnColor v-bind="props" @click="openDialog2()">
               추가하기
             </v-btn>
             <v-dialog v-model="dialog2" persistent width="800">
-              <v-card>
+              <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
                   <span class="text-h5">항차 추가</span>
                 </v-card-title>
@@ -290,6 +296,12 @@
                               <!-- 날짜 설정 -->
 
                               <VueDatePicker
+                                :class="
+                                  themeMode === 'dark'
+                                    ? 'dp__theme_dark'
+                                    : 'dp__theme_light'
+                                "
+                                :dark="themeMode === 'dark'"
                                 style="--dp-input-padding: 15px"
                                 v-model="editstartdate"
                                 text-input
@@ -310,6 +322,12 @@
 
                             <v-col cols="8">
                               <VueDatePicker
+                                :class="
+                                  themeMode === 'dark'
+                                    ? 'dp__theme_dark'
+                                    : 'dp__theme_light'
+                                "
+                                :dark="themeMode === 'dark'"
                                 style="
                                   margin-top: 20px;
                                   --dp-input-padding: 15px;
@@ -428,11 +446,11 @@
           </div>
           <!-- 수정하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn color="blue" v-bind="props" @click="openDialog3()">
+            <v-btn :color = btnColor v-bind="props" @click="openDialog3()">
               수정하기
             </v-btn>
             <v-dialog v-model="dialog3" persistent width="800">
-              <v-card>
+              <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
                   <span class="text-h5">항차 수정</span>
                 </v-card-title>
@@ -454,6 +472,12 @@
                               <!-- 날짜 설정 -->
 
                               <VueDatePicker
+                                :class="
+                                  themeMode === 'dark'
+                                    ? 'dp__theme_dark'
+                                    : 'dp__theme_light'
+                                "
+                                :dark="themeMode === 'dark'"
                                 style="--dp-input-padding: 15px"
                                 v-model="selectedstartdate"
                                 text-input
@@ -472,6 +496,12 @@
 
                             <v-col cols="8">
                               <VueDatePicker
+                                :class="
+                                  themeMode === 'dark'
+                                    ? 'dp__theme_dark'
+                                    : 'dp__theme_light'
+                                "
+                                :dark="themeMode === 'dark'"
                                 style="
                                   margin-top: 20px;
                                   --dp-input-padding: 15px;
@@ -588,10 +618,10 @@
           </div>
           <!-- 삭제하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn color="blue" @click="openDialog4()"> 삭제하기 </v-btn>
+            <v-btn :color = btnColor @click="openDialog4()"> 삭제하기 </v-btn>
 
             <v-dialog v-model="dialog4" persistent width="350">
-              <v-card>
+              <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
                   <span class="text-h5">항차 정보 삭제</span>
                 </v-card-title>
@@ -654,7 +684,11 @@
         </v-data-table>
       </v-card-item>
     </v-card>
-    <v-overlay v-model="overlay" contained class="align-center justify-center overlay">
+    <v-overlay
+      v-model="overlay"
+      contained
+      class="align-center justify-center overlay"
+    >
       <v-progress-circular
         :size="50"
         color="primary"
@@ -665,9 +699,34 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watchEffect, defineEmits } from "vue";
+import { computed, ref, onMounted, watchEffect, defineEmits, watch } from "vue";
 import axios from "axios";
-import { createTrialData, updateTrialData, deleteTrialData, readTrialData } from "../../api/index.js";
+import {
+  createTrialData,
+  updateTrialData,
+  deleteTrialData,
+  readTrialData,
+} from "../../api/index.js";
+import {
+  darkbackcolor,
+  whitebackcolor,
+  darkbtn,
+  lightbtn,
+} from "../../color/color.js";
+
+const themeMode = ref(localStorage.getItem("themeMode") || "light");
+
+const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
+});
+
+const themeColor = ref(
+  themeMode.value === "light" ? whitebackcolor : darkbackcolor
+);
+watch(themeMode, (newValue) => {
+  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
+});
 
 // 데이트 피커 제한
 const currentDate = new Date();
@@ -676,7 +735,7 @@ const currentTime = {
   minutes: new Date().getMinutes(),
 };
 
-const emit = defineEmits(["overlay"])
+const emit = defineEmits(["overlay"]);
 
 // 데이터 테이블 하단 바 설정
 const page = ref(1);
@@ -993,19 +1052,19 @@ const startData = async () => {
 };
 
 // 종료하기 후 취소
-const cancelData= async () => {
-    sessionStorage.removeItem("name");
-    sessionStorage.removeItem("testPurpose");
-    sessionStorage.removeItem("navigationArea");
-    sessionStorage.removeItem("startTimeUtc");
-    sessionStorage.removeItem("endTimeUtc");
-    sessionStorage.removeItem("description");
-    sessionStorage.setItem("startstate", "false");
-    startstate.value = false;
-    alert("항차 측정이 종료됩니다.");
-    location.reload();
-    nullDialog1_1();
-}
+const cancelData = async () => {
+  sessionStorage.removeItem("name");
+  sessionStorage.removeItem("testPurpose");
+  sessionStorage.removeItem("navigationArea");
+  sessionStorage.removeItem("startTimeUtc");
+  sessionStorage.removeItem("endTimeUtc");
+  sessionStorage.removeItem("description");
+  sessionStorage.setItem("startstate", "false");
+  startstate.value = false;
+  alert("항차 측정이 종료됩니다.");
+  location.reload();
+  nullDialog1_1();
+};
 
 //추가하기
 const editData = async () => {
@@ -1148,7 +1207,7 @@ const changeData = async () => {
         console.log(data);
         try {
           await updateTrialData(tokenid.value, data);
-          
+
           alert("선택된 항차의 수정이 완료되었습니다.");
           overlay.value = false;
           nullDialog3();
@@ -1208,8 +1267,6 @@ const overlayemit = (data) => {
   console.log(2);
 };
 
-
-
 // 데이터 테이블 헤더
 const headers = ref([
   { title: "항차", align: "start", key: "division" },
@@ -1262,10 +1319,7 @@ const fetchData = async () => {
         time: formattedTime,
       });
       if (i === response.length - 1) {
-        sessionStorage.setItem(
-          "division",
-          Number(response[i].seatrialId) + 1
-        );
+        sessionStorage.setItem("division", Number(response[i].seatrialId) + 1);
       }
     }
     items.value.sort((a, b) => {
@@ -1273,7 +1327,7 @@ const fetchData = async () => {
       const dateB = new Date(b.startdate);
       return dateB - dateA;
     });
-    
+
     division.value = Number(response.length);
     console.log(timeRange.value);
     // sessionStorage.setItem("division", division.value.toString());
@@ -1322,5 +1376,61 @@ console.log(items);
 </script>
 
 <style scoped>
+.dp__theme_dark {
+  --dp-background-color: #424242;
+  --dp-text-color: #fff;
+  --dp-hover-color: #484848;
+  --dp-hover-text-color: #fff;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #005cb2;
+  --dp-primary-disabled-color: #61a8ea;
+  --dp-primary-text-color: #fff;
+  --dp-secondary-color: #a9a9a9;
+  --dp-border-color: #999;
+  --dp-menu-border-color: #2d2d2d;
+  --dp-border-color-hover: #aaaeb7;
+  --dp-disabled-color: #737373;
+  --dp-disabled-color-text: #d0d0d0;
+  --dp-scroll-bar-background: #212121;
+  --dp-scroll-bar-color: #484848;
+  --dp-success-color: #00701a;
+  --dp-success-color-disabled: #428f59;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #e53935;
+  --dp-marker-color: #e53935;
+  --dp-tooltip-color: #3e3e3e;
+  --dp-highlight-color: rgb(0 92 178 / 20%);
+  --dp-range-between-dates-background-color: var(--dp-hover-color, #484848);
+  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #fff);
+  --dp-range-between-border-color: var(--dp-hover-color, #fff);
+}
 
+.dp__theme_light {
+  --dp-background-color: #fff;
+  --dp-text-color: #212121;
+  --dp-hover-color: #f3f3f3;
+  --dp-hover-text-color: #212121;
+  --dp-hover-icon-color: #959595;
+  --dp-primary-color: #1976d2;
+  --dp-primary-disabled-color: #6bacea;
+  --dp-primary-text-color: #f8f5f5;
+  --dp-secondary-color: #c0c4cc;
+  --dp-border-color: #ddd;
+  --dp-menu-border-color: #ddd;
+  --dp-border-color-hover: #aaaeb7;
+  --dp-disabled-color: #f6f6f6;
+  --dp-scroll-bar-background: #f3f3f3;
+  --dp-scroll-bar-color: #959595;
+  --dp-success-color: #76d275;
+  --dp-success-color-disabled: #a3d9b1;
+  --dp-icon-color: #959595;
+  --dp-danger-color: #ff6f60;
+  --dp-marker-color: #ff6f60;
+  --dp-tooltip-color: #fafafa;
+  --dp-disabled-color-text: #8e8e8e;
+  --dp-highlight-color: rgb(25 118 210 / 10%);
+  --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
+  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
+  --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
+}
 </style>
