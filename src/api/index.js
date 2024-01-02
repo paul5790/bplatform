@@ -1,7 +1,7 @@
 // src/api/index.js
 import axios from "axios";
 
-const apiLocation = "192.168.0.73:8080";
+const apiLocation = "192.168.0.44:9999";
 
 // 로그인
 export const checkLogin = async (data) => {

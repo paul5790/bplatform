@@ -245,7 +245,7 @@
                     <v-pagination
                       v-model="page"
                       :length="pageCount"
-                      :total-visible="8"
+                      :total-visible="10"
                     >
                     </v-pagination>
                   </div>
@@ -266,7 +266,7 @@
           style="max-width: 150px; margin-top: 20px"
           variant="solo"
         ></v-select>
-        <v-btn
+        <!-- <v-btn
           :loading="downloadBtnLoading"
           :color="textColor"
           :style="{
@@ -277,7 +277,7 @@
           @click="dataload()"
           :disabled="downloadBtnDisabled"
           >{{ downloadBtnLoadingpercent }}</v-btn
-        >
+        > -->
         <v-btn
           :loading="downloadBtnLoading"
           :color="textColor"
@@ -906,7 +906,6 @@ const fetchData = async (data) => {
       const content = ref();
       console.log(startDate.value);
       [subComponunt.value, content.value] = upperData.value.split("/");
-      // alert(`${startDate.value}`, `${endDate.value}`);
       console.log(searchStart.value);
       console.log(searchEnd.value);
       try {
@@ -973,17 +972,14 @@ const updateTable = async () => {
   }
   switch (selectedTab) {
     case "GLL":
-      backDataSet.value = GLL.value;
       pageCount.value = Math.ceil(GLL.value.length / itemsPerPage.value);
       updateData(GLL.value, GLLheader.value, page.value);
       break;
     case "GGA":
-      backDataSet.value = GGA.value;
       pageCount.value = Math.ceil(GGA.value.length / itemsPerPage.value);
       updateData(GGA.value, GGAheader.value, page.value);
       break;
     case "RMC":
-      backDataSet.value = RMC.value;
       pageCount.value = Math.ceil(RMC.value.length / itemsPerPage.value);
       updateData(RMC.value, RMCheader.value, page.value);
       break;
