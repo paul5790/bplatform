@@ -77,7 +77,7 @@ import {
 // 다크모드
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
 
-const tabColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
+const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
 watch(themeMode, (newValue) => {
   themeColor.value = newValue === "light" ? lightbtn : darkbtn;
 });

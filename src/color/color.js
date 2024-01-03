@@ -1,5 +1,4 @@
-export const apiLocation ="#f0f0f0";
-
+// back color
 export const darkbackcolor = "#353535";
 export const darksurfacecolor = "#424242";
 export const whitebackcolor = "#f7f7f7";

@@ -207,7 +207,7 @@
                   indeterminate
                 ></v-progress-circular>
                 <p style="margin-top: 10px; font-weight: 400; font-size: 18px">
-                  loading ({{ loadingpercent }}%)
+                  loading
                 </p>
               </v-sheet>
               <v-data-table
@@ -219,6 +219,7 @@
                 :items="dataSet"
                 return-object
                 style="padding-top: 5px"
+                @update:options="handleSortUpdate"
               >
                 <template v-slot:no-data>
                   <v-sheet
@@ -297,7 +298,6 @@
 
 <script setup>
 import { ref, computed, watchEffect, onMounted, watch } from "vue";
-import axios from "axios";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 import { saveAs } from "file-saver";
@@ -350,12 +350,14 @@ watch(themeMode, (newValue) => {
 
 const tab = ref(0);
 
+// 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
+
+// 데이터 테이블
 const itemsPerPage = ref(20);
 const page = ref(1);
 const headerName = ref([]); // 빈 배열로 초기화
 const dataSet = ref([]); // 빈 배열로 초기화
-const backDataSet = ref([]); // 빈 배열로 초기화
 const selectedData = ref([]); //
 const message = ref("데이터가 존재하지 않습니다.");
 const searchstart = ref(false);
@@ -584,7 +586,7 @@ watchEffect(() => {
     endDate.value.setHours(endDate.value.getHours());
   }
 });
-let dataValues1 = [];
+let sheetName = [];
 
 const downloadFormat = ref(["xlsx", "csv", "txt"]);
 const selectDownlodFormat = ref("xlsx");
@@ -633,7 +635,7 @@ let worksheet;
 //         workbook = XLSX.utils.book_new();
 //         for (let i = 0; i < downloadData.length; i++) {
 //           worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-//           XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+//           XLSX.utils.book_append_sheet(workbook, worksheet, sheetName[i]);
 //         }
 //         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
 //       } else {
@@ -680,7 +682,7 @@ const dataDownload = async () => {
         workbook = XLSX.utils.book_new();
         for (let i = 0; i < downloadData.length; i++) {
           worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-          XLSX.utils.book_append_sheet(workbook, worksheet, dataValues1[i]);
+          XLSX.utils.book_append_sheet(workbook, worksheet, sheetName[i]);
         }
         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
       } else {
@@ -719,10 +721,10 @@ const dataDownload = async () => {
 const searchData = () => {
   loading.value = true;
   lastloading.value = true;
-  headerVariables.forEach((variable) => (variable.value = []));
-  dataVariables.forEach((variable) => (variable.value = []));
+  // headerVariables.forEach((variable) => (variable.value = []));
+  // dataVariables.forEach((variable) => (variable.value = []));
   downloadData = [];
-  dataValues1 = [];
+  sheetName = [];
   selectedData.value = contentsSelectedItems.value;
   let variableName = getVariableName(selectedData.value).value;
 
@@ -732,6 +734,7 @@ const searchData = () => {
   end.setHours(end.getHours() + 9);
   startDate.value = start.toISOString();
   endDate.value = end.toISOString();
+
   tab.value = 0;
   fetchData(variableName); // 초기 데이터 요청
 
@@ -852,20 +855,18 @@ const fetchData = async (data) => {
         );
         dataSet.value = response;
         if (response && response.length > 0) {
+          const importantKeys = ["seatrial_ID", "timestamp_EQUIPMENT", "timestamp_PUBLISH", "ship_ID"];
           const dataheader = ref(
-            Object.keys(response[0]).reduce((acc, key) => {
-              if (key.toLowerCase() !== "id") {
+            [...importantKeys, ...Object.keys(response[0]).filter(key => !importantKeys.includes(key))]
+              .map(key => {
                 let modifiedKey = key;
-                if (key === "timestamp_PUBLISH") {
-                  modifiedKey = "timestamp_PUBLISH(UTC+9)";
-                } else if (key === "timestamp_EQUIPMENT") {
-                  modifiedKey = "timestamp_EQUIPMENT(UTC+9)";
-                }
-
-                acc.push({ title: modifiedKey, align: "start", key });
-              }
-              return acc;
-            }, [])
+                // if (key === "timestamp_PUBLISH") {
+                //   modifiedKey = "timestamp_PUBLISH(UTC+9)";
+                // } else if (key === "timestamp_EQUIPMENT") {
+                //   modifiedKey = "timestamp_EQUIPMENT(UTC+9)";
+                // }
+                return { title: modifiedKey, align: "start", key, width: key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT" ? 280 : undefined };
+              })
           );
 
           if (dataheader.value == null) {
@@ -918,19 +919,18 @@ const fetchData = async (data) => {
         );
         dataSet.value = response;
         if (response && response.length > 0) {
+          const importantKeys = ["seatrial_ID", "timestamp_EQUIPMENT", "timestamp_PUBLISH", "ship_ID"];
           const dataheader = ref(
-            Object.keys(response[0]).reduce((acc, key) => {
-              if (key.toLowerCase() !== "id") {
+            [...importantKeys, ...Object.keys(response[0]).filter(key => !importantKeys.includes(key))]
+              .map(key => {
                 let modifiedKey = key;
-                if (key === "timestamp_PUBLISH") {
-                  modifiedKey = "timestamp_PUBLISH(UTC+9)";
-                } else if (key === "timestamp_EQUIPMENT") {
-                  modifiedKey = "timestamp_EQUIPMENT(UTC+9)";
-                }
-                acc.push({ title: modifiedKey, align: "start", key });
-              }
-              return acc;
-            }, [])
+                // if (key === "timestamp_PUBLISH") {
+                //   modifiedKey = "timestamp_PUBLISH(UTC+9)";
+                // } else if (key === "timestamp_EQUIPMENT") {
+                //   modifiedKey = "timestamp_EQUIPMENT(UTC+9)";
+                // }
+                return { title: modifiedKey, align: "start", key, width: key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT" ? 280 : undefined };
+              })
           );
           updateTable();
           switchValue(data[i], dataheader, response);
@@ -964,7 +964,6 @@ const updateData = async (data, header, page) => {
 
 const updateTable = async () => {
   const selectedTab = selectedData.value[tab.value];
-  // page.value = 1;
   itemsPerPage.value = 21;
   if (beforePage.value != selectedTab) {
     page.value = 1;
@@ -972,6 +971,8 @@ const updateTable = async () => {
   }
   switch (selectedTab) {
     case "GLL":
+      GLL.value.sort((a, b) => {});
+      // 정렬에 필요한 조건을 여기에 추가
       pageCount.value = Math.ceil(GLL.value.length / itemsPerPage.value);
       updateData(GLL.value, GLLheader.value, page.value);
       break;
@@ -984,106 +985,86 @@ const updateTable = async () => {
       updateData(RMC.value, RMCheader.value, page.value);
       break;
     case "VTG":
-      backDataSet.value = VTG.value;
       pageCount.value = Math.ceil(VTG.value.length / itemsPerPage.value);
       updateData(VTG.value, VTGheader.value, page.value);
       break;
     case "ZDA":
-      backDataSet.value = ZDA.value;
       pageCount.value = Math.ceil(ZDA.value.length / itemsPerPage.value);
       updateData(ZDA.value, ZDAheader.value, page.value);
       break;
     case "GSV":
-      backDataSet.value = GSV.value;
       pageCount.value = Math.ceil(GSV.value.length / itemsPerPage.value);
       updateData(GSV.value, GSVheader.value, page.value);
       break;
     case "GSA":
-      backDataSet.value = GSA.value;
       pageCount.value = Math.ceil(GSA.value.length / itemsPerPage.value);
       updateData(GSA.value, GSAheader.value, page.value);
       break;
     case "HDT":
-      backDataSet.value = HDT.value;
       pageCount.value = Math.ceil(HDT.value.length / itemsPerPage.value);
       updateData(HDT.value, HDTheader.value, page.value);
       break;
     case "ROT":
-      backDataSet.value = ROT.value;
       pageCount.value = Math.ceil(ROT.value.length / itemsPerPage.value);
       updateData(ROT.value, ROTheader.value, page.value);
       break;
     case "MWV":
-      backDataSet.value = MWV.value;
       pageCount.value = Math.ceil(MWV.value.length / itemsPerPage.value);
       updateData(MWV.value, MWVheader.value, page.value);
       break;
     case "RADAR_SCREEN":
-      backDataSet.value = RADAR_SCREEN.value;
       pageCount.value = Math.ceil(
         RADAR_SCREEN.value.length / itemsPerPage.value
       );
       updateData(RADAR_SCREEN.value, RADAR_SCREENheader.value, page.value);
       break;
     case "VDM":
-      backDataSet.value = VDM.value;
       pageCount.value = Math.ceil(VDM.value.length / itemsPerPage.value);
       updateData(VDM.value, VDMheader.value, page.value);
       break;
     case "VDO":
-      backDataSet.value = VDO.value;
       pageCount.value = Math.ceil(VDO.value.length / itemsPerPage.value);
       updateData(VDO.value, VDOheader.value, page.value);
       break;
     case "ROUTEINFO":
-      backDataSet.value = ROUTEINFO.value;
       pageCount.value = Math.ceil(ROUTEINFO.value.length / itemsPerPage.value);
       updateData(ROUTEINFO.value, ROUTEINFOheader.value, page.value);
       break;
     case "WAYPOINTS":
-      backDataSet.value = WAYPOINTS.value;
       pageCount.value = Math.ceil(WAYPOINTS.value.length / itemsPerPage.value);
       updateData(WAYPOINTS.value, WAYPOINTSheader.value, page.value);
       break;
     case "RTZ":
-      backDataSet.value = RTZ.value;
       pageCount.value = Math.ceil(RTZ.value.length / itemsPerPage.value);
       updateData(RTZ.value, RTZheader.value, page.value);
       break;
     case "ECDIS_SCREEN":
-      backDataSet.value = ECDIS_SCREEN.value;
       pageCount.value = Math.ceil(
         ECDIS_SCREEN.value.length / itemsPerPage.value
       );
       updateData(ECDIS_SCREEN.value, ECDIS_SCREENheader.value, page.value);
       break;
     case "RSA":
-      backDataSet.value = RSA.value;
       pageCount.value = Math.ceil(RSA.value.length / itemsPerPage.value);
       updateData(RSA.value, RSAheader.value, page.value);
       break;
     case "HTD":
-      backDataSet.value = HTD.value;
       pageCount.value = Math.ceil(HTD.value.length / itemsPerPage.value);
       updateData(HTD.value, HTDheader.value, page.value);
       break;
     case "VBW":
-      backDataSet.value = VBW.value;
       pageCount.value = Math.ceil(VBW.value.length / itemsPerPage.value);
       updateData(VBW.value, VBWheader.value, page.value);
       break;
     case "VHW":
-      backDataSet.value = VHW.value;
       pageCount.value = Math.ceil(VHW.value.length / itemsPerPage.value);
       updateData(VHW.value, VHWheader.value, page.value);
       break;
     case "VLW":
-      backDataSet.value = VLW.value;
       pageCount.value = Math.ceil(VLW.value.length / itemsPerPage.value);
       updateData(VLW.value, VLWheader.value, page.value);
       break;
     case "CAN_Online_State":
-      backDataSet.value = CAN_Online_State.value;
       pageCount.value = Math.ceil(
         CAN_Online_State.value.length / itemsPerPage.value
       );
@@ -1094,24 +1075,20 @@ const updateTable = async () => {
       );
       break;
     case "Engine_RPM":
-      backDataSet.value = Engine_RPM.value;
       pageCount.value = Math.ceil(Engine_RPM.value.length / itemsPerPage.value);
       updateData(Engine_RPM.value, Engine_RPMheader.value, page.value);
       break;
     case "Rudder":
-      backDataSet.value = Rudder.value;
       pageCount.value = Math.ceil(Rudder.value.length / itemsPerPage.value);
       updateData(Rudder.value, Rudderheader.value, page.value);
       break;
     case "Rudder_Scale":
-      backDataSet.value = Rudder_Scale.value;
       pageCount.value = Math.ceil(
         Rudder_Scale.value.length / itemsPerPage.value
       );
       updateData(Rudder_Scale.value, Rudder_Scaleheader.value, page.value);
       break;
     case "AUTOPILOTCONTACT":
-      backDataSet.value = AUTOPILOTCONTACT.value;
       pageCount.value = Math.ceil(
         AUTOPILOTCONTACT.value.length / itemsPerPage.value
       );
@@ -1122,7 +1099,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_61444":
-      backDataSet.value = NO1ENGINE_PANEL_61444.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_61444.value.length / itemsPerPage.value
       );
@@ -1133,7 +1109,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65262":
-      backDataSet.value = NO1ENGINE_PANEL_65262.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65262.value.length / itemsPerPage.value
       );
@@ -1144,7 +1119,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65263":
-      backDataSet.value = NO1ENGINE_PANEL_65263.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65263.value.length / itemsPerPage.value
       );
@@ -1155,7 +1129,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65272":
-      backDataSet.value = NO1ENGINE_PANEL_65272.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65272.value.length / itemsPerPage.value
       );
@@ -1166,7 +1139,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65271":
-      backDataSet.value = NO1ENGINE_PANEL_65271.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65271.value.length / itemsPerPage.value
       );
@@ -1177,7 +1149,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65253":
-      backDataSet.value = NO1ENGINE_PANEL_65253.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65253.value.length / itemsPerPage.value
       );
@@ -1188,7 +1159,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65270":
-      backDataSet.value = NO1ENGINE_PANEL_65270.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65270.value.length / itemsPerPage.value
       );
@@ -1199,7 +1169,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65276":
-      backDataSet.value = NO1ENGINE_PANEL_65276.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65276.value.length / itemsPerPage.value
       );
@@ -1210,7 +1179,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65360":
-      backDataSet.value = NO1ENGINE_PANEL_65360.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65360.value.length / itemsPerPage.value
       );
@@ -1221,7 +1189,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65361_LAMP":
-      backDataSet.value = NO1ENGINE_PANEL_65361_LAMP.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
       );
@@ -1232,7 +1199,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65361_STATUS":
-      backDataSet.value = NO1ENGINE_PANEL_65361_STATUS.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
       );
@@ -1243,7 +1209,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65378":
-      backDataSet.value = NO1ENGINE_PANEL_65378.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65378.value.length / itemsPerPage.value
       );
@@ -1254,7 +1219,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65376":
-      backDataSet.value = NO1ENGINE_PANEL_65376.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65376.value.length / itemsPerPage.value
       );
@@ -1265,7 +1229,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.1ENGINE_PANEL_65379":
-      backDataSet.value = NO1ENGINE_PANEL_65379.value;
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65379.value.length / itemsPerPage.value
       );
@@ -1276,7 +1239,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_61444":
-      backDataSet.value = NO2ENGINE_PANEL_61444.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_61444.value.length / itemsPerPage.value
       );
@@ -1287,7 +1249,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65262":
-      backDataSet.value = NO2ENGINE_PANEL_65262.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65262.value.length / itemsPerPage.value
       );
@@ -1298,7 +1259,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65263":
-      backDataSet.value = NO2ENGINE_PANEL_65263.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65263.value.length / itemsPerPage.value
       );
@@ -1309,7 +1269,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65272":
-      backDataSet.value = NO2ENGINE_PANEL_65272.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65272.value.length / itemsPerPage.value
       );
@@ -1320,7 +1279,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65271":
-      backDataSet.value = NO2ENGINE_PANEL_65271.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65271.value.length / itemsPerPage.value
       );
@@ -1331,7 +1289,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65253":
-      backDataSet.value = NO2ENGINE_PANEL_65253.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65253.value.length / itemsPerPage.value
       );
@@ -1342,7 +1299,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65270":
-      backDataSet.value = NO2ENGINE_PANEL_65270.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65270.value.length / itemsPerPage.value
       );
@@ -1353,7 +1309,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65276":
-      backDataSet.value = NO2ENGINE_PANEL_65276.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65276.value.length / itemsPerPage.value
       );
@@ -1364,7 +1319,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65360":
-      backDataSet.value = NO2ENGINE_PANEL_65360.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65360.value.length / itemsPerPage.value
       );
@@ -1375,7 +1329,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65361_LAMP":
-      backDataSet.value = NO2ENGINE_PANEL_65361_LAMP.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
       );
@@ -1386,7 +1339,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65361_STATUS":
-      backDataSet.value = NO2ENGINE_PANEL_65361_STATUS.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
       );
@@ -1397,7 +1349,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65378":
-      backDataSet.value = NO2ENGINE_PANEL_65378.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65378.value.length / itemsPerPage.value
       );
@@ -1408,7 +1359,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65376":
-      backDataSet.value = NO2ENGINE_PANEL_65376.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65376.value.length / itemsPerPage.value
       );
@@ -1419,7 +1369,6 @@ const updateTable = async () => {
       );
       break;
     case "NO.2ENGINE_PANEL_65379":
-      backDataSet.value = NO2ENGINE_PANEL_65379.value;
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65379.value.length / itemsPerPage.value
       );
@@ -1552,462 +1501,425 @@ const NO2ENGINE_PANEL_65378 = ref([]);
 const NO2ENGINE_PANEL_65376 = ref([]);
 const NO2ENGINE_PANEL_65379 = ref([]);
 
-const headerVariables = [
-  GLLheader,
-  GGAheader,
-  RMCheader,
-  VTGheader,
-  ZDAheader,
-  GSVheader,
-  GSAheader,
-  HDTheader,
-  ROTheader,
-  MWVheader,
-  RADAR_SCREENheader,
-  VDMheader,
-  VDOheader,
-  ROUTEINFOheader,
-  WAYPOINTSheader,
-  RTZheader,
-  ECDIS_SCREENheader,
-  RSAheader,
-  HTDheader,
-  VBWheader,
-  VHWheader,
-  VLWheader,
-  CAN_Online_Stateheader,
-  Engine_RPMheader,
-  Rudderheader,
-  Rudder_Scaleheader,
-  AUTOPILOTCONTACTheader,
-  NO1ENGINE_PANEL_61444header,
-  NO1ENGINE_PANEL_65262header,
-  NO1ENGINE_PANEL_65263header,
-  NO1ENGINE_PANEL_65272header,
-  NO1ENGINE_PANEL_65271header,
-  NO1ENGINE_PANEL_65253header,
-  NO1ENGINE_PANEL_65270header,
-  NO1ENGINE_PANEL_65276header,
-  NO1ENGINE_PANEL_65360header,
-  NO1ENGINE_PANEL_65361_LAMPheader,
-  NO1ENGINE_PANEL_65361_STATUSheader,
-  NO1ENGINE_PANEL_65378header,
-  NO1ENGINE_PANEL_65376header,
-  NO1ENGINE_PANEL_65379header,
-  NO2ENGINE_PANEL_61444header,
-  NO2ENGINE_PANEL_65262header,
-  NO2ENGINE_PANEL_65263header,
-  NO2ENGINE_PANEL_65272header,
-  NO2ENGINE_PANEL_65271header,
-  NO2ENGINE_PANEL_65253header,
-  NO2ENGINE_PANEL_65270header,
-  NO2ENGINE_PANEL_65276header,
-  NO2ENGINE_PANEL_65360header,
-  NO2ENGINE_PANEL_65361_LAMPheader,
-  NO2ENGINE_PANEL_65361_STATUSheader,
-  NO2ENGINE_PANEL_65378header,
-  NO2ENGINE_PANEL_65376header,
-  NO2ENGINE_PANEL_65379header,
-];
-
-const dataVariables = [
-  GLL,
-  GGA,
-  RMC,
-  VTG,
-  ZDA,
-  GSV,
-  GSA,
-  HDT,
-  ROT,
-  MWV,
-  RADAR_SCREEN,
-  VDM,
-  VDO,
-  ROUTEINFO,
-  WAYPOINTS,
-  RTZ,
-  ECDIS_SCREEN,
-  RSA,
-  HTD,
-  VBW,
-  VHW,
-  VLW,
-  CAN_Online_State,
-  Engine_RPM,
-  Rudder,
-  Rudder_Scale,
-  AUTOPILOTCONTACT,
-  NO1ENGINE_PANEL_61444,
-  NO1ENGINE_PANEL_65262,
-  NO1ENGINE_PANEL_65263,
-  NO1ENGINE_PANEL_65272,
-  NO1ENGINE_PANEL_65271,
-  NO1ENGINE_PANEL_65253,
-  NO1ENGINE_PANEL_65270,
-  NO1ENGINE_PANEL_65276,
-  NO1ENGINE_PANEL_65360,
-  NO1ENGINE_PANEL_65361_LAMP,
-  NO1ENGINE_PANEL_65361_STATUS,
-  NO1ENGINE_PANEL_65378,
-  NO1ENGINE_PANEL_65376,
-  NO1ENGINE_PANEL_65379,
-  NO2ENGINE_PANEL_61444,
-  NO2ENGINE_PANEL_65262,
-  NO2ENGINE_PANEL_65263,
-  NO2ENGINE_PANEL_65272,
-  NO2ENGINE_PANEL_65271,
-  NO2ENGINE_PANEL_65253,
-  NO2ENGINE_PANEL_65270,
-  NO2ENGINE_PANEL_65276,
-  NO2ENGINE_PANEL_65360,
-  NO2ENGINE_PANEL_65361_LAMP,
-  NO2ENGINE_PANEL_65361_STATUS,
-  NO2ENGINE_PANEL_65378,
-  NO2ENGINE_PANEL_65376,
-  NO2ENGINE_PANEL_65379,
-];
-
 let downloadData = [];
 
+const dataHandlers = {
+  "dgps/gll": { header: GLLheader, data: GLL, sheetName: "GLL" },
+  "dgps/gga": { header: GGAheader, data: GGA, sheetName: "GGA" },
+  "dgps/rmc": { header: RMCheader, data: RMC, sheetName: "RMC" },
+  "dgps/vtg": { header: VTGheader, data: VTG, sheetName: "VTG" },
+  "dgps/zda": { header: ZDAheader, data: ZDA, sheetName: "ZDA" },
+  "dgps/gsv": { header: GSVheader, data: GSV, sheetName: "GSV" },
+  "dgps/gsa": { header: GSAheader, data: GSA, sheetName: "GSA" },
+  "gyro/hdt": { header: HDTheader, data: HDT, sheetName: "HDT" },
+  "gyro/rot": { header: ROTheader, data: ROT, sheetName: "ROT" },
+  "anemometer/mwv": { header: MWVheader, data: MWV, sheetName: "MWV" },
+  "radar/screen": {
+    header: RADAR_SCREENheader,
+    data: RADAR_SCREEN,
+    sheetName: "RADAR_SCREEN",
+  },
+  "ais/vdm": { header: VDMheader, data: VDM, sheetName: "VDM" },
+  "ais/vdo": { header: VDOheader, data: VDO, sheetName: "VDO" },
+  "ecdis/routeinfo": {
+    header: ROUTEINFOheader,
+    data: ROUTEINFO,
+    sheetName: "ROUTEINFO",
+  },
+  "ecdis/waypoints": {
+    header: WAYPOINTSheader,
+    data: WAYPOINTS,
+    sheetName: "WAYPOINTS",
+  },
+  "ecdis/rtz": { header: RTZheader, data: RTZ, sheetName: "RTZ" },
+  "ecdis/screen": {
+    header: ECDIS_SCREENheader,
+    data: ECDIS_SCREEN,
+    sheetName: "ECDIS_SCREEN",
+  },
+  "autopilot/rsa": { header: RSAheader, data: RSA, sheetName: "RSA" },
+  "autopilot/htd": { header: HTDheader, data: HTD, sheetName: "HTD" },
+  "speedlog/vbw": { header: VBWheader, data: VBW, sheetName: "VBW" },
+  "speedlog/vhw": { header: VHWheader, data: VHW, sheetName: "VHW" },
+  "speedlog/vlw": { header: VLWheader, data: VLW, sheetName: "VLW" },
+  "canthrottle/canonlinestate": {
+    header: CAN_Online_Stateheader,
+    data: CAN_Online_State,
+    sheetName: "CAN_Online_State",
+  },
+  "canthrottle/enginerpm": {
+    header: Engine_RPMheader,
+    data: Engine_RPM,
+    sheetName: "Engine_RPM",
+  },
+  "canthrottle/rudder": { header: Rudderheader, data: Rudder, sheetName: "Rudder" },
+  "canthrottle/rudderscale": {
+    header: Rudder_Scaleheader,
+    data: Rudder_Scale,
+    sheetName: "Rudder_Scale",
+  },
+  "autopilotcontact/autopilotcontact": {
+    header: AUTOPILOTCONTACTheader,
+    data: AUTOPILOTCONTACT,
+    sheetName: "AUTOPILOTCONTACT",
+  },
+  "no1enginepanel/no1engine_panel_61444": {
+    header: NO1ENGINE_PANEL_61444header,
+    data: NO1ENGINE_PANEL_61444,
+    sheetName: "NO.1ENGINE_PANEL_61444",
+  },
+  "no1enginepanel/no1engine_panel_65262": {
+    header: NO1ENGINE_PANEL_65262header,
+    data: NO1ENGINE_PANEL_65262,
+    sheetName: "NO.1ENGINE_PANEL_65262",
+  },
+  "no1enginepanel/no1engine_panel_65263": {
+    header: NO1ENGINE_PANEL_65263header,
+    data: NO1ENGINE_PANEL_65263,
+    sheetName: "NO.1ENGINE_PANEL_65263",
+  },
+  "no1enginepanel/no1engine_panel_65272": {
+    header: NO1ENGINE_PANEL_65272header,
+    data: NO1ENGINE_PANEL_65272,
+    sheetName: "NO.1ENGINE_PANEL_65272",
+  },
+  "no1enginepanel/no1engine_panel_65271": {
+    header: NO1ENGINE_PANEL_65271header,
+    data: NO1ENGINE_PANEL_65271,
+    sheetName: "NO1ENGINE_PANEL_65271",
+  },
+  "no1enginepanel/no1engine_panel_65253": {
+    header: NO1ENGINE_PANEL_65253header,
+    data: NO1ENGINE_PANEL_65253,
+    sheetName: "NO1ENGINE_PANEL_65253",
+  },
+  "no1enginepanel/no1engine_panel_65270": {
+    header: NO1ENGINE_PANEL_65270header,
+    data: NO1ENGINE_PANEL_65270,
+    sheetName: "NO1ENGINE_PANEL_65270",
+  },
+  "no1enginepanel/no1engine_panel_65276": {
+    header: NO1ENGINE_PANEL_65276header,
+    data: NO1ENGINE_PANEL_65276,
+    sheetName: "NO1ENGINE_PANEL_65276",
+  },
+  "no1enginepanel/no1engine_panel_65360": {
+    header: NO1ENGINE_PANEL_65360header,
+    data: NO1ENGINE_PANEL_65360,
+    sheetName: "NO1ENGINE_PANEL_65360",
+  },
+  "no1enginepanel/no1engine_panel_65361_lamp": {
+    header: NO1ENGINE_PANEL_65361_LAMPheader,
+    data: NO1ENGINE_PANEL_65361_LAMP,
+    sheetName: "NO1ENGINE_PANEL_65361_LAMP",
+  },
+  "no1enginepanel/no1engine_panel_65361_status": {
+    header: NO1ENGINE_PANEL_65361_STATUSheader,
+    data: NO1ENGINE_PANEL_65361_STATUS,
+    sheetName: "NO1ENGINE_PANEL_65361_STATUS",
+  },
+  "no1enginepanel/no1engine_panel_65378": {
+    header: NO1ENGINE_PANEL_65378header,
+    data: NO1ENGINE_PANEL_65378,
+    sheetName: "NO1ENGINE_PANEL_65378",
+  },
+  "no1enginepanel/no1engine_panel_65376": {
+    header: NO1ENGINE_PANEL_65376header,
+    data: NO1ENGINE_PANEL_65376,
+    sheetName: "NO1ENGINE_PANEL_65376",
+  },
+  "no1enginepanel/no1engine_panel_65379": {
+    header: NO1ENGINE_PANEL_65379header,
+    data: NO1ENGINE_PANEL_65379,
+    sheetName: "NO1ENGINE_PANEL_65379",
+  },
+  "no2enginepanel/no2engine_panel_61444": {
+    header: NO2ENGINE_PANEL_61444header,
+    data: NO2ENGINE_PANEL_61444,
+    sheetName: "NO2ENGINE_PANEL_61444",
+  },
+  "no2enginepanel/no2engine_panel_65262": {
+    header: NO2ENGINE_PANEL_65262header,
+    data: NO2ENGINE_PANEL_65262,
+    sheetName: "NO2ENGINE_PANEL_65262",
+  },
+  "no2enginepanel/no2engine_panel_65263": {
+    header: NO2ENGINE_PANEL_65263header,
+    data: NO2ENGINE_PANEL_65263,
+    sheetName: "NO2ENGINE_PANEL_65263",
+  },
+  "no2enginepanel/no2engine_panel_65272": {
+    header: NO2ENGINE_PANEL_65272header,
+    data: NO2ENGINE_PANEL_65272,
+    sheetName: "NO2ENGINE_PANEL_65272",
+  },
+  "no2enginepanel/no2engine_panel_65271": {
+    header: NO2ENGINE_PANEL_65271header,
+    data: NO2ENGINE_PANEL_65271,
+    sheetName: "NO2ENGINE_PANEL_65271",
+  },
+  "no2enginepanel/no2engine_panel_65253": {
+    header: NO2ENGINE_PANEL_65253header,
+    data: NO2ENGINE_PANEL_65253,
+    sheetName: "NO2ENGINE_PANEL_65253",
+  },
+  "no2enginepanel/no2engine_panel_65270": {
+    header: NO2ENGINE_PANEL_65270header,
+    data: NO2ENGINE_PANEL_65270,
+    sheetName: "NO2ENGINE_PANEL_65270",
+  },
+  "no2enginepanel/no2engine_panel_65276": {
+    header: NO2ENGINE_PANEL_65276header,
+    data: NO2ENGINE_PANEL_65276,
+    sheetName: "NO2ENGINE_PANEL_65276",
+  },
+  "no2enginepanel/no2engine_panel_65360": {
+    header: NO2ENGINE_PANEL_65360header,
+    data: NO2ENGINE_PANEL_65360,
+    sheetName: "NO2ENGINE_PANEL_65360",
+  },
+  "no2enginepanel/no2engine_panel_65361_lamp": {
+    header: NO2ENGINE_PANEL_65361_LAMPheader,
+    data: NO2ENGINE_PANEL_65361_LAMP,
+    sheetName: "NO2ENGINE_PANEL_65361_LAMP",
+  },
+  "no2enginepanel/no2engine_panel_65361_status": {
+    header: NO2ENGINE_PANEL_65361_STATUSheader,
+    data: NO2ENGINE_PANEL_65361_STATUS,
+    sheetName: "NO2ENGINE_PANEL_65361_STATUS",
+  },
+  "no2enginepanel/no2engine_panel_65378": {
+    header: NO2ENGINE_PANEL_65378header,
+    data: NO2ENGINE_PANEL_65378,
+    sheetName: "NO2ENGINE_PANEL_65378",
+  },
+  "no2enginepanel/no2engine_panel_65376": {
+    header: NO2ENGINE_PANEL_65376header,
+    data: NO2ENGINE_PANEL_65376,
+    sheetName: "NO2ENGINE_PANEL_65376",
+  },
+  "no2enginepanel/no2engine_panel_65379": {
+    header: NO2ENGINE_PANEL_65379header,
+    data: NO2ENGINE_PANEL_65379,
+    sheetName: "NO2ENGINE_PANEL_65379",
+  },
+};
+
 const switchValue = (axiosItem, dataheader, response) => {
-  switch (axiosItem) {
-    case "dgps/gll":
-      GLLheader.value = dataheader.value;
-      GLL.value = response;
-      downloadData.push(GLL);
-      dataValues1.push("GLL");
-      break;
-    case "dgps/gga":
-      GGAheader.value = dataheader.value;
-      GGA.value = response;
-      downloadData.push(GGA);
-      dataValues1.push("GGA");
-      break;
-    case "dgps/rmc":
-      RMCheader.value = dataheader.value;
-      RMC.value = response;
-      downloadData.push(RMC);
-      dataValues1.push("RMC");
-      break;
-    case "dgps/vtg":
-      VTGheader.value = dataheader.value;
-      VTG.value = response;
-      downloadData.push(VTG);
-      dataValues1.push("VTG");
-      break;
-    case "dgps/zda":
-      ZDAheader.value = dataheader.value;
-      ZDA.value = response;
-      downloadData.push(ZDA);
-      dataValues1.push("ZDA");
-      break;
-    case "dgps/gsv":
-      GSVheader.value = dataheader.value;
-      GSV.value = response;
-      downloadData.push(GSV);
-      dataValues1.push("GSV");
-      break;
-    case "dgps/gsa":
-      GSAheader.value = dataheader.value;
-      GSA.value = response;
-      downloadData.push(GSA);
-      dataValues1.push("GSA");
-      break;
-    case "gyro/hdt":
-      HDTheader.value = dataheader.value;
-      HDT.value = response;
-      downloadData.push(HDT);
-      dataValues1.push("HDT");
-      break;
-    case "gyro/rot":
-      ROTheader.value = dataheader.value;
-      ROT.value = response;
-      downloadData.push(ROT);
-      dataValues1.push("ROT");
-      break;
-    case "anemometer/mwv":
-      MWVheader.value = dataheader.value;
-      MWV.value = response;
-      downloadData.push(MWV);
-      dataValues1.push("MWV");
-      break;
-    case "radar/screen":
-      RADAR_SCREENheader.value = dataheader.value;
+  const handler = dataHandlers[axiosItem];
+  if (handler) {
+    handler.header.value = dataheader.value;
+    handler.data.value = response;
+    downloadData.push(handler.data);
+    sheetName.push(handler.sheetName);
+  }
+};
 
-      RADAR_SCREEN.value = response;
-      downloadData.push(RADAR_SCREEN);
-      dataValues1.push("RADAR_SCREEN");
-      break;
-    case "ais/vdm":
-      VDMheader.value = dataheader.value;
-      VDM.value = response;
-      downloadData.push(VDM);
-      dataValues1.push("VDM");
-      break;
-    case "ais/vdo":
-      VDOheader.value = dataheader.value;
-      VDO.value = response;
-      downloadData.push(VDO);
-      dataValues1.push("VDO");
-      break;
-    case "ecdis/routeinfo":
-      ROUTEINFOheader.value = dataheader.value;
-      ROUTEINFO.value = response;
-      downloadData.push(ROUTEINFO);
-      dataValues1.push("ROUTEINFO");
-      break;
-    case "ecdis/waypoints":
-      WAYPOINTSheader.value = dataheader.value;
-      WAYPOINTS.value = response;
-      downloadData.push(WAYPOINTS);
-      dataValues1.push("WAYPOINTS");
-      break;
-    case "ecdis/rtz":
-      RTZheader.value = dataheader.value;
-      RTZ.value = response;
-      downloadData.push(RTZ);
-      dataValues1.push("RTZ");
-      break;
-    case "ecdis/screen":
-      ECDIS_SCREENheader.value = dataheader.value;
-      ECDIS_SCREEN.value = response;
-      downloadData.push(ECDIS_SCREEN);
-      dataValues1.push("ECDIS_SCREEN");
-      break;
-    case "autopilot/rsa":
-      RSAheader.value = dataheader.value;
-      RSA.value = response;
-      downloadData.push(RSA);
-      dataValues1.push("RSA");
-      break;
-    case "autopilot/htd":
-      HTDheader.value = dataheader.value;
-      HTD.value = response;
-      downloadData.push(HTD);
-      dataValues1.push("HTD");
-      break;
-    case "speedlog/vbw":
-      VBWheader.value = dataheader.value;
-      VBW.value = response;
-      downloadData.push(VBW);
-      dataValues1.push("VBW");
-      break;
-    case "speedlog/vhw":
-      VHWheader.value = dataheader.value;
-      VHW.value = response;
-      downloadData.push(VHW);
-      dataValues1.push("VHW");
-      break;
-    case "speedlog/vlw":
-      VLWheader.value = dataheader.value;
-      VLW.value = response;
-      downloadData.push(VLW);
-      dataValues1.push("VLW");
-      break;
+const handleSortUpdate = (newOptions) => {
+  // 정렬 옵션이 변경될 때 발생하는 이벤트 처리
+  console.log("정렬 옵션이 변경되었습니다.", newOptions);
+  console.log(
+    "정렬 옵션이 변경되었습니다.",
+    newOptions.sortBy && newOptions.sortBy[0]?.key,
+    newOptions.sortBy && newOptions.sortBy[0]?.order,
+    selectedData.value[tab.value]
+  );
 
+  // 예를 들어, 다른 이벤트를 호출하거나 특정 동작을 수행할 수 있습니다.
+  // 정렬 키와 순서 가져오기
+  const sortByKey = newOptions.sortBy && newOptions.sortBy[0]?.key;
+  const sortOrder = newOptions.sortBy && newOptions.sortBy[0]?.order;
+
+  switch (selectedData.value[tab.value]) {
+    case "GLL":
+      sortData(GLL.value, sortByKey, sortOrder);
+      break;
+    case "GGA":
+      sortData(GGA.value, sortByKey, sortOrder);
+      break;
+    case "RMC":
+      sortData(RMC.value, sortByKey, sortOrder);
+      break;
+    case "VTG":
+      sortData(VTG.value, sortByKey, sortOrder);
+      break;
+    case "ZDA":
+      sortData(ZDA.value, sortByKey, sortOrder);
+      break;
+    case "GSV":
+      sortData(GSV.value, sortByKey, sortOrder);
+      break;
+    case "GSA":
+      sortData(GSA.value, sortByKey, sortOrder);
+      break;
+    case "HDT":
+      sortData(HDT.value, sortByKey, sortOrder);
+      break;
+    case "ROT":
+      sortData(ROT.value, sortByKey, sortOrder);
+      break;
+    case "MWV":
+      sortData(MWV.value, sortByKey, sortOrder);
+      break;
+    case "RADAR_SCREEN":
+      sortData(RADAR_SCREEN.value, sortByKey, sortOrder);
+      break;
+    case "VDM":
+      sortData(VDM.value, sortByKey, sortOrder);
+      break;
+    case "VDO":
+      sortData(VDO.value, sortByKey, sortOrder);
+      break;
+    case "ROUTEINFO":
+      sortData(ROUTEINFO.value, sortByKey, sortOrder);
+      break;
+    case "WAYPOINTS":
+      sortData(WAYPOINTS.value, sortByKey, sortOrder);
+      break;
+    case "RTZ":
+      sortData(RTZ.value, sortByKey, sortOrder);
+      break;
+    case "ECDIS_SCREEN":
+      sortData(ECDIS_SCREEN.value, sortByKey, sortOrder);
+      break;
+    case "RSA":
+      sortData(RSA.value, sortByKey, sortOrder);
+      break;
+    case "HTD":
+      sortData(HTD.value, sortByKey, sortOrder);
+      break;
+    case "VBW":
+      sortData(VBW.value, sortByKey, sortOrder);
+      break;
+    case "VHW":
+      sortData(VHW.value, sortByKey, sortOrder);
+      break;
+    case "VLW":
+      sortData(VLW.value, sortByKey, sortOrder);
+      break;
     case "CAN_Online_State":
-      CAN_Online_Stateheader.value = dataheader.value;
-      CAN_Online_State.value = response;
-      downloadData.push(CAN_Online_State);
-      dataValues1.push("CAN_Online_State");
+      sortData(CAN_Online_State.value, sortByKey, sortOrder);
       break;
     case "Engine_RPM":
-      Engine_RPMheader.value = dataheader.value;
-      Engine_RPM.value = response;
-      downloadData.push(Engine_RPM);
-      dataValues1.push("Engine_RPM");
+      sortData(Engine_RPM.value, sortByKey, sortOrder);
       break;
     case "Rudder":
-      Rudderheader.value = dataheader.value;
-      Rudder.value = response;
-      downloadData.push(Rudder);
-      dataValues1.push("Rudder");
+      sortData(Rudder.value, sortByKey, sortOrder);
       break;
     case "Rudder_Scale":
-      Rudder_Scaleheader.value = dataheader.value;
-      Rudder_Scale.value = response;
-      downloadData.push(Rudder_Scale);
-      dataValues1.push("Rudder_Scale");
+      sortData(Rudder_Scale.value, sortByKey, sortOrder);
       break;
     case "AUTOPILOTCONTACT":
-      AUTOPILOTCONTACTheader.value = dataheader.value;
-      AUTOPILOTCONTACT.value = response;
-      downloadData.push(AUTOPILOTCONTACT);
-      dataValues1.push("AUTOPILOTCONTACT");
+      sortData(AUTOPILOTCONTACT.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_61444":
-      NO1ENGINE_PANEL_61444header.value = dataheader.value;
-      NO1ENGINE_PANEL_61444.value = response;
-      downloadData.push(NO1ENGINE_PANEL_61444);
-      dataValues1.push("NO.1ENGINE_PANEL_61444");
+    case "NO.1ENGINE_PANEL_61444":
+      sortData(NO1ENGINE_PANEL_61444.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65262":
-      NO1ENGINE_PANEL_65262header.value = dataheader.value;
-      NO1ENGINE_PANEL_65262.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65262);
-      dataValues1.push("NO.1ENGINE_PANEL_65262");
+    case "NO1ENGINE_PANEL_65262":
+      sortData(NO1ENGINE_PANEL_65262.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65263":
-      NO1ENGINE_PANEL_65263header.value = dataheader.value;
-      NO1ENGINE_PANEL_65263.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65263);
-      dataValues1.push("NO.1ENGINE_PANEL_65263");
+    case "NO1ENGINE_PANEL_65263":
+      sortData(NO1ENGINE_PANEL_65263.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65272":
-      NO1ENGINE_PANEL_65272header.value = dataheader.value;
-      NO1ENGINE_PANEL_65272.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65272);
-      dataValues1.push("NO.1ENGINE_PANEL_65272");
+    case "NO1ENGINE_PANEL_65272":
+      sortData(NO1ENGINE_PANEL_65272.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65271":
-      NO1ENGINE_PANEL_65271header.value = dataheader.value;
-      NO1ENGINE_PANEL_65271.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65271);
-      dataValues1.push("NO1ENGINE_PANEL_65271");
+    case "NO1ENGINE_PANEL_65271":
+      sortData(NO1ENGINE_PANEL_65271.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65253":
-      NO1ENGINE_PANEL_65253header.value = dataheader.value;
-      NO1ENGINE_PANEL_65253.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65253);
-      dataValues1.push("NO1ENGINE_PANEL_65253");
+    case "NO1ENGINE_PANEL_65253":
+      sortData(NO1ENGINE_PANEL_65253.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65270":
-      NO1ENGINE_PANEL_65270header.value = dataheader.value;
-      NO1ENGINE_PANEL_65270.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65270);
-      dataValues1.push("NO1ENGINE_PANEL_65270");
+    case "NO1ENGINE_PANEL_65270":
+      sortData(NO1ENGINE_PANEL_65270.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65276":
-      NO1ENGINE_PANEL_65276header.value = dataheader.value;
-      NO1ENGINE_PANEL_65276.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65276);
-      dataValues1.push("NO1ENGINE_PANEL_65276");
+    case "NO1ENGINE_PANEL_65276":
+      sortData(NO1ENGINE_PANEL_65276.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65360":
-      NO1ENGINE_PANEL_65360header.value = dataheader.value;
-      NO1ENGINE_PANEL_65360.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65360);
-      dataValues1.push("NO1ENGINE_PANEL_65360");
+    case "NO1ENGINE_PANEL_65360":
+      sortData(NO1ENGINE_PANEL_65360.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65361_lamp":
-      NO1ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-      NO1ENGINE_PANEL_65361_LAMP.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65361_LAMP);
-      dataValues1.push("NO1ENGINE_PANEL_65361_LAMP");
+    case "NO1ENGINE_PANEL_65361_LAMP":
+      sortData(NO1ENGINE_PANEL_65361_LAMP.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65361_status":
-      NO1ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-      NO1ENGINE_PANEL_65361_STATUS.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65361_STATUS);
-      dataValues1.push("NO1ENGINE_PANEL_65361_STATUS");
+    case "NO1ENGINE_PANEL_65361_STATUS":
+      sortData(NO1ENGINE_PANEL_65361_STATUS.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65378":
-      NO1ENGINE_PANEL_65378header.value = dataheader.value;
-      NO1ENGINE_PANEL_65378.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65378);
-      dataValues1.push("NO1ENGINE_PANEL_65378");
+    case "NO1ENGINE_PANEL_65378":
+      sortData(NO1ENGINE_PANEL_65378.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65376":
-      NO1ENGINE_PANEL_65376header.value = dataheader.value;
-      NO1ENGINE_PANEL_65376.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65376);
-      dataValues1.push("NO1ENGINE_PANEL_65376");
+    case "NO1ENGINE_PANEL_65376":
+      sortData(NO1ENGINE_PANEL_65376.value, sortByKey, sortOrder);
       break;
-    case "no1enginepanel/no1engine_panel_65379":
-      NO1ENGINE_PANEL_65379header.value = dataheader.value;
-      NO1ENGINE_PANEL_65379.value = response;
-      downloadData.push(NO1ENGINE_PANEL_65379);
-      dataValues1.push("NO1ENGINE_PANEL_65379");
+    case "NO1ENGINE_PANEL_65379":
+      sortData(NO1ENGINE_PANEL_65379.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_61444":
-      NO2ENGINE_PANEL_61444header.value = dataheader.value;
-      NO2ENGINE_PANEL_61444.value = response;
-      downloadData.push(NO2ENGINE_PANEL_61444);
-      dataValues1.push("NO2ENGINE_PANEL_61444");
+    case "NO2ENGINE_PANEL_61444":
+      sortData(NO2ENGINE_PANEL_61444.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65262":
-      NO2ENGINE_PANEL_65262header.value = dataheader.value;
-      NO2ENGINE_PANEL_65262.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65262);
-      dataValues1.push("NO2ENGINE_PANEL_65262");
+    case "NO2ENGINE_PANEL_65262":
+      sortData(NO2ENGINE_PANEL_65262.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65263":
-      NO2ENGINE_PANEL_65263header.value = dataheader.value;
-      NO2ENGINE_PANEL_65263.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65263);
-      dataValues1.push("NO2ENGINE_PANEL_65263");
+    case "NO2ENGINE_PANEL_65263":
+      sortData(NO2ENGINE_PANEL_65263.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65272":
-      NO2ENGINE_PANEL_65272header.value = dataheader.value;
-      NO2ENGINE_PANEL_65272.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65272);
-      dataValues1.push("NO2ENGINE_PANEL_65272");
+    case "NO2ENGINE_PANEL_65272":
+      sortData(NO2ENGINE_PANEL_65272.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65271":
-      NO2ENGINE_PANEL_65271header.value = dataheader.value;
-      NO2ENGINE_PANEL_65271.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65271);
-      dataValues1.push("NO2ENGINE_PANEL_65271");
+    case "NO2ENGINE_PANEL_65271":
+      sortData(NO2ENGINE_PANEL_65271.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65253":
-      NO2ENGINE_PANEL_65253header.value = dataheader.value;
-      NO2ENGINE_PANEL_65253.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65253);
-      dataValues1.push("NO2ENGINE_PANEL_65253");
+    case "NO2ENGINE_PANEL_65253":
+      sortData(NO2ENGINE_PANEL_65253.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65270":
-      NO2ENGINE_PANEL_65270header.value = dataheader.value;
-      NO2ENGINE_PANEL_65270.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65270);
-      dataValues1.push("NO2ENGINE_PANEL_65270");
+    case "NO2ENGINE_PANEL_65270":
+      sortData(NO2ENGINE_PANEL_65270.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65276":
-      NO2ENGINE_PANEL_65276header.value = dataheader.value;
-      NO2ENGINE_PANEL_65276.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65276);
-      dataValues1.push("NO2ENGINE_PANEL_65276");
+    case "NO2ENGINE_PANEL_65276":
+      sortData(NO2ENGINE_PANEL_65276.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65360":
-      NO2ENGINE_PANEL_65360header.value = dataheader.value;
-      NO2ENGINE_PANEL_65360.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65360);
-      dataValues1.push("NO2ENGINE_PANEL_65360");
+    case "NO2ENGINE_PANEL_65360":
+      sortData(NO2ENGINE_PANEL_65360.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65361_lamp":
-      NO2ENGINE_PANEL_65361_LAMPheader.value = dataheader.value;
-      NO2ENGINE_PANEL_65361_LAMP.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65361_LAMP);
-      dataValues1.push("NO2ENGINE_PANEL_65361_LAMP");
+    case "NO2ENGINE_PANEL_65361_LAMP":
+      sortData(NO2ENGINE_PANEL_65361_LAMP.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65361_status":
-      NO2ENGINE_PANEL_65361_STATUSheader.value = dataheader.value;
-      NO2ENGINE_PANEL_65361_STATUS.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65361_STATUS);
-      dataValues1.push("NO2ENGINE_PANEL_65361_STATUS");
+    case "NO2ENGINE_PANEL_65361_STATUS":
+      sortData(NO2ENGINE_PANEL_65361_STATUS.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65378":
-      NO2ENGINE_PANEL_65378header.value = dataheader.value;
-      NO2ENGINE_PANEL_65378.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65378);
-      dataValues1.push("NO2ENGINE_PANEL_65378");
+    case "NO2ENGINE_PANEL_65378":
+      sortData(NO2ENGINE_PANEL_65378.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65376":
-      NO2ENGINE_PANEL_65376header.value = dataheader.value;
-      NO2ENGINE_PANEL_65376.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65376);
-      dataValues1.push("NO2ENGINE_PANEL_65376");
+    case "NO2ENGINE_PANEL_65376":
+      sortData(NO2ENGINE_PANEL_65376.value, sortByKey, sortOrder);
       break;
-    case "no2enginepanel/no2engine_panel_65379":
-      NO2ENGINE_PANEL_65379header.value = dataheader.value;
-      NO2ENGINE_PANEL_65379.value = response;
-      downloadData.push(NO2ENGINE_PANEL_65379);
-      dataValues1.push("NO2ENGINE_PANEL_65379");
+    case "NO2ENGINE_PANEL_65379":
+      sortData(NO2ENGINE_PANEL_65379.value, sortByKey, sortOrder);
       break;
-
+    // 다른 데이터에 대한 처리 추가
+    // ...
     default:
-      console.error("Unknown axiosItem:", axiosItem);
+      console.error("Invalid tab value:", selectedData.value[tab.value]);
   }
+};
+
+const sortData = (data, sortByKey, sortOrder) => {
+  if (!data || !data.length || !sortByKey) {
+    return;
+  }
+
+  data.sort((a, b) => {
+    const valueA = a[sortByKey];
+    const valueB = b[sortByKey];
+
+    if (sortOrder === "asc") {
+      return valueA.localeCompare(valueB);
+    } else if (sortOrder === "desc") {
+      return valueB.localeCompare(valueA);
+    } else {
+      return 0; // 정렬 순서가 지정되지 않은 경우, 기본적으로 정렬하지 않음
+    }
+  });
 };
 </script>
 

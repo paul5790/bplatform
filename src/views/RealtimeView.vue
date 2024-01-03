@@ -251,7 +251,7 @@
           <v-col
             :cols="getEngineColsValue()"
             no-gutters
-            :style="{ padding: '0px', paddingLeft: `${getLampPaddingLeft()}px`, paddingTop: '4px' }"
+            :style="{ padding: '0px', paddingLeft: `${getPaddingLeftValue()}px`, paddingTop: '4px' }"
           >
             <v-card style="flex: 1">
               <v-card-item>
@@ -1661,10 +1661,6 @@ const getLampheightValueALL2 = () => {
   return screenWidth.value <= 1890 ? 25 : 21;
 };
 
-const getStarboardPaddingLeft = () => {
-  return screenWidth.value <= 1800 ? 16 : 4;
-};
-
 const getLampPaddingLeft = () => {
   return screenWidth.value <= 1890 ? 16 : 4;
 };
@@ -1681,10 +1677,6 @@ const getLampPaddingBottom2 = () => {
   return screenWidth.value <= 1890 ? 15 : 4;
 };
 
-const getSocketCheckHeight = () => {
-  return screenWidth.value <= 1890 ? 15 : 4;
-};
-
 const getheadingPaddingTop = () => {
   return screenWidth.value <= 1800 ? 5 : 0;
 };
@@ -1693,16 +1685,8 @@ const getOtherPaddingTop = () => {
   return screenWidth.value <= 1800 ? 4 : 20;
 };
 
-const getPaddingTopValue = () => {
-  return screenWidth.value <= 1800 ? 105 : 15;
-};
-
 const getPaddingLeftValue = () => {
   return screenWidth.value <= 1800 ? 16 : 4;
-};
-
-const getPaddingRightValue = () => {
-  return screenWidth.value <= 1800 ? 15 : 0;
 };
 
 const handleResize = () => {

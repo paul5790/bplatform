@@ -1269,8 +1269,8 @@ const overlayemit = (data) => {
 
 // 데이터 테이블 헤더
 const headers = ref([
-  { title: "항차", align: "start", key: "division" },
-  { title: "시작시간", align: "start", key: "startdate" },
+  { title: "항차", align: "start", sortable: true,  key: "division" },
+  { title: "시작시간", align: "start", key: "startdate", sortable: true },
   { title: "끝시간", align: "start", key: "enddate" },
   { title: "진행 시간", align: "start", key: "time" },
   { title: "Ship ID", align: "start", key: "shipid" },
@@ -1281,6 +1281,22 @@ const headers = ref([
   { title: "설명", align: "start", key: "description" },
   // { title: "입력자", align: "end", key: "user" },
 ]);
+
+const customSort = (items, index, isDesc) => {
+  alert('gd')
+  items.sort((a, b) => {
+    if (index[0] === 'starttime') {
+      if (!isDesc[0]) {
+        return new Date(`2022-01-01 ${b[index]}`) - new Date(`2022-01-01 ${a[index]}`);
+      } else {
+        return new Date(`2022-01-01 ${a[index]}`) - new Date(`2022-01-01 ${b[index]}`);
+      }
+    } else {
+      // 다른 열의 정렬 로직 추가
+    }
+  });
+  return items;
+};
 
 const items = ref([]);
 // 데이터 받아오기

@@ -134,7 +134,7 @@ const fetchData = async () => {
         startdate: response[i].startTimeUtc,
         purpose: response[i].testPurpose,
         location: response[i].navigationArea,
-        storage: response[i].storageSize,
+        storage: response[i].storageSize + "MB",
         enddate: response[i].endTimeUtc,
         description: response[i].description,
         time: formattedTime,
