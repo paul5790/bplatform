@@ -15,7 +15,7 @@
     >
       <v-tab :value="1">항차 설정</v-tab>
       <v-tab :value="2">사용자 설정</v-tab>
-      <v-tab :value="3">로그 설정</v-tab>
+      <v-tab :value="3">로그 관리</v-tab>
     </v-tabs>
     <v-window
       v-model="tab"
@@ -41,7 +41,6 @@
               </div>
             </div>
             <div v-if="tab === 3">
-              Move v-if here
               <div class="component-container">
                 <LogViewing />
                 <!-- <SettingAll/> -->

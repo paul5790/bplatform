@@ -337,13 +337,13 @@ const pageCount = computed(() => {
 });
 
 const headers = ref([
-  { title: "ID", key: "userId" },
-  { title: "userName", key: "userName" },
-  { title: "userGroup", key: "userGroup" },
-  { title: "department", key: "department" },
-  { title: "email", key: "email" },
-  { title: "phoneNumber", key: "phoneNumber" },
-  { title: "description", key: "description" },
+  { title: "사용자 ID", key: "userId" },
+  { title: "이름", key: "userName" },
+  { title: "권한", key: "userGroup" },
+  { title: "소속", key: "department" },
+  { title: "이메일", key: "email" },
+  { title: "전화번호", key: "phoneNumber" },
+  { title: "설명", key: "description" },
 ]);
 
 const items = ref([]);

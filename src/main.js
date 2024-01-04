@@ -21,7 +21,7 @@ createApp(App)
     },
   })
   .use(VueApexCharts)
-  .use(socket, "ws://192.168.0.73:8080/ws/shipinfo")
+  .use(socket, "ws://192.168.0.44:9999/ws/shipinfo")
   .component("VueDatePicker", VueDatePicker)
   .component("v-chart", VueECharts)
   .mount("#app");

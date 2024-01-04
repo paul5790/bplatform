@@ -1,5 +1,21 @@
 <template>
-  <v-chart class="chart" :option="option" autoresize />
+  <div class="autocomplete-container">
+    <v-select
+      v-model="selectedtrialNum"
+      label="select"
+      :items="trialrun"
+      variant="underlined"
+      style="width: 120px; height: 5vh"
+      position="top right"
+      density="compact"
+    ></v-select>
+    <v-sheet
+      :elevation="elevation"
+      style="display: flex; flex-direction: column; align-items: center"
+    >
+      <v-chart class="chart" :option="option" autoresize />
+    </v-sheet>
+  </div>
 </template>
 
 <script setup>
@@ -12,8 +28,8 @@ import {
   LegendComponent,
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
-import { ref, provide, watch } from "vue";
-import { readDataStorage } from "../../api/index.js";
+import { ref, provide, watch, onMounted } from "vue";
+import { readTrialData, readDataStorage } from "../../api/index.js";
 import { darkText, lightText } from "../../color/color.js";
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
@@ -22,6 +38,10 @@ const textColor = ref(themeMode.value === "light" ? lightText : darkText);
 watch(themeMode, (newValue) => {
   textColor.value = newValue === "light" ? lightText : darkText;
 });
+
+// 시운전 데이터
+const trialrun = ref([]);
+const selectedtrialNum = ref();
 
 const DGPS = ref({ value: 0, name: "DGPS", itemStyle: { color: "#2Fe7b3" } });
 const GYRO = ref({ value: 0, name: "GYRO" });
@@ -111,6 +131,19 @@ const fetchData = async () => {
   }
 };
 
+const getTrialDate = async () => {
+  try {
+    const response = await readTrialData(tokenid.value);
+    trialrun.value.push('전체');
+    for (let i = 0; i < response.length; i++) {
+      trialrun.value.push(`항차 ${i + 1}번`);
+      selectedtrialNum.value = trialrun.value[0];
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+onMounted(getTrialDate);
 fetchData();
 
 use([
@@ -187,11 +220,21 @@ const option = ref({
 
 <style scoped>
 .chart {
-  margin-top: 2vh;
-  height: 40vh;
+  margin-top: 3vh;
+  height: 37vh;
   padding: 5px;
 }
 body {
   margin: 0;
+}
+.autocomplete-container {
+  position: relative;
+}
+
+.v-select {
+  margin-top: 5px;
+  position: absolute;
+  top: 0;
+  right: 0;
 }
 </style>

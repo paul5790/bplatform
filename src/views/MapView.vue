@@ -97,7 +97,7 @@ onMounted(async () => {
       const longitude = aisData[i].longitude;
 
       // latitude 또는 longitude가 null이 아닌 경우에만 데이터를 추가
-      if (latitude !== null && longitude !== null) {
+      if (latitude !== null && longitude !== null && latitude < 90 && longitude < 180) {
         ais.value.push([latitude, longitude]);
       }
     }
