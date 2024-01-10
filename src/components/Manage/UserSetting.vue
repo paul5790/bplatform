@@ -193,7 +193,6 @@
 
 <script setup>
 import { computed, ref, watch } from "vue";
-import axios from "axios";
 import {
   readUserData,
   deleteUserData,
@@ -231,10 +230,7 @@ const selectedemail = ref();
 const selecteduserGroup = ref();
 const selecteddescription = ref();
 const selectedphoneNumber = ref();
-const readonly = ref(true);
 const message = ref("유저 정보 로딩중...");
-
-const username = ref("홍길동");
 
 const rulesdepartment = ref(false);
 const rulesdescription = ref(false);
@@ -330,8 +326,6 @@ const deleteData = async () => {
   }
 };
 
-const saveData = () => {};
-
 const pageCount = computed(() => {
   return Math.ceil(items.value.length / itemsPerPage.value);
 });
@@ -420,9 +414,6 @@ const nullDialog = () => {
   selecteddescription.value = "";
   selectedphoneNumber.value = "";
 };
-
-// 데이터 테이블 바디
-const items1 = ref([]);
 </script>
 
 <style scoped>

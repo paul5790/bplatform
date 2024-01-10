@@ -10,7 +10,7 @@ CanThrottle
 AUTOPILOTCONTACT
 NO.1ENGINEPANEL
 NO.2ENGINEPANEL
-dataValues1.push(
+dataValues1.push
 GLL
 GGA
 RMC

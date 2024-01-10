@@ -344,7 +344,6 @@ export const readDataTrial = async (tokenid, data, selectedtrialNum) => {
   }
 };
 
-
 // 데이터 조회하기 (날짜)
 export const readDataDate = async (
   tokenid,
@@ -419,7 +418,6 @@ export const serverStorage = async (tokenid) => {
     throw error;
   }
 };
-
 
 
 

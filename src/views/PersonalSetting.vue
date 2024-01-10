@@ -1480,7 +1480,7 @@ const newpwcheck = ref();
 const privacyDialog = ref(false);
 const passwordchangeDialog = ref(false);
 const losstimeDialog = ref(false);
-const ALLlosstimeDialog = ref(false); // 소실주기 전체
+const ALLlosstimeDialog = ref(true); // 소실주기 전체
 const realtimeDialog = ref(false);
 
 // 데이터 소실주기 설정

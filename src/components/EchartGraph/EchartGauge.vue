@@ -5,7 +5,7 @@
 <script setup props="props">
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { GaugeChart } from "echarts/charts"; // GaugeChart로 변경
+import { GaugeChart } from "echarts/charts";
 import {
   TitleComponent,
   TooltipComponent,
@@ -24,7 +24,7 @@ watch(themeMode, (newValue) => {
 
 use([
   CanvasRenderer,
-  GaugeChart, // GaugeChart로 변경
+  GaugeChart,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
@@ -33,7 +33,6 @@ use([
 provide(THEME_KEY);
 
 const props = defineProps({
-  // #2 props 정의
   name: String,
   left: String,
   unit: String,
@@ -47,7 +46,7 @@ const option = ref({
     text: props.name,
     left: props.left,
     textStyle: {
-      fontSize: 14, // 폰트 크기 설정
+      fontSize: 14, 
       color: textColor.value,
     },
   },
@@ -59,7 +58,7 @@ const option = ref({
       name: "SPEEDLOG",
       min: 0,
       max: props.max_speed,
-      type: "gauge", // gauge 타입 사용
+      type: "gauge",
       center: ["50%", `${props.center_y}`],
       pointer: {
         offsetCenter: [0, "0%"],
@@ -74,12 +73,11 @@ const option = ref({
         formatter: `{value} ${props.unit}`,
         fontSize: 14,
         textStyle: {
-          color: textColor.value, // 텍스트 컬러 설정
+          color: textColor.value,
         },
       },
       axisLabel: {
-        // 여기에 axisLabel 속성 추가
-        color: textColor.value, // 눈금 텍스트 색상을 흰색으로 설정
+        color: textColor.value,
       },
       data: [
         {
@@ -89,7 +87,7 @@ const option = ref({
     },
   ],
 });
-// 1초마다 랜덤값 생성
+
 const updateValue = () => {
   if (isNaN(props.value) || props.value === undefined) {
     option.value.series[0].data[0].value = null;

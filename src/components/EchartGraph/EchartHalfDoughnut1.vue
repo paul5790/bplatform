@@ -117,10 +117,8 @@ const option = ref({
           itemStyle: { color: "#D0E0D0" },
         },
         {
-          // make an record to fill the bottom 50%
           value: totalSize.value,
           itemStyle: {
-            // stop the chart from rendering this piece
             color: "none",
             decal: {
               symbol: "none",
@@ -169,10 +167,6 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
     },
   ];
 });
-
-// console.log(serverInUsedSize.value);
-// console.log(dbSize.value);
-// console.log(serverRemainingSize.value);
 </script>
 
 <style scoped>

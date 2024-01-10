@@ -216,8 +216,7 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted, watchEffect, watch } from "vue";
-import axios from "axios";
+import { ref, provide, onMounted, watchEffect } from "vue";
 import html2canvas from "html2canvas";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
@@ -262,21 +261,10 @@ provide(THEME_KEY);
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
 
 const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
-});
-
 const textColor = ref(themeMode.value === "light" ? lightText : darkText);
-watch(themeMode, (newValue) => {
-  textColor.value = newValue === "light" ? lightText : darkText;
-});
-
 const themeColor = ref(
   themeMode.value === "light" ? whitebackcolor : darkbackcolor
 );
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
 
 // 왼쪽 셀렉바 설정
 const tokenid = ref(sessionStorage.getItem("token") || "");
@@ -370,16 +358,6 @@ watchEffect(() => {
     // 시간 범위 설정
     dateRange.value = [startDate2.value, endDate2.value];
   }
-  // console.log(selectedtrialNum.value);
-  // const date1 = ref(setStartTime.value[index]);
-  // const date2 = ref(setEndTime.value[index]);
-
-  // // Date 객체로 변환
-  // const startDate = new Date(date1.value);
-  // const endDate = new Date(date2.value);
-
-  // // 시간 범위 설정
-  // dateRange.value = [startDate, endDate];
 });
 
 watchEffect(() => {
@@ -481,1116 +459,200 @@ onMounted(() => {
   date.value = [startDate, endDate];
 });
 
+const fetchData = async (component, type, item, trialNum, startDate, endDate) => {
+  try {
+    const dataType = `${component.toLowerCase()}/${type.toLowerCase()}`;
+    if (voyagesearch.value) {
+      return await readDataTrial(tokenid.value, dataType, trialNum);
+    } else {
+      return await readDataDate(tokenid.value, component, type, startDate, endDate);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error; // 에러를 호출자에게 전파
+  }
+};
+const fetchEngineData = async (url, component, type, item, trialNum, startDate, endDate) => {
+  try {
+    const dataType = url;
+    if (voyagesearch.value) {
+      return await readDataTrial(tokenid.value, dataType, trialNum);
+    } else {
+      return await readDataDate(tokenid.value, component, type, startDate, endDate);
+    }
+  } catch (error) {
+    console.error(error);
+    throw error; // 에러를 호출자에게 전파
+  }
+};
+
+const processData = (data, timestampKey, dataKey, unitValue, contentsItemValue, analysisName) => {
+  analysisData.value = data.map(item => item[dataKey]);
+  analysisTime.value = data.map(item => item[timestampKey].slice(8, 19));
+  unit.value = unitValue;
+  selectedcontentsItem.value = contentsItemValue;
+  analysis.value[0].name = analysisName;
+  console.log(analysisData.value);
+  console.log(analysisTime.value);
+};
+
 const searchData = async () => {
   nodata.value = true;
   loading.value = true;
   first.value = false;
+
   try {
     analysisData.value = [];
     analysisTime.value = [];
-    if (
-      selectedsubComponent.value !== null &&
+
+    if (selectedsubComponent.value !== null &&
       selectedItem.value !== null &&
       selectedtrialrun.value !== null
     ) {
-      if (selectedsubComponent.value === "DGPS") {
-        console.log(startDate2.value);
-        console.log(endDate2.value);
-        try {
-          let gga;
-          if (voyagesearch.value) {
-            gga = await readDataTrial(
-              tokenid.value,
-              "dgps/gga",
-              selectedtrialNum.value
-            );
-          } else {
-            gga = await readDataDate(
-              tokenid.value,
-              "DGPS",
-              "GGA",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
+      const [gga, vtg, hdt, rot, mwv, vhw, rsa, engine_SPEED,engine_OIL_TEMPERATURE1,engine_OIL_PRESSURE,transmission_OIL_PRESSURE,charging_SYSTEM_POTENTIAL,engine_TOTAL_HOURS,engine_INTAKE_MANIFOLD_NO1_PRESSURE,fuel_LEVEL_1,
+    engine_SPEED2,engine_OIL_TEMPERATURE2,engine_OIL_PRESSURE2,transmission_OIL_PRESSURE2,charging_SYSTEM_POTENTIAL2,engine_TOTAL_HOURS2,engine_INTAKE_MANIFOLD_NO1_PRESSURE2,fuel_LEVEL_2,] = await Promise.all([
+        fetchData("DGPS", "GGA", selectedItem.value === "위도" || selectedItem.value === "경도" ? "latitude,longitude" : "altitude", selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchData("DGPS", "VTG", selectedItem.value === "SOG" || selectedItem.value === "COG" ? "speedovergroundknots,courseovergrounddegreestrue" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchData("GYRO", "HDT", selectedItem.value === "Heading" ? "heading" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchData("GYRO", "ROT", selectedItem.value === "회전 속도" ? "rateofturn" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchData("ANEMOMETER", "MWV", selectedItem.value === "풍향" || selectedItem.value === "풍속" ? "anemometerangle,anemometerspeed" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchData("SPEEDLOG", "VHW", selectedItem.value === "선박 속도" ? "speedn" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchData("AUTOPILOT", "RSA", selectedItem.value === "스타보트 센서" || selectedItem.value === "포트 센서" ? "starboardruddersensor,portruddersensor" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        
+        fetchEngineData("no1enginepanel/no1engine_panel_61444", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65262", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65263", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65272", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65271", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65253", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65270", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65276", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_61444", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65262", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65263", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65272", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65271", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65253", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65270", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65276", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+      ]);
 
-          let vtg;
-          if (voyagesearch.value) {
-            vtg = await readDataTrial(
-              tokenid.value,
-              "dgps/vtg",
-              selectedtrialNum.value
-            );
-          } else {
-            vtg = await readDataDate(
-              tokenid.value,
-              "DGPS",
-              "VTG",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          switch (selectedItem.value) {
-            case "위도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < gga.length; i++) {
-                analysisData.value.push(gga[i].latitude / 100);
+      switch (selectedItem.value) {
+        case "위도":
+          processData(gga, "timestamp_EQUIPMENT", "latitude", "degree(°)", "gga/latitude", "latitude");
+          break;
+        case "경도":
+          processData(gga, "timestamp_EQUIPMENT", "longitude", "degree(°)", "gga/longitude", "longitude");
+          break;
+        case "고도":
+          processData(gga, "timestamp_EQUIPMENT", "altitude", "M", "gga/altitude", "altitude");
+          break;
+        case "SOG":
+          processData(vtg, "timestamp_EQUIPMENT", "speedovergroundknots", "N", "vtg/speedovergroundknots", "speedovergroundknots");
+          break;
+        case "COG":
+          processData(vtg, "timestamp_EQUIPMENT", "courseovergrounddegreestrue", "degree(°)", "vtg/courseovergrounddegreestrue", "courseovergrounddegreestrue");
+          break;
+        case "Heading":
+          processData(hdt, "timestamp_EQUIPMENT", "heading", "degree(°)", "hdt/heading", "heading");
+          break;
+        case "회전 속도":
+          processData(rot, "timestamp_EQUIPMENT", "rateofturn", "degree/minute", "rot/rateofturn", "rateofturn");
+          break;
+        case "풍향":
+          processData(mwv, "timestamp_EQUIPMENT", "anemometerangle", "degree(°)", "mwv/anemometerangle", "anemometerangle");
+          break;
+        case "풍속":
+          processData(mwv, "timestamp_EQUIPMENT", "anemometerspeed", "m/s", "mwv/anemometerspeed", "anemometerspeed");
+          break;
+        case "선박 속도":
+          processData(vhw, "timestamp_EQUIPMENT", "speedn", "N", "vhw/speedn", "speedn");
+          break;
+        case "스타보트 센서":
+          processData(rsa, "timestamp_EQUIPMENT", "starboardruddersensor", "degree(°)", "rsa/starboardruddersensor", "starboardruddersensor");
+          break;
+        case "포트 센서":
+          processData(rsa, "timestamp_EQUIPMENT", "portruddersensor", "degree(°)", "rsa/portruddersensor", "portruddersensor");
+          break;
 
-                analysisTime.value.push(
-                  gga[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree(°)";
-              selectedcontentsItem.value = "gga/latitude";
-              analysis.value[0].name = "latitude";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-            case "경도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < gga.length; i++) {
-                analysisData.value.push(gga[i].longitude / 100);
+        case "엔진1 속도":
+          processData(engine_SPEED, "timestamp_EQUIPMENT", "engine_SPEED", "RPM", "no1engine_panel_61444/Engine Speed", "Engine Speed");
+          break;
+        case "엔진1 오일 온도":
+          processData(engine_OIL_TEMPERATURE1, "timestamp_EQUIPMENT", "engine_OIL_TEMPERATURE1", "°C", "no1engine_panel_65262/Engine Oil Temperature", "Engine Oil Temperature");
+          break;
+        case "엔진1 오일 압력":
+          processData(engine_OIL_PRESSURE, "timestamp_EQUIPMENT", "engine_OIL_PRESSURE", "kPa", "no1engine_panel_65263/Engine Oil Pressure", "Engine Oil Pressure");
+          break;
+        case "엔진1 냉각수 량":
+          processData(engine_OIL_PRESSURE, "timestamp_EQUIPMENT", "engine_COOLANT_LEVEL", "%", "no1engine_panel_65263/Engine Coolant Level", "Engine Coolant Level");
+          break;
+        case "엔진1 변속기 오일 압력":
+          processData(transmission_OIL_PRESSURE, "timestamp_EQUIPMENT", "transmission_OIL_PRESSURE", "kPa", "no1engine_panel_65272/Transmission Oil Pressure", "Transmission Oil Pressure");
+          break;
+        case "엔진1 충전 시스템 전압":
+          processData(charging_SYSTEM_POTENTIAL, "timestamp_EQUIPMENT", "charging_SYSTEM_POTENTIAL", "V", "no1engine_panel_65271/Charging System Potential", "Charging System Potential");
+          break;
+        case "엔진1 배터리 전압":
+          processData(charging_SYSTEM_POTENTIAL, "timestamp_EQUIPMENT", "battery_POTENTIAL", "V", "no1engine_panel_65271/Battery Potential", "Battery Potential");
+          break;
+        case "엔진1 누적 가동시간":
+          processData(engine_TOTAL_HOURS, "timestamp_EQUIPMENT", "engine_TOTAL_HOURS", "hr", "no1engine_panel_65253/Engine total hours", "Engine total hours");
+          break;
+        case "엔진1 흡입 매니폴드 압력":
+          processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_PRESSURE", "kPa", "no1engine_panel_65270/Engine Intake Manifold Pressure", "Engine Intake Manifold Pressure");
+          break;
+        case "엔진1 흡입 매니폴드 온도":
+          processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_TEMP", "°C", "no1engine_panel_65270/Engine Intake Manifold Temp", "Engine Intake Manifold Temp");
+          break;
+        case "엔진1 배기가스 온도":
+          processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_EXHAUST_GAS_TEMPERATURE", "°C", "no1engine_panel_65270/Engine Exhaust Gas Temperature", "Engine Exhaust Gas Temperature");
+          break;
+        case "엔진1 연료 량":
+          processData(fuel_LEVEL_1, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no1engine_panel_65276/Fuel Level", "fuel_LEVEL");
+          break;
 
-                analysisTime.value.push(
-                  gga[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree(°)";
-              selectedcontentsItem.value = "gga/longitude";
-              analysis.value[0].name = "longitude";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-            case "고도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < gga.length; i++) {
-                analysisData.value.push(gga[i].altitude);
 
-                analysisTime.value.push(
-                  gga[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "M";
-              selectedcontentsItem.value = "gga/altitude";
-              analysis.value[0].name = "altitude";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-            case "SOG":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < vtg.length; i++) {
-                analysisData.value.push(vtg[i].speedovergroundknots);
 
-                analysisTime.value.push(
-                  vtg[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "N";
-              selectedcontentsItem.value = "vtg/speedovergroundknots";
-              analysis.value[0].name = "speedovergroundknots";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-            case "COG":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < vtg.length; i++) {
-                analysisData.value.push(vtg[i].courseovergrounddegreestrue);
-
-                analysisTime.value.push(
-                  vtg[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree(°)";
-              selectedcontentsItem.value = "vtg/courseovergrounddegreestrue";
-              analysis.value[0].name = "courseovergrounddegreestrue";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      } else if (selectedsubComponent.value === "GYRO") {
-        try {
-          let hdt;
-          if (voyagesearch.value) {
-            hdt = await readDataTrial(
-              tokenid.value,
-              "gyro/hdt",
-              selectedtrialNum.value
-            );
-          } else {
-            hdt = await readDataDate(
-              tokenid.value,
-              "GYRO",
-              "HDT",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          let rot;
-          if (voyagesearch.value) {
-            rot = await readDataTrial(
-              tokenid.value,
-              "gyro/rot",
-              selectedtrialNum.value
-            );
-          } else {
-            rot = await readDataDate(
-              tokenid.value,
-              "GYRO",
-              "ROT",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          switch (selectedItem.value) {
-            case "Heading":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < hdt.length; i++) {
-                analysisData.value.push(hdt[i].heading);
-
-                analysisTime.value.push(
-                  hdt[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree(°)";
-              selectedcontentsItem.value = "hdt/heading";
-              analysis.value[0].name = "heading";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "회전 속도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < rot.length; i++) {
-                analysisData.value.push(rot[i].rateofturn);
-
-                analysisTime.value.push(
-                  rot[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree/minute";
-              selectedcontentsItem.value = "rot/rateofturn";
-              analysis.value[0].name = "rateofturn";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      } else if (selectedsubComponent.value === "ANEMOMETER") {
-        try {
-          let mwv;
-          if (voyagesearch.value) {
-            mwv = await readDataTrial(
-              tokenid.value,
-              "anemometer/mwv",
-              selectedtrialNum.value
-            );
-          } else {
-            mwv = await readDataDate(
-              tokenid.value,
-              "ANEMOMETER",
-              "MWV",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          switch (selectedItem.value) {
-            case "풍향":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < mwv.length; i++) {
-                analysisData.value.push(mwv[i].anemometerangle);
-
-                analysisTime.value.push(
-                  mwv[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree(°)";
-              selectedcontentsItem.value = "mwv/anemometerangle";
-              analysis.value[0].name = "anemometerangle";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "풍속":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < mwv.length; i++) {
-                analysisData.value.push(mwv[i].anemometerspeed);
-
-                analysisTime.value.push(
-                  mwv[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "m/s";
-              selectedcontentsItem.value = "mwv/anemometerspeed";
-              analysis.value[0].name = "anemometerspeed";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      } else if (selectedsubComponent.value === "SPEEDLOG") {
-        try {
-          let vhw;
-          if (voyagesearch.value) {
-            vhw = await readDataTrial(
-              tokenid.value,
-              "speedlog/vhw",
-              selectedtrialNum.value
-            );
-          } else {
-            vhw = await readDataDate(
-              tokenid.value,
-              "SPEEDLOG",
-              "VHW",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          switch (selectedItem.value) {
-            case "선박 속도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < vhw.length; i++) {
-                if (vhw[i].speedn <= 0) {
-                  analysisData.value.push("0");
-                } else {
-                  analysisData.value.push(vhw[i].speedn);
-                }
-
-                analysisTime.value.push(
-                  vhw[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "N";
-              selectedcontentsItem.value = "vhw/speedn";
-              analysis.value[0].name = "speedn";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      } else if (selectedsubComponent.value === "AUTOPILOT") {
-        try {
-          let rsa;
-          if (voyagesearch.value) {
-            rsa = await readDataTrial(
-              tokenid.value,
-              "autopilot/rsa",
-              selectedtrialNum.value
-            );
-          } else {
-            rsa = await readDataDate(
-              tokenid.value,
-              "AUTOPILOT",
-              "RSA",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          switch (selectedItem.value) {
-            case "스타보트 센서":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < rsa.length; i++) {
-                analysisData.value.push(rsa[i].starboardruddersensor);
-
-                analysisTime.value.push(
-                  rsa[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree(°)";
-              selectedcontentsItem.value = "rsa/starboardruddersensor";
-              analysis.value[0].name = "starboardruddersensor";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "포트 센서":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < rsa.length; i++) {
-                analysisData.value.push(rsa[i].portruddersensor);
-
-                analysisTime.value.push(
-                  rsa[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "degree(°)";
-              selectedcontentsItem.value = "rsa/portruddersensor";
-              analysis.value[0].name = "portruddersensor";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              break;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      } else if (selectedsubComponent.value === "NO.1ENGINEPANEL") {
-        try {
-          let no1engine_panel_61444;
-          if (voyagesearch.value) {
-            no1engine_panel_61444 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_61444",
-              selectedtrialNum.value
-            );
-          } else {
-            no1engine_panel_61444 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_61444",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no1engine_panel_65262;
-          if (voyagesearch.value) {
-            no1engine_panel_65262 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_65262",
-              selectedtrialNum.value
-            );
-          } else {
-            no1engine_panel_65262 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_65262",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no1engine_panel_65263;
-          if (voyagesearch.value) {
-            no1engine_panel_65263 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_65263",
-              selectedtrialNum.value
-            );
-          } else {
-            no1engine_panel_65263 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_65263",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no1engine_panel_65272;
-          if (voyagesearch.value) {
-            no1engine_panel_65272 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_65272",
-              selectedtrialNum.value
-            );
-          } else {
-            no1engine_panel_65272 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_65272",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no1engine_panel_65271;
-          if (voyagesearch.value) {
-            no1engine_panel_65271 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_65271",
-              selectedtrialNum.value
-            );
-          } else {
-            no1engine_panel_65271 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_65271",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no1engine_panel_65253;
-          if (voyagesearch.value) {
-            no1engine_panel_65253 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_65253",
-              selectedtrialNum.value
-            );
-          } else {
-            no1engine_panel_65253 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_65253",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no1engine_panel_65270;
-          if (voyagesearch.value) {
-            no1engine_panel_65270 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_65270",
-              selectedtrialNum.value
-            );
-            console.log("여깁니다용", no1engine_panel_65270);
-          } else {
-            no1engine_panel_65270 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_65270",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no1engine_panel_65276;
-          if (voyagesearch.value) {
-            no1engine_panel_65276 = await readDataTrial(
-              tokenid.value,
-              "no1enginepanel/no1engine_panel_65276",
-              selectedtrialNum.value
-            );
-          } else {
-            no1engine_panel_65276 = await readDataDate(
-              tokenid.value,
-              "NO1ENGINEPANEL",
-              "NO1ENGINE_PANEL_65276",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          switch (selectedItem.value) {
-            case "엔진1 속도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_61444.length; i++) {
-                analysisData.value.push(no1engine_panel_61444[i].engine_SPEED);
-
-                analysisTime.value.push(
-                  no1engine_panel_61444[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "RPM";
-              selectedcontentsItem.value = "no1engine_panel_61444/Engine Speed";
-              analysis.value[0].name = "Engine Speed";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 오일 온도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65262.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65262[i].engine_OIL_TEMPERATURE1
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65262[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "°C";
-              selectedcontentsItem.value =
-                "no1engine_panel_65262/Engine Oil Temperature";
-              analysis.value[0].name = "Engine Oil Temperature";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 오일 압력":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65263.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65263[i].engine_OIL_PRESSURE
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "kPa";
-              selectedcontentsItem.value =
-                "no1engine_panel_65263/Engine Oil Pressure";
-              analysis.value[0].name = "Engine Oil Pressure";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 냉각수 량":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65263.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65263[i].engine_COOLANT_LEVEL
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "%";
-              selectedcontentsItem.value =
-                "no1engine_panel_65263/Engine Coolant Level";
-              analysis.value[0].name = "Engine Coolant Level";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 변속기 오일 압력":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65272.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65272[i].transmission_OIL_PRESSURE
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65272[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "kPa";
-              selectedcontentsItem.value =
-                "no1engine_panel_65272/Transmission Oil Pressure";
-              analysis.value[0].name = "Transmission Oil Pressure";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 충전 시스템 전압":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65271.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65271[i].charging_SYSTEM_POTENTIAL
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "V";
-              selectedcontentsItem.value =
-                "no1engine_panel_65271/Charging System Potential";
-              analysis.value[0].name = "Charging System Potential";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 배터리 전압":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65271.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65271[i].battery_POTENTIAL
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "V";
-              selectedcontentsItem.value =
-                "no1engine_panel_65271/Battery Potential";
-              analysis.value[0].name = "Battery Potential";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 누적 가동시간":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65253.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65253[i].engine_TOTAL_HOURS
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65253[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "hr";
-              selectedcontentsItem.value =
-                "no1engine_panel_65253/Engine total hours";
-              analysis.value[0].name = "Engine total hours";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 흡입 매니폴드 압력":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65270.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65270[i].engine_INTAKE_MANIFOLD_NO1_PRESSURE
-                );
-                analysisTime.value.push(
-                  no1engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "kPa";
-              console.log(analysisData.value);
-              selectedcontentsItem.value =
-                "no1engine_panel_65270/Engine Intake Manifold Pressure";
-              analysis.value[0].name = "Engine Intake Manifold Pressure";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 흡입 매니폴드 온도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65270.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65270[i].engine_INTAKE_MANIFOLD_NO1_TEMP
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "°C";
-              selectedcontentsItem.value =
-                "no1engine_panel_65270/Engine Intake Manifold Temp";
-              analysis.value[0].name = "Engine Intake Manifold Temp";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 배기가스 온도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65270.length; i++) {
-                analysisData.value.push(
-                  no1engine_panel_65270[i].engine_EXHAUST_GAS_TEMPERATURE
-                );
-
-                analysisTime.value.push(
-                  no1engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "°C";
-              selectedcontentsItem.value =
-                "no1engine_panel_65270/Engine Exhaust Gas Temperature";
-              analysis.value[0].name = "Engine Exhaust Gas Temperature";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진1 연료 량":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no1engine_panel_65276.length; i++) {
-                analysisData.value.push(no1engine_panel_65276[i].fuel_LEVEL_1);
-
-                analysisTime.value.push(
-                  no1engine_panel_65276[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              selectedcontentsItem.value = "no1engine_panel_65270/Fuel Level";
-              analysis.value[0].name = "fuel_LEVEL";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-          }
-        } catch (error) {
-          console.error(error);
-        }
-      } else if (selectedsubComponent.value === "NO.2ENGINEPANEL") {
-        try {
-          let no2engine_panel_61444;
-          if (voyagesearch.value) {
-            no2engine_panel_61444 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_61444",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_61444 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_61444",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no2engine_panel_65262;
-          if (voyagesearch.value) {
-            no2engine_panel_65262 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_65262",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_65262 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_65262",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no2engine_panel_65263;
-          if (voyagesearch.value) {
-            no2engine_panel_65263 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_65263",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_65263 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_65263",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          let no2engine_panel_65272;
-          if (voyagesearch.value) {
-            no2engine_panel_65272 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_65272",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_65272 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_65272",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          let no2engine_panel_65271;
-          if (voyagesearch.value) {
-            no2engine_panel_65271 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_65271",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_65271 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_65271",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          let no2engine_panel_65253;
-          if (voyagesearch.value) {
-            no2engine_panel_65253 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_65253",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_65253 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_65253",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          let no2engine_panel_65270;
-          if (voyagesearch.value) {
-            no2engine_panel_65270 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_65270",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_65270 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_65270",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-
-          let no2engine_panel_65276;
-          if (voyagesearch.value) {
-            no2engine_panel_65276 = await readDataTrial(
-              tokenid.value,
-              "no2enginepanel/no2engine_panel_65276",
-              selectedtrialNum.value
-            );
-          } else {
-            no2engine_panel_65276 = await readDataDate(
-              tokenid.value,
-              "NO2ENGINEPANEL",
-              "NO2ENGINE_PANEL_65276",
-              `${startDate2.value}`,
-              `${endDate2.value}`
-            );
-          }
-          switch (selectedItem.value) {
-            case "엔진2 속도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_61444.length; i++) {
-                analysisData.value.push(no2engine_panel_61444[i].engine_SPEED);
-
-                analysisTime.value.push(
-                  no2engine_panel_61444[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "RPM";
-              selectedcontentsItem.value = "no2engine_panel_61444/Engine Speed";
-              analysis.value[0].name = "Engine Speed";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 오일 온도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65262.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65262[i].engine_OIL_TEMPERATURE1
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65262[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "°C";
-              selectedcontentsItem.value =
-                "no2engine_panel_65262/Engine Oil Temperature";
-              analysis.value[0].name = "Engine Oil Temperature";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 오일 압력":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65263.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65263[i].engine_OIL_PRESSURE
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "kPa";
-              selectedcontentsItem.value =
-                "no2engine_panel_65263/Engine Oil Pressure";
-              analysis.value[0].name = "Engine Oil Pressure";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 냉각수 량":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65263.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65263[i].engine_COOLANT_LEVEL
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65263[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "%";
-              selectedcontentsItem.value =
-                "no2engine_panel_65263/Engine Coolant Level";
-              analysis.value[0].name = "Engine Coolant Level";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 변속기 오일 압력":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65272.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65272[i].transmission_OIL_PRESSURE
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65272[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "kPa";
-              selectedcontentsItem.value =
-                "no2engine_panel_65272/Transmission Oil Pressure";
-              analysis.value[0].name = "Transmission Oil Pressure";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 충전 시스템 전압":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65271.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65271[i].charging_SYSTEM_POTENTIAL
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "V";
-              selectedcontentsItem.value =
-                "no2engine_panel_65271/Charging System Potential";
-              analysis.value[0].name = "Charging System Potential";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 배터리 전압":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65271.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65271[i].battery_POTENTIAL
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65271[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "V";
-              selectedcontentsItem.value =
-                "no2engine_panel_65271/Battery Potential";
-              analysis.value[0].name = "Battery Potential";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 누적 가동시간":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65253.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65253[i].engine_TOTAL_HOURS
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65253[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "hr";
-              selectedcontentsItem.value =
-                "no2engine_panel_65253/Engine total hours";
-              analysis.value[0].name = "Engine total hours";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 흡입 매니폴드 압력":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65270.length; i++) {
-                analysisData.value.push(
-                  no2engine_panel_65270[i].engine_INTAKE_MANIFOLD_NO1_PRESSURE
-                );
-
-                analysisTime.value.push(
-                  no2engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "kPa";
-              selectedcontentsItem.value =
-                "no2engine_panel_65270/Engine Intake Manifold Pressure";
-              analysis.value[0].name = "Engine Intake Manifold Pressure";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 흡입 매니폴드 온도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65270.length; i++) {
-                analysisData.value.push(no2engine_panel_65270[i]);
-
-                analysisTime.value.push(
-                  no2engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "°C";
-              selectedcontentsItem.value =
-                "no2engine_panel_65270/Engine Intake Manifold Temp";
-              analysis.value[0].name = "Engine Intake Manifold Temp";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 배기가스 온도":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65270.length; i++) {
-                analysisData.value.push(no2engine_panel_65270[i]);
-
-                analysisTime.value.push(
-                  no2engine_panel_65270[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "°C";
-              selectedcontentsItem.value =
-                "no2engine_panel_65270/Engine Exhaust Gas Temperature";
-              analysis.value[0].name = "Engine Exhaust Gas Temperature";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-            case "엔진2 연료 량":
-              analysisData.value = [];
-              analysisTime.value = [];
-              for (let i = 0; i < no2engine_panel_65276.length; i++) {
-                analysisData.value.push(no2engine_panel_65276[i].fuel_LEVEL_1);
-
-                analysisTime.value.push(
-                  no2engine_panel_65276[i].timestamp_EQUIPMENT.slice(8, 19)
-                );
-              }
-              unit.value = "%";
-              selectedcontentsItem.value = "no2engine_panel_65270/Fuel Level";
-              analysis.value[0].name = "fuel_LEVEL";
-              console.log(analysisData.value);
-              console.log(analysisTime.value);
-              console.log(selectedtrialNum.value);
-              break;
-          }
-        } catch (error) {
-          console.error(error);
-        }
+        case "엔진2 속도":
+          processData(engine_SPEED2, "timestamp_EQUIPMENT", "engine_SPEED", "RPM", "no2engine_panel_61444/Engine Speed", "Engine Speed");
+          break;
+        case "엔진2 오일 온도":
+          processData(engine_OIL_TEMPERATURE2, "timestamp_EQUIPMENT", "engine_OIL_TEMPERATURE1", "°C", "no2engine_panel_65262/Engine Oil Temperature", "Engine Oil Temperature");
+          break;
+        case "엔진2 오일 압력":
+          processData(engine_OIL_PRESSURE2, "timestamp_EQUIPMENT", "engine_OIL_PRESSURE", "kPa", "no2engine_panel_65263/Engine Oil Pressure", "Engine Oil Pressure");
+          break;
+        case "엔진2 냉각수 량":
+          processData(engine_OIL_PRESSURE2, "timestamp_EQUIPMENT", "engine_COOLANT_LEVEL", "%", "no2engine_panel_65263/Engine Coolant Level", "Engine Coolant Level");
+          break;
+        case "엔진2 변속기 오일 압력":
+          processData(transmission_OIL_PRESSURE2, "timestamp_EQUIPMENT", "transmission_OIL_PRESSURE", "kPa", "no2engine_panel_65272/Transmission Oil Pressure", "Transmission Oil Pressure");
+          break;
+        case "엔진2 충전 시스템 전압":
+          processData(charging_SYSTEM_POTENTIAL2, "timestamp_EQUIPMENT", "charging_SYSTEM_POTENTIAL", "V", "no2engine_panel_65271/Charging System Potential", "Charging System Potential");
+          break;
+        case "엔진2 배터리 전압":
+          processData(charging_SYSTEM_POTENTIAL2, "timestamp_EQUIPMENT", "battery_POTENTIAL", "V", "no2engine_panel_65271/Battery Potential", "Battery Potential");
+          break;
+        case "엔진2 누적 가동시간":
+          processData(engine_TOTAL_HOURS2, "timestamp_EQUIPMENT", "engine_TOTAL_HOURS", "hr", "no2engine_panel_65253/Engine total hours", "Engine total hours");
+          break;
+        case "엔진2 흡입 매니폴드 압력":
+          processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_PRESSURE", "kPa", "no2engine_panel_65270/Engine Intake Manifold Pressure", "Engine Intake Manifold Pressure");
+          break;
+        case "엔진2 흡입 매니폴드 온도":
+          processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_TEMP", "°C", "no2engine_panel_65270/Engine Intake Manifold Temp", "Engine Intake Manifold Temp");
+          break;
+        case "엔진2 배기가스 온도":
+          processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_EXHAUST_GAS_TEMPERATURE", "°C", "no2engine_panel_65270/Engine Exhaust Gas Temperature", "Engine Exhaust Gas Temperature");
+          break;
+        case "엔진2 연료 량":
+          processData(fuel_LEVEL_2, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no2engine_panel_65276/Fuel Level", "fuel_LEVEL");
+          break;
       }
-      const datasetRaw2 = ref([["time", "value"]]);
+    }
+    const datasetRaw2 = ref([["time", "value"]]);
       datasetRaw2.value = [];
       for (let i = 0; i <= analysisTime.value.length; i++) {
         datasetRaw2.value.push([
@@ -1663,21 +725,6 @@ const searchData = async () => {
         ],
       };
 
-      // analysisData.value = [];
-      // analysisData.value = [
-      //   "1",
-      //   "2",
-      //   "3",
-      //   "4",
-      //   "5",
-      //   "4",
-      //   "3",
-      //   "2",
-      //   "1",
-      //   "1",
-      //   "1",
-      // ];
-
       const minValue = ref(); // 최솟값
       const maxValue = ref(); // 최댓값
       const averageValue = ref(); // 평균값
@@ -1690,7 +737,7 @@ const searchData = async () => {
         .map((value) => Number(value))
         .filter((value) => !isNaN(value));
 
-      console.log(analysisData.value); // if(analysisData)
+      console.log( "통계:", analysisData.value); // if(analysisData)
 
       if (numericValues.length > 1) {
         // 최솟값 구하기
@@ -1737,6 +784,7 @@ const searchData = async () => {
         standardError.value =
           standardDeviation.value / Math.sqrt(numericValues.length);
       } else {
+        alert("..")
         averageValue.value = 0;
         standardDeviation.value = 0;
         rms.value = 0;
@@ -1771,13 +819,10 @@ const searchData = async () => {
           (value) => typeof value !== "number" || isNaN(value)
         )}`
       );
-    } else {
-      alert("선택항목을 전부 선택해주세요.");
-      loading.value = false;
-      first.value = true;
-    }
   } catch (error) {
-    console.log(error);
+    console.error(error);
+  } finally {
+    loading.value = false;
   }
 };
 const datasetRaw = ref([["time", "value"]]);
@@ -1931,4 +976,5 @@ body {
   --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
   --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
 }
+
 </style>

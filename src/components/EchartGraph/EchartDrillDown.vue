@@ -451,8 +451,7 @@ const option = ref({
       // params에서 필요한 정보 추출
       let groupId = params.data ? params.data.groupId : null; // groupId 값
       let value = params.data ? params.data.value : null; // value 값
-      let percent = params.data ? params.data.percent : null; // "얄라리"
-
+      let percent = params.data ? params.data.percent : null;
       // params.data가 존재하고 groupId, value, percent 속성이 존재하는지 확인
       if (
         params.data &&
@@ -500,222 +499,6 @@ const option = ref({
     type: "bar",
     id: "sales",
     data: [
-      {
-        value:
-          GLL.value +
-          GGA.value +
-          RMC.value +
-          VTG.value +
-          ZDA.value +
-          GSV.value +
-          GSA.value,
-        groupId: "DGPS",
-        percent: (
-          ((GLL.value +
-            GGA.value +
-            RMC.value +
-            VTG.value +
-            ZDA.value +
-            GSV.value +
-            GSA.value) /
-            (ALLGLL.value +
-              ALLGGA.value +
-              ALLRMC.value +
-              ALLVTG.value +
-              ALLZDA.value +
-              ALLGSV.value +
-              ALLGSA.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value:
-          // THS.value +
-          HDT.value + ROT.value,
-        groupId: "GYRO",
-        percent: (
-          ((HDT.value + ROT.value) / (ALLHDT.value + ALLROT.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value: MWV.value,
-        // MWD.value +
-        // VWR.value +
-        // MTW.value +
-        // VWT.value,
-        groupId: "ANEMOMETER",
-        percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
-      },
-      {
-        // TTM.value + TLL.value +
-        value: RSCREEN.value,
-        groupId: "RADAR",
-        percent: ((RSCREEN.value / ALLRSCREEN.value) * 100).toFixed(2),
-      },
-      {
-        value: VDM.value + VDO.value,
-        groupId: "AIS",
-        percent: (
-          ((VDM.value + VDO.value) / (ALLVDM.value + ALLVDO.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value: ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value,
-        groupId: "ECDIS",
-        percent: (
-          ((ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value) /
-            (ALLROUTEINFO.value +
-              ALLWAYPOINTS.value +
-              ALLRTZ.value +
-              ALLESCREEN.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value: RSA.value + HTD.value,
-        //+ MODE.value,
-        groupId: "AUTOPILOT",
-        percent: (
-          ((RSA.value + HTD.value) / (ALLRSA.value + ALLHTD.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value: VBW.value + VHW.value + VLW.value,
-        groupId: "SPEEDLOG",
-        percent: (
-          ((VBW.value + VHW.value + VLW.value) /
-            (ALLVBW.value + ALLVHW.value + ALLVLW.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value:
-          CAN_Online_State.value +
-          Engine_RPM.value +
-          Rudder.value +
-          Rudder_Scale.value,
-        groupId: "CanThrottle",
-        percent: (
-          ((CAN_Online_State.value +
-            Engine_RPM.value +
-            Rudder.value +
-            Rudder_Scale.value) /
-            (ALLCAN_Online_State.value +
-              ALLEngine_RPM.value +
-              ALLRudder.value +
-              ALLRudder_Scale.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value: AUTOPILOTCONTACT.value,
-        groupId: "AUTOPILOTCONTACT",
-        percent: (
-          (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value:
-          NO1ENGINE_PANEL_61444.value +
-          NO1ENGINE_PANEL_65262.value +
-          NO1ENGINE_PANEL_65263.value +
-          NO1ENGINE_PANEL_65272.value +
-          NO1ENGINE_PANEL_65271.value +
-          NO1ENGINE_PANEL_65253.value +
-          NO1ENGINE_PANEL_65270.value +
-          NO1ENGINE_PANEL_65276.value +
-          NO1ENGINE_PANEL_65360.value +
-          NO1ENGINE_PANEL_65361_LAMP.value +
-          NO1ENGINE_PANEL_65361_STATUS.value +
-          NO1ENGINE_PANEL_65378.value +
-          NO1ENGINE_PANEL_65376.value +
-          NO1ENGINE_PANEL_65379.value,
-        groupId: "NO.1ENGINE",
-        percent: (
-          ((NO1ENGINE_PANEL_61444.value +
-            NO1ENGINE_PANEL_65262.value +
-            NO1ENGINE_PANEL_65263.value +
-            NO1ENGINE_PANEL_65272.value +
-            NO1ENGINE_PANEL_65271.value +
-            NO1ENGINE_PANEL_65253.value +
-            NO1ENGINE_PANEL_65270.value +
-            NO1ENGINE_PANEL_65276.value +
-            NO1ENGINE_PANEL_65360.value +
-            NO1ENGINE_PANEL_65361_LAMP.value +
-            NO1ENGINE_PANEL_65361_STATUS.value +
-            NO1ENGINE_PANEL_65378.value +
-            NO1ENGINE_PANEL_65376.value +
-            NO1ENGINE_PANEL_65379.value) /
-            (ALLNO1ENGINE_PANEL_61444.value +
-              ALLNO1ENGINE_PANEL_65262.value +
-              ALLNO1ENGINE_PANEL_65263.value +
-              ALLNO1ENGINE_PANEL_65272.value +
-              ALLNO1ENGINE_PANEL_65271.value +
-              ALLNO1ENGINE_PANEL_65253.value +
-              ALLNO1ENGINE_PANEL_65270.value +
-              ALLNO1ENGINE_PANEL_65276.value +
-              ALLNO1ENGINE_PANEL_65360.value +
-              ALLNO1ENGINE_PANEL_65361_LAMP.value +
-              ALLNO1ENGINE_PANEL_65361_STATUS.value +
-              ALLNO1ENGINE_PANEL_65378.value +
-              ALLNO1ENGINE_PANEL_65376.value +
-              ALLNO1ENGINE_PANEL_65379.value)) *
-          100
-        ).toFixed(2),
-      },
-      {
-        value:
-          NO2ENGINE_PANEL_61444.value +
-          NO2ENGINE_PANEL_65262.value +
-          NO2ENGINE_PANEL_65263.value +
-          NO2ENGINE_PANEL_65272.value +
-          NO2ENGINE_PANEL_65271.value +
-          NO2ENGINE_PANEL_65253.value +
-          NO2ENGINE_PANEL_65270.value +
-          NO2ENGINE_PANEL_65276.value +
-          NO2ENGINE_PANEL_65360.value +
-          NO2ENGINE_PANEL_65361_LAMP.value +
-          NO2ENGINE_PANEL_65361_STATUS.value +
-          NO2ENGINE_PANEL_65378.value +
-          NO2ENGINE_PANEL_65376.value +
-          NO2ENGINE_PANEL_65379.value,
-        groupId: "NO.2ENGINE",
-        percent: (
-          ((NO2ENGINE_PANEL_61444.value +
-            NO2ENGINE_PANEL_65262.value +
-            NO2ENGINE_PANEL_65263.value +
-            NO2ENGINE_PANEL_65272.value +
-            NO2ENGINE_PANEL_65271.value +
-            NO2ENGINE_PANEL_65253.value +
-            NO2ENGINE_PANEL_65270.value +
-            NO2ENGINE_PANEL_65276.value +
-            NO2ENGINE_PANEL_65360.value +
-            NO2ENGINE_PANEL_65361_LAMP.value +
-            NO2ENGINE_PANEL_65361_STATUS.value +
-            NO2ENGINE_PANEL_65378.value +
-            NO2ENGINE_PANEL_65376.value +
-            NO2ENGINE_PANEL_65379.value) /
-            (ALLNO2ENGINE_PANEL_61444.value +
-              ALLNO2ENGINE_PANEL_65262.value +
-              ALLNO2ENGINE_PANEL_65263.value +
-              ALLNO2ENGINE_PANEL_65272.value +
-              ALLNO2ENGINE_PANEL_65271.value +
-              ALLNO2ENGINE_PANEL_65253.value +
-              ALLNO2ENGINE_PANEL_65270.value +
-              ALLNO2ENGINE_PANEL_65276.value +
-              ALLNO2ENGINE_PANEL_65360.value +
-              ALLNO2ENGINE_PANEL_65361_LAMP.value +
-              ALLNO2ENGINE_PANEL_65361_STATUS.value +
-              ALLNO2ENGINE_PANEL_65378.value +
-              ALLNO2ENGINE_PANEL_65376.value +
-              ALLNO2ENGINE_PANEL_65379.value)) *
-          100
-        ).toFixed(2),
-      },
       // 다른 데이터도 추가 가능
     ],
     universalTransition: {
@@ -726,6 +509,17 @@ const option = ref({
 });
 let drilldownData = [];
 // 그래프 클릭 이벤트 핸들러
+
+const createDataObject = (groupId, values, allValues) => ({
+  value: values.reduce((acc, val) => acc + val.value, 0),
+  groupId: groupId,
+  percent: (
+    (values.reduce((acc, val) => acc + val.value, 0) /
+      allValues.reduce((acc, val) => acc + val.value, 0)) *
+    100
+  ).toFixed(2),
+});
+
 const handleChartClick = async (event) => {
   if (event.data) {
     // 클릭된 데이터에 대한 하위 데이터 검색
@@ -790,236 +584,111 @@ const handleChartClick = async (event) => {
                   id: "sales",
                   dataGroupId: "",
                   data: [
-                    {
-                      value:
-                        GLL.value +
-                        GGA.value +
-                        RMC.value +
-                        VTG.value +
-                        ZDA.value +
-                        GSV.value +
-                        GSA.value,
-                      groupId: "DGPS",
-                      percent: (
-                        ((GLL.value +
-                          GGA.value +
-                          RMC.value +
-                          VTG.value +
-                          ZDA.value +
-                          GSV.value +
-                          GSA.value) /
-                          (ALLGLL.value +
-                            ALLGGA.value +
-                            ALLRMC.value +
-                            ALLVTG.value +
-                            ALLZDA.value +
-                            ALLGSV.value +
-                            ALLGSA.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value:
-                        // THS.value +
-                        HDT.value + ROT.value,
-                      groupId: "GYRO",
-                      percent: (
-                        ((HDT.value + ROT.value) /
-                          (ALLHDT.value + ALLROT.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value: MWV.value,
-                      // MWD.value +
-                      // VWR.value +
-                      // MTW.value +
-                      // VWT.value,
-                      groupId: "ANEMOMETER",
-                      percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
-                    },
-                    {
-                      // TTM.value + TLL.value +
-                      value: RSCREEN.value,
-                      groupId: "RADAR",
-                      percent: (
-                        (RSCREEN.value / ALLRSCREEN.value) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value: VDM.value + VDO.value,
-                      groupId: "AIS",
-                      percent: (
-                        ((VDM.value + VDO.value) /
-                          (ALLVDM.value + ALLVDO.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value:
-                        ROUTEINFO.value +
-                        WAYPOINTS.value +
-                        RTZ.value +
-                        ESCREEN.value,
-                      groupId: "ECDIS",
-                      percent: (
-                        ((ROUTEINFO.value +
-                          WAYPOINTS.value +
-                          RTZ.value +
-                          ESCREEN.value) /
-                          (ALLROUTEINFO.value +
-                            ALLWAYPOINTS.value +
-                            ALLRTZ.value +
-                            ALLESCREEN.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value: RSA.value + HTD.value,
-                      //+ MODE.value,
-                      groupId: "AUTOPILOT",
-                      percent: (
-                        ((RSA.value + HTD.value) /
-                          (ALLRSA.value + ALLHTD.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value: VBW.value + VHW.value + VLW.value,
-                      groupId: "SPEEDLOG",
-                      percent: (
-                        ((VBW.value + VHW.value + VLW.value) /
-                          (ALLVBW.value + ALLVHW.value + ALLVLW.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value:
-                        CAN_Online_State.value +
-                        Engine_RPM.value +
-                        Rudder.value +
-                        Rudder_Scale.value,
-                      groupId: "CanThrottle",
-                      percent: (
-                        ((CAN_Online_State.value +
-                          Engine_RPM.value +
-                          Rudder.value +
-                          Rudder_Scale.value) /
-                          (ALLCAN_Online_State.value +
-                            ALLEngine_RPM.value +
-                            ALLRudder.value +
-                            ALLRudder_Scale.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value: AUTOPILOTCONTACT.value,
-                      groupId: "AUTOPILOTCONTACT",
-                      percent: (
-                        (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value:
-                        NO1ENGINE_PANEL_61444.value +
-                        NO1ENGINE_PANEL_65262.value +
-                        NO1ENGINE_PANEL_65263.value +
-                        NO1ENGINE_PANEL_65272.value +
-                        NO1ENGINE_PANEL_65271.value +
-                        NO1ENGINE_PANEL_65253.value +
-                        NO1ENGINE_PANEL_65270.value +
-                        NO1ENGINE_PANEL_65276.value +
-                        NO1ENGINE_PANEL_65360.value +
-                        NO1ENGINE_PANEL_65361_LAMP.value +
-                        NO1ENGINE_PANEL_65361_STATUS.value +
-                        NO1ENGINE_PANEL_65378.value +
-                        NO1ENGINE_PANEL_65376.value +
-                        NO1ENGINE_PANEL_65379.value,
-                      groupId: "NO.1ENGINE",
-                      percent: (
-                        ((NO1ENGINE_PANEL_61444.value +
-                          NO1ENGINE_PANEL_65262.value +
-                          NO1ENGINE_PANEL_65263.value +
-                          NO1ENGINE_PANEL_65272.value +
-                          NO1ENGINE_PANEL_65271.value +
-                          NO1ENGINE_PANEL_65253.value +
-                          NO1ENGINE_PANEL_65270.value +
-                          NO1ENGINE_PANEL_65276.value +
-                          NO1ENGINE_PANEL_65360.value +
-                          NO1ENGINE_PANEL_65361_LAMP.value +
-                          NO1ENGINE_PANEL_65361_STATUS.value +
-                          NO1ENGINE_PANEL_65378.value +
-                          NO1ENGINE_PANEL_65376.value +
-                          NO1ENGINE_PANEL_65379.value) /
-                          (ALLNO1ENGINE_PANEL_61444.value +
-                            ALLNO1ENGINE_PANEL_65262.value +
-                            ALLNO1ENGINE_PANEL_65263.value +
-                            ALLNO1ENGINE_PANEL_65272.value +
-                            ALLNO1ENGINE_PANEL_65271.value +
-                            ALLNO1ENGINE_PANEL_65253.value +
-                            ALLNO1ENGINE_PANEL_65270.value +
-                            ALLNO1ENGINE_PANEL_65276.value +
-                            ALLNO1ENGINE_PANEL_65360.value +
-                            ALLNO1ENGINE_PANEL_65361_LAMP.value +
-                            ALLNO1ENGINE_PANEL_65361_STATUS.value +
-                            ALLNO1ENGINE_PANEL_65378.value +
-                            ALLNO1ENGINE_PANEL_65376.value +
-                            ALLNO1ENGINE_PANEL_65379.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    {
-                      value:
-                        NO2ENGINE_PANEL_61444.value +
-                        NO2ENGINE_PANEL_65262.value +
-                        NO2ENGINE_PANEL_65263.value +
-                        NO2ENGINE_PANEL_65272.value +
-                        NO2ENGINE_PANEL_65271.value +
-                        NO2ENGINE_PANEL_65253.value +
-                        NO2ENGINE_PANEL_65270.value +
-                        NO2ENGINE_PANEL_65276.value +
-                        NO2ENGINE_PANEL_65360.value +
-                        NO2ENGINE_PANEL_65361_LAMP.value +
-                        NO2ENGINE_PANEL_65361_STATUS.value +
-                        NO2ENGINE_PANEL_65378.value +
-                        NO2ENGINE_PANEL_65376.value +
-                        NO2ENGINE_PANEL_65379.value,
-                      groupId: "NO.2ENGINE",
-                      percent: (
-                        ((NO2ENGINE_PANEL_61444.value +
-                          NO2ENGINE_PANEL_65262.value +
-                          NO2ENGINE_PANEL_65263.value +
-                          NO2ENGINE_PANEL_65272.value +
-                          NO2ENGINE_PANEL_65271.value +
-                          NO2ENGINE_PANEL_65253.value +
-                          NO2ENGINE_PANEL_65270.value +
-                          NO2ENGINE_PANEL_65276.value +
-                          NO2ENGINE_PANEL_65360.value +
-                          NO2ENGINE_PANEL_65361_LAMP.value +
-                          NO2ENGINE_PANEL_65361_STATUS.value +
-                          NO2ENGINE_PANEL_65378.value +
-                          NO2ENGINE_PANEL_65376.value +
-                          NO2ENGINE_PANEL_65379.value) /
-                          (ALLNO2ENGINE_PANEL_61444.value +
-                            ALLNO2ENGINE_PANEL_65262.value +
-                            ALLNO2ENGINE_PANEL_65263.value +
-                            ALLNO2ENGINE_PANEL_65272.value +
-                            ALLNO2ENGINE_PANEL_65271.value +
-                            ALLNO2ENGINE_PANEL_65253.value +
-                            ALLNO2ENGINE_PANEL_65270.value +
-                            ALLNO2ENGINE_PANEL_65276.value +
-                            ALLNO2ENGINE_PANEL_65360.value +
-                            ALLNO2ENGINE_PANEL_65361_LAMP.value +
-                            ALLNO2ENGINE_PANEL_65361_STATUS.value +
-                            ALLNO2ENGINE_PANEL_65378.value +
-                            ALLNO2ENGINE_PANEL_65376.value +
-                            ALLNO2ENGINE_PANEL_65379.value)) *
-                        100
-                      ).toFixed(2),
-                    },
-                    // 다른 데이터도 추가 가능
+                    createDataObject(
+                      "DGPS",
+                      [GLL, GGA, RMC, VTG, ZDA, GSV, GSA],
+                      [ALLGLL, ALLGGA, ALLRMC, ALLVTG, ALLZDA, ALLGSV, ALLGSA]
+                    ),
+                    createDataObject("GYRO", [HDT, ROT], [ALLHDT, ALLROT]),
+                    createDataObject("ANEMOMETER", [MWV], [ALLMWV]),
+                    createDataObject("RADAR", [RSCREEN], [ALLRSCREEN]),
+                    createDataObject("AIS", [VDM, VDO], [ALLVDM, ALLVDO]),
+                    createDataObject(
+                      "ECDIS",
+                      [ROUTEINFO, WAYPOINTS, RTZ, ESCREEN],
+                      [ALLROUTEINFO, ALLWAYPOINTS, ALLRTZ, ALLESCREEN]
+                    ),
+                    createDataObject("AUTOPILOT", [RSA, HTD], [ALLRSA, ALLHTD]),
+                    createDataObject(
+                      "SPEEDLOG",
+                      [VBW, VHW, VLW],
+                      [ALLVBW, ALLVHW, ALLVLW]
+                    ),
+                    createDataObject(
+                      "CanThrottle",
+                      [CAN_Online_State, Engine_RPM, Rudder, Rudder_Scale],
+                      [
+                        ALLCAN_Online_State,
+                        ALLEngine_RPM,
+                        ALLRudder,
+                        ALLRudder_Scale,
+                      ]
+                    ),
+                    createDataObject(
+                      "AUTOPILOTCONTACT",
+                      [AUTOPILOTCONTACT],
+                      [ALLAUTOPILOTCONTACT]
+                    ),
+                    createDataObject(
+                      "NO.1ENGINE",
+                      [
+                        NO1ENGINE_PANEL_61444,
+                        NO1ENGINE_PANEL_65262,
+                        NO1ENGINE_PANEL_65263,
+                        NO1ENGINE_PANEL_65272,
+                        NO1ENGINE_PANEL_65271,
+                        NO1ENGINE_PANEL_65253,
+                        NO1ENGINE_PANEL_65270,
+                        NO1ENGINE_PANEL_65276,
+                        NO1ENGINE_PANEL_65360,
+                        NO1ENGINE_PANEL_65361_LAMP,
+                        NO1ENGINE_PANEL_65361_STATUS,
+                        NO1ENGINE_PANEL_65378,
+                        NO1ENGINE_PANEL_65376,
+                        NO1ENGINE_PANEL_65379,
+                      ],
+                      [
+                        ALLNO1ENGINE_PANEL_61444,
+                        ALLNO1ENGINE_PANEL_65262,
+                        ALLNO1ENGINE_PANEL_65263,
+                        ALLNO1ENGINE_PANEL_65272,
+                        ALLNO1ENGINE_PANEL_65271,
+                        ALLNO1ENGINE_PANEL_65253,
+                        ALLNO1ENGINE_PANEL_65270,
+                        ALLNO1ENGINE_PANEL_65276,
+                        ALLNO1ENGINE_PANEL_65360,
+                        ALLNO1ENGINE_PANEL_65361_LAMP,
+                        ALLNO1ENGINE_PANEL_65361_STATUS,
+                        ALLNO1ENGINE_PANEL_65378,
+                        ALLNO1ENGINE_PANEL_65376,
+                        ALLNO1ENGINE_PANEL_65379,
+                      ]
+                    ),
+                    createDataObject(
+                      "NO.2ENGINE",
+                      [
+                        NO2ENGINE_PANEL_61444,
+                        NO2ENGINE_PANEL_65262,
+                        NO2ENGINE_PANEL_65263,
+                        NO2ENGINE_PANEL_65272,
+                        NO2ENGINE_PANEL_65271,
+                        NO2ENGINE_PANEL_65253,
+                        NO2ENGINE_PANEL_65270,
+                        NO2ENGINE_PANEL_65276,
+                        NO2ENGINE_PANEL_65360,
+                        NO2ENGINE_PANEL_65361_LAMP,
+                        NO2ENGINE_PANEL_65361_STATUS,
+                        NO2ENGINE_PANEL_65378,
+                        NO2ENGINE_PANEL_65376,
+                        NO2ENGINE_PANEL_65379,
+                      ],
+                      [
+                        ALLNO2ENGINE_PANEL_61444,
+                        ALLNO2ENGINE_PANEL_65262,
+                        ALLNO2ENGINE_PANEL_65263,
+                        ALLNO2ENGINE_PANEL_65272,
+                        ALLNO2ENGINE_PANEL_65271,
+                        ALLNO2ENGINE_PANEL_65253,
+                        ALLNO2ENGINE_PANEL_65270,
+                        ALLNO2ENGINE_PANEL_65276,
+                        ALLNO2ENGINE_PANEL_65360,
+                        ALLNO2ENGINE_PANEL_65361_LAMP,
+                        ALLNO2ENGINE_PANEL_65361_STATUS,
+                        ALLNO2ENGINE_PANEL_65378,
+                        ALLNO2ENGINE_PANEL_65376,
+                        ALLNO2ENGINE_PANEL_65379,
+                      ]
+                    ),
                   ],
                   universalTransition: {
                     enabled: true,
@@ -1040,7 +709,6 @@ const handleChartClick = async (event) => {
                   ],
                 });
               }
-              // graphic의 style의 text를 ""값으로 할당
             },
           },
         ],
@@ -1051,6 +719,27 @@ const handleChartClick = async (event) => {
     }
   }
 };
+
+const calculateGroupPercentage = (values, allValues) => {
+  const value = values.reduce(
+    (acc, currentValue) => acc + currentValue.value,
+    0
+  );
+  const percent = (
+    (value /
+      allValues.reduce((acc, currentValue) => acc + currentValue.value, 0)) *
+    100
+  ).toFixed(2);
+
+  return { value, percent };
+};
+
+const updateDataObject = (id, value, allValue) => ({
+  value: value,
+  groupId: id,
+  percent: ((value / allValue) * 100).toFixed(2),
+});
+
 const updateChart = () => {
   if (chart.value) {
     // 차트 데이터 업데이트 로직
@@ -1061,223 +750,134 @@ const updateChart = () => {
         id: "sales",
         data: [
           {
-            value:
-              GLL.value +
-              GGA.value +
-              RMC.value +
-              VTG.value +
-              ZDA.value +
-              GSV.value +
-              GSA.value,
             groupId: "DGPS",
-            percent: (
-              ((GLL.value +
-                GGA.value +
-                RMC.value +
-                VTG.value +
-                ZDA.value +
-                GSV.value +
-                GSA.value) /
-                (ALLGLL.value +
-                  ALLGGA.value +
-                  ALLRMC.value +
-                  ALLVTG.value +
-                  ALLZDA.value +
-                  ALLGSV.value +
-                  ALLGSA.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage(
+              [GLL, GGA, RMC, VTG, ZDA, GSV, GSA],
+              [ALLGLL, ALLGGA, ALLRMC, ALLVTG, ALLZDA, ALLGSV, ALLGSA]
+            ),
           },
           {
-            value:
-              // THS.value +
-              HDT.value + ROT.value,
             groupId: "GYRO",
-            percent: (
-              ((HDT.value + ROT.value) / (ALLHDT.value + ALLROT.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage([HDT, ROT], [ALLHDT, ALLROT]),
           },
           {
-            value: MWV.value,
-            // MWD.value +
-            // VWR.value +
-            // MTW.value +
-            // VWT.value,
             groupId: "ANEMOMETER",
-            percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
+            ...calculateGroupPercentage([MWV], [ALLMWV]),
           },
           {
-            // TTM.value + TLL.value +
-            value: RSCREEN.value,
             groupId: "RADAR",
-            percent: ((RSCREEN.value / ALLRSCREEN.value) * 100).toFixed(2),
+            ...calculateGroupPercentage([RSCREEN], [ALLRSCREEN]),
           },
           {
-            value: VDM.value + VDO.value,
             groupId: "AIS",
-            percent: (
-              ((VDM.value + VDO.value) / (ALLVDM.value + ALLVDO.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage([VDM, VDO], [ALLVDM, ALLVDO]),
           },
           {
-            value:
-              ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value,
             groupId: "ECDIS",
-            percent: (
-              ((ROUTEINFO.value + WAYPOINTS.value + RTZ.value + ESCREEN.value) /
-                (ALLROUTEINFO.value +
-                  ALLWAYPOINTS.value +
-                  ALLRTZ.value +
-                  ALLESCREEN.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage(
+              [ROUTEINFO, WAYPOINTS, RTZ, ESCREEN],
+              [ALLROUTEINFO, ALLWAYPOINTS, ALLRTZ, ALLESCREEN]
+            ),
           },
           {
-            value: RSA.value + HTD.value,
-            //+ MODE.value,
             groupId: "AUTOPILOT",
-            percent: (
-              ((RSA.value + HTD.value) / (ALLRSA.value + ALLHTD.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage([RSA, HTD], [ALLRSA, ALLHTD]),
           },
           {
-            value: VBW.value + VHW.value + VLW.value,
             groupId: "SPEEDLOG",
-            percent: (
-              ((VBW.value + VHW.value + VLW.value) /
-                (ALLVBW.value + ALLVHW.value + ALLVLW.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage(
+              [VBW, VHW, VLW],
+              [ALLVBW, ALLVHW, ALLVLW]
+            ),
           },
           {
-            value:
-              CAN_Online_State.value +
-              Engine_RPM.value +
-              Rudder.value +
-              Rudder_Scale.value,
             groupId: "CanThrottle",
-            percent: (
-              ((CAN_Online_State.value +
-                Engine_RPM.value +
-                Rudder.value +
-                Rudder_Scale.value) /
-                (ALLCAN_Online_State.value +
-                  ALLEngine_RPM.value +
-                  ALLRudder.value +
-                  ALLRudder_Scale.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage(
+              [CAN_Online_State, Engine_RPM, Rudder, Rudder_Scale],
+              [ALLCAN_Online_State, ALLEngine_RPM, ALLRudder, ALLRudder_Scale]
+            ),
           },
           {
-            value: AUTOPILOTCONTACT.value,
             groupId: "AUTOPILOTCONTACT",
-            percent: (
-              (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage(
+              [AUTOPILOTCONTACT],
+              [ALLAUTOPILOTCONTACT]
+            ),
           },
           {
-            value:
-              NO1ENGINE_PANEL_61444.value +
-              NO1ENGINE_PANEL_65262.value +
-              NO1ENGINE_PANEL_65263.value +
-              NO1ENGINE_PANEL_65272.value +
-              NO1ENGINE_PANEL_65271.value +
-              NO1ENGINE_PANEL_65253.value +
-              NO1ENGINE_PANEL_65270.value +
-              NO1ENGINE_PANEL_65276.value +
-              NO1ENGINE_PANEL_65360.value +
-              NO1ENGINE_PANEL_65361_LAMP.value +
-              NO1ENGINE_PANEL_65361_STATUS.value +
-              NO1ENGINE_PANEL_65378.value +
-              NO1ENGINE_PANEL_65376.value +
-              NO1ENGINE_PANEL_65379.value,
             groupId: "NO.1ENGINE",
-            percent: (
-              ((NO1ENGINE_PANEL_61444.value +
-                NO1ENGINE_PANEL_65262.value +
-                NO1ENGINE_PANEL_65263.value +
-                NO1ENGINE_PANEL_65272.value +
-                NO1ENGINE_PANEL_65271.value +
-                NO1ENGINE_PANEL_65253.value +
-                NO1ENGINE_PANEL_65270.value +
-                NO1ENGINE_PANEL_65276.value +
-                NO1ENGINE_PANEL_65360.value +
-                NO1ENGINE_PANEL_65361_LAMP.value +
-                NO1ENGINE_PANEL_65361_STATUS.value +
-                NO1ENGINE_PANEL_65378.value +
-                NO1ENGINE_PANEL_65376.value +
-                NO1ENGINE_PANEL_65379.value) /
-                (ALLNO1ENGINE_PANEL_61444.value +
-                  ALLNO1ENGINE_PANEL_65262.value +
-                  ALLNO1ENGINE_PANEL_65263.value +
-                  ALLNO1ENGINE_PANEL_65272.value +
-                  ALLNO1ENGINE_PANEL_65271.value +
-                  ALLNO1ENGINE_PANEL_65253.value +
-                  ALLNO1ENGINE_PANEL_65270.value +
-                  ALLNO1ENGINE_PANEL_65276.value +
-                  ALLNO1ENGINE_PANEL_65360.value +
-                  ALLNO1ENGINE_PANEL_65361_LAMP.value +
-                  ALLNO1ENGINE_PANEL_65361_STATUS.value +
-                  ALLNO1ENGINE_PANEL_65378.value +
-                  ALLNO1ENGINE_PANEL_65376.value +
-                  ALLNO1ENGINE_PANEL_65379.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage(
+              [
+                NO1ENGINE_PANEL_61444,
+                NO1ENGINE_PANEL_65262,
+                NO1ENGINE_PANEL_65263,
+                NO1ENGINE_PANEL_65272,
+                NO1ENGINE_PANEL_65271,
+                NO1ENGINE_PANEL_65253,
+                NO1ENGINE_PANEL_65270,
+                NO1ENGINE_PANEL_65276,
+                NO1ENGINE_PANEL_65360,
+                NO1ENGINE_PANEL_65361_LAMP,
+                NO1ENGINE_PANEL_65361_STATUS,
+                NO1ENGINE_PANEL_65378,
+                NO1ENGINE_PANEL_65376,
+                NO1ENGINE_PANEL_65379,
+              ],
+              [
+                ALLNO1ENGINE_PANEL_61444,
+                ALLNO1ENGINE_PANEL_65262,
+                ALLNO1ENGINE_PANEL_65263,
+                ALLNO1ENGINE_PANEL_65272,
+                ALLNO1ENGINE_PANEL_65271,
+                ALLNO1ENGINE_PANEL_65253,
+                ALLNO1ENGINE_PANEL_65270,
+                ALLNO1ENGINE_PANEL_65276,
+                ALLNO1ENGINE_PANEL_65360,
+                ALLNO1ENGINE_PANEL_65361_LAMP,
+                ALLNO1ENGINE_PANEL_65361_STATUS,
+                ALLNO1ENGINE_PANEL_65378,
+                ALLNO1ENGINE_PANEL_65376,
+                ALLNO1ENGINE_PANEL_65379,
+              ]
+            ),
           },
           {
-            value:
-              NO2ENGINE_PANEL_61444.value +
-              NO2ENGINE_PANEL_65262.value +
-              NO2ENGINE_PANEL_65263.value +
-              NO2ENGINE_PANEL_65272.value +
-              NO2ENGINE_PANEL_65271.value +
-              NO2ENGINE_PANEL_65253.value +
-              NO2ENGINE_PANEL_65270.value +
-              NO2ENGINE_PANEL_65276.value +
-              NO2ENGINE_PANEL_65360.value +
-              NO2ENGINE_PANEL_65361_LAMP.value +
-              NO2ENGINE_PANEL_65361_STATUS.value +
-              NO2ENGINE_PANEL_65378.value +
-              NO2ENGINE_PANEL_65376.value +
-              NO2ENGINE_PANEL_65379.value,
             groupId: "NO.2ENGINE",
-            percent: (
-              ((NO2ENGINE_PANEL_61444.value +
-                NO2ENGINE_PANEL_65262.value +
-                NO2ENGINE_PANEL_65263.value +
-                NO2ENGINE_PANEL_65272.value +
-                NO2ENGINE_PANEL_65271.value +
-                NO2ENGINE_PANEL_65253.value +
-                NO2ENGINE_PANEL_65270.value +
-                NO2ENGINE_PANEL_65276.value +
-                NO2ENGINE_PANEL_65360.value +
-                NO2ENGINE_PANEL_65361_LAMP.value +
-                NO2ENGINE_PANEL_65361_STATUS.value +
-                NO2ENGINE_PANEL_65378.value +
-                NO2ENGINE_PANEL_65376.value +
-                NO2ENGINE_PANEL_65379.value) /
-                (ALLNO2ENGINE_PANEL_61444.value +
-                  ALLNO2ENGINE_PANEL_65262.value +
-                  ALLNO2ENGINE_PANEL_65263.value +
-                  ALLNO2ENGINE_PANEL_65272.value +
-                  ALLNO2ENGINE_PANEL_65271.value +
-                  ALLNO2ENGINE_PANEL_65253.value +
-                  ALLNO2ENGINE_PANEL_65270.value +
-                  ALLNO2ENGINE_PANEL_65276.value +
-                  ALLNO2ENGINE_PANEL_65360.value +
-                  ALLNO2ENGINE_PANEL_65361_LAMP.value +
-                  ALLNO2ENGINE_PANEL_65361_STATUS.value +
-                  ALLNO2ENGINE_PANEL_65378.value +
-                  ALLNO2ENGINE_PANEL_65376.value +
-                  ALLNO2ENGINE_PANEL_65379.value)) *
-              100
-            ).toFixed(2),
+            ...calculateGroupPercentage(
+              [
+                NO2ENGINE_PANEL_61444,
+                NO2ENGINE_PANEL_65262,
+                NO2ENGINE_PANEL_65263,
+                NO2ENGINE_PANEL_65272,
+                NO2ENGINE_PANEL_65271,
+                NO2ENGINE_PANEL_65253,
+                NO2ENGINE_PANEL_65270,
+                NO2ENGINE_PANEL_65276,
+                NO2ENGINE_PANEL_65360,
+                NO2ENGINE_PANEL_65361_LAMP,
+                NO2ENGINE_PANEL_65361_STATUS,
+                NO2ENGINE_PANEL_65378,
+                NO2ENGINE_PANEL_65376,
+                NO2ENGINE_PANEL_65379,
+              ],
+              [
+                ALLNO2ENGINE_PANEL_61444,
+                ALLNO2ENGINE_PANEL_65262,
+                ALLNO2ENGINE_PANEL_65263,
+                ALLNO2ENGINE_PANEL_65272,
+                ALLNO2ENGINE_PANEL_65271,
+                ALLNO2ENGINE_PANEL_65253,
+                ALLNO2ENGINE_PANEL_65270,
+                ALLNO2ENGINE_PANEL_65276,
+                ALLNO2ENGINE_PANEL_65360,
+                ALLNO2ENGINE_PANEL_65361_LAMP,
+                ALLNO2ENGINE_PANEL_65361_STATUS,
+                ALLNO2ENGINE_PANEL_65378,
+                ALLNO2ENGINE_PANEL_65376,
+                ALLNO2ENGINE_PANEL_65379,
+              ]
+            ),
           },
-          // 다른 데이터도 추가 가능
         ],
         universalTransition: {
           enabled: true,
@@ -1290,138 +890,40 @@ const updateChart = () => {
       {
         dataGroupId: "DGPS",
         data: [
-          [
-            "GLL",
-            {
-              value: GLL.value,
-              groupId: "GLL",
-              percent: ((GLL.value / ALLGLL.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "GGA",
-            {
-              value: GGA.value,
-              groupId: "GGA",
-              percent: ((GGA.value / ALLGGA.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "RMC",
-            {
-              value: RMC.value,
-              groupId: "RMC",
-              percent: ((RMC.value / ALLRMC.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "VTG",
-            {
-              value: VTG.value,
-              groupId: "VTG",
-              percent: ((VTG.value / ALLVTG.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "ZDA",
-            {
-              value: ZDA.value,
-              groupId: "ZDA",
-              percent: ((ZDA.value / ALLZDA.value) * 100).toFixed(2),
-            },
-          ],
-          // ["DTM", DTM.value],
-          [
-            "GSV",
-            {
-              value: GSV.value,
-              groupId: "GSV",
-              percent: ((GSV.value / ALLGSV.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "GSA",
-            {
-              value: GSA.value,
-              groupId: "GSA",
-              percent: ((GSA.value / ALLGSA.value) * 100).toFixed(2),
-            },
-          ],
+          ["GLL", updateDataObject("GLL", GLL.value, ALLGLL.value)],
+          ["GGA", updateDataObject("GGA", GGA.value, ALLGGA.value)],
+          ["RMC", updateDataObject("RMC", RMC.value, ALLRMC.value)],
+          ["VTG", updateDataObject("VTG", VTG.value, ALLVTG.value)],
+          ["ZDA", updateDataObject("ZDA", ZDA.value, ALLZDA.value)],
+          ["GSV", updateDataObject("GSV", GSV.value, ALLGSV.value)],
+          ["GSA", updateDataObject("GSA", GSA.value, ALLGSA.value)],
         ],
       },
       {
         dataGroupId: "GYRO",
         data: [
-          //["THS", THS.value],
-          [
-            "HDT",
-            {
-              value: HDT.value,
-              groupId: "HDT",
-              percent: ((HDT.value / ALLHDT.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "ROT",
-            {
-              value: ROT.value,
-              groupId: "ROT",
-              percent: ((ROT.value / ALLROT.value) * 100).toFixed(2),
-            },
-          ],
+          ["HDT", updateDataObject("HDT", HDT.value, ALLHDT.value)],
+          ["ROT", updateDataObject("ROT", ROT.value, ALLROT.value)],
         ],
       },
       {
         dataGroupId: "ANEMOMETER",
-        data: [
-          [
-            "MWV",
-            {
-              value: MWV.value,
-              groupId: "MWV",
-              percent: ((MWV.value / ALLMWV.value) * 100).toFixed(2),
-            },
-          ],
-          // ["MWD", MWD.value],
-          // ["VWR", VWR.value],
-          // ["MTW", MTW.value],
-          // ["VWT", VWT.value],
-        ],
+        data: [["MWV", updateDataObject("MWV", MWV.value, ALLMWV.value)]],
       },
       {
         dataGroupId: "RADAR",
         data: [
-          // ["TTM", TTM.value],
-          // ["TLL", TLL.value],
           [
             "RSCREEN",
-            {
-              value: RSCREEN.value,
-              groupId: "RSCREEN",
-              percent: ((RSCREEN.value / ALLRSCREEN.value) * 100).toFixed(2),
-            },
+            updateDataObject("RSCREEN", RSCREEN.value, ALLRSCREEN.value),
           ],
         ],
       },
       {
         dataGroupId: "AIS",
         data: [
-          [
-            "VDM",
-            {
-              value: VDM.value,
-              groupId: "VDM",
-              percent: ((VDM.value / ALLVDM.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "VDO",
-            {
-              value: VDO.value,
-              groupId: "VDO",
-              percent: ((VDO.value / ALLVDO.value) * 100).toFixed(2),
-            },
-          ],
+          ["VDM", updateDataObject("VDM", VDM.value, ALLVDM.value)],
+          ["VDO", updateDataObject("VDO", VDO.value, ALLVDO.value)],
         ],
       },
       {
@@ -1429,135 +931,61 @@ const updateChart = () => {
         data: [
           [
             "ROUTEINFO",
-            {
-              value: ROUTEINFO.value,
-              groupId: "ROUTEINFO",
-              percent: ((ROUTEINFO.value / ALLROUTEINFO.value) * 100).toFixed(
-                2
-              ),
-            },
+            updateDataObject("ROUTEINFO", ROUTEINFO.value, ALLROUTEINFO.value),
           ],
           [
             "WAYPOINTS",
-            {
-              value: WAYPOINTS.value,
-              groupId: "WAYPOINTS",
-              percent: ((WAYPOINTS.value / ALLWAYPOINTS.value) * 100).toFixed(
-                2
-              ),
-            },
+            updateDataObject("WAYPOINTS", WAYPOINTS.value, ALLWAYPOINTS.value),
           ],
-          [
-            "RTZ",
-            {
-              value: RTZ.value,
-              groupId: "RTZ",
-              percent: ((RTZ.value / ALLRTZ.value) * 100).toFixed(2),
-            },
-          ],
+          ["RTZ", updateDataObject("RTZ", RTZ.value, ALLRTZ.value)],
           [
             "ESCREEN",
-            {
-              value: ESCREEN.value,
-              groupId: "ESCREEN",
-              percent: ((ESCREEN.value / ALLESCREEN.value) * 100).toFixed(2),
-            },
+            updateDataObject("ESCREEN", ESCREEN.value, ALLESCREEN.value),
           ],
         ],
       },
       {
         dataGroupId: "AUTOPILOT",
         data: [
-          [
-            "RSA",
-            {
-              value: RSA.value,
-              groupId: "RSA",
-              percent: ((RSA.value / ALLRSA.value) * 100).toFixed(2),
-            },
-          ],
-          // ["MODE", MODE.value],
-          [
-            "HTD",
-            {
-              value: HTD.value,
-              groupId: "HTD",
-              percent: ((HTD.value / ALLHTD.value) * 100).toFixed(2),
-            },
-          ],
+          ["RSA", updateDataObject("RSA", RSA.value, ALLRSA.value)],
+          ["HTD", updateDataObject("HTD", HTD.value, ALLHTD.value)],
         ],
       },
       {
         dataGroupId: "SPEEDLOG",
         data: [
-          [
-            "VBW",
-            {
-              value: VBW.value,
-              groupId: "VBW",
-              percent: ((VBW.value / ALLVBW.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "VHW",
-            {
-              value: VHW.value,
-              groupId: "VHW",
-              percent: ((VHW.value / ALLVHW.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "VLW",
-            {
-              value: VLW.value,
-              groupId: "VLW",
-              percent: ((VLW.value / ALLVLW.value) * 100).toFixed(2),
-            },
-          ],
+          ["VBW", updateDataObject("VBW", VBW.value, ALLVBW.value)],
+          ["VHW", updateDataObject("VHW", VHW.value, ALLVHW.value)],
+          ["VLW", updateDataObject("VLW", VLW.value, ALLVLW.value)],
         ],
       },
       {
         dataGroupId: "CanThrottle",
         data: [
           [
-            "CAN_Online_State,",
-            {
-              value: CAN_Online_State.value,
-              groupId: "CAN_Online_State",
-              percent: (
-                (CAN_Online_State.value / ALLCAN_Online_State.value) *
-                100
-              ).toFixed(2),
-            },
+            "CAN_Online_State",
+            updateDataObject(
+              "CAN_Online_State",
+              CAN_Online_State.value,
+              ALLCAN_Online_State.value
+            ),
           ],
           [
-            "Engine_RPM,",
-            {
-              value: Engine_RPM.value,
-              groupId: "Engine_RPM",
-              percent: ((Engine_RPM.value / ALLEngine_RPM.value) * 100).toFixed(
-                2
-              ),
-            },
+            "Engine_RPM",
+            updateDataObject(
+              "Engine_RPM",
+              Engine_RPM.value,
+              ALLEngine_RPM.value
+            ),
           ],
+          ["Rudder", updateDataObject("Rudder", Rudder.value, ALLRudder.value)],
           [
-            "Rudder,",
-            {
-              value: Rudder.value,
-              groupId: "Rudder",
-              percent: ((Rudder.value / ALLRudder.value) * 100).toFixed(2),
-            },
-          ],
-          [
-            "Rudder_Scale,",
-            {
-              value: Rudder_Scale.value,
-              groupId: "Rudder_Scale",
-              percent: (
-                (Rudder_Scale.value / ALLRudder_Scale.value) *
-                100
-              ).toFixed(2),
-            },
+            "Rudder_Scale",
+            updateDataObject(
+              "Rudder_Scale",
+              Rudder_Scale.value,
+              ALLRudder_Scale.value
+            ),
           ],
         ],
       },
@@ -1566,176 +994,128 @@ const updateChart = () => {
         data: [
           [
             "AUTOPILOTCONTACT",
-            {
-              value: AUTOPILOTCONTACT.value,
-              groupId: "AUTOPILOTCONTACT",
-              percent: (
-                (AUTOPILOTCONTACT.value / ALLAUTOPILOTCONTACT.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "AUTOPILOTCONTACT",
+              AUTOPILOTCONTACT.value,
+              ALLAUTOPILOTCONTACT.value
+            ),
           ],
         ],
       },
-
       {
         dataGroupId: "NO.1ENGINE",
         data: [
           [
             "61444",
-            {
-              value: NO1ENGINE_PANEL_61444.value,
-              groupId: "NO1ENGINE_PANEL_61444",
-              percent: (
-                (NO1ENGINE_PANEL_61444.value / ALLNO1ENGINE_PANEL_61444.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_61444",
+              NO1ENGINE_PANEL_61444.value,
+              ALLNO1ENGINE_PANEL_61444.value
+            ),
           ],
           [
             "65262",
-            {
-              value: NO1ENGINE_PANEL_65262.value,
-              groupId: "NO1ENGINE_PANEL_65262",
-              percent: (
-                (NO1ENGINE_PANEL_65262.value / ALLNO1ENGINE_PANEL_65262.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65262",
+              NO1ENGINE_PANEL_65262.value,
+              ALLNO1ENGINE_PANEL_65262.value
+            ),
           ],
           [
             "65263",
-            {
-              value: NO1ENGINE_PANEL_65263.value,
-              groupId: "NO1ENGINE_PANEL_65263",
-              percent: (
-                (NO1ENGINE_PANEL_65263.value / ALLNO1ENGINE_PANEL_65263.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65263",
+              NO1ENGINE_PANEL_65263.value,
+              ALLNO1ENGINE_PANEL_65263.value
+            ),
           ],
           [
             "65272",
-            {
-              value: NO1ENGINE_PANEL_65272.value,
-              groupId: "NO1ENGINE_PANEL_65272",
-              percent: (
-                (NO1ENGINE_PANEL_65272.value / ALLNO1ENGINE_PANEL_65272.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65272",
+              NO1ENGINE_PANEL_65272.value,
+              ALLNO1ENGINE_PANEL_65272.value
+            ),
           ],
           [
             "65271",
-            {
-              value: NO1ENGINE_PANEL_65271.value,
-              groupId: "NO1ENGINE_PANEL_65271",
-              percent: (
-                (NO1ENGINE_PANEL_65271.value / ALLNO1ENGINE_PANEL_65271.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65271",
+              NO1ENGINE_PANEL_65271.value,
+              ALLNO1ENGINE_PANEL_65271.value
+            ),
           ],
           [
             "65253",
-            {
-              value: NO1ENGINE_PANEL_65253.value,
-              groupId: "NO1ENGINE_PANEL_65253",
-              percent: (
-                (NO1ENGINE_PANEL_65253.value / ALLNO1ENGINE_PANEL_65253.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65253",
+              NO1ENGINE_PANEL_65253.value,
+              ALLNO1ENGINE_PANEL_65253.value
+            ),
           ],
           [
             "65270",
-            {
-              value: NO1ENGINE_PANEL_65270.value,
-              groupId: "NO1ENGINE_PANEL_65270",
-              percent: (
-                (NO1ENGINE_PANEL_65270.value / ALLNO1ENGINE_PANEL_65270.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65270",
+              NO1ENGINE_PANEL_65270.value,
+              ALLNO1ENGINE_PANEL_65270.value
+            ),
           ],
           [
             "65276",
-            {
-              value: NO1ENGINE_PANEL_65276.value,
-              groupId: "NO1ENGINE_PANEL_65276",
-              percent: (
-                (NO1ENGINE_PANEL_65276.value / ALLNO1ENGINE_PANEL_65276.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65276",
+              NO1ENGINE_PANEL_65276.value,
+              ALLNO1ENGINE_PANEL_65276.value
+            ),
           ],
           [
             "65360",
-            {
-              value: NO1ENGINE_PANEL_65360.value,
-              groupId: "NO1ENGINE_PANEL_65360",
-              percent: (
-                (NO1ENGINE_PANEL_65360.value / ALLNO1ENGINE_PANEL_65360.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65360",
+              NO1ENGINE_PANEL_65360.value,
+              ALLNO1ENGINE_PANEL_65360.value
+            ),
           ],
           [
             "65361_LAMP",
-            {
-              value: NO1ENGINE_PANEL_65361_LAMP.value,
-              groupId: "NO1ENGINE_PANEL_65361_LAMP",
-              percent: (
-                (NO1ENGINE_PANEL_65361_LAMP.value /
-                  ALLNO1ENGINE_PANEL_65361_LAMP.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65361_LAMP",
+              NO1ENGINE_PANEL_65361_LAMP.value,
+              ALLNO1ENGINE_PANEL_65361_LAMP.value
+            ),
           ],
           [
             "65361_STATUS",
-            {
-              value: NO1ENGINE_PANEL_65361_STATUS.value,
-              groupId: "NO1ENGINE_PANEL_65361_STATUS",
-              percent: (
-                (NO1ENGINE_PANEL_65361_STATUS.value /
-                  ALLNO1ENGINE_PANEL_65361_STATUS.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65361_STATUS",
+              NO1ENGINE_PANEL_65361_STATUS.value,
+              ALLNO1ENGINE_PANEL_65361_STATUS.value
+            ),
           ],
           [
             "65378",
-            {
-              value: NO1ENGINE_PANEL_65378.value,
-              groupId: "NO1ENGINE_PANEL_65378",
-              percent: (
-                (NO1ENGINE_PANEL_65378.value / ALLNO1ENGINE_PANEL_65378.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65378",
+              NO1ENGINE_PANEL_65378.value,
+              ALLNO1ENGINE_PANEL_65378.value
+            ),
           ],
           [
             "65376",
-            {
-              value: NO1ENGINE_PANEL_65376.value,
-              groupId: "NO1ENGINE_PANEL_65376",
-              percent: (
-                (NO1ENGINE_PANEL_65376.value / ALLNO1ENGINE_PANEL_65376.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65376",
+              NO1ENGINE_PANEL_65376.value,
+              ALLNO1ENGINE_PANEL_65376.value
+            ),
           ],
           [
             "65379",
-            {
-              value: NO1ENGINE_PANEL_65379.value,
-              groupId: "NO1ENGINE_PANEL_65379",
-              percent: (
-                (NO1ENGINE_PANEL_65379.value / ALLNO1ENGINE_PANEL_65379.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO1ENGINE_PANEL_65379",
+              NO1ENGINE_PANEL_65379.value,
+              ALLNO1ENGINE_PANEL_65379.value
+            ),
           ],
         ],
       },
@@ -1744,179 +1124,118 @@ const updateChart = () => {
         data: [
           [
             "61444",
-            {
-              value: NO2ENGINE_PANEL_61444.value,
-              groupId: "NO2ENGINE_PANEL_61444",
-              percent: (
-                (NO2ENGINE_PANEL_61444.value / ALLNO2ENGINE_PANEL_61444.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_61444",
+              NO2ENGINE_PANEL_61444.value,
+              ALLNO2ENGINE_PANEL_61444.value
+            ),
           ],
           [
             "65262",
-            {
-              value: NO2ENGINE_PANEL_65262.value,
-              groupId: "NO2ENGINE_PANEL_65262",
-              percent: (
-                (NO2ENGINE_PANEL_65262.value / ALLNO2ENGINE_PANEL_65262.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65262",
+              NO2ENGINE_PANEL_65262.value,
+              ALLNO2ENGINE_PANEL_65262.value
+            ),
           ],
           [
             "65263",
-            {
-              value: NO2ENGINE_PANEL_65263.value,
-              groupId: "NO2ENGINE_PANEL_65263",
-              percent: (
-                (NO2ENGINE_PANEL_65263.value / ALLNO2ENGINE_PANEL_65263.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65263",
+              NO2ENGINE_PANEL_65263.value,
+              ALLNO2ENGINE_PANEL_65263.value
+            ),
           ],
           [
             "65272",
-            {
-              value: NO2ENGINE_PANEL_65272.value,
-              groupId: "NO2ENGINE_PANEL_65272",
-              percent: (
-                (NO2ENGINE_PANEL_65272.value / ALLNO2ENGINE_PANEL_65272.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65272",
+              NO2ENGINE_PANEL_65272.value,
+              ALLNO2ENGINE_PANEL_65272.value
+            ),
           ],
           [
             "65271",
-            {
-              value: NO2ENGINE_PANEL_65271.value,
-              groupId: "NO2ENGINE_PANEL_65271",
-              percent: (
-                (NO2ENGINE_PANEL_65271.value / ALLNO2ENGINE_PANEL_65271.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65271",
+              NO2ENGINE_PANEL_65271.value,
+              ALLNO2ENGINE_PANEL_65271.value
+            ),
           ],
           [
             "65253",
-            {
-              value: NO2ENGINE_PANEL_65253.value,
-              groupId: "NO2ENGINE_PANEL_65253",
-              percent: (
-                (NO2ENGINE_PANEL_65253.value / ALLNO2ENGINE_PANEL_65253.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65253",
+              NO2ENGINE_PANEL_65253.value,
+              ALLNO2ENGINE_PANEL_65253.value
+            ),
           ],
           [
             "65270",
-            {
-              value: NO2ENGINE_PANEL_65270.value,
-              groupId: "NO2ENGINE_PANEL_65270",
-              percent: (
-                (NO2ENGINE_PANEL_65270.value / ALLNO2ENGINE_PANEL_65270.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65270",
+              NO2ENGINE_PANEL_65270.value,
+              ALLNO2ENGINE_PANEL_65270.value
+            ),
           ],
           [
             "65276",
-            {
-              value: NO2ENGINE_PANEL_65276.value,
-              groupId: "NO2ENGINE_PANEL_65276",
-              percent: (
-                (NO2ENGINE_PANEL_65276.value / ALLNO2ENGINE_PANEL_65276.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65276",
+              NO2ENGINE_PANEL_65276.value,
+              ALLNO2ENGINE_PANEL_65276.value
+            ),
           ],
           [
             "65360",
-            {
-              value: NO2ENGINE_PANEL_65360.value,
-              groupId: "NO2ENGINE_PANEL_65360",
-              percent: (
-                (NO2ENGINE_PANEL_65360.value / ALLNO2ENGINE_PANEL_65360.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65360",
+              NO2ENGINE_PANEL_65360.value,
+              ALLNO2ENGINE_PANEL_65360.value
+            ),
           ],
           [
             "65361_LAMP",
-            {
-              value: NO2ENGINE_PANEL_65361_LAMP.value,
-              groupId: "NO2ENGINE_PANEL_65361_LAMP",
-              percent: (
-                (NO2ENGINE_PANEL_65361_LAMP.value /
-                  ALLNO2ENGINE_PANEL_65361_LAMP.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65361_LAMP",
+              NO2ENGINE_PANEL_65361_LAMP.value,
+              ALLNO2ENGINE_PANEL_65361_LAMP.value
+            ),
           ],
           [
             "65361_STATUS",
-            {
-              value: NO2ENGINE_PANEL_65361_STATUS.value,
-              groupId: "NO2ENGINE_PANEL_65361_STATUS",
-              percent: (
-                (NO2ENGINE_PANEL_65361_STATUS.value /
-                  ALLNO2ENGINE_PANEL_65361_STATUS.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65361_STATUS",
+              NO2ENGINE_PANEL_65361_STATUS.value,
+              ALLNO2ENGINE_PANEL_65361_STATUS.value
+            ),
           ],
           [
             "65378",
-            {
-              value: NO2ENGINE_PANEL_65378.value,
-              groupId: "NO2ENGINE_PANEL_65378",
-              percent: (
-                (NO2ENGINE_PANEL_65378.value / ALLNO2ENGINE_PANEL_65378.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65378",
+              NO2ENGINE_PANEL_65378.value,
+              ALLNO2ENGINE_PANEL_65378.value
+            ),
           ],
           [
             "65376",
-            {
-              value: NO2ENGINE_PANEL_65376.value,
-              groupId: "NO2ENGINE_PANEL_65376",
-              percent: (
-                (NO2ENGINE_PANEL_65376.value / ALLNO2ENGINE_PANEL_65376.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65376",
+              NO2ENGINE_PANEL_65376.value,
+              ALLNO2ENGINE_PANEL_65376.value
+            ),
           ],
           [
             "65379",
-            {
-              value: NO2ENGINE_PANEL_65379.value,
-              groupId: "NO2ENGINE_PANEL_65379",
-              percent: (
-                (NO2ENGINE_PANEL_65379.value / ALLNO2ENGINE_PANEL_65379.value) *
-                100
-              ).toFixed(2),
-            },
+            updateDataObject(
+              "NO2ENGINE_PANEL_65379",
+              NO2ENGINE_PANEL_65379.value,
+              ALLNO2ENGINE_PANEL_65379.value
+            ),
           ],
         ],
-        // [
-        //   ["61444", NO2ENGINE_PANEL_61444.value],
-        //   ["65262", NO2ENGINE_PANEL_65262.value],
-        //   ["65263", NO2ENGINE_PANEL_65263.value],
-        //   ["65272", NO2ENGINE_PANEL_65272.value],
-        //   ["65271", NO2ENGINE_PANEL_65271.value],
-        //   ["65253", NO2ENGINE_PANEL_65253.value],
-        //   ["65270", NO2ENGINE_PANEL_65270.value],
-        //   ["65276", NO2ENGINE_PANEL_65276.value],
-        //   ["65360", NO2ENGINE_PANEL_65360.value],
-        //   ["65361_LAMP", NO2ENGINE_PANEL_65361_LAMP.value],
-        //   ["65361_STATUS", NO2ENGINE_PANEL_65361_STATUS.value],
-        //   ["65378", NO2ENGINE_PANEL_65378.value],
-        //   ["65376", NO2ENGINE_PANEL_65376.value],
-        //   ["65379", NO2ENGINE_PANEL_65379.value],
-        // ],
       },
-      // 다른 drilldown 데이터도 추가
     ];
 
     // 차트에 새로운 옵션 적용

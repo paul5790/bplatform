@@ -5,7 +5,7 @@
 <script setup props="props">
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { GaugeChart } from "echarts/charts"; // GaugeChart로 변경
+import { GaugeChart } from "echarts/charts";
 import {
   TitleComponent,
   TooltipComponent,
@@ -23,7 +23,6 @@ watch(themeMode, (newValue) => {
 });
 
 const props = defineProps({
-  // #2 props 정의
   value: Number,
   barWidth: Number,
   name: String,
@@ -33,7 +32,7 @@ const windspeed = ref(0);
 
 use([
   CanvasRenderer,
-  GaugeChart, // GaugeChart로 변경
+  GaugeChart,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
@@ -46,7 +45,7 @@ const option = ref({
     text: props.name,
     left: "center",
     textStyle: {
-      fontSize: 10, // 폰트 크기 설정
+      fontSize: 10,
       color: textColor.value,
     },
   },

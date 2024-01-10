@@ -5,7 +5,7 @@
 <script setup props="props">
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
-import { GaugeChart } from "echarts/charts"; // GaugeChart로 변경
+import { GaugeChart } from "echarts/charts";
 import {
   TitleComponent,
   TooltipComponent,
@@ -15,16 +15,13 @@ import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted, defineProps } from "vue";
 
 const props = defineProps({
-  // #2 props 정의
   starport: String,
   name: String,
 });
-const starValue = ref();
-const portValue = ref();
 
 use([
   CanvasRenderer,
-  GaugeChart, // GaugeChart로 변경
+  GaugeChart,
   TitleComponent,
   TooltipComponent,
   LegendComponent,
@@ -95,7 +92,7 @@ const option = ref({
           }
         },
       },
-      type: "gauge", // gauge 타입 사용
+      type: "gauge",
       detail: {
         valueAnimation: true,
         formatter: "{value}",
@@ -111,7 +108,6 @@ const option = ref({
   ],
 });
 
-// 1초마다 랜덤값 생성
 const updateValue = () => {
   if (isNaN(props.starport) || props.starport === undefined) {
     option.value.series[0].data[0].value = null;
