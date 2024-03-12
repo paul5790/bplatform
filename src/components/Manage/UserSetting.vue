@@ -98,6 +98,13 @@
                     </v-container>
                   </v-card-text>
                   <v-card-actions>
+                    <v-btn
+                      color="deep-orange-darken-1"
+                      variant="text"
+                      @click="resetPW()"
+                    >
+                      비밀번호 초기화
+                    </v-btn>
                     <v-spacer></v-spacer>
                     <v-btn
                       color="blue-darken-1"
@@ -197,6 +204,7 @@ import {
   readUserData,
   deleteUserData,
   updateUserData,
+  resetPassword
 } from "../../api/index.js";
 import {
   darkbackcolor,
@@ -308,6 +316,22 @@ const check2 = () => {
 
   console.log(selectedemail.value);
 };
+
+// 비밀번호 초기화
+const resetPW= () => {
+  let data = {
+    "id":selectedId.value
+  };
+  console.log(data);
+  try{
+    resetPassword(tokenid.value, data);
+    alert("비밀번호가 초기화 되었습니다.")
+  }
+  catch(error) {
+    console.error(error);
+    message.value = `api 오류(${error})`;
+  }
+}
 
 const deleteData = async () => {
   const data = {

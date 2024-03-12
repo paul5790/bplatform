@@ -16,11 +16,11 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <!-- <OSMap
+                  <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
                     :state="mapstart"
-                  /> -->
+                  />
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -415,7 +415,7 @@ import EchartHeading from "../components/EchartGraph/EchartHeading.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
-import { timeData } from "../api/index.js";
+import { readLampTimeData } from "../api/index.js";
 import { darkbackcolor, whitebackcolor } from "../color/color.js";
 // 웹소켓 관련, Web Socket
 import { ref, inject, onMounted, onBeforeUnmount, onUnmounted, watch } from "vue";
@@ -437,11 +437,13 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 const checkTime = ref();
 const fetchData = async () => {
   try {
-    const timedata = await timeData(tokenid.value);
-    console.log(timedata);
-    checkTime.value = Number(timedata.lampTime);
+    const timedata = await readLampTimeData(tokenid.value);
+    console.log(`설정타임 : ${timedata.lampTime}`);
+    checkTime.value = Number(timedata.lampTime)*1000;
+    console.log(`checkTime : ${checkTime.value}`);
   } catch (error) {
     //console.error(error);
+    console.log(`설정타임에러`);
   }
 };
 
@@ -481,10 +483,10 @@ const checkdata = ref({
   VBW: "no",
   VHW: "no",
   VLW: "no",
-  CAN_Online_State: "no",
-  Engine_RPM: "no",
-  Rudder: "no",
-  Rudder_Scale: "no",
+  CAN_ONLINE_STATE: "no",
+  ENGINE_RPM: "no",
+  RUDDER: "no",
+  RUDDER_SCALE: "no",
   AUTOPILOTCONTACT: "no",
   NO1ENGINE_PANEL_61444: "no",
   NO1ENGINE_PANEL_65262: "no",
@@ -685,10 +687,10 @@ let VBWtimeout = null;
 let VHWtimeout = null;
 let VHWtimeout1 = null;
 let VLWtimeout = null;
-let CAN_Online_Statetimeout = null;
-let Engine_RPMtimeout = null;
-let Ruddertimeout = null;
-let Rudder_Scaletimeout = null;
+let CAN_ONLINE_STATEtimeout = null;
+let ENGINE_RPMtimeout = null;
+let RUDDERtimeout = null;
+let RUDDER_SCALEtimeout = null;
 let AUTOPILOTCONTACTtimeout = null;
 let NO1ENGINE_PANEL_61444timeout = null;
 let NO1ENGINE_PANEL_61444timeout1 = null;
@@ -761,7 +763,7 @@ onMessage((message) => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         latitude.value = null;
         mapstart.value = "stop";
-      }, 3000);
+      }, checkTime.value);
       longitude.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[4]
@@ -770,7 +772,7 @@ onMessage((message) => {
       GGAtimeout2 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         longitude.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "ANEMOMETER/MWV") {
       windspeed.value = Number(
@@ -781,7 +783,7 @@ onMessage((message) => {
       MWVtimeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         windspeed.value = null;
-      }, 3000);
+      }, checkTime.value);
 
       windangle.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
@@ -791,7 +793,7 @@ onMessage((message) => {
       MWVtimeout2 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         windangle.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
 
     // 헤딩값
@@ -804,7 +806,7 @@ onMessage((message) => {
       HDTtimeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         heading.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     // 스피드
     if (headerName === "SPEEDLOG/VHW") {
@@ -816,7 +818,7 @@ onMessage((message) => {
       VHWtimeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         speed.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     // 러더
     if (headerName === "AUTOPILOT/RSA") {
@@ -828,7 +830,7 @@ onMessage((message) => {
       RSAtimeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         star.value = null;
-      }, 3000);
+      }, checkTime.value);
       port.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
           .Value[3]
@@ -837,7 +839,7 @@ onMessage((message) => {
       RSAtimeout2 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         port.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
 
     // 엔진1
@@ -850,7 +852,7 @@ onMessage((message) => {
       NO1ENGINE_PANEL_61444timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine1Speed.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65262") {
       engine1oilTemperature.value = Number(
@@ -861,7 +863,7 @@ onMessage((message) => {
       NO1ENGINE_PANEL_65262timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine1oilTemperature.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65263") {
       engine1oilPressure.value = Number(
@@ -872,7 +874,7 @@ onMessage((message) => {
       NO1ENGINE_PANEL_65263timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine1oilPressure.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65272") {
       engine1transmissionPressure.value = Number(
@@ -883,18 +885,18 @@ onMessage((message) => {
       NO1ENGINE_PANEL_65272timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine1transmissionPressure.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65270") {
       engine1gasTemperature.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0]
+          .Value[2]
       ).toFixed(2);
       clearTimeout(NO1ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
       NO1ENGINE_PANEL_65270timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine1gasTemperature.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_LAMP") {
       for (let i = 0; i < 16; i++) {
@@ -954,7 +956,7 @@ onMessage((message) => {
       NO2ENGINE_PANEL_61444timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine2Speed.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65262") {
       engine2oilTemperature.value = Number(
@@ -965,7 +967,7 @@ onMessage((message) => {
       NO2ENGINE_PANEL_65262timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine2oilTemperature.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65263") {
       engine2oilPressure.value = Number(
@@ -976,7 +978,7 @@ onMessage((message) => {
       NO2ENGINE_PANEL_65263timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine2oilPressure.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65272") {
       engine2transmissionPressure.value = Number(
@@ -987,18 +989,18 @@ onMessage((message) => {
       NO2ENGINE_PANEL_65272timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine2transmissionPressure.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65270") {
       engine2gasTemperature.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0]
+          .Value[2]
       ).toFixed(2);
       clearTimeout(NO2ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
       NO2ENGINE_PANEL_65270timeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
         engine2gasTemperature.value = null;
-      }, 3000);
+      }, checkTime.value);
     }
     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_LAMP") {
       for (let i = 0; i < 16; i++) {
@@ -1041,448 +1043,448 @@ const checkingData = (headerName) => {
     clearTimeout(GLLtimeout);
     GLLtimeout = setTimeout(() => {
       checkdata.value.GLL = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "DGPS/GGA") {
     checkdata.value.GGA = "ok";
     clearTimeout(GGAtimeout);
     GGAtimeout = setTimeout(() => {
       checkdata.value.GGA = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "DGPS/RMC") {
     checkdata.value.RMC = "ok";
     clearTimeout(RMCtimeout);
     RMCtimeout = setTimeout(() => {
       checkdata.value.RMC = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "DGPS/VTG") {
     checkdata.value.VTG = "ok";
     clearTimeout(VTGtimeout);
     VTGtimeout = setTimeout(() => {
       checkdata.value.VTG = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "DGPS/ZDA") {
     checkdata.value.ZDA = "ok";
     clearTimeout(ZDAtimeout);
     ZDAtimeout = setTimeout(() => {
       checkdata.value.ZDA = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "DGPS/DTM") {
     checkdata.value.DTM = "ok";
     clearTimeout(DTMtimeout);
     DTMtimeout = setTimeout(() => {
       checkdata.value.DTM = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "DGPS/GSV") {
     checkdata.value.GSV = "ok";
     clearTimeout(GSVtimeout);
     GSVtimeout = setTimeout(() => {
       checkdata.value.GSV = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "DGPS/GSA") {
     checkdata.value.GSA = "ok";
     clearTimeout(GSAtimeout);
     GSAtimeout = setTimeout(() => {
       checkdata.value.GSA = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "GYRO/THS") {
     checkdata.value.THS = "ok";
     clearTimeout(THStimeout);
     THStimeout = setTimeout(() => {
       checkdata.value.THS = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "GYRO/HDT") {
     checkdata.value.HDT = "ok";
     clearTimeout(HDTtimeout);
     HDTtimeout = setTimeout(() => {
       checkdata.value.HDT = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "GYRO/ROT") {
     checkdata.value.ROT = "ok";
     clearTimeout(ROTtimeout);
     ROTtimeout = setTimeout(() => {
       checkdata.value.ROT = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ANEMOMETER/MWV") {
     checkdata.value.MWV = "ok";
     clearTimeout(MWVtimeout);
     MWVtimeout = setTimeout(() => {
       checkdata.value.MWV = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ANEMOMETER/MWD") {
     checkdata.value.MWD = "ok";
     clearTimeout(MWDtimeout);
     MWDtimeout = setTimeout(() => {
       checkdata.value.MWD = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ANEMOMETER/VWR") {
     checkdata.value.VWR = "ok";
     clearTimeout(VWRtimeout);
     VWRtimeout = setTimeout(() => {
       checkdata.value.VWR = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ANEMOMETER/MTW") {
     checkdata.value.MTW = "ok";
     clearTimeout(MTWtimeout);
     MTWtimeout = setTimeout(() => {
       checkdata.value.MTW = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ANEMOMETER/VWT") {
     checkdata.value.VWT = "ok";
     clearTimeout(VWTtimeout);
     VWTtimeout = setTimeout(() => {
       checkdata.value.VWT = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "RADAR/TTM") {
     checkdata.value.TTM = "ok";
     clearTimeout(TTMtimeout);
     TTMtimeout = setTimeout(() => {
       checkdata.value.TTM = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "RADAR/TLL") {
     checkdata.value.TLL = "ok";
     clearTimeout(TLLtimeout);
     TLLtimeout = setTimeout(() => {
       checkdata.value.TLL = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "RADAR/RADAR SCREEN") {
     checkdata.value.RSCREEN = "ok";
     clearTimeout(RSCREENtimeout);
     RSCREENtimeout = setTimeout(() => {
       checkdata.value.RSCREEN = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "AIS/VDM") {
     checkdata.value.VDM = "ok";
     clearTimeout(VDMtimeout);
     VDMtimeout = setTimeout(() => {
       checkdata.value.VDM = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "AIS/VDO") {
     checkdata.value.VDO = "ok";
     clearTimeout(VDOtimeout);
     VDOtimeout = setTimeout(() => {
       checkdata.value.VDO = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ECDIS/ROUTEINFO") {
     checkdata.value.ROUTEINFO = "ok";
     clearTimeout(ROUTEINFOtimeout);
     ROUTEINFOtimeout = setTimeout(() => {
       checkdata.value.ROUTEINFO = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ECDIS/WAYPOINTS") {
     checkdata.value.WAYPOINTS = "ok";
     clearTimeout(WAYPOINTStimeout);
     WAYPOINTStimeout = setTimeout(() => {
       checkdata.value.WAYPOINTS = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ECDIS/RTZ") {
     checkdata.value.RTZ = "ok";
     clearTimeout(RTZtimeout);
     RTZtimeout = setTimeout(() => {
       checkdata.value.RTZ = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "ECDIS/ECDIS SCREEN") {
     checkdata.value.ESCREEN = "ok";
     clearTimeout(ESCREENtimeout);
     ESCREENtimeout = setTimeout(() => {
       checkdata.value.ESCREEN = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "AUTOPILOT/RSA") {
     checkdata.value.RSA = "ok";
     clearTimeout(RSAtimeout);
     RSAtimeout = setTimeout(() => {
       checkdata.value.RSA = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "AUTOPILOT/MODE") {
     checkdata.value.MODE = "ok";
     clearTimeout(MODEtimeout);
     MODEtimeout = setTimeout(() => {
       checkdata.value.MODE = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "AUTOPILOT/HTD") {
     checkdata.value.HTD = "ok";
     clearTimeout(HTDtimeout);
     HTDtimeout = setTimeout(() => {
       checkdata.value.HTD = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "SPEEDLOG/VBW") {
     checkdata.value.VBW = "ok";
     clearTimeout(VBWtimeout);
     VBWtimeout = setTimeout(() => {
       checkdata.value.VBW = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "SPEEDLOG/VHW") {
     checkdata.value.VHW = "ok";
     clearTimeout(VHWtimeout);
     VHWtimeout = setTimeout(() => {
       checkdata.value.VHW = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "SPEEDLOG/VLW") {
     checkdata.value.VLW = "ok";
     clearTimeout(VLWtimeout);
     VLWtimeout = setTimeout(() => {
       checkdata.value.VLW = "no";
-    }, checktime);
+    }, checkTime.value);
   }
-  if (headerName === "CanThrottle/CAN Online State") {
-    checkdata.value.CAN_Online_State = "ok";
-    clearTimeout(CAN_Online_Statetimeout);
-    CAN_Online_Statetimeout = setTimeout(() => {
-      checkdata.value.CAN_Online_State = "no";
-    }, checktime);
+  if (headerName === "CANTHROTTLE/CAN ONLINE STATE") {
+    checkdata.value.CAN_ONLINE_STATE = "ok";
+    clearTimeout(CAN_ONLINE_STATEtimeout);
+    CAN_ONLINE_STATEtimeout = setTimeout(() => {
+      checkdata.value.CAN_ONLINE_STATE = "no";
+    }, checkTime.value);
   }
-  if (headerName === "CanThrottle/Engine RPM") {
-    checkdata.value.Engine_RPM = "ok";
-    clearTimeout(Engine_RPMtimeout);
-    Engine_RPMtimeout = setTimeout(() => {
-      checkdata.value.Engine_RPM = "no";
-    }, checktime);
+  if (headerName === "CANTHROTTLE/ENGINE RPM") {
+    checkdata.value.ENGINE_RPM = "ok";
+    clearTimeout(ENGINE_RPMtimeout);
+    ENGINE_RPMtimeout = setTimeout(() => {
+      checkdata.value.ENGINE_RPM = "no";
+    }, checkTime.value);
   }
-  if (headerName === "CanThrottle/Rudder") {
-    checkdata.value.Rudder = "ok";
-    clearTimeout(Ruddertimeout);
-    Ruddertimeout = setTimeout(() => {
-      checkdata.value.Rudder = "no";
-    }, checktime);
+  if (headerName === "CANTHROTTLE/RUDDER") {
+    checkdata.value.RUDDER = "ok";
+    clearTimeout(RUDDERtimeout);
+    RUDDERtimeout = setTimeout(() => {
+      checkdata.value.RUDDER = "no";
+    }, checkTime.value);
   }
-  if (headerName === "CanThrottle/Rudder Scale") {
-    checkdata.value.Rudder_Scale = "ok";
-    clearTimeout(Rudder_Scaletimeout);
-    Rudder_Scaletimeout = setTimeout(() => {
-      checkdata.value.Rudder_Scale = "no";
-    }, checktime);
+  if (headerName === "CANTHROTTLE/RUDDER SCALE") {
+    checkdata.value.RUDDER_SCALE = "ok";
+    clearTimeout(RUDDER_SCALEtimeout);
+    RUDDER_SCALEtimeout = setTimeout(() => {
+      checkdata.value.RUDDER_SCALE = "no";
+    }, checkTime.value);
   }
-  if (headerName === "AutoPilotContact/AutoPilotContact") {
+  if (headerName === "AUTOPILOTCONTACT/AUTOPILOTCONTACT") {
     checkdata.value.AUTOPILOTCONTACT = "ok";
     clearTimeout(AUTOPILOTCONTACTtimeout);
     AUTOPILOTCONTACTtimeout = setTimeout(() => {
       checkdata.value.AUTOPILOTCONTACT = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_61444") {
     checkdata.value.NO1ENGINE_PANEL_61444 = "ok";
     clearTimeout(NO1ENGINE_PANEL_61444timeout);
     NO1ENGINE_PANEL_61444timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_61444 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65262") {
     checkdata.value.NO1ENGINE_PANEL_65262 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65262timeout);
     NO1ENGINE_PANEL_65262timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65262 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65263") {
     checkdata.value.NO1ENGINE_PANEL_65263 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65263timeout);
     NO1ENGINE_PANEL_65263timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65263 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65272") {
     checkdata.value.NO1ENGINE_PANEL_65272 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65272timeout);
     NO1ENGINE_PANEL_65272timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65272 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65271") {
     checkdata.value.NO1ENGINE_PANEL_65271 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65271timeout);
     NO1ENGINE_PANEL_65271timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65271 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65253") {
     checkdata.value.NO1ENGINE_PANEL_65253 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65253timeout);
     NO1ENGINE_PANEL_65253timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65253 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65270") {
     checkdata.value.NO1ENGINE_PANEL_65270 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65270timeout);
     NO1ENGINE_PANEL_65270timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65270 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65276") {
     checkdata.value.NO1ENGINE_PANEL_65276 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65276timeout);
     NO1ENGINE_PANEL_65276timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65276 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65360") {
     checkdata.value.NO1ENGINE_PANEL_65360 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65360timeout);
     NO1ENGINE_PANEL_65360timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65360 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_LAMP") {
     checkdata.value.NO1ENGINE_PANEL_65361_LAMP = "ok";
     clearTimeout(NO1ENGINE_PANEL_65361_LAMPtimeout);
     NO1ENGINE_PANEL_65361_LAMPtimeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65361_LAMP = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_STATUS") {
     checkdata.value.NO1ENGINE_PANEL_65361_STATUS = "ok";
     clearTimeout(NO1ENGINE_PANEL_65361_STATUStimeout);
     NO1ENGINE_PANEL_65361_STATUStimeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65361_STATUS = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65378") {
     checkdata.value.NO1ENGINE_PANEL_65378 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65378timeout);
     NO1ENGINE_PANEL_65378timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65378 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65376") {
     checkdata.value.NO1ENGINE_PANEL_65376 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65376timeout);
     NO1ENGINE_PANEL_65376timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65376 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65379") {
     checkdata.value.NO1ENGINE_PANEL_65379 = "ok";
     clearTimeout(NO1ENGINE_PANEL_65379timeout);
     NO1ENGINE_PANEL_65379timeout = setTimeout(() => {
       checkdata.value.NO1ENGINE_PANEL_65379 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_61444") {
     checkdata.value.NO2ENGINE_PANEL_61444 = "ok";
     clearTimeout(NO2ENGINE_PANEL_61444timeout);
     NO2ENGINE_PANEL_61444timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_61444 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65262") {
     checkdata.value.NO2ENGINE_PANEL_65262 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65262timeout);
     NO2ENGINE_PANEL_65262timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65262 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65263") {
     checkdata.value.NO2ENGINE_PANEL_65263 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65263timeout);
     NO2ENGINE_PANEL_65263timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65263 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65272") {
     checkdata.value.NO2ENGINE_PANEL_65272 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65272timeout);
     NO2ENGINE_PANEL_65272timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65272 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65271") {
     checkdata.value.NO2ENGINE_PANEL_65271 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65271timeout);
     NO2ENGINE_PANEL_65271timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65271 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65253") {
     checkdata.value.NO2ENGINE_PANEL_65253 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65253timeout);
     NO2ENGINE_PANEL_65253timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65253 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65270") {
     checkdata.value.NO2ENGINE_PANEL_65270 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65270timeout);
     NO2ENGINE_PANEL_65270timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65270 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65276") {
     checkdata.value.NO2ENGINE_PANEL_65276 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65276timeout);
     NO2ENGINE_PANEL_65276timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65276 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65360") {
     checkdata.value.NO2ENGINE_PANEL_65360 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65360timeout);
     NO2ENGINE_PANEL_65360timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65360 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_LAMP") {
     checkdata.value.NO2ENGINE_PANEL_65361_LAMP = "ok";
     clearTimeout(NO2ENGINE_PANEL_65361_LAMPtimeout);
     NO2ENGINE_PANEL_65361_LAMPtimeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65361_LAMP = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_STATUS") {
     checkdata.value.NO2ENGINE_PANEL_65361_STATUS = "ok";
     clearTimeout(NO2ENGINE_PANEL_65361_STATUStimeout);
     NO2ENGINE_PANEL_65361_STATUStimeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65361_STATUS = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65378") {
     checkdata.value.NO2ENGINE_PANEL_65378 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65378timeout);
     NO2ENGINE_PANEL_65378timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65378 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65376") {
     checkdata.value.NO2ENGINE_PANEL_65376 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65376timeout);
     NO2ENGINE_PANEL_65376timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65376 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
   if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65379") {
     checkdata.value.NO2ENGINE_PANEL_65379 = "ok";
     clearTimeout(NO2ENGINE_PANEL_65379timeout);
     NO2ENGINE_PANEL_65379timeout = setTimeout(() => {
       checkdata.value.NO2ENGINE_PANEL_65379 = "no";
-    }, checktime);
+    }, checkTime.value);
   }
 };
 

@@ -187,7 +187,7 @@
                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로 보여짐
                     </p>
                     <v-btn
-                      style="margin-top: 30px"
+                      style="margin-top: 10px"
                       width="500px"
                       :color = btnColor
                       @click="searchData()"
@@ -195,7 +195,7 @@
                       조회하기
                     </v-btn>
                     <v-btn
-                      style="margin-top: 355px"
+                      style="margin-top: 350px"
                       height="50px"
                       width="500px"
                       :color = btnColor

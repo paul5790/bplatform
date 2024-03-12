@@ -201,7 +201,7 @@ axios.interceptors.response.use(
   (error) => {
     const alertShow = ref(sessionStorage.getItem("showDashboard") === "true");
     if (
-      (error.response.status === 401 || error.response.status === 500) &&
+      (error.response.status === 401 || error.response.status === 500) && error.response.data === "Token Expired" &&
       alertShow.value
     ) {
       // 401 또는 500 상태 코드가 발생한 경우 로그아웃 처리

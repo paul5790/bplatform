@@ -250,7 +250,7 @@
         <!-- CanThrottle -->
         <v-list-group>
           <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" title="CanThrottle"></v-list-item>
+            <v-list-item v-bind="props" title="CANTHROTTLE"></v-list-item>
           </template>
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
@@ -273,7 +273,7 @@
         <!-- AutoPilotContact -->
         <v-list-group>
           <template v-slot:activator="{ props }">
-            <v-list-item v-bind="props" title="AutoPilotContact"></v-list-item>
+            <v-list-item v-bind="props" title="AUTOPILOTCONTACT"></v-list-item>
           </template>
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
@@ -432,10 +432,10 @@ const data = [
   { key: "VBW" }, //SPEEDLOG
   { key: "VHW" },
   { key: "VLW" },
-  { key: "CAN_Online_State" },//CanThrottle
-  { key: "Engine_RPM" },
-  { key: "Rudder" },
-  { key: "Rudder_Scale" },
+  { key: "CAN_ONLINE_STATE" },//CanThrottle
+  { key: "ENGINE_RPM" },
+  { key: "RUDDER" },
+  { key: "RUDDER_SCALE" },
   { key: "AUTOPILOTCONTACT" },
   { key: "NO1ENGINE_PANEL_61444" }, //NO.1
   { key: "NO1ENGINE_PANEL_65262" },

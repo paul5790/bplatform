@@ -10,13 +10,13 @@
         overflow-y: auto;
       "
     >
-      <v-card-item>
+      <v-card-item style="padding-top: 0px">
         <v-row class="dialog-row">
           <!-- 종료 후 저장 -->
           <div class="dialog-div" style="display: flex; margin-right: 0">
             <v-btn
               v-if="startstate"
-              :color = btnColor
+              :color="btnColor"
               v-bind="props"
               @click="openDialog1_1()"
             >
@@ -85,7 +85,7 @@
           <div class="dialog-div">
             <v-btn
               v-if="!startstate"
-              :color = btnColor
+              :color="btnColor"
               v-bind="props"
               @click="openDialog1()"
             >
@@ -251,7 +251,7 @@
           </div>
           <!-- 추가하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn :color = btnColor v-bind="props" @click="openDialog2()">
+            <v-btn :color="btnColor" v-bind="props" @click="openDialog2()">
               추가하기
             </v-btn>
             <v-dialog v-model="dialog2" persistent width="800">
@@ -446,7 +446,7 @@
           </div>
           <!-- 수정하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn :color = btnColor v-bind="props" @click="openDialog3()">
+            <v-btn :color="btnColor" v-bind="props" @click="openDialog3()">
               수정하기
             </v-btn>
             <v-dialog v-model="dialog3" persistent width="800">
@@ -618,7 +618,7 @@
           </div>
           <!-- 삭제하기 -->
           <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn :color = btnColor @click="openDialog4()"> 삭제하기 </v-btn>
+            <v-btn :color="btnColor" @click="openDialog4()"> 삭제하기 </v-btn>
 
             <v-dialog v-model="dialog4" persistent width="350">
               <v-card :style="{ backgroundColor: themeColor }">
@@ -699,13 +699,13 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, watchEffect, defineEmits, watch } from "vue";
-import axios from "axios";
+import { computed, ref, onMounted, defineEmits, watch } from "vue";
 import {
   createTrialData,
   updateTrialData,
   deleteTrialData,
   readTrialData,
+  createErrorData,
 } from "../../api/index.js";
 import {
   darkbackcolor,
@@ -755,11 +755,8 @@ const pageCount = computed(() => {
   return Math.ceil(items.value.length / itemsPerPage.value);
 });
 
-const name = ref("");
 const startdate = ref("");
 const enddate = ref("");
-const description = ref("");
-const modifieduser = ref("");
 const division = ref();
 
 // 1번째
@@ -773,17 +770,12 @@ const endTimeUtc = ref();
 const startpurpose = ref();
 const startlocation = ref();
 const startdescription = ref();
-const startdivision = ref();
-const startshipId = ref();
-const startenddate = ref();
 
 // 2번째
 const editname = ref("");
 const editstartdate = ref("");
 const editenddate = ref("");
 const editdescription = ref("");
-const editdivision = ref();
-const editmodifieduser = ref("");
 const editpurpose = ref("");
 const editlocation = ref("");
 
@@ -871,8 +863,6 @@ const rules1 = ref({
     },
   ],
 });
-
-let isEditing = ref(false); // 수정 모드인지 여부
 
 // 데이트 피커
 startTimeUtc.value = new Date();
@@ -1046,6 +1036,21 @@ const startData = async () => {
   } catch (error) {
     console.error(error);
     alert(error.response?.data || "An error occurred during signup.");
+    let errorItem = {
+      id: sessionStorage.getItem("userid") || "",
+      requestMethod: error.response ? error.response.config.method : "unknown",
+      requestUrl: error.response ? error.response.request.responseURL : "unknown",
+      statusCode: error.response ? error.response.status : "unknown",
+      log: error.name ? error.name : "unknown",
+    };
+    console.log(errorItem);
+    try {
+      createErrorData(tokenid.value, errorItem);
+    } catch (error) {
+      console.error(error);
+    }
+    overlay.value = false;
+    alert("")
   }
 
   nullDialog1_1();
@@ -1140,6 +1145,23 @@ const editData = async () => {
         }
       } catch (error) {
         console.error("An error occurred in waitStart:", error);
+        let errorItem = {
+          id: sessionStorage.getItem("userid") || "",
+          requestMethod: error.response
+            ? error.response.config.method
+            : "unknown",
+          requestUrl: error.response
+            ? error.response.request.responseURL
+            : "unknown",
+          statusCode: error.response ? error.response.status : "unknown",
+          log: error.name ? error.name : "unknown",
+        };
+        console.log(errorItem);
+        try {
+          createErrorData(tokenid.value, errorItem);
+        } catch (error) {
+          console.error(error);
+        }
       }
     }
   }
@@ -1230,6 +1252,23 @@ const changeData = async () => {
       } catch (error) {
         console.error(error);
         alert("선택된 항차 목록이 존재하지 않습니다.");
+        let errorItem = {
+          id: sessionStorage.getItem("userid") || "",
+          requestMethod: error.response
+            ? error.response.config.method
+            : "unknown",
+          requestUrl: error.response
+            ? error.response.request.responseURL
+            : "unknown",
+          statusCode: error.response ? error.response.status : "unknown",
+          log: error.name ? error.name : "unknown",
+        };
+        console.log(errorItem);
+        try {
+          createErrorData(tokenid.value, errorItem);
+        } catch (error) {
+          console.error(error);
+        }
         console.log(1145);
       }
     }
@@ -1241,7 +1280,7 @@ const changeData = async () => {
 
 // 삭제하기
 const deleteData = async () => {
-  // overlay.value = true;
+  overlay.value = true;
   overlayemit(true);
   dialog4.value = false;
   const data = {
@@ -1255,7 +1294,21 @@ const deleteData = async () => {
     overlay.value = false;
     location.reload();
   } catch (error) {
-    console.error("An error occurred in waitStart:", error);
+    let errorItem = {
+      id: sessionStorage.getItem("userid") || "",
+      requestMethod: error.response ? error.response.config.method : "unknown",
+      requestUrl: error.response
+        ? error.response.request.responseURL
+        : "unknown",
+      statusCode: error.response ? error.response.status : "unknown",
+      log: error.name ? error.name : "unknown",
+    };
+    console.log(errorItem);
+    try {
+      createErrorData(tokenid.value, errorItem);
+    } catch (error) {
+      console.error(error);
+    }
   }
 };
 
@@ -1269,7 +1322,7 @@ const overlayemit = (data) => {
 
 // 데이터 테이블 헤더
 const headers = ref([
-  { title: "항차", align: "start", sortable: true,  key: "division" },
+  { title: "항차", align: "start", sortable: true, key: "division" },
   { title: "시작시간", align: "start", key: "startdate", sortable: true },
   { title: "끝시간", align: "start", key: "enddate" },
   { title: "진행 시간", align: "start", key: "time" },
@@ -1282,21 +1335,21 @@ const headers = ref([
   // { title: "입력자", align: "end", key: "user" },
 ]);
 
-const customSort = (items, index, isDesc) => {
-  alert('gd')
-  items.sort((a, b) => {
-    if (index[0] === 'starttime') {
-      if (!isDesc[0]) {
-        return new Date(`2022-01-01 ${b[index]}`) - new Date(`2022-01-01 ${a[index]}`);
-      } else {
-        return new Date(`2022-01-01 ${a[index]}`) - new Date(`2022-01-01 ${b[index]}`);
-      }
-    } else {
-      // 다른 열의 정렬 로직 추가
-    }
-  });
-  return items;
-};
+// const customSort = (items, index, isDesc) => {
+//   alert('gd')
+//   items.sort((a, b) => {
+//     if (index[0] === 'starttime') {
+//       if (!isDesc[0]) {
+//         return new Date(`2022-01-01 ${b[index]}`) - new Date(`2022-01-01 ${a[index]}`);
+//       } else {
+//         return new Date(`2022-01-01 ${a[index]}`) - new Date(`2022-01-01 ${b[index]}`);
+//       }
+//     } else {
+//       // 다른 열의 정렬 로직 추가
+//     }
+//   });
+//   return items;
+// };
 
 const items = ref([]);
 // 데이터 받아오기

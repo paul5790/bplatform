@@ -26,7 +26,7 @@
       >
         <v-list-subheader>주기 설정</v-list-subheader>
 
-        <v-list-item @click="losstimeDialog = true">
+        <v-list-item @click="(ALLlosstimeDialog = true), setTimeRefs()">
           <v-list-item-title>데이터 소실 주기 설정</v-list-item-title>
 
           <v-list-item-subtitle>
@@ -46,10 +46,15 @@
 
         <v-list-subheader>테마 설정</v-list-subheader>
         <v-list-item>
-  <v-btn-toggle v-model="themeMode" mandatory divided variant="outlined">
-    <v-btn @click="lightMode()" value="light">light mode</v-btn>
-    <v-btn @click="darkMode()" value="dark">dark mode</v-btn>
-  </v-btn-toggle>
+          <v-btn-toggle
+            v-model="themeMode"
+            mandatory
+            divided
+            variant="outlined"
+          >
+            <v-btn @click="lightMode()" value="light">light mode</v-btn>
+            <v-btn @click="darkMode()" value="dark">dark mode</v-btn>
+          </v-btn-toggle>
         </v-list-item>
       </v-list>
 
@@ -1395,10 +1400,13 @@
             <v-btn
               color="blue-darken-1"
               variant="text"
-              @click="losstimeDialog = false"
+              @click="ALLlosstimeDialog = false"
               >취소</v-btn
             >
-            <v-btn color="blue-darken-1" variant="text" @click="axiostime()"
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click="updateTimeRefs(), setTimeRefs()"
               >설정</v-btn
             >
           </v-card-actions>
@@ -1428,7 +1436,7 @@
               @click="realtimeDialog = false"
               >취소</v-btn
             >
-            <v-btn color="blue-darken-1" variant="text" @click="axiostime()"
+            <v-btn color="blue-darken-1" variant="text" @click="axiosrealtime()"
               >설정</v-btn
             >
           </v-card-actions>
@@ -1445,6 +1453,8 @@ import {
   updateMineData,
   updatePassword,
   updateSetTime,
+  readLossTimeData,
+  updateLossTimeData,
 } from "../api/index.js";
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
@@ -1452,12 +1462,12 @@ const themeMode = ref(localStorage.getItem("themeMode") || "light");
 const lightMode = () => {
   localStorage.setItem("themeMode", "light");
   location.reload();
-}
+};
 
 const darkMode = () => {
   localStorage.setItem("themeMode", "dark");
   location.reload();
-}
+};
 
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
@@ -1480,7 +1490,7 @@ const newpwcheck = ref();
 const privacyDialog = ref(false);
 const passwordchangeDialog = ref(false);
 const losstimeDialog = ref(false);
-const ALLlosstimeDialog = ref(true); // 소실주기 전체
+const ALLlosstimeDialog = ref(false); // 소실주기 전체
 const realtimeDialog = ref(false);
 
 // 데이터 소실주기 설정
@@ -1490,7 +1500,7 @@ const realtime = ref();
 // 데이터 소실주기 시간
 const selectRadio = ref("DGPS");
 const timeRefs = {
-  GLL: ref("1"),
+  GLL: ref(),
   GGA: ref(),
   RMC: ref(),
   VTG: ref(),
@@ -1507,10 +1517,8 @@ const timeRefs = {
   WAYPOINTS: ref(),
   ECDISSCREEN: ref(),
   RTZ: ref(),
-
   RSA: ref(),
   HTD: ref(),
-
   VBW: ref(),
   VHW: ref(),
   VLW: ref(),
@@ -1547,6 +1555,165 @@ const timeRefs = {
   NO2ENGINE_PANEL_65378: ref(),
   NO2ENGINE_PANEL_65376: ref(),
   NO2ENGINE_PANEL_65379: ref(),
+};
+
+const setTimeRefs = async () => {
+  const response = await readLossTimeData(tokenid.value);
+  timeRefs.GLL.value = response.DGPS_GLL;
+  timeRefs.GGA.value = response.DGPS_GGA;
+  timeRefs.RMC.value = response.DGPS_RMC;
+  timeRefs.VTG.value = response.DGPS_VTG;
+  timeRefs.ZDA.value = response.DGPS_ZDA;
+  timeRefs.GSV.value = response.DGPS_GSV;
+  timeRefs.GSA.value = response.DGPS_GSA;
+  timeRefs.HDT.value = response.GYRO_HDT;
+  timeRefs.ROT.value = response.GYRO_ROT;
+  timeRefs.MWV.value = response.ANEMOMETER_MWV;
+  timeRefs.RADARSCREEN.value = response.RADAR_RADARSCREEN;
+  timeRefs.VDM.value = response.AIS_VDM;
+  timeRefs.VDO.value = response.AIS_VDO;
+  timeRefs.ROUTEINFO.value = response.ECDIS_ROUTEINFO;
+  timeRefs.WAYPOINTS.value = response.ECDIS_WAYPOINTS;
+  timeRefs.ECDISSCREEN.value = response.ECDIS_ECDISSCREEN;
+  timeRefs.RTZ.value = response.ECDIS_RTZ;
+  timeRefs.RSA.value = response.AUTOPILOT_RSA;
+  timeRefs.HTD.value = response.AUTOPILOT_HTD;
+  timeRefs.VBW.value = response.SPEEDLOG_VBW;
+  timeRefs.VHW.value = response.SPEEDLOG_VHW;
+  timeRefs.VLW.value = response.SPEEDLOG_VLW;
+  timeRefs.CAN_Online_State.value = response.CANTHROTTLE_CANONLINESTATE;
+  timeRefs.Engine_RPM.value = response.CANTHROTTLE_ENGINERPM;
+  timeRefs.Rudder.value = response.CANTHROTTLE_RUDDER;
+  timeRefs.Rudder_Scale.value = response.CANTHROTTLE_RUDDERSCALE;
+  timeRefs.AUTOPILOTCONTACT.value = response.AUTOPILOTCONTACT_AUTOPILOTCONTACT;
+  timeRefs.NO1ENGINE_PANEL_61444.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_61444;
+  timeRefs.NO1ENGINE_PANEL_65262.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65262;
+  timeRefs.NO1ENGINE_PANEL_65263.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65263;
+  timeRefs.NO1ENGINE_PANEL_65272.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65272;
+  timeRefs.NO1ENGINE_PANEL_65271.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65271;
+  timeRefs.NO1ENGINE_PANEL_65253.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65253;
+  timeRefs.NO1ENGINE_PANEL_65270.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65270;
+  timeRefs.NO1ENGINE_PANEL_65276.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65276;
+  timeRefs.NO1ENGINE_PANEL_65360.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65360;
+  timeRefs.NO1ENGINE_PANEL_65361_LAMP.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_LAMP;
+  timeRefs.NO1ENGINE_PANEL_65361_STATUS.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_STATUS;
+  timeRefs.NO1ENGINE_PANEL_65378.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65378;
+  timeRefs.NO1ENGINE_PANEL_65376.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65376;
+  timeRefs.NO1ENGINE_PANEL_65379.value =
+    response.NO1ENGINEPANEL_NO1ENGINE_PANEL_65379;
+  timeRefs.NO2ENGINE_PANEL_61444.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_61444;
+  timeRefs.NO2ENGINE_PANEL_65262.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65262;
+  timeRefs.NO2ENGINE_PANEL_65263.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65263;
+  timeRefs.NO2ENGINE_PANEL_65272.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65272;
+  timeRefs.NO2ENGINE_PANEL_65271.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65271;
+  timeRefs.NO2ENGINE_PANEL_65253.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65253;
+  timeRefs.NO2ENGINE_PANEL_65270.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65270;
+  timeRefs.NO2ENGINE_PANEL_65276.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65276;
+  timeRefs.NO2ENGINE_PANEL_65360.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65360;
+  timeRefs.NO2ENGINE_PANEL_65361_LAMP.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_LAMP;
+  timeRefs.NO2ENGINE_PANEL_65361_STATUS.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_STATUS;
+  timeRefs.NO2ENGINE_PANEL_65378.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65378;
+  timeRefs.NO2ENGINE_PANEL_65376.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65376;
+  timeRefs.NO2ENGINE_PANEL_65379.value =
+    response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65379;
+};
+
+const updateTimeRefs = async () => {
+  let data = {
+    id: "admin",
+    AUTOPILOTCONTACT_AUTOPILOTCONTACT: timeRefs.AUTOPILOTCONTACT.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_61444: timeRefs.NO1ENGINE_PANEL_61444.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65262: timeRefs.NO1ENGINE_PANEL_65262.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65263: timeRefs.NO1ENGINE_PANEL_65263.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65272: timeRefs.NO1ENGINE_PANEL_65272.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65271: timeRefs.NO1ENGINE_PANEL_65271.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65253: timeRefs.NO1ENGINE_PANEL_65253.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65270: timeRefs.NO1ENGINE_PANEL_65270.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65276: timeRefs.NO1ENGINE_PANEL_65276.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65360: timeRefs.NO1ENGINE_PANEL_65360.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_LAMP: timeRefs.NO1ENGINE_PANEL_65361_LAMP.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_STATUS: timeRefs.NO1ENGINE_PANEL_65361_STATUS.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65378: timeRefs.NO1ENGINE_PANEL_65378.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65376: timeRefs.NO1ENGINE_PANEL_65376.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65379: timeRefs.NO1ENGINE_PANEL_65379.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_61444: timeRefs.NO2ENGINE_PANEL_61444.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65262: timeRefs.NO2ENGINE_PANEL_65262.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65263: timeRefs.NO2ENGINE_PANEL_65263.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65272: timeRefs.NO2ENGINE_PANEL_65272.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65271: timeRefs.NO2ENGINE_PANEL_65271.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65253: timeRefs.NO2ENGINE_PANEL_65253.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65270: timeRefs.NO2ENGINE_PANEL_65270.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65276: timeRefs.NO2ENGINE_PANEL_65276.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65360: timeRefs.NO2ENGINE_PANEL_65360.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_LAMP: timeRefs.NO2ENGINE_PANEL_65361_LAMP.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_STATUS: timeRefs.NO2ENGINE_PANEL_65361_STATUS.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65378: timeRefs.NO2ENGINE_PANEL_65378.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65376: timeRefs.NO2ENGINE_PANEL_65376.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65379: timeRefs.NO2ENGINE_PANEL_65379.value,
+
+    CANTHROTTLE_CANONLINESTATE: timeRefs.CAN_Online_State.value,
+    RADAR_RADARSCREEN: timeRefs.RADARSCREEN.value,
+    ECDIS_ECDISSCREEN: timeRefs.ECDISSCREEN.value,
+    CANTHROTTLE_ENGINERPM: timeRefs.Engine_RPM.value,
+    CANTHROTTLE_RUDDER: timeRefs.Rudder.value,
+    CANTHROTTLE_RUDDERSCALE: timeRefs.Rudder_Scale.value,
+    // ANEMOMETER_MWD: timeRefs.MWD.value,
+    DGPS_RMC: timeRefs.RMC.value,
+    // ANEMOMETER_VWT: timeRefs.VWT.value,
+    DGPS_GGA: timeRefs.GGA.value,
+    DGPS_GSV: timeRefs.GSV.value,
+    GYRO_HDT: timeRefs.HDT.value,
+    ANEMOMETER_MWV: timeRefs.MWV.value,
+    AIS_VDO: timeRefs.VDO.value,
+    ECDIS_ROUTEINFO: timeRefs.ROUTEINFO.value,
+    // DGPS_DTM: timeRefs.DTM.value,
+    // RADAR_TTM: timeRefs.TTM.value,
+    DGPS_GLL: timeRefs.GLL.value,
+    DGPS_VTG: timeRefs.VTG.value,
+    // GYRO_THS: timeRefs.THS.value,
+    DGPS_GSA: timeRefs.GSA.value,
+    GYRO_ROT: timeRefs.ROT.value,
+    // ANEMOMETER_VWR: timeRefs.VWR.value,
+    // RADAR_TLL: timeRefs.TLL.value,
+    AIS_VDM: timeRefs.VDM.value,
+    DGPS_ZDA: timeRefs.ZDA.value,
+    ECDIS_WAYPOINTS: timeRefs.WAYPOINTS.value,
+    AUTOPILOT_RSA: timeRefs.RSA.value,
+    // ANEMOMETER_MTW: timeRefs.MTW.value,
+    ECDIS_RTZ: timeRefs.RTZ.value,
+    SPEEDLOG_VBW: timeRefs.VBW.value,
+    SPEEDLOG_VHW: timeRefs.VHW.value,
+    AUTOPILOT_HTD: timeRefs.HTD.value,
+    SPEEDLOG_VLW: timeRefs.VLW.value,
+  };
+  await updateLossTimeData(tokenid.value, data);
+  setTimeRefs();
 };
 
 onMounted(() => {

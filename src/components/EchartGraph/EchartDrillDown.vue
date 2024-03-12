@@ -55,7 +55,12 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted, watch } from "vue";
-import { readTrialData, readlossData, readTimeData } from "../../api/index.js";
+import {
+  readTrialData,
+  readlossData,
+  readTimeData,
+  readLossTimeData,
+} from "../../api/index.js";
 import { darkText, lightText } from "../../color/color.js";
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
@@ -206,6 +211,64 @@ const ALLNO2ENGINE_PANEL_65378 = ref(0);
 const ALLNO2ENGINE_PANEL_65376 = ref(0);
 const ALLNO2ENGINE_PANEL_65379 = ref(0);
 
+const timeDataRefs = [
+  GLL,
+  GGA,
+  RMC,
+  VTG,
+  ZDA,
+  GSV,
+  GSA,
+  HDT,
+  ROT,
+  MWV,
+  RSCREEN,
+  VDM,
+  VDO,
+  ROUTEINFO,
+  WAYPOINTS,
+  RTZ,
+  ESCREEN,
+  RSA,
+  HTD,
+  VBW,
+  VHW,
+  VLW,
+  CAN_Online_State,
+  Engine_RPM,
+  Rudder,
+  Rudder_Scale,
+  AUTOPILOTCONTACT,
+  NO1ENGINE_PANEL_61444,
+  NO1ENGINE_PANEL_65262,
+  NO1ENGINE_PANEL_65263,
+  NO1ENGINE_PANEL_65272,
+  NO1ENGINE_PANEL_65271,
+  NO1ENGINE_PANEL_65253,
+  NO1ENGINE_PANEL_65270,
+  NO1ENGINE_PANEL_65276,
+  NO1ENGINE_PANEL_65360,
+  NO1ENGINE_PANEL_65361_LAMP,
+  NO1ENGINE_PANEL_65361_STATUS,
+  NO1ENGINE_PANEL_65378,
+  NO1ENGINE_PANEL_65376,
+  NO1ENGINE_PANEL_65379,
+  NO2ENGINE_PANEL_61444,
+  NO2ENGINE_PANEL_65262,
+  NO2ENGINE_PANEL_65263,
+  NO2ENGINE_PANEL_65272,
+  NO2ENGINE_PANEL_65271,
+  NO2ENGINE_PANEL_65253,
+  NO2ENGINE_PANEL_65270,
+  NO2ENGINE_PANEL_65276,
+  NO2ENGINE_PANEL_65360,
+  NO2ENGINE_PANEL_65361_LAMP,
+  NO2ENGINE_PANEL_65361_STATUS,
+  NO2ENGINE_PANEL_65378,
+  NO2ENGINE_PANEL_65376,
+  NO2ENGINE_PANEL_65379,
+];
+
 const dataRefs = [
   GLL,
   GGA,
@@ -262,6 +325,64 @@ const dataRefs = [
   NO2ENGINE_PANEL_65378,
   NO2ENGINE_PANEL_65376,
   NO2ENGINE_PANEL_65379,
+];
+
+const responseKeys = [
+  "DGPS_GLL",
+  "DGPS_GGA",
+  "DGPS_RMC",
+  "DGPS_VTG",
+  "DGPS_ZDA",
+  "DGPS_GSV",
+  "DGPS_GSA",
+  "GYRO_HDT",
+  "GYRO_ROT",
+  "ANEMOMETER_MWV",
+  "RADAR_RADARSCREEN",
+  "AIS_VDM",
+  "AIS_VDO",
+  "ECDIS_ROUTEINFO",
+  "ECDIS_WAYPOINTS",
+  "ECDIS_RTZ",
+  "ECDIS_ECDISSCREEN",
+  "AUTOPILOT_RSA",
+  "AUTOPILOT_HTD",
+  "SPEEDLOG_VBW",
+  "SPEEDLOG_VHW",
+  "SPEEDLOG_VLW",
+  "CANTHROTTLE_CANONLINESTATE",
+  "CANTHROTTLE_ENGINERPM",
+  "CANTHROTTLE_RUDDER",
+  "CANTHROTTLE_RUDDERSCALE",
+  "AUTOPILOTCONTACT_AUTOPILOTCONTACT",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_61444",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65262",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65263",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65272",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65271",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65253",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65270",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65276",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65360",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_LAMP",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_STATUS",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65378",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65376",
+  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65379",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_61444",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65262",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65263",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65272",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65271",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65253",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65270",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65276",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65360",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_LAMP",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_STATUS",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65378",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65376",
+  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65379",
 ];
 
 const alldataRefs = [
@@ -386,18 +507,18 @@ const loading = ref(true);
 const fetchData = async () => {
   loading.value = true;
   try {
+    const response = await readLossTimeData(tokenid.value);
+    const timeDataRefs = responseKeys.map(key => response[key]);
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
-        const timedata = await readTimeData(tokenid.value);
-
-        await (settingTime.value = timedata.lossTime);
-
         const response = await readlossData(
           tokenid.value,
           endpoint,
           trialNum.value,
-          settingTime.value
+          timeDataRefs[i]
         );
+
+        console.log("time : " + timeDataRefs[i]);
 
         dataRefs[i].value = 0;
         dataRefs[i].value += Number(response.countDelay);

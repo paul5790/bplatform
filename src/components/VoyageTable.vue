@@ -36,7 +36,7 @@
         </v-sheet>
       </template>
       <template v-slot:bottom>
-        <div class="text-center pt-2">
+        <div class="text-center pt-0">
           <v-pagination
             v-model="page"
             :length="pageCount"
@@ -127,6 +127,7 @@ const fetchData = async () => {
       const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+      const storageSizeFloat = parseFloat(response[i].storageSize).toFixed(2);
       newItems.push({
         division: response[i].seatrialId,
         name: response[i].name,
@@ -134,7 +135,7 @@ const fetchData = async () => {
         startdate: response[i].startTimeUtc,
         purpose: response[i].testPurpose,
         location: response[i].navigationArea,
-        storage: response[i].storageSize + "MB",
+        storage: storageSizeFloat + "MB",
         enddate: response[i].endTimeUtc,
         description: response[i].description,
         time: formattedTime,
