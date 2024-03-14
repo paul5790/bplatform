@@ -28,6 +28,7 @@
 <script setup>
 import { computed, ref } from "vue";
 import { readErrorData, createErrorData } from "../../api/index.js";
+import moment from "moment";
 const page = ref(1);
 const itemsPerPage = ref(16);
 
@@ -54,9 +55,10 @@ const fetchData = async () => {
     const response = await readErrorData(tokenid.value);
     console.log(response);
     for (let i = 0; i < response.length; i++) {
+      const koreanTime = moment(response[i].timeStamp).add(9, 'hours').format('YYYY-MM-DD HH:mm:ss');
       items.value.push({
         name: response[i].id || "",
-        utc: response[i].timeStamp || "",
+        utc: koreanTime || "",
         // target: response[i].userGroup || "",
         method: response[i].requestMethod || "",
         state: response[i].statusCode || "",
