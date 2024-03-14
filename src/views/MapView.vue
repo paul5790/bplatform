@@ -98,18 +98,27 @@ onMounted(async () => {
   try {
     const waypointData = await readWaypoint(tokenid.value, props.trial);
     const aisData = await readAis(tokenid.value, props.trial);
-
+    const uniqueWaypoints = new Set();
+    // waypointData의 중복을 제거하고 A에 저장
+    for (let i = 0; i < waypointData.length; i++) {
+      const key = waypointData[i].latitude + "," + waypointData[i].longitude;
+      uniqueWaypoints.add(key);
+    }
+    const uniqueWaypointsArray = Array.from(uniqueWaypoints);
     // 시작점, 끝점
     const startlocation = ref([]);
     const endlocation = ref([]);
 
     // waypoints 설정
     const waypoints = ref([]);
-    for (let i = 0; i < waypointData.length; i++) {
-      waypoints.value.push([
-        waypointData[i].latitude,
-        waypointData[i].longitude,
-      ]);
+
+    for (let i = 0; i < uniqueWaypointsArray.length; i++) {
+      // waypoints.value.push([
+      //   uniqueWaypointsArray[i].latitude,
+      //   uniqueWaypointsArray[i].longitude,
+      // ]);
+      const [latitude, longitude] = uniqueWaypointsArray[i].split(",");
+      waypoints.value.push([latitude, longitude]);
     }
 
     // ais 항적 설정
@@ -137,6 +146,19 @@ onMounted(async () => {
     initializeMap(waypoints, ais, startlocation, endlocation);
   } catch (error) {
     console.error(error);
+    let errorItem = {
+      id: sessionStorage.getItem("userid") || "",
+      requestMethod: error.response ? error.response.config.method : "unknown",
+      requestUrl: error.response ? error.response.request.responseURL : "unknown",
+      statusCode: error.response ? error.response.status : "unknown",
+      log: error.name ? error.name : "no-data",
+    };
+    console.log(errorItem);
+    try {
+      createErrorData(tokenid.value, errorItem);
+    } catch (error) {
+      console.error(error);
+    }
   }
 });
 </script>

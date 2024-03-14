@@ -231,7 +231,7 @@
                         color="primary"
                         indeterminate
                       ></v-progress-circular>
-                      <p style="font-weight: 500; font-size: 20px">loading</p>
+                      <p style="font-weight: 500; font-size: 20px">loading!</p>
                     </div>
                     <div v-if="!lastloading" style="text-align: center">
                       <p style="font-weight: 500; font-size: 20px">
@@ -292,7 +292,7 @@
           >데이터 다운로드 (서버용 테스트)</v-btn
         >
 
-        <v-btn
+        <!-- <v-btn
           :loading="downloadBtnLoading"
           :color="textColor"
           :style="{
@@ -303,16 +303,16 @@
           @click="dataDownload()"
           :disabled="downloadBtnDisabled"
           >데이터 다운로드</v-btn
-        >
+        > -->
       </v-card-actions>
     </div>
     <!-- 데이터 저장중 모달 persistent -->
-    <v-dialog v-model="downloadDialog" max-width="400">
+    <v-dialog v-model="downloadDialog" max-width="300" persistent>
       <v-card>
         <v-card-text>
           <v-row align-content="center" class="fill-height" justify="center">
             <v-col class="text-subtitle-1 text-center" cols="12">
-              Getting your files
+              Getting files
             </v-col>
             <v-col cols="6">
               <v-progress-linear
@@ -327,7 +327,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn
-            color="blue-darken-1"
+            color="blue"
             variant="text"
             @click="(downloadDialog = false), cancleLoading()"
             >취소</v-btn
@@ -412,11 +412,9 @@ const message = ref("데이터가 존재하지 않습니다.");
 const searchstart = ref(false);
 const loading = ref(false);
 const lastloading = ref(false);
-const loadingpercent = ref(0);
 const beforePage = ref("GLL");
 const downloadBtnDisabled = ref(true);
 const downloadBtnLoading = ref(false);
-const downloadBtnLoadingpercent = ref("데이터 다운로드");
 
 // dialog
 const downloadDialog = ref(false);
@@ -582,7 +580,7 @@ const selectedvoyage = ref();
 
 // 시운전 시간 받아오기
 const date_readonly = ref(true);
-const dateRange = ref([new Date(), new Date()]); // 반응적인(ref) 배열로 초기화
+const dateRange = ref(); // 반응적인(ref) 배열로 초기화
 
 const startDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
 const endDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
@@ -605,7 +603,8 @@ const voyageCheck = () => {
   if (selectedvoyage.value === "직접 선택") {
     date_readonly.value = false;
     searchType.value = "period";
-
+    console.log(dateRange.value[0].toISOString());
+    console.log(dateRange.value[1].toISOString());
     let start, end;
     if (
       !isNaN(Date.parse(dateRange.value[0])) &&
@@ -618,8 +617,8 @@ const voyageCheck = () => {
       console.error("Invalid date values in dateRange");
       // 여기에서 적절한 대체 값이나 오류 처리를 추가할 수 있습니다.
     }
-    searchStart.value = start;
-    searchEnd.value = end;
+    // searchStart.value = start;
+    // searchEnd.value = end;
   } else {
     const index = voyage.value.indexOf(selectedvoyage.value);
     date_readonly.value = true;
@@ -725,12 +724,16 @@ let worksheet;
 
 const dataDownloadServer = async () => {
   try {
+    canceling.value = false;
     downloadDialog.value = true;
     downloadBtnLoading.value = true;
+    //searchStart
+    console.log(searchStart.value);
+    console.log(startTime.value);
     let period = ["N/A", "N/A"];
     let seatrial = "N/A";
     if (searchType.value == "period") {
-      period = [startTime.value, endTime.value];
+      period = [searchStart.value, searchEnd.value];
       seatrial = "N/A";
     } else {
       period = ["N/A", "N/A"];
@@ -747,6 +750,15 @@ const dataDownloadServer = async () => {
     console.log(setData);
     const loadData = await downloadDataFile(tokenid.value, setData);
 
+    // 다운로드할 파일 이름 추출
+    const contentDispositionHeader = loadData.headers["content-disposition"];
+    const match = contentDispositionHeader.match(/filename=([^;]+)/);
+    const fileName = match ? match[1] : "downloaded-file";
+
+    console.log(contentDispositionHeader);
+    console.log(match);
+    console.log("File name:", fileName);
+
     // 파일 형식 확인
     const contentType = "application/zip"; // ZIP 파일 형식에 따라 MIME 타입 설정
     const blob = new Blob([loadData.data]);
@@ -756,7 +768,7 @@ const dataDownloadServer = async () => {
     // <a> 태그를 생성하고 다운로드 링크 설정
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "filename.zip"); // 다운로드할 ZIP 파일의 이름 설정
+    link.setAttribute("download", fileName); // 다운로드할 ZIP 파일의 이름 설정
     document.body.appendChild(link);
 
     // 다운로드 링크 클릭하여 파일 다운로드
@@ -765,11 +777,13 @@ const dataDownloadServer = async () => {
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
     downloadBtnLoading.value = false;
+    downloadDialog.value = false;
   } catch (error) {
-    downloadBtnLoading.value == false;
+    downloadBtnLoading.value = false;
+    downloadDialog.value = false;
     if (canceling.value) {
       alert("데이터 다운로드를 취소합니다.");
-      downloadBtnLoading.value == false;
+      downloadBtnLoading.value = false;
       canceling.value = false;
     } else {
       let errorItem = {
@@ -795,7 +809,9 @@ const dataDownloadServer = async () => {
 
 const cancleLoading = () => {
   canceling.value = true;
+  downloadBtnLoading.value = false;
   cancelDownload();
+  //location.reload();
 };
 
 // const dataDownload = async () => {
@@ -880,6 +896,12 @@ const searchData = async() => {
       endTime.value = end.toISOString().slice(0, 19);
 
       await fetchData(variableName); // 초기 데이터 요청
+
+      console.log("dataSetv = " + dataSet.value.length);
+      if (dataSet.value.length <= 0){
+          loading.value = false;
+          lastloading.value = false;
+      }
 
       searchstart.value = true;
       downloadBtnDisabled.value = false;
@@ -974,7 +996,6 @@ const getVariableName = (item) => {
 };
 
 const fetchData = async (data) => {
-  loadingpercent.value = 0.0;
   if (searchType.value == "seatrial") {
     for (let i = 0; i < data.length; i++) {
       try {
@@ -984,6 +1005,8 @@ const fetchData = async (data) => {
           selectedtrialNum.value
         );
         dataSet.value = response;
+
+        const dataheader = ref();
         if (response && response.length > 0) {
           const importantKeys = [
             "seatrial_ID",
@@ -991,38 +1014,31 @@ const fetchData = async (data) => {
             "timestamp_PUBLISH",
             "ship_ID",
           ];
-          const dataheader = ref(
-            [
-              ...importantKeys,
-              ...Object.keys(response[0]).filter(
-                (key) => !importantKeys.includes(key)
-              ),
-            ].map((key) => {
-              let modifiedKey = key;
-              return {
-                title: modifiedKey,
-                align: "start",
-                key,
-                width:
-                  key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
-                    ? 280
-                    : undefined,
-              };
-            })
-          );
-
-          if (dataheader.value == null) { //
-          } else {
-            updateTable();
-            await switchValue(data[i], dataheader, response);
-          }
+          dataheader.value =
+          [
+            ...importantKeys,
+            ...Object.keys(response[0]).filter(
+              (key) => !importantKeys.includes(key)
+            ),
+          ].map((key) => {
+            let modifiedKey = key;
+            return {
+              title: modifiedKey,
+              align: "start",
+              key,
+              width:
+                key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
+                  ? 280
+                  : undefined,
+            };
+          });
+          updateTable();
+          await switchValue(data[i], dataheader, response);
         } else {
+          await switchValue(data[i], dataheader, response);
           updateTable();
         }
-        downloadBtnLoadingpercent.value = ((i + 1) / 1) * 100;
-        if (downloadBtnLoadingpercent.value === 100) {
-          downloadBtnLoadingpercent.value = "데이터 다운로드";
-        }
+
         if (data.length === 1) {
           loading.value = false;
         } else {
@@ -1044,10 +1060,8 @@ const fetchData = async (data) => {
       const content = ref();
       [subComponunt.value, content.value] = upperData.value.split("/");
       try {
-        console.log(tokenid.value,
-          subComponunt.value,
-          content.value,
-          searchStart.value,
+        console.log("이거 잘봐" +
+          searchStart.value + 
           searchEnd.value);
         const response = await readDataDate(
           tokenid.value,
@@ -1058,6 +1072,10 @@ const fetchData = async (data) => {
         );
         
         dataSet.value = response;
+        console.log("response : " + response.length);
+        console.log("dataSet : " + dataSet.value.length);
+
+        const dataheader = ref();
         if (response && response.length > 0) {
           const importantKeys = [
             "seatrial_ID",
@@ -1065,32 +1083,33 @@ const fetchData = async (data) => {
             "timestamp_PUBLISH",
             "ship_ID",
           ];
-          const dataheader = ref(
-            [
-              ...importantKeys,
-              ...Object.keys(response[0]).filter(
-                (key) => !importantKeys.includes(key)
-              ),
-            ].map((key) => {
-              let modifiedKey = key;
-              return {
-                title: modifiedKey,
-                align: "start",
-                key,
-                width:
-                  key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
-                    ? 280
-                    : undefined,
-              };
-            })
-          );
+          dataheader.value = 
+          [
+            ...importantKeys,
+            ...Object.keys(response[0]).filter(
+              (key) => !importantKeys.includes(key)
+            ),
+          ].map((key) => {
+            let modifiedKey = key;
+            return {
+              title: modifiedKey,
+              align: "start",
+              key,
+              width:
+                key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
+                  ? 280
+                  : undefined,
+            };
+          });
           updateTable();
           console.log(data[i]);
           switchValue(data[i], dataheader, response);
         } else {
-          updateTable();
+          switchValue(data[i], dataheader, response);
+          loading.value = false;
+          console.log("로딩오프?" + loading.value);
+          break;
         }
-        loadingpercent.value = ((i / (data.length - 1)) * 100).toFixed(1);
         if (data.length === 1) {
           loading.value = false;
           console.log("1");
@@ -1108,12 +1127,14 @@ const fetchData = async (data) => {
     }
   }
   console.log(loading.value);
+  console.log("로딩오프?" + loading.value);
 };
 
 const updateData = async (data, header, page) => {
   // 미리 보여질 일부 데이터를 설정
   const initialData = data.slice(0 + (page - 1) * 18, 18 + (page - 1) * 18);
   headerName.value = header;
+  console.log("설마 여기서? : " + initialData);
   dataSet.value = initialData;
 };
 

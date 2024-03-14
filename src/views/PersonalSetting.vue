@@ -187,6 +187,7 @@
                     persistent-hint
                     v-model="newpwcheck"
                     @click:append-inner="visible = !visible"
+                    @keyup.enter="passwordOK()"
                     required
                   ></v-text-field>
                 </v-col>
@@ -283,6 +284,7 @@
                           label="NO.2ENGINEPANEL"
                           value="NO.2ENGINEPANEL"
                         ></v-radio>
+                        <v-radio label="ALL DATA" value="ALL DATA"></v-radio>
                       </v-radio-group>
                     </v-card-item>
                   </v-card>
@@ -1389,6 +1391,29 @@
                           <v-col cols="1"> </v-col>
                         </v-row>
                       </v-sheet>
+                      <v-sheet v-if="selectRadio === 'ALL DATA'">
+                        <!-- RADARSCREEN -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.ALL.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="4">
+                            <v-list-subheader>
+                              <v-btn @click="updateTenRefs()" color="blue-grey-lighten-4" style="height: 55px; font-size: 12px">
+                                Change All Data
+                              </v-btn>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                      </v-sheet>
                     </v-card-item>
                   </v-card>
                 </v-sheet>
@@ -1500,6 +1525,7 @@ const realtime = ref();
 // 데이터 소실주기 시간
 const selectRadio = ref("DGPS");
 const timeRefs = {
+  ALL: ref(10),
   GLL: ref(),
   GGA: ref(),
   RMC: ref(),
@@ -1714,6 +1740,12 @@ const updateTimeRefs = async () => {
   };
   await updateLossTimeData(tokenid.value, data);
   setTimeRefs();
+};
+
+const updateTenRefs = () => {
+  Object.values(timeRefs).forEach(refObj => {
+    refObj.value = timeRefs.ALL.value; // 10의 상수값을 넣으려면 이 부분을 수정
+  });
 };
 
 onMounted(() => {

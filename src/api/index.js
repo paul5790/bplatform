@@ -1,10 +1,10 @@
 // src/api/index.js
 import axios from "axios";
 
-const apiLocation = "192.168.0.50:8080";
+const apiLocation = "192.168.0.44:9999";
 
 // 취소 토큰 생성
-const cancelTokenSource = axios.CancelToken.source();
+let cancelTokenSource = axios.CancelToken.source();
 
 // 로그인
 export const checkLogin = async (data) => {
@@ -41,8 +41,6 @@ export const createMineData = async (data) => {
     throw error;
   }
 };
-
-
 
 // 개인정보 가져오기
 export const readMineData = async (tokenid) => {
@@ -128,9 +126,6 @@ export const resetPassword = async (tokenid, data) => {
   }
 };
 
-
-
-
 // 사용자 데이터 받아오기
 export const readUserData = async (tokenid) => {
   try {
@@ -194,7 +189,6 @@ export const deleteUserData = async (tokenid, data) => {
   }
 };
 
-
 // 에러 로그 가져오기
 export const readErrorData = async (tokenid) => {
   try {
@@ -236,7 +230,6 @@ export const createErrorData = async (tokenid, data) => {
     throw error;
   }
 };
-
 
 // 실시간 데이터 주기
 export const updateSetTime = async (tokenid, data) => {
@@ -343,9 +336,13 @@ export const readLampTimeData = async (tokenid) => {
   }
 };
 
-
 // 데이터 소실 빈도 확인
-export const readlossData = async (tokenid, endpoint, trialnum, settingtime) => {
+export const readlossData = async (
+  tokenid,
+  endpoint,
+  trialnum,
+  settingtime
+) => {
   try {
     const response = await axios.post(
       `http://${apiLocation}/info/lossdata/${endpoint}/${trialnum}/${settingtime}`,
@@ -364,9 +361,6 @@ export const readlossData = async (tokenid, endpoint, trialnum, settingtime) => 
     throw error;
   }
 };
-
-
-
 
 // 항차 데이터 가져오기
 export const readTrialData = async (tokenid) => {
@@ -452,8 +446,6 @@ export const deleteTrialData = async (tokenid, data) => {
   }
 };
 
-
-
 // 데이터 조회하기 (항차)
 export const readDataTrial = async (tokenid, data, selectedtrialNum) => {
   try {
@@ -506,10 +498,8 @@ export const readDataDate = async (
   }
 };
 
-// 데이터 조회하기 (날짜)
-export const downloadDataFile = async (
-  tokenid, data
-) => {
+// 데이터 다운로드
+export const downloadDataFile = async (tokenid, data) => {
   try {
     const response = await axios.post(
       `http://${apiLocation}/data/download`,
@@ -531,13 +521,32 @@ export const downloadDataFile = async (
   }
 };
 
-
-
 // (Echart 도넛) 전체 데이터 저장 용량 비교
 export const readDataStorage = async (tokenid) => {
   try {
     const response = await axios.post(
       `http://${apiLocation}/info/storage/table`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+// (Echart 도넛) 항차별 데이터 저장 용량 비교
+export const readDataTrialStorage = async (tokenid, trialnum) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/info/storage/subcomp/${trialnum}`,
       {},
       {
         headers: {
@@ -574,8 +583,6 @@ export const serverStorage = async (tokenid) => {
     throw error;
   }
 };
-
-
 
 // 웨이포인트 가져오기
 export const readWaypoint = async (tokenid, trial) => {
@@ -619,10 +626,9 @@ export const readAis = async (tokenid, trial) => {
   }
 };
 
-
-
-
 // 요청 취소 함수
 export const cancelDownload = () => {
-  cancelTokenSource.cancel('요청이 사용자에 의해 취소되었습니다.');
+  cancelTokenSource.cancel("요청이 사용자에 의해 취소되었습니다.");
+  // 새로운 cancelTokenSource 생성
+  cancelTokenSource = axios.CancelToken.source();
 };

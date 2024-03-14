@@ -221,6 +221,7 @@
                                 type="text"
                                 :rules="rules1.description"
                                 maxlength="25"
+                                @keyup.enter="waitStart()"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -416,6 +417,7 @@
                                 style="margin-bottom: 5px"
                                 :rules="rules1.description"
                                 maxlength="25"
+                                @keyup.enter="editData()"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -588,6 +590,7 @@
                                 style="margin-bottom: 35px"
                                 :rules="rules1.description"
                                 maxlength="25"
+                                @keyup.enter="changeData()"
                               ></v-text-field>
                             </v-col>
                           </v-row>
@@ -684,6 +687,26 @@
         </v-data-table>
       </v-card-item>
     </v-card>
+    <!-- 데이터 저장중 모달 persistent -->
+    <v-dialog v-model="loadDialog" max-width="300" height="100" persistent>
+      <v-card>
+        <v-card-text>
+          <v-row align-content="center" class="fill-height" justify="center">
+            <v-col class="text-subtitle-1 text-center mt-3" cols="12">
+              Processing settings
+            </v-col>
+            <v-col cols="6">
+              <v-progress-linear
+                color="blue"
+                height="6"
+                indeterminate
+                rounded
+              ></v-progress-linear>
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
     <v-overlay
       v-model="overlay"
       contained
@@ -713,6 +736,9 @@ import {
   darkbtn,
   lightbtn,
 } from "../../color/color.js";
+
+// loaddialog
+const loadDialog = ref(false);
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
 
@@ -993,7 +1019,8 @@ const waitStart = () => {
 
 // 종료하기 후 저장
 const startData = async () => {
-  overlay.value = true;
+  //overlay.value = true;
+  loadDialog.value = true;
   dialog1_1.value = false;
   sessionStorage.setItem("startstate", "false");
   startstate.value = false;
@@ -1105,7 +1132,8 @@ const editData = async () => {
       alert("선택된 날짜에 항차가 이미 존재합니다.");
     } else {
       try {
-        overlay.value = true;
+        //overlay.value = true;
+        loadDialog.value = true;
         dialog2.value = false;
         const division = sessionStorage.getItem("division") || null;
         const data = {
@@ -1169,7 +1197,8 @@ const editData = async () => {
 
 // 수정하기
 const changeData = async () => {
-  overlay.value = true;
+  loadDialog.value = true;
+  //overlay.value = true;
   dialog3.value = false;
   const startDate = new Date(selectedstartdate.value);
   const endDate = new Date(selectedenddate.value);
@@ -1231,7 +1260,6 @@ const changeData = async () => {
           await updateTrialData(tokenid.value, data);
 
           alert("선택된 항차의 수정이 완료되었습니다.");
-          overlay.value = false;
           nullDialog3();
           location.reload();
         } catch (error) {
@@ -1280,7 +1308,8 @@ const changeData = async () => {
 
 // 삭제하기
 const deleteData = async () => {
-  overlay.value = true;
+  loadDialog.value = true;
+  //overlay.value = true;
   overlayemit(true);
   dialog4.value = false;
   const data = {
@@ -1371,6 +1400,9 @@ const fetchData = async () => {
           i
         ].endTimeUtc.slice(0, 19)}`
       );
+      const size = parseFloat(response[i].storageSize).toFixed(1);
+      const startUtc = (response[i].startTimeUtc).substring(0, 22);
+      const endUtc = (response[i].endTimeUtc).substring(0, 22);
       const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
@@ -1379,11 +1411,11 @@ const fetchData = async () => {
         division: response[i].seatrialId,
         name: response[i].name,
         shipid: response[i].shipId,
-        startdate: response[i].startTimeUtc,
+        startdate: startUtc + "Z",
         purpose: response[i].testPurpose,
         location: response[i].navigationArea,
-        storage: response[i].storageSize + "MB",
-        enddate: response[i].endTimeUtc,
+        storage: size + "MB",
+        enddate: endUtc + "Z",
         description: response[i].description,
         time: formattedTime,
       });

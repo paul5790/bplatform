@@ -497,20 +497,20 @@ const processData = (data, timestampKey, dataKey, unitValue, contentsItemValue, 
 };
 
 const searchData = async () => {
-  nodata.value = true;
-  loading.value = true;
-  first.value = false;
-
-  try {
-    analysisData.value = [];
-    analysisTime.value = [];
-
-    if (selectedsubComponent.value !== null &&
+  if (selectedsubComponent.value !== null &&
       selectedItem.value !== null &&
       selectedtrialrun.value !== null
-    ) {
+  ) {
+    nodata.value = true;
+    loading.value = true;
+    first.value = false;
+
+    try {
+      analysisData.value = [];
+      analysisTime.value = [];
+
       const [gga, vtg, hdt, rot, mwv, vhw, rsa, engine_SPEED,engine_OIL_TEMPERATURE1,engine_OIL_PRESSURE,transmission_OIL_PRESSURE,charging_SYSTEM_POTENTIAL,engine_TOTAL_HOURS,engine_INTAKE_MANIFOLD_NO1_PRESSURE,fuel_LEVEL_1,
-    engine_SPEED2,engine_OIL_TEMPERATURE2,engine_OIL_PRESSURE2,transmission_OIL_PRESSURE2,charging_SYSTEM_POTENTIAL2,engine_TOTAL_HOURS2,engine_INTAKE_MANIFOLD_NO1_PRESSURE2,fuel_LEVEL_2,] = await Promise.all([
+      engine_SPEED2,engine_OIL_TEMPERATURE2,engine_OIL_PRESSURE2,transmission_OIL_PRESSURE2,charging_SYSTEM_POTENTIAL2,engine_TOTAL_HOURS2,engine_INTAKE_MANIFOLD_NO1_PRESSURE2,fuel_LEVEL_2,] = await Promise.all([
         fetchData("DGPS", "GGA", selectedItem.value === "위도" || selectedItem.value === "경도" ? "latitude,longitude" : "altitude", selectedtrialNum.value, startDate2.value, endDate2.value),
         fetchData("DGPS", "VTG", selectedItem.value === "SOG" || selectedItem.value === "COG" ? "speedovergroundknots,courseovergrounddegreestrue" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
         fetchData("GYRO", "HDT", selectedItem.value === "Heading" ? "heading" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
@@ -651,178 +651,181 @@ const searchData = async () => {
           processData(fuel_LEVEL_2, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no2engine_panel_65276/Fuel Level", "fuel_LEVEL");
           break;
       }
-    }
-    const datasetRaw2 = ref([["time", "value"]]);
-      datasetRaw2.value = [];
-      for (let i = 0; i <= analysisTime.value.length; i++) {
-        datasetRaw2.value.push([
-          analysisTime.value[i + 1],
-          analysisData.value[i],
-        ]);
-      }
-      if (analysisTime.value.length <= 0) {
-        nodata.value = true;
-        loading.value = false;
-      } else {
-        nodata.value = false;
-      }
-      console.log(`ROW2: ${datasetRaw2.value}`);
-
-      option.value = {
-        dataset: [
-          {
-            id: "dataset_raw",
-            source: datasetRaw2.value,
-          },
-        ],
-        tooltip: {
-          trigger: "axis",
-          formatter: function (params) {
-            params = params[0];
-            return `Time: ${params.value[0]}, Value: ${params.value[1]}`;
-          },
-          axisPointer: {
-            animation: false,
-          },
-        },
-        dataZoom: [
-          {
-            show: true,
-            realtime: true,
-            start: 0,
-            end: 100,
-            xAxisIndex: [0, 1],
-            height: "2%",
-          },
-        ],
-        xAxis: {
-          type: "category",
-          nameLocation: "middle",
-          data: analysisTime.value, // x축 데이터를 times 배열로 설정
-          axisLabel: {
-            color: textColor.value, // 텍스트 색상을 흰색으로 설정
-          },
-        },
-        yAxis: {},
-        series: [
-          {
-            type: "line",
-            datasetId: "dataset_raw",
-            showSymbol: false,
-            markPoint: {
-              data: [
-                { type: "max", name: "Max" },
-                { type: "min", name: "Min" },
-              ],
-            },
-            encode: {
-              x: "time",
-              y: "value",
-              itemName: "time",
-              tooltip: ["value"],
-            },
-          },
-        ],
-      };
-
-      const minValue = ref(); // 최솟값
-      const maxValue = ref(); // 최댓값
-      const averageValue = ref(); // 평균값
-      const standardDeviation = ref(); // 표준편차
-      const rms = ref(); // 제곱평균제곱근
-      const median = ref(); // 중앙값
-      const standardError = ref(); // 표준오차
-      const variance = ref();
-      const numericValues = analysisData.value
-        .map((value) => Number(value))
-        .filter((value) => !isNaN(value));
-
-      console.log( "통계:", analysisData.value); // if(analysisData)
-
-      if (numericValues.length > 1) {
-        // 최솟값 구하기
-        minValue.value = Math.min(...analysisData.value);
-
-        // 최댓값 구하기
-        maxValue.value = Math.max(...analysisData.value);
-        // 평균 계산sortedValues
-        const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
-        averageValue.value = sum.value / numericValues.length;
-
-        // 표준편차 계산
-        const squaredDifferences = ref(
-          numericValues.map((value) => Math.pow(value - averageValue.value, 2))
-        );
-        const sumOfSquaredDifferences = squaredDifferences.value.reduce(
-          (acc, value) => acc + value,
-          0
-        );
-        variance.value = sumOfSquaredDifferences / numericValues.length;
-        standardDeviation.value = Math.sqrt(variance.value);
-
-        // 제곱평균제곱근(RMS) 계산
-        const sumOfSquares = ref(
-          numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
-        );
-        rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
-
-        // 중앙값 계산
-        const sortedValues = numericValues.sort((a, b) => a - b);
-        const mid = ref(Math.floor(sortedValues.length / 2));
-
-        if (sortedValues.length % 2 === 0) {
-          // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
-          median.value =
-            (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
-          console.log("짝수");
-        } else {
-          // 홀수일 경우 중간 값이 중앙값
-          median.value = sortedValues[mid.value];
-          console.log("홀수");
+      
+      const datasetRaw2 = ref([["time", "value"]]);
+        datasetRaw2.value = [];
+        for (let i = 0; i <= analysisTime.value.length; i++) {
+          datasetRaw2.value.push([
+            analysisTime.value[i + 1],
+            analysisData.value[i],
+          ]);
         }
-        // 표준 오차 계산
-        standardError.value =
-          standardDeviation.value / Math.sqrt(numericValues.length);
-      } else {
-        alert("..")
-        averageValue.value = 0;
-        standardDeviation.value = 0;
-        rms.value = 0;
-        median.value = 0;
-        standardError.value = 0;
-      }
-      analysis.value[0].unit = unit.value;
-      console.log(`Minimum Value: ${minValue.value}`); // 최솟값
-      analysis.value[0].min = minValue.value.toFixed(4);
-      console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
-      analysis.value[0].max = maxValue.value.toFixed(4);
-      console.log(`Average Value: ${averageValue.value}`); // 평균값
-      analysis.value[0].average = averageValue.value.toFixed(4);
-      console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
-      analysis.value[0].rmse = standardDeviation.value.toFixed(4);
-      console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
-      analysis.value[0].rms = rms.value.toFixed(4);
-      console.log(`Median: ${median.value}`); // 중앙값
-      analysis.value[0].median = median.value.toFixed(4);
-      console.log(`Standard Error: ${standardError.value}`); // 표준 오차
-      analysis.value[0].error = standardError.value.toFixed(4);
-      console.log(`Variance: ${variance.value}`); // 분산
-      analysis.value[0].variance = variance.value.toFixed(4);
+        if (analysisTime.value.length <= 0) {
+          nodata.value = true;
+          loading.value = false;
+        } else {
+          nodata.value = false;
+        }
+        console.log(`ROW2: ${datasetRaw2.value}`);
 
-      console.log(`NaN Check: ${analysisData.value.some(isNaN)}`);
-      console.log(`Empty Value Check: ${analysisData.value.includes("")}`);
-      console.log(
-        `Undefined Value Check: ${analysisData.value.includes(undefined)}`
-      );
-      console.log(
-        `Non-numeric Value Check: ${analysisData.value.some(
-          (value) => typeof value !== "number" || isNaN(value)
-        )}`
-      );
-  } catch (error) {
-    console.error(error);
-  } finally {
-    loading.value = false;
+        option.value = {
+          dataset: [
+            {
+              id: "dataset_raw",
+              source: datasetRaw2.value,
+            },
+          ],
+          tooltip: {
+            trigger: "axis",
+            formatter: function (params) {
+              params = params[0];
+              return `Time: ${params.value[0]}, Value: ${params.value[1]}`;
+            },
+            axisPointer: {
+              animation: false,
+            },
+          },
+          dataZoom: [
+            {
+              show: true,
+              realtime: true,
+              start: 0,
+              end: 100,
+              xAxisIndex: [0, 1],
+              height: "2%",
+            },
+          ],
+          xAxis: {
+            type: "category",
+            nameLocation: "middle",
+            data: analysisTime.value, // x축 데이터를 times 배열로 설정
+            axisLabel: {
+              color: textColor.value, // 텍스트 색상을 흰색으로 설정
+            },
+          },
+          yAxis: {},
+          series: [
+            {
+              type: "line",
+              datasetId: "dataset_raw",
+              showSymbol: false,
+              markPoint: {
+                data: [
+                  { type: "max", name: "Max" },
+                  { type: "min", name: "Min" },
+                ],
+              },
+              encode: {
+                x: "time",
+                y: "value",
+                itemName: "time",
+                tooltip: ["value"],
+              },
+            },
+          ],
+        };
+
+        const minValue = ref(); // 최솟값
+        const maxValue = ref(); // 최댓값
+        const averageValue = ref(); // 평균값
+        const standardDeviation = ref(); // 표준편차
+        const rms = ref(); // 제곱평균제곱근
+        const median = ref(); // 중앙값
+        const standardError = ref(); // 표준오차
+        const variance = ref();
+        const numericValues = analysisData.value
+          .map((value) => Number(value))
+          .filter((value) => !isNaN(value));
+
+        console.log( "통계:", analysisData.value); // if(analysisData)
+
+        if (numericValues.length > 1) {
+          // 최솟값 구하기
+          minValue.value = Math.min(...analysisData.value);
+
+          // 최댓값 구하기
+          maxValue.value = Math.max(...analysisData.value);
+          // 평균 계산sortedValues
+          const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
+          averageValue.value = sum.value / numericValues.length;
+
+          // 표준편차 계산
+          const squaredDifferences = ref(
+            numericValues.map((value) => Math.pow(value - averageValue.value, 2))
+          );
+          const sumOfSquaredDifferences = squaredDifferences.value.reduce(
+            (acc, value) => acc + value,
+            0
+          );
+          variance.value = sumOfSquaredDifferences / numericValues.length;
+          standardDeviation.value = Math.sqrt(variance.value);
+
+          // 제곱평균제곱근(RMS) 계산
+          const sumOfSquares = ref(
+            numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
+          );
+          rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
+
+          // 중앙값 계산
+          const sortedValues = numericValues.sort((a, b) => a - b);
+          const mid = ref(Math.floor(sortedValues.length / 2));
+
+          if (sortedValues.length % 2 === 0) {
+            // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
+            median.value =
+              (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
+            console.log("짝수");
+          } else {
+            // 홀수일 경우 중간 값이 중앙값
+            median.value = sortedValues[mid.value];
+            console.log("홀수");
+          }
+          // 표준 오차 계산
+          standardError.value =
+            standardDeviation.value / Math.sqrt(numericValues.length);
+        } else {
+          alert("데이터가 존재하지 않습니다.")
+          averageValue.value = 0;
+          standardDeviation.value = 0;
+          rms.value = 0;
+          median.value = 0;
+          standardError.value = 0;
+        }
+        analysis.value[0].unit = unit.value;
+        console.log(`Minimum Value: ${minValue.value}`); // 최솟값
+        analysis.value[0].min = minValue.value.toFixed(4);
+        console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
+        analysis.value[0].max = maxValue.value.toFixed(4);
+        console.log(`Average Value: ${averageValue.value}`); // 평균값
+        analysis.value[0].average = averageValue.value.toFixed(4);
+        console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
+        analysis.value[0].rmse = standardDeviation.value.toFixed(4);
+        console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
+        analysis.value[0].rms = rms.value.toFixed(4);
+        console.log(`Median: ${median.value}`); // 중앙값
+        analysis.value[0].median = median.value.toFixed(4);
+        console.log(`Standard Error: ${standardError.value}`); // 표준 오차
+        analysis.value[0].error = standardError.value.toFixed(4);
+        console.log(`Variance: ${variance.value}`); // 분산
+        analysis.value[0].variance = variance.value.toFixed(4);
+
+        console.log(`NaN Check: ${analysisData.value.some(isNaN)}`);
+        console.log(`Empty Value Check: ${analysisData.value.includes("")}`);
+        console.log(
+          `Undefined Value Check: ${analysisData.value.includes(undefined)}`
+        );
+        console.log(
+          `Non-numeric Value Check: ${analysisData.value.some(
+            (value) => typeof value !== "number" || isNaN(value)
+          )}`
+        );
+    } catch (error) {
+      console.error(error);
+    } finally {
+      loading.value = false;
+    }
+  }else{
+    alert("선택항목을 선택해주세요.")
   }
 };
 const datasetRaw = ref([["time", "value"]]);

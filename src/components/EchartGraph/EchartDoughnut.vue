@@ -29,7 +29,12 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, watch, onMounted } from "vue";
-import { readTrialData, readDataStorage } from "../../api/index.js";
+import {
+  readTrialData,
+  readDataStorage,
+  readDataTrialStorage,
+  createErrorData,
+} from "../../api/index.js";
 import { darkText, lightText } from "../../color/color.js";
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
@@ -65,76 +70,154 @@ const NO1ENGINEPANEL = ref({ value: 0, name: "NO.1ENGINEPANEL" });
 const NO2ENGINEPANEL = ref({ value: 0, name: "NO.2ENGINEPANEL" });
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
+const trialNum = ref(0);
 
-const fetchData = async () => {
+watch(selectedtrialNum, (newTrialNum) => {
+  // 항차 N번에서 N 추출
+  AIS.value.value = 0;
+  GYRO.value.value = 0;
+  ANEMOMETER.value.value = 0;
+  RADAR.value.value = 0;
+  DGPS.value.value = 0;
+  ECDIS.value.value = 0;
+  AUTOPILOT.value.value = 0;
+  SPEEDLOG.value.value = 0;
+  Canthrottle.value.value = 0;
+  AUTOPILOTCONTACT.value.value = 0;
+  NO1ENGINEPANEL.value.value = 0;
+  NO2ENGINEPANEL.value.value = 0;
+
+  if (newTrialNum != "전체") {
+    const num = parseInt(newTrialNum.match(/\d+/)[0]);
+    fetchTrialData(num);
+  } else {
+    fetchAllData();
+  }
+  // const num = parseInt(newTrialNum.match(/\d+/)[0]);
+  // trialNum.value = num;
+  // fetchData();
+});
+
+const fetchAllData = async () => {
   try {
     const data = await readDataStorage(tokenid.value);
-
-    data.forEach((item) => {
-      // Extracting the prefix before the underscore
-      const prefix = item.tableName.split("_")[0];
-
-      // Adding dataLength to the corresponding variable based on the prefix
-      switch (prefix) {
-        case "ais":
-          AIS.value.value += Number(item.tableSize);
-          break;
-        case "gyro":
-          GYRO.value.value += Number(item.tableSize);
-          break;
-        case "anemometer":
-          ANEMOMETER.value.value += Number(item.tableSize);
-          break;
-        case "radar":
-          RADAR.value.value += Number(item.tableSize);
-          break;
-        case "dgps":
-          DGPS.value.value += Number(item.tableSize);
-          break;
-        case "ecdis":
-          ECDIS.value.value += Number(item.tableSize);
-          break;
-        case "autopilot":
-          AUTOPILOT.value.value += Number(item.tableSize);
-          break;
-        case "speedlog":
-          SPEEDLOG.value.value += Number(item.tableSize);
-          break;
-        case "canthrottle":
-          Canthrottle.value.value += Number(item.tableSize);
-          break;
-        case "autopilotcontact":
-          AUTOPILOTCONTACT.value.value += Number(item.tableSize);
-          break;
-        case "no1enginepanel":
-          NO1ENGINEPANEL.value.value += Number(item.tableSize);
-          break;
-        case "no2enginepanel":
-          NO2ENGINEPANEL.value.value += Number(item.tableSize);
-          break;
-      }
-    });
-
-    // Log the calculated values
-    console.log("AIS:", AIS.value);
-    console.log("GYRO:", GYRO.value);
-    console.log("ANEMOMETER:", ANEMOMETER.value);
-    console.log("RADAR:", RADAR.value);
-    console.log("DGPS:", DGPS.value);
-    console.log("ECDIS:", ECDIS.value);
-    console.log("AUTOPILOT:", AUTOPILOT.value);
-    console.log("SPEEDLOG:", SPEEDLOG.value);
-    console.log("NO.1ENGINEPANEL:", NO1ENGINEPANEL.value);
-    console.log("NO.2ENGINEPANEL:", NO2ENGINEPANEL.value);
+    dataFilter(data);
   } catch (error) {
     console.error(error);
+    errorLog(error);
   }
+};
+
+const fetchTrialData = async (trialnum) => {
+  try {
+    const data = await readDataTrialStorage(tokenid.value, trialnum);
+    dataFilter1(data);
+  } catch (error) {
+    console.error(error);
+    errorLog(error);
+  }
+};
+
+const dataFilter1 = (data) => {
+  Object.keys(data).forEach((key) => {
+    // Extracting the prefix before the underscore
+    const prefix = key.split("_")[0];
+    //console.log("prefix = " + prefix);
+    //console.log("value = " + data[key]);
+    const compValue = Number(data[key]);
+
+    switch (prefix) {
+      case "ais":
+        AIS.value.value = (Number(AIS.value.value) + compValue).toFixed(2);
+        break;
+      case "gyro":
+        GYRO.value.value = (Number(GYRO.value.value) + compValue).toFixed(2);
+        break;
+      case "anemometer":
+        ANEMOMETER.value.value = (Number(ANEMOMETER.value.value) + compValue).toFixed(2);
+        break;
+      case "radar":
+        RADAR.value.value = (Number(RADAR.value.value) + compValue).toFixed(2);
+        break;
+      case "dgps":
+        DGPS.value.value = (Number(DGPS.value.value) + compValue).toFixed(2);
+        break;
+      case "ecdis":
+        ECDIS.value.value = (Number(ECDIS.value.value) + compValue).toFixed(2);
+        break;
+      case "autopilot":
+        AUTOPILOT.value.value = (Number(AUTOPILOT.value.value) + compValue).toFixed(2);
+        break;
+      case "speedlog":
+        SPEEDLOG.value.value = (Number(SPEEDLOG.value.value) + compValue).toFixed(2);
+        break;
+      case "canthrottle":
+        Canthrottle.value.value = (Number(Canthrottle.value.value) + compValue).toFixed(2);
+        break;
+      case "autopilotcontact":
+        AUTOPILOTCONTACT.value.value = (Number(AUTOPILOTCONTACT.value.value) + compValue).toFixed(2);
+        break;
+      case "no1ENGINEPANEL":
+        NO1ENGINEPANEL.value.value = (Number(NO1ENGINEPANEL.value.value) + compValue).toFixed(2);
+        break;
+      case "no2ENGINEPANEL":
+        NO2ENGINEPANEL.value.value = (Number(NO2ENGINEPANEL.value.value) + compValue).toFixed(2);
+        break;
+    }
+  });
+};
+
+const dataFilter = (data) => {
+  data.forEach((item) => {
+    // Extracting the prefix before the underscore
+    const prefix = item.tableName.split("_")[0];
+
+    // Adding dataLength to the corresponding variable based on the prefix
+    switch (prefix) {
+      case "ais":
+        AIS.value.value += Number(item.tableSize);
+        break;
+      case "gyro":
+        GYRO.value.value += Number(item.tableSize);
+        break;
+      case "anemometer":
+        ANEMOMETER.value.value += Number(item.tableSize);
+        break;
+      case "radar":
+        RADAR.value.value += Number(item.tableSize);
+        break;
+      case "dgps":
+        DGPS.value.value += Number(item.tableSize);
+        break;
+      case "ecdis":
+        ECDIS.value.value += Number(item.tableSize);
+        break;
+      case "autopilot":
+        AUTOPILOT.value.value += Number(item.tableSize);
+        break;
+      case "speedlog":
+        SPEEDLOG.value.value += Number(item.tableSize);
+        break;
+      case "canthrottle":
+        Canthrottle.value.value += Number(item.tableSize);
+        break;
+      case "autopilotcontact":
+        AUTOPILOTCONTACT.value.value += Number(item.tableSize);
+        break;
+      case "no1enginepanel":
+        NO1ENGINEPANEL.value.value += Number(item.tableSize);
+        break;
+      case "no2enginepanel":
+        NO2ENGINEPANEL.value.value += Number(item.tableSize);
+        break;
+    }
+  });
 };
 
 const getTrialDate = async () => {
   try {
     const response = await readTrialData(tokenid.value);
-    trialrun.value.push('전체');
+    trialrun.value.push("전체");
     for (let i = 0; i < response.length; i++) {
       trialrun.value.push(`항차 ${i + 1}번`);
       selectedtrialNum.value = trialrun.value[0];
@@ -144,7 +227,7 @@ const getTrialDate = async () => {
   }
 };
 onMounted(getTrialDate);
-fetchData();
+fetchAllData();
 
 use([
   CanvasRenderer,
@@ -158,7 +241,7 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "전체 데이터 저장 용량",
+    text: "항차 별 데이터 저장 용량",
     left: "center",
     textStyle: {
       fontSize: 19, // 폰트 크기 설정
@@ -216,6 +299,22 @@ const option = ref({
     },
   ],
 });
+
+const errorLog = (error) => {
+  let errorItem = {
+    id: sessionStorage.getItem("userid") || "",
+    requestMethod: error.response ? error.response.config.method : "unknown",
+    requestUrl: error.response ? error.response.request.responseURL : "unknown",
+    statusCode: error.response ? error.response.status : "unknown",
+    log: error.name ? error.name : "unknown",
+  };
+  try {
+    createErrorData(tokenid.value, errorItem);
+    alert("데이터 오류");
+  } catch (error) {
+    console.error(error);
+  }
+};
 </script>
 
 <style scoped>
@@ -238,7 +337,3 @@ body {
   right: 0;
 }
 </style>
-
-
-
-

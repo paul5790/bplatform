@@ -503,7 +503,10 @@ const axioslist = ref([
 
 const settingTime = ref(5);
 
+// 로딩
 const loading = ref(true);
+
+
 const fetchData = async () => {
   loading.value = true;
   try {

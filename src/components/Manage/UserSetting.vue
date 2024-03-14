@@ -195,6 +195,35 @@
         </v-data-table>
       </v-card-item>
     </v-card>
+    <!-- 데이터 저장중 모달 persistent -->
+    <v-dialog v-model="loadDialog" max-width="400">
+      <v-card>
+        <v-card-text>
+          <v-row align-content="center" class="fill-height" justify="center">
+            <v-col class="text-subtitle-1 text-center" cols="12">
+              loading...
+            </v-col>
+            <v-col cols="6">
+              <v-progress-linear
+                color="deep-purple-accent-4"
+                height="6"
+                indeterminate
+                rounded
+              ></v-progress-linear>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue-darken-1"
+            variant="text"
+            @click="(loadDialog = false), cancleLoading()"
+            >취소</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-sheet>
 </template>
 
@@ -230,6 +259,9 @@ const dialog = ref(false);
 const dialog2 = ref(false);
 const page = ref(1);
 const itemsPerPage = ref(13);
+
+// load dialog
+const loadDialog = ref(false);
 
 const selectedId = ref();
 const selecteduserName = ref();
