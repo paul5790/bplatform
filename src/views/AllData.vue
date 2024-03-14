@@ -2085,13 +2085,30 @@ const sortData = (data, sortByKey, sortOrder) => {
     const valueA = a[sortByKey];
     const valueB = b[sortByKey];
 
-    if (sortOrder === "asc") {
-      return valueA.localeCompare(valueB);
-    } else if (sortOrder === "desc") {
-      return valueB.localeCompare(valueA);
+    // 숫자로 변환 가능한지 체크
+    const numA = parseFloat(valueA);
+    const numB = parseFloat(valueB);
+
+    // 숫자로 변환 가능한 경우
+    if (valueA == numA && valueB == numB) {
+      console.log("숫자");
+      if (sortOrder === "asc") {
+        return numA - numB;
+      } else if (sortOrder === "desc") {
+        return numB - numA;
+      }
     } else {
-      return 0; // 정렬 순서가 지정되지 않은 경우, 기본적으로 정렬하지 않음
+      console.log("문자");
+      // 숫자로 변환 불가능한 경우, 문자열로 정렬
+      if (sortOrder === "asc") {
+        return valueA.localeCompare(valueB);
+      } else if (sortOrder === "desc") {
+        return valueB.localeCompare(valueA);
+      }
     }
+
+    // 기본적으로 정렬하지 않음
+    return 0;
   });
 };
 </script>
