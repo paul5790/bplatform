@@ -488,7 +488,7 @@ const fetchEngineData = async (url, component, type, item, trialNum, startDate, 
 
 const processData = (data, timestampKey, dataKey, unitValue, contentsItemValue, analysisName) => {
   analysisData.value = data.map(item => item[dataKey]);
-  analysisTime.value = data.map(item => item[timestampKey].slice(8, 19));
+  analysisTime.value = data.map(item => item[timestampKey].slice(0, 19));
   unit.value = unitValue;
   selectedcontentsItem.value = contentsItemValue;
   analysis.value[0].name = analysisName;
@@ -668,6 +668,27 @@ const searchData = async () => {
         }
         console.log(`ROW2: ${datasetRaw2.value}`);
 
+        console.log("analysisTime.value : " + analysisTime.value);
+
+        analysisTime.value.sort((a, b) => {
+          // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+          const timeA = new Date(a);
+          const timeB = new Date(b);
+          return timeA - timeB;
+        });
+
+        console.log("analysisTime.value2 : " + analysisTime.value);
+
+        datasetRaw2.value.sort((a, b) => {
+          // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+          const timeA = new Date(a[0]);
+          const timeB = new Date(b[0]);
+          return timeA - timeB;
+        });
+        
+
+        console.log(`Sorted ROW2: ${datasetRaw2.value}`);
+
         option.value = {
           dataset: [
             {
@@ -809,14 +830,14 @@ const searchData = async () => {
         console.log(`Variance: ${variance.value}`); // 분산
         analysis.value[0].variance = variance.value.toFixed(4);
 
-        console.log(`NaN Check: ${analysisData.value.some(isNaN)}`);
-        console.log(`Empty Value Check: ${analysisData.value.includes("")}`);
+        console.log(`NaN Check: ${analysisData.value.some(isNaN)}`); //f
+        console.log(`Empty Value Check: ${analysisData.value.includes("")}`); //t
         console.log(
-          `Undefined Value Check: ${analysisData.value.includes(undefined)}`
+          `Undefined Value Check: ${analysisData.value.includes(undefined)}` //f
         );
         console.log(
           `Non-numeric Value Check: ${analysisData.value.some(
-            (value) => typeof value !== "number" || isNaN(value)
+            (value) => typeof value !== "number" || isNaN(value) //t
           )}`
         );
     } catch (error) {

@@ -246,7 +246,7 @@
           <v-card-text>
             <v-row>
               <v-col cols="4">
-                <v-sheet style="height: 60vh; display: flex">
+                <v-sheet style="height: 63vh; display: flex">
                   <v-card style="flex: 1">
                     <v-card-item>
                       <v-radio-group
@@ -291,7 +291,7 @@
                 </v-sheet>
               </v-col>
               <v-col cols="8">
-                <v-sheet style="height: 60vh; display: flex">
+                <v-sheet style="height: 63vh; display: flex">
                   <v-card
                     style="flex: 1; overflow-y: auto"
                     class="scrollable-card-1"
