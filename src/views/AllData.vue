@@ -286,10 +286,11 @@
             'background-color': btnColor,
             'margin-top': '0px',
             'margin-left': '20px',
+            width: '200px',
           }"
           @click="dataDownloadServer()"
           :disabled="downloadBtnDisabled"
-          >데이터 다운로드 (서버용 테스트)</v-btn
+          >데이터 다운로드</v-btn
         >
 
         <!-- <v-btn
@@ -401,32 +402,28 @@ const tab = ref(0);
 
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
-const downloadState = ref(sessionStorage.getItem("downloading") || "false");
+const downloadBtnLoading = ref(sessionStorage.getItem("downloading") || false);
 
 // downloadState의 값이 변경될 때마다 호출되는 함수를 정의합니다.
-watch(downloadState, (newValue, oldValue) => {
+watch(downloadBtnLoading, (newValue, oldValue) => {
   // newValue는 새로운 값, oldValue는 이전 값입니다.
   console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
 });
 
 onMounted(() => {
   // 페이지 로드 후 downloadState의 값이 변경되었음을 확인합니다.
-  console.log("페이지 로드됨. downloadState 초기값:", downloadState.value);
+  console.log("페이지 로드됨. downloadState 초기값:", downloadBtnLoading.value);
 
-  // watch 함수를 사용하여 downloadState의 값이 변경될 때마다 동작을 수행합니다.
-  watch(downloadState, (newValue, oldValue) => {
-    console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
-    // 다른 로직을 여기에 추가할 수 있습니다.
-
-    // downloadState의 값에 따라 다른 동작을 수행합니다.
-    if (newValue === "true") {
-      console.log("downloadState 값이 true입니다. 다운로드를 시작합니다.");
-    } else if (newValue === "false") {
-      console.log("downloadState 값이 false입니다. 다운로드를 중지합니다.");
-    } else {
-      console.warn("downloadState 값이 유효하지 않습니다.");
-    }
-  });
+  // downloadState의 값에 따라 다른 동작을 수행합니다.
+  if (downloadBtnLoading.value === "true") {
+    console.log("downloadState 값이 true입니다. 다운로드를 시작합니다.");
+    downloadBtnLoading.value = true;
+  } else if (downloadBtnLoading.value === "false") {
+    console.log("downloadState 값이 false입니다. 다운로드를 중지합니다.");
+    downloadBtnLoading.value = false;
+  } else {
+    console.warn("downloadState 값이 유효하지 않습니다.");
+  }
 });
 
 // 데이터 테이블
@@ -441,7 +438,6 @@ const loading = ref(false);
 const lastloading = ref(false);
 const beforePage = ref("GLL");
 const downloadBtnDisabled = ref(true);
-const downloadBtnLoading = ref(false);
 
 // dialog
 const downloadDialog = ref(false);
@@ -453,7 +449,6 @@ const startTime = ref();
 const endTime = ref();
 const startISOTime = ref();
 const endISOTime = ref();
-
 
 watch(selectedData, (newVal, oldVal) => {
   tab.value = 0;
@@ -759,7 +754,7 @@ const dataDownloadServer = async () => {
     downloadBtnLoading.value = true;
     sessionStorage.setItem("downloading", true);
     //searchStart
-    console.log("ㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃ"+searchStart.value);
+    console.log("ㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃ" + searchStart.value);
     console.log(startTime.value);
     console.log(startISOTime.value);
     let period = ["N/A", "N/A"];

@@ -179,6 +179,7 @@ import {
   lightbtn,
 } from "./color/color.js";
 
+sessionStorage.setItem("downloading", false);
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
 
 const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
