@@ -307,7 +307,7 @@
       </v-card-actions>
     </div>
     <!-- 데이터 저장중 모달 persistent -->
-    <v-dialog v-model="downloadDialog" max-width="300" persistent>
+    <v-dialog v-model="downloadDialog" max-width="300">
       <v-card>
         <v-card-text>
           <v-row align-content="center" class="fill-height" justify="center">
@@ -401,6 +401,33 @@ const tab = ref(0);
 
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
+const downloadState = ref(sessionStorage.getItem("downloading") || "false");
+
+// downloadState의 값이 변경될 때마다 호출되는 함수를 정의합니다.
+watch(downloadState, (newValue, oldValue) => {
+  // newValue는 새로운 값, oldValue는 이전 값입니다.
+  console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
+});
+
+onMounted(() => {
+  // 페이지 로드 후 downloadState의 값이 변경되었음을 확인합니다.
+  console.log("페이지 로드됨. downloadState 초기값:", downloadState.value);
+
+  // watch 함수를 사용하여 downloadState의 값이 변경될 때마다 동작을 수행합니다.
+  watch(downloadState, (newValue, oldValue) => {
+    console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
+    // 다른 로직을 여기에 추가할 수 있습니다.
+
+    // downloadState의 값에 따라 다른 동작을 수행합니다.
+    if (newValue === "true") {
+      console.log("downloadState 값이 true입니다. 다운로드를 시작합니다.");
+    } else if (newValue === "false") {
+      console.log("downloadState 값이 false입니다. 다운로드를 중지합니다.");
+    } else {
+      console.warn("downloadState 값이 유효하지 않습니다.");
+    }
+  });
+});
 
 // 데이터 테이블
 const itemsPerPage = ref(18);
@@ -424,6 +451,9 @@ let variableName;
 const canceling = ref(false);
 const startTime = ref();
 const endTime = ref();
+const startISOTime = ref();
+const endISOTime = ref();
+
 
 watch(selectedData, (newVal, oldVal) => {
   tab.value = 0;
@@ -593,7 +623,7 @@ const searchStart = ref();
 const searchEnd = ref();
 
 watchEffect(() => {
-  if(selectedvoyage.value === "직접 선택") date_readonly.value = false;
+  if (selectedvoyage.value === "직접 선택") date_readonly.value = false;
   else date_readonly.value = true;
 });
 
@@ -727,16 +757,18 @@ const dataDownloadServer = async () => {
     canceling.value = false;
     downloadDialog.value = true;
     downloadBtnLoading.value = true;
+    sessionStorage.setItem("downloading", true);
     //searchStart
-    console.log(searchStart.value);
+    console.log("ㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃ"+searchStart.value);
     console.log(startTime.value);
+    console.log(startISOTime.value);
     let period = ["N/A", "N/A"];
     let seatrial = "N/A";
     if (searchType.value == "period") {
       period = [searchStart.value, searchEnd.value];
       seatrial = "N/A";
     } else {
-      period = ["N/A", "N/A"];
+      period = [startISOTime.value, endISOTime.value];
       seatrial = selectedtrialNum.value;
     }
 
@@ -750,6 +782,7 @@ const dataDownloadServer = async () => {
     console.log(setData);
     const loadData = await downloadDataFile(tokenid.value, setData);
 
+    sessionStorage.setItem("downloading", false);
     // 다운로드할 파일 이름 추출
     const contentDispositionHeader = loadData.headers["content-disposition"];
     const match = contentDispositionHeader.match(/filename=([^;]+)/);
@@ -864,11 +897,11 @@ const cancleLoading = () => {
 
 // 검색 이벤트
 
-const searchData = async() => {
+const searchData = async () => {
   if (
     !firstSelectedItems.value ||
     !contentsSelectedItems.value ||
-    !selectedvoyage.value 
+    !selectedvoyage.value
   ) {
     alert("조회할 데이터 범위를 선택해주세요.");
   } else {
@@ -886,6 +919,10 @@ const searchData = async() => {
 
       let start = new Date(dateRange.value[0]);
       let end = new Date(dateRange.value[1]);
+
+      startISOTime.value = start.toISOString().slice(0, 19);
+      endISOTime.value = end.toISOString().slice(0, 19);
+
       start.setHours(start.getHours() + 9);
       end.setHours(end.getHours() + 9);
       startDate.value = start.toISOString();
@@ -899,9 +936,9 @@ const searchData = async() => {
       await fetchData(variableName); // 초기 데이터 요청
 
       console.log("dataSetv = " + dataSet.value.length);
-      if (dataSet.value.length <= 0){
-          loading.value = false;
-          lastloading.value = false;
+      if (dataSet.value.length <= 0) {
+        loading.value = false;
+        lastloading.value = false;
       }
 
       searchstart.value = true;
@@ -1014,8 +1051,7 @@ const fetchData = async (data) => {
             "timestamp_PUBLISH",
             "ship_ID",
           ];
-          dataheader.value =
-          [
+          dataheader.value = [
             ...importantKeys,
             ...Object.keys(response[0]).filter(
               (key) => !importantKeys.includes(key)
@@ -1060,9 +1096,7 @@ const fetchData = async (data) => {
       const content = ref();
       [subComponunt.value, content.value] = upperData.value.split("/");
       try {
-        console.log("이거 잘봐" +
-          searchStart.value + 
-          searchEnd.value);
+        console.log("이거 잘봐" + searchStart.value + searchEnd.value);
         const response = await readDataDate(
           tokenid.value,
           subComponunt.value,
@@ -1070,7 +1104,7 @@ const fetchData = async (data) => {
           searchStart.value,
           searchEnd.value
         );
-        
+
         dataSet.value = response;
         console.log("response : " + response.length);
         console.log("dataSet : " + dataSet.value.length);
@@ -1083,8 +1117,7 @@ const fetchData = async (data) => {
             "timestamp_PUBLISH",
             "ship_ID",
           ];
-          dataheader.value = 
-          [
+          dataheader.value = [
             ...importantKeys,
             ...Object.keys(response[0]).filter(
               (key) => !importantKeys.includes(key)
@@ -1896,7 +1929,6 @@ const switchValue = (axiosItem, dataheader, response) => {
 
 const handleSortUpdate = (newOptions) => {
   // 정렬 옵션이 변경될 때 발생하는 이벤트 처리
-  
 
   // 예를 들어, 다른 이벤트를 호출하거나 특정 동작을 수행할 수 있습니다.
   // 정렬 키와 순서 가져오기

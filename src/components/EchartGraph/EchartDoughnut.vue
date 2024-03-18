@@ -241,6 +241,31 @@ use([
 
 provide(THEME_KEY);
 
+watch([DGPS.value, GYRO.value, ANEMOMETER.value, RADAR.value, AIS.value, ECDIS.value, AUTOPILOT.value, SPEEDLOG.value, Canthrottle.value, AUTOPILOTCONTACT.value, NO1ENGINEPANEL.value, NO2ENGINEPANEL.value], () => {
+  option.value.legend.data = getLegendData(); // 데이터 변경 시 legend 업데이트
+});
+
+function getLegendData() {
+  const legendData = [
+      { name: 'DGPS', icon: 'circle', value: DGPS.value.value },
+      { name: 'GYRO', icon: 'circle', value: GYRO.value.value },
+      { name: 'ANEMOMETER', icon: 'circle', value: ANEMOMETER.value.value },
+      { name: 'RADAR', icon: 'circle', value: RADAR.value.value },
+      { name: 'AIS', icon: 'circle', value: AIS.value.value },
+      { name: 'ECDIS', icon: 'circle', value: ECDIS.value.value },
+      { name: 'AUTOPILOT', icon: 'circle', value: AUTOPILOT.value.value },
+      { name: 'SPEEDLOG', icon: 'circle', value: SPEEDLOG.value.value },
+      { name: 'Canthrottle', icon: 'circle', value: Canthrottle.value.value },
+      { name: 'AUTOPILOTCONTACT', icon: 'circle', value: AUTOPILOTCONTACT.value.value },
+      { name: 'NO.1ENGINEPANEL', icon: 'circle', value: NO1ENGINEPANEL.value.value },
+      { name: 'NO.2ENGINEPANEL', icon: 'circle', value: NO2ENGINEPANEL.value.value },
+    // 다른 항목들도 추가합니다.
+  ];
+
+  // 데이터가 0이거나 null인 항목은 필터링하여 제외합니다.
+  return legendData.filter(item => item.value != 0 && item.value != null);
+}
+
 const option = ref({
   title: {
     text: '',
@@ -256,6 +281,7 @@ const option = ref({
     formatter: "{b} : {c}MB ({d}%)",
   },
   legend: {
+    data: getLegendData(),
     orient: "vertical", // 수직 방향으로 표시
     top: "40", // 수직 정렬을 중앙으로 설정
     right: "10%",

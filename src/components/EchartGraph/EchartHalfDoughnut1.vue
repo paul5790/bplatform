@@ -1,5 +1,8 @@
 <template>
-  <v-chart class="chart" :option="option" autoresize />
+  <div class="autocomplete-container">
+    <v-sheet style="width: 120px; height: 3vh"></v-sheet>
+    <v-chart class="chart" :option="option" autoresize />
+  </div>
 </template>
 
 <script setup>
@@ -175,5 +178,8 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
 }
 body {
   margin: 0;
+}
+.autocomplete-container {
+  position: relative;
 }
 </style>
