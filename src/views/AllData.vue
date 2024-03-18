@@ -875,6 +875,7 @@ const searchData = async() => {
     try {
       loading.value = true;
       lastloading.value = true;
+      downloadBtnDisabled.value = false;
       // headerVariables.forEach((variable) => (variable.value = []));
       // dataVariables.forEach((variable) => (variable.value = []));
       await voyageCheck();
@@ -904,7 +905,6 @@ const searchData = async() => {
       }
 
       searchstart.value = true;
-      downloadBtnDisabled.value = false;
     } catch {
       loading.value = false;
       lastloading.value = false;

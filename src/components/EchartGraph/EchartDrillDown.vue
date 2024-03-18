@@ -506,12 +506,11 @@ const settingTime = ref(5);
 // 로딩
 const loading = ref(true);
 
-
 const fetchData = async () => {
   loading.value = true;
   try {
     const response = await readLossTimeData(tokenid.value);
-    const timeDataRefs = responseKeys.map(key => response[key]);
+    const timeDataRefs = responseKeys.map((key) => response[key]);
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
         const response = await readlossData(
@@ -864,10 +863,22 @@ const updateDataObject = (id, value, allValue) => ({
   percent: ((value / allValue) * 100).toFixed(2),
 });
 
+watch(selectedtrialNum, (newTrialNum) => {
+  option.value.title.text = `${newTrialNum} 데이터 저장 용량`;
+});
+
 const updateChart = () => {
   if (chart.value) {
     // 차트 데이터 업데이트 로직
     const updatedOption = {
+      title: {
+        text: `${selectedtrialNum.value} 데이터 소실 빈도`,
+        left: "center",
+        textStyle: {
+          fontSize: 19, // 폰트 크기 설정
+          fontWeight: 550,
+        },
+      },
       series: {
         name: "바바",
         type: "bar",

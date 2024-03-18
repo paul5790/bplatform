@@ -73,6 +73,8 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 const trialNum = ref(0);
 
 watch(selectedtrialNum, (newTrialNum) => {
+  console.log(selectedtrialNum.value);
+  option.value.title.text = `${newTrialNum} 데이터 저장 용량`;
   // 항차 N번에서 N 추출
   AIS.value.value = 0;
   GYRO.value.value = 0;
@@ -241,7 +243,7 @@ provide(THEME_KEY);
 
 const option = ref({
   title: {
-    text: "항차 별 데이터 저장 용량",
+    text: '',
     left: "center",
     textStyle: {
       fontSize: 19, // 폰트 크기 설정
@@ -255,7 +257,7 @@ const option = ref({
   },
   legend: {
     orient: "vertical", // 수직 방향으로 표시
-    top: "middle", // 수직 정렬을 중앙으로 설정
+    top: "40", // 수직 정렬을 중앙으로 설정
     right: "10%",
     textStyle: {
       color: textColor.value, // 텍스트 컬러 설정
@@ -266,7 +268,7 @@ const option = ref({
       name: "Traffic Sources",
       type: "pie",
       radius: ["40%", "70%"],
-      center: ["30%", "50%"], // 이 부분을 수정하여 위치 조절
+      center: ["30%", "55%"], // 이 부분을 수정하여 위치 조절
       avoidLabelOverlap: false,
       label: {
         show: false,
