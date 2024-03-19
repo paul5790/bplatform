@@ -96,10 +96,18 @@
             </p></v-toolbar-title
           >
           <v-spacer></v-spacer>
+
+                          <v-progress-circular
+                  :size="50"
+                  color="primary"
+                  indeterminate
+                ></v-progress-circular>
+
           <p>{{ toolbarname }}</p>
           <!-- <v-btn icon>
             <v-icon>mdi-bell</v-icon>
           </v-btn> -->
+          
           <v-menu>
             <template v-slot:activator="{ props }">
               <v-btn icon="mdi-account" v-bind="props"></v-btn>

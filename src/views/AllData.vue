@@ -754,7 +754,7 @@ const dataDownloadServer = async () => {
     downloadBtnLoading.value = true;
     sessionStorage.setItem("downloading", true);
     //searchStart
-    console.log("ㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃㅃ" + searchStart.value);
+    console.log(searchStart.value);
     console.log(startTime.value);
     console.log(startISOTime.value);
     let period = ["N/A", "N/A"];
@@ -778,6 +778,7 @@ const dataDownloadServer = async () => {
     const loadData = await downloadDataFile(tokenid.value, setData);
 
     sessionStorage.setItem("downloading", false);
+    downloadBtnLoading.value = false;
     // 다운로드할 파일 이름 추출
     const contentDispositionHeader = loadData.headers["content-disposition"];
     const match = contentDispositionHeader.match(/filename=([^;]+)/);
@@ -804,7 +805,7 @@ const dataDownloadServer = async () => {
 
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
-    downloadBtnLoading.value = false;
+    
     downloadDialog.value = false;
   } catch (error) {
     downloadBtnLoading.value = false;
