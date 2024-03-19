@@ -404,36 +404,36 @@ const tab = ref(0);
 
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
-const downloadBtnLoading = ref(sessionStorage.getItem("downloading") || false);
+const downloadBtnLoading = ref(false);
 
 // downloadState의 값이 변경될 때마다 호출되는 함수를 정의합니다.
-watch(downloadBtnLoading, (newValue, oldValue) => {
-  // newValue는 새로운 값, oldValue는 이전 값입니다.
-  console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
-});
+// watch(downloadBtnLoading, (newValue, oldValue) => {
+//   // newValue는 새로운 값, oldValue는 이전 값입니다.
+//   console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
+// });
 
 // 세션 스토리지의 'downloading' 데이터를 감시하여 값이 변경될 때 실행되는 함수
-watch(() => sessionStorage.getItem("downloading"), (newValue) => {
-  // newValue가 "true" 문자열이면 true로, 그 외에는 false로 변경
-  console.log("세션스토리지 바뀌므");
-  downloadBtnLoading.value = newValue === "true";
-});
+// watch(() => sessionStorage.getItem("downloading"), (newValue) => {
+//   // newValue가 "true" 문자열이면 true로, 그 외에는 false로 변경
+//   console.log("세션스토리지 바뀌므");
+//   downloadBtnLoading.value = newValue === "true";
+// });
 
-onMounted(() => {
-  // 페이지 로드 후 downloadState의 값이 변경되었음을 확인합니다.
-  console.log("페이지 로드됨. downloadState 초기값:", downloadBtnLoading.value);
+// onMounted(() => {
+//   // 페이지 로드 후 downloadState의 값이 변경되었음을 확인합니다.
+//   console.log("페이지 로드됨. downloadState 초기값:", downloadBtnLoading.value);
 
-  // downloadState의 값에 따라 다른 동작을 수행합니다.
-  if (downloadBtnLoading.value === "true") {
-    console.log("downloadState 값이 true입니다. 다운로드를 시작합니다.");
-    downloadBtnLoading.value = true;
-  } else if (downloadBtnLoading.value === "false") {
-    console.log("downloadState 값이 false입니다. 다운로드를 중지합니다.");
-    downloadBtnLoading.value = false;
-  } else {
-    console.warn("downloadState 값이 유효하지 않습니다.");
-  }
-});
+//   // downloadState의 값에 따라 다른 동작을 수행합니다.
+//   if (downloadBtnLoading.value === "true") {
+//     console.log("downloadState 값이 true입니다. 다운로드를 시작합니다.");
+//     downloadBtnLoading.value = true;
+//   } else if (downloadBtnLoading.value === "false") {
+//     console.log("downloadState 값이 false입니다. 다운로드를 중지합니다.");
+//     downloadBtnLoading.value = false;
+//   } else {
+//     console.warn("downloadState 값이 유효하지 않습니다.");
+//   }
+// });
 
 // 데이터 테이블
 const itemsPerPage = ref(18);
@@ -674,8 +674,8 @@ const voyageCheck = () => {
 };
 let sheetName = [];
 
-const downloadFormat = ref(["xlsx", "csv", "txt"]);
-const selectDownlodFormat = ref("xlsx");
+const downloadFormat = ref(["csv", "txt"]);
+const selectDownlodFormat = ref("csv");
 let workbook;
 let worksheet;
 // // 데이터 다운로드
@@ -759,7 +759,7 @@ let worksheet;
 const dataDownloadServer = async () => {
   try {
     canceling.value = false;
-    downloadDialog.value = true;
+    // downloadDialog.value = true;
     downloadBtnLoading.value = true;
     sessionStorage.setItem("downloading", true);
     //searchStart
@@ -815,10 +815,10 @@ const dataDownloadServer = async () => {
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
     
-    downloadDialog.value = false;
+    // downloadDialog.value = false;
   } catch (error) {
     downloadBtnLoading.value = false;
-    downloadDialog.value = false;
+    // downloadDialog.value = false;
     if (canceling.value) {
       alert("데이터 다운로드를 취소합니다.");
       downloadBtnLoading.value = false;
@@ -844,6 +844,7 @@ const dataDownloadServer = async () => {
     }
   }
 };
+
 
 const cancleLoading = () => {
   canceling.value = true;
