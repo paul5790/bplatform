@@ -514,6 +514,7 @@ export const downloadDataFile = async (tokenid, data) => {
       }
     );
     console.log(response.headers);
+    sessionStorage.setItem("downloading", false);
     return response;
   } catch (error) {
     console.error("Error fetching data:", error);

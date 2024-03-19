@@ -398,6 +398,8 @@ watch(themeMode, (newValue) => {
   themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
 });
 
+
+
 const tab = ref(0);
 
 // 토큰
@@ -408,6 +410,13 @@ const downloadBtnLoading = ref(sessionStorage.getItem("downloading") || false);
 watch(downloadBtnLoading, (newValue, oldValue) => {
   // newValue는 새로운 값, oldValue는 이전 값입니다.
   console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
+});
+
+// 세션 스토리지의 'downloading' 데이터를 감시하여 값이 변경될 때 실행되는 함수
+watch(() => sessionStorage.getItem("downloading"), (newValue) => {
+  // newValue가 "true" 문자열이면 true로, 그 외에는 false로 변경
+  console.log("세션스토리지 바뀌므");
+  downloadBtnLoading.value = newValue === "true";
 });
 
 onMounted(() => {

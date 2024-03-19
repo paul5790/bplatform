@@ -97,12 +97,6 @@
           >
           <v-spacer></v-spacer>
 
-                          <v-progress-circular
-                  :size="50"
-                  color="primary"
-                  indeterminate
-                ></v-progress-circular>
-
           <p>{{ toolbarname }}</p>
           <!-- <v-btn icon>
             <v-icon>mdi-bell</v-icon>
