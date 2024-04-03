@@ -69,12 +69,14 @@ const AUTOPILOTCONTACT = ref({
 const NO1ENGINEPANEL = ref({ value: 0, name: "NO.1ENGINEPANEL" });
 const NO2ENGINEPANEL = ref({ value: 0, name: "NO.2ENGINEPANEL" });
 
+const AllData = ref(0);
+
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const trialNum = ref(0);
 
-watch(selectedtrialNum, (newTrialNum) => {
+watch(selectedtrialNum, async (newTrialNum) => {
   console.log(selectedtrialNum.value);
-  option.value.title.text = `${newTrialNum} 데이터 저장 용량`;
+
   // 항차 N번에서 N 추출
   AIS.value.value = 0;
   GYRO.value.value = 0;
@@ -91,10 +93,13 @@ watch(selectedtrialNum, (newTrialNum) => {
 
   if (newTrialNum != "전체") {
     const num = parseInt(newTrialNum.match(/\d+/)[0]);
-    fetchTrialData(num);
+    await fetchTrialData(num);
   } else {
-    fetchAllData();
+    await fetchAllData();
   }
+
+
+  option.value.title.text = `${newTrialNum} 데이터 저장 용량 (${AllData.value}MB)`;
   // const num = parseInt(newTrialNum.match(/\d+/)[0]);
   // trialNum.value = num;
   // fetchData();
@@ -166,7 +171,22 @@ const dataFilter1 = (data) => {
         NO2ENGINEPANEL.value.value = (Number(NO2ENGINEPANEL.value.value) + compValue).toFixed(2);
         break;
     }
+    AllData.value = (
+      Number(AIS.value.value) +
+      Number(GYRO.value.value) +
+      Number(ANEMOMETER.value.value) +
+      Number(RADAR.value.value) +
+      Number(DGPS.value.value) +
+      Number(ECDIS.value.value) +
+      Number(AUTOPILOT.value.value) +
+      Number(SPEEDLOG.value.value) +
+      Number(Canthrottle.value.value) +
+      Number(AUTOPILOTCONTACT.value.value) +
+      Number(NO1ENGINEPANEL.value.value) +
+      Number(NO2ENGINEPANEL.value.value) 
+    ).toFixed(2);
   });
+  console.log(AllData.value);
 };
 
 const dataFilter = (data) => {
@@ -213,7 +233,22 @@ const dataFilter = (data) => {
         NO2ENGINEPANEL.value.value += Number(item.tableSize);
         break;
     }
+      AllData.value = (
+      Number(AIS.value.value) +
+      Number(GYRO.value.value) +
+      Number(ANEMOMETER.value.value) +
+      Number(RADAR.value.value) +
+      Number(DGPS.value.value) +
+      Number(ECDIS.value.value) +
+      Number(AUTOPILOT.value.value) +
+      Number(SPEEDLOG.value.value) +
+      Number(Canthrottle.value.value) +
+      Number(AUTOPILOTCONTACT.value.value) +
+      Number(NO1ENGINEPANEL.value.value) +
+      Number(NO2ENGINEPANEL.value.value) 
+    );
   });
+  console.log(AllData.value);
 };
 
 const getTrialDate = async () => {

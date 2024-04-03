@@ -8,9 +8,15 @@
     }"
   >
     <v-tabs
+      :style="{
+        color:
+          tab === index
+            ? themeSelectedTabTextColor
+            : themeNoNSelectedTabTextColor,
+      }"
       style="height: 5vh; margin-left: 15px"
       v-model="tab"
-      :color = btnColor
+      :color="btnColor"
       align-tabs="start"
     >
       <v-tab :value="1">항차 설정</v-tab>
@@ -71,7 +77,12 @@ import {
   whitebackcolor,
   darkbtn,
   lightbtn,
+  darkselectedTabText,
+  darkNoNselectedTabTextAdmin,
+  lightselectedTabText,
+  lightNoNselectedTabTextAdmin
 } from "../color/color.js";
+
 
 // 다크모드
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
@@ -88,12 +99,21 @@ watch(themeMode, (newValue) => {
   themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
 });
 
+
+const themeSelectedTabTextColor = ref(
+  themeMode.value === "light" ? lightselectedTabText : darkselectedTabText
+);
+const themeNoNSelectedTabTextColor = ref(
+  themeMode.value === "light" ? lightNoNselectedTabTextAdmin : darkNoNselectedTabTextAdmin
+);
+
 const overlay = ref(false);
 const tab = ref(Number(sessionStorage.getItem("admintab")) || null);
 watch(tab, (newValue, oldValue) => {
   console.log(`Tab changed from ${oldValue} to ${newValue}`);
   sessionStorage.setItem("admintab", newValue.toString());
 });
+
 
 const overlayEmit = (dataFromChild) => {
   console.log(3);

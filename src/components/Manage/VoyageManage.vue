@@ -307,7 +307,6 @@
                                 v-model="editstartdate"
                                 text-input
                                 :max-date="currentDate"
-                                :max-time="currentTime"
                               />
                             </v-col>
                           </v-row>
@@ -693,7 +692,7 @@
         <v-card-text>
           <v-row align-content="center" class="fill-height" justify="center">
             <v-col class="text-subtitle-1 text-center mt-3" cols="12">
-              Processing settings
+              Processing
             </v-col>
             <v-col cols="6">
               <v-progress-linear

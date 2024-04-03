@@ -567,6 +567,7 @@ const option = ref({
     textStyle: {
       fontSize: 19, // 폰트 크기 설정
       fontWeight: 550,
+      color: textColor.value,
     },
   },
   tooltip: {
@@ -877,6 +878,7 @@ const updateChart = () => {
         textStyle: {
           fontSize: 19, // 폰트 크기 설정
           fontWeight: 550,
+          color: textColor.value,
         },
       },
       series: {

@@ -138,6 +138,7 @@
                 paddingLeft: '10px',
                 display: 'flex',
                 backgroundColor: themeColor,
+                position: 'relative'
               }"
             >
               <v-card style="flex: 1">
@@ -195,8 +196,8 @@
                       조회하기
                     </v-btn>
                     <v-btn
-                      style="margin-top: 350px"
-                      height="50px"
+                      style="position: absolute; bottom: 10px; left: 10px; width: calc(100% - 20px);"
+                      height="40px"
                       width="500px"
                       :color = btnColor
                       @click="captureImage()"
@@ -297,9 +298,6 @@ const getTrialDate = async () => {
       setStartTime.value.push(`${response[i].startTimeUtc}`);
       setEndTime.value.push(`${response[i].endTimeUtc}`);
       selectedtrialNum.value = i + 1;
-      console.log(setStartTime.value);
-      console.log(setEndTime.value);
-      console.log(`항차 ${i + 1}번`);
       trialrun.value.push(`항차 ${i + 1}번`);
     }
   } catch (error) {
@@ -334,8 +332,6 @@ watchEffect(() => {
       // 유효한 날짜인 경우에만 ISO 문자열로 변환
       startDate2.value = start.toISOString();
       endDate2.value = end.toISOString();
-      console.log("start.toISOString():", start.toISOString().slice(0, 10));
-      console.log("end.toISOString():", end.toISOString().slice(0, 10));
       daterange.value = `${start.toISOString().slice(0, 10)}~${end
         .toISOString()
         .slice(0, 10)} 데이터`;
@@ -344,7 +340,6 @@ watchEffect(() => {
     }
   } else {
     const index = trialrun.value.indexOf(selectedtrialrun.value);
-    console.log(index);
     date_readonly.value = true;
     voyagesearch.value = true;
 
@@ -438,14 +433,14 @@ const analysis = ref([
   {
     name: "signal",
     unit: "-",
-    min: 0,
-    max: 0,
-    average: 0,
-    rmse: 0,
-    rms: 0,
-    variance: 0,
-    error: 0,
-    median: 0,
+    min: "-",
+    max: "-",
+    average: "-",
+    rmse: "-",
+    rms: "-",
+    variance: "-",
+    error: "-",
+    median: "-",
   },
 ]);
 const unit = ref();
@@ -492,8 +487,6 @@ const processData = (data, timestampKey, dataKey, unitValue, contentsItemValue, 
   unit.value = unitValue;
   selectedcontentsItem.value = contentsItemValue;
   analysis.value[0].name = analysisName;
-  console.log(analysisData.value);
-  console.log(analysisTime.value);
 };
 
 const searchData = async () => {
@@ -661,14 +654,23 @@ const searchData = async () => {
           ]);
         }
         if (analysisTime.value.length <= 0) {
+          console.log("yolololololol~~");
+
+          analysis.value[0].min = "-"; // 최댓값
+          analysis.value[0].max = "-"; // 평균값
+          analysis.value[0].average = "-"; // 표준편차
+          analysis.value[0].rmse = "-"; // 제곱평균제곱근
+          analysis.value[0].rms = "-"; // 중앙값
+          analysis.value[0].median = "-"; // 표준 오차
+          analysis.value[0].error = "-"; // 분산
+          analysis.value[0].variance = "-";
+
+
           nodata.value = true;
           loading.value = false;
         } else {
           nodata.value = false;
         }
-        console.log(`ROW2: ${datasetRaw2.value}`);
-
-        console.log("analysisTime.value : " + analysisTime.value);
 
         analysisTime.value.sort((a, b) => {
           // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
@@ -677,17 +679,12 @@ const searchData = async () => {
           return timeA - timeB;
         });
 
-        console.log("analysisTime.value2 : " + analysisTime.value);
-
         datasetRaw2.value.sort((a, b) => {
           // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
           const timeA = new Date(a[0]);
           const timeB = new Date(b[0]);
           return timeA - timeB;
         });
-        
-
-        console.log(`Sorted ROW2: ${datasetRaw2.value}`);
 
         option.value = {
           dataset: [
@@ -758,7 +755,7 @@ const searchData = async () => {
           .map((value) => Number(value))
           .filter((value) => !isNaN(value));
 
-        console.log( "통계:", analysisData.value); // if(analysisData)
+        // console.log( "통계:", analysisData.value); // if(analysisData)
 
         if (numericValues.length > 1) {
           // 최솟값 구하기
@@ -813,33 +810,33 @@ const searchData = async () => {
           standardError.value = 0;
         }
         analysis.value[0].unit = unit.value;
-        console.log(`Minimum Value: ${minValue.value}`); // 최솟값
+        // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
         analysis.value[0].min = minValue.value.toFixed(4);
-        console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
+        // console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
         analysis.value[0].max = maxValue.value.toFixed(4);
-        console.log(`Average Value: ${averageValue.value}`); // 평균값
+        // console.log(`Average Value: ${averageValue.value}`); // 평균값
         analysis.value[0].average = averageValue.value.toFixed(4);
-        console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
+        // console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
         analysis.value[0].rmse = standardDeviation.value.toFixed(4);
-        console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
+        // console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
         analysis.value[0].rms = rms.value.toFixed(4);
-        console.log(`Median: ${median.value}`); // 중앙값
+        // console.log(`Median: ${median.value}`); // 중앙값
         analysis.value[0].median = median.value.toFixed(4);
-        console.log(`Standard Error: ${standardError.value}`); // 표준 오차
+        // console.log(`Standard Error: ${standardError.value}`); // 표준 오차
         analysis.value[0].error = standardError.value.toFixed(4);
-        console.log(`Variance: ${variance.value}`); // 분산
+        // console.log(`Variance: ${variance.value}`); // 분산
         analysis.value[0].variance = variance.value.toFixed(4);
 
-        console.log(`NaN Check: ${analysisData.value.some(isNaN)}`); //f
-        console.log(`Empty Value Check: ${analysisData.value.includes("")}`); //t
-        console.log(
-          `Undefined Value Check: ${analysisData.value.includes(undefined)}` //f
-        );
-        console.log(
-          `Non-numeric Value Check: ${analysisData.value.some(
-            (value) => typeof value !== "number" || isNaN(value) //t
-          )}`
-        );
+        // console.log(`NaN Check: ${analysisData.value.some(isNaN)}`); //f
+        // console.log(`Empty Value Check: ${analysisData.value.includes("")}`); //t
+        // console.log(
+        //   `Undefined Value Check: ${analysisData.value.includes(undefined)}` //f
+        // );
+        // console.log(
+        //   `Non-numeric Value Check: ${analysisData.value.some(
+        //     (value) => typeof value !== "number" || isNaN(value) //t
+        //   )}`
+        // );
     } catch (error) {
       console.error(error);
     } finally {
@@ -853,7 +850,6 @@ const datasetRaw = ref([["time", "value"]]);
 
 const times = ref([]);
 const rand = ref([]);
-console.log(rand);
 for (let i = 0; i <= 8000; i++) {
   datasetRaw.value.push([times.value[i], rand.value[i]]);
 }

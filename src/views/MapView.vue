@@ -29,7 +29,7 @@ const state = toRefs({
 });
 
 // 맵을 초기화하는 함수
-const initializeMap = (waypoints, ais, startlocation, endlocation) => {
+const initializeMap = (waypoints, wid, ais, startlocation, endlocation) => {
   try {
     state.pathCoordinates = state.trialdata;
 
@@ -73,7 +73,7 @@ const initializeMap = (waypoints, ais, startlocation, endlocation) => {
     for (let i = 0; i < waypoints.value.length; i++) {
       L.marker(waypoints.value[i], { icon: greenIcon })
         .addTo(state.map)
-        .bindPopup(`waypoint${i + 1}`);
+        .bindPopup(`waypoint${wid.value[i]}`);
     }
   } catch (error) {
     let errorItem = {
@@ -101,7 +101,7 @@ onMounted(async () => {
     const uniqueWaypoints = new Set();
     // waypointData의 중복을 제거하고 A에 저장
     for (let i = 0; i < waypointData.length; i++) {
-      const key = waypointData[i].latitude + "," + waypointData[i].longitude;
+      const key = waypointData[i].latitude + "," + waypointData[i].longitude + "," + waypointData[i].waypointIdentifier;
       uniqueWaypoints.add(key);
     }
     const uniqueWaypointsArray = Array.from(uniqueWaypoints);
@@ -111,14 +111,16 @@ onMounted(async () => {
 
     // waypoints 설정
     const waypoints = ref([]);
+    const id = ref([]);
 
     for (let i = 0; i < uniqueWaypointsArray.length; i++) {
       // waypoints.value.push([
       //   uniqueWaypointsArray[i].latitude,
       //   uniqueWaypointsArray[i].longitude,
       // ]);
-      const [latitude, longitude] = uniqueWaypointsArray[i].split(",");
+      const [latitude, longitude, waypointId] = uniqueWaypointsArray[i].split(",");
       waypoints.value.push([latitude, longitude]);
+      id.value.push(waypointId);
     }
 
     // ais 항적 설정
@@ -143,7 +145,7 @@ onMounted(async () => {
 
     console.log(startlocation.value);
     console.log(endlocation.value);
-    initializeMap(waypoints, ais, startlocation, endlocation);
+    initializeMap(waypoints, id, ais, startlocation, endlocation);
   } catch (error) {
     console.error(error);
     let errorItem = {

@@ -34,6 +34,9 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
+
+                  <!-- <video ref="video" width="10%" height="100" controls muted="muted"></video> -->
+                  <!-- <video ref="video" width="350" controls muted="muted"></video> -->
                   <EchartStarPort
                     :starport="parseFloat(port)"
                     :name="'PortRudder'"
@@ -408,6 +411,9 @@
 </template>
 
 <script setup>
+// cctv
+import Hls from 'hls.js';
+// map
 import OSMap from "../components/OSMap.vue";
 import SocketChecking from "../components/SocketChecking.vue";
 import EngineLampChecking from "../components/EngineLampChecking.vue";
@@ -435,6 +441,21 @@ const checktime = ref(3000);
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
 const checkTime = ref();
+
+const video = ref(null);
+
+onMounted(() => {
+  let hls = new Hls();
+  let url = "http://192.168.0.50:8081/stream/index.m3u8";
+  hls.loadSource(url);
+  hls.attachMedia(video.value);
+  hls.on(Hls.Events.MANIFEST_PARSED, () => {
+    video.value.play().catch(error => {
+      console.error('비디오 재생 오류:', error);
+    });
+  });
+});
+
 const fetchData = async () => {
   try {
     const timedata = await readLampTimeData(tokenid.value);
