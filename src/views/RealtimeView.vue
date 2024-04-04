@@ -16,11 +16,11 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <OSMap
+                  <!-- <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
                     :state="mapstart"
-                  />
+                  /> -->
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -34,7 +34,6 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-
                   <!-- <video ref="video" width="10%" height="100" controls muted="muted"></video> -->
                   <!-- <video ref="video" width="350" controls muted="muted"></video> -->
                   <EchartStarPort
@@ -254,7 +253,11 @@
           <v-col
             :cols="getEngineColsValue()"
             no-gutters
-            :style="{ padding: '0px', paddingLeft: `${getPaddingLeftValue()}px`, paddingTop: '4px' }"
+            :style="{
+              padding: '0px',
+              paddingLeft: `${getPaddingLeftValue()}px`,
+              paddingTop: '4px',
+            }"
           >
             <v-card style="flex: 1">
               <v-card-item>
@@ -335,7 +338,11 @@
 
         <!-- (최) Lamp뷰 -->
         <v-row>
-          <v-col :cols="getLampColsValue()" no-gutters :style="{ padding: '0px'}">
+          <v-col
+            :cols="getLampColsValue()"
+            no-gutters
+            :style="{ padding: '0px' }"
+          >
             <v-sheet
               :style="{
                 height: `${getLampheightValueALL1()}vh`,
@@ -359,7 +366,11 @@
 
           <!-- (최) Lamp뷰 -->
 
-          <v-col :cols="getLampColsValue()" no-gutters :style="{ padding: '0px' }">
+          <v-col
+            :cols="getLampColsValue()"
+            no-gutters
+            :style="{ padding: '0px' }"
+          >
             <v-sheet
               :style="{
                 height: `${getLampheightValueALL2()}vh`,
@@ -389,10 +400,22 @@
           :style="{
             backgroundColor: themeColor,
             paddingTop: '8px',
+            paddingLeft: '0px',
+            paddingRight: '9px',
+            height: `${5}vh`,
+            display: 'flex',
+          }"
+        >
+          <v-btn style="width: 100%; height: 100%" @click="openCCTV()">CCTV 확인</v-btn>
+        </v-sheet>
+        <v-sheet
+          :style="{
+            backgroundColor: themeColor,
+            paddingTop: '8px',
             paddingBottom: '8px',
             paddingLeft: '0px',
             paddingRight: '9px',
-            height: `${getheightValue2()}vh`,
+            height: `${getheightValue2() - 5}vh`,
             display: 'flex',
           }"
         >
@@ -408,11 +431,35 @@
       </v-col>
     </v-row>
   </v-card>
+  <!-- 개인정보 변경 -->
+  <v-dialog v-model="cctvDialog" max-width="1350" max-height="1000">
+    <v-card>
+      <v-card-title>cctv</v-card-title>
+      <v-card-text>
+        <v-container>
+          <v-row>
+            <v-col cols="12"><p style="font-size: 13px">~cctv~</p></v-col>
+            
+            <video ref="video" width="1280" controls muted="muted"></video>
+          </v-row>
+        </v-container>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="blue-darken-1"
+          variant="text"
+          @click="closeCCTV()"
+          >나가기</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
 // cctv
-import Hls from 'hls.js';
+import Hls from "hls.js";
 // map
 import OSMap from "../components/OSMap.vue";
 import SocketChecking from "../components/SocketChecking.vue";
@@ -424,12 +471,21 @@ import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 import { readLampTimeData } from "../api/index.js";
 import { darkbackcolor, whitebackcolor } from "../color/color.js";
 // 웹소켓 관련, Web Socket
-import { ref, inject, onMounted, onBeforeUnmount, onUnmounted, watch } from "vue";
+import {
+  ref,
+  inject,
+  onMounted,
+  onBeforeUnmount,
+  onUnmounted,
+  watch,
+} from "vue";
 import { onMessage, onOpen, onClose, onError } from "vue3-websocket";
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
 
-const themeColor = ref(themeMode.value === "light" ? whitebackcolor : darkbackcolor);
+const themeColor = ref(
+  themeMode.value === "light" ? whitebackcolor : darkbackcolor
+);
 watch(themeMode, (newValue) => {
   themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
 });
@@ -443,24 +499,30 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 const checkTime = ref();
 
 const video = ref(null);
+const cctvDialog = ref(false);
 
-onMounted(() => {
+const openCCTV = () => {
   let hls = new Hls();
   let url = "http://192.168.0.50:8081/stream/index.m3u8";
   hls.loadSource(url);
   hls.attachMedia(video.value);
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    video.value.play().catch(error => {
-      console.error('비디오 재생 오류:', error);
+    video.value.play().catch((error) => {
+      console.error("비디오 재생 오류:", error);
     });
   });
-});
+  cctvDialog.value = true;
+}
+
+const closeCCTV = () => {
+  cctvDialog.value = false;
+}
 
 const fetchData = async () => {
   try {
     const timedata = await readLampTimeData(tokenid.value);
     console.log(`설정타임 : ${timedata.lampTime}`);
-    checkTime.value = Number(timedata.lampTime)*1000;
+    checkTime.value = Number(timedata.lampTime) * 1000;
     console.log(`checkTime : ${checkTime.value}`);
   } catch (error) {
     //console.error(error);
@@ -1664,11 +1726,11 @@ const getheightValue1 = () => {
 };
 
 const getheightValue2 = () => {
-    return screenWidth.value <= 1800
-    ? 184  // 1800 이하일 경우 130 반환
+  return screenWidth.value <= 1800
+    ? 184 // 1800 이하일 경우 130 반환
     : screenWidth.value <= 1890
-    ? 120  // 1800 초과이면서 1890 이하일 경우 120 반환
-    : 93;  // 그 외의 경우 93 반환
+    ? 120 // 1800 초과이면서 1890 이하일 경우 120 반환
+    : 93; // 그 외의 경우 93 반환
 };
 
 const getLampheightValue1 = () => {

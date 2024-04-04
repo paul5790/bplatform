@@ -80,6 +80,7 @@ import VoyageTable from "../components/VoyageTable.vue";
 import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut1";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
+import EchartDrillDownMulti from "../components/EchartGraph/EchartDrillDownMulti.vue";
 import { darkbackcolor, whitebackcolor } from "../color/color.js";
 const guest = ref(true);
 const userid = ref(sessionStorage.getItem("isAdmin"));
@@ -121,7 +122,7 @@ const charts = ref([
   {
     id: 3,
     cols: 4,
-    component: EchartHalfDoughnut,
+    component: EchartDrillDownMulti,
     style: {
       height: "43vh",
       backgroundColor: themeColor.value,

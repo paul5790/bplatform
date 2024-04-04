@@ -1,6 +1,14 @@
 <template>
   <v-sheet>
-    <v-btn color="blue" @click="errorMethod">오류발생 버튼</v-btn>
+    <!-- <v-btn color="blue" @click="errorMethod">오류발생 버튼</v-btn> -->
+    <v-select
+      v-model="selectedLog"
+      label="select"
+      :items="selectionLog"
+      variant="underlined"
+      style="width: 150px; height: 5vh; margin-top: 10px; margin-left: 10px;"
+      density="compact"
+    ></v-select>
     <v-data-table
       style="margin-top: 10px"
       v-model:page="page"
@@ -26,11 +34,18 @@
 </template>
 
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { readErrorData, createErrorData } from "../../api/index.js";
 import moment from "moment";
 const page = ref(1);
 const itemsPerPage = ref(16);
+
+const selectionLog = ref(["Error", "Event"]);
+const selectedLog = ref(selectionLog.value[0]);
+
+watchEffect(() => {
+  console.log('selectedLog changed:', selectedLog.value);
+});
 
 const pageCount = computed(() => {
   return Math.ceil(items.value.length / itemsPerPage.value);

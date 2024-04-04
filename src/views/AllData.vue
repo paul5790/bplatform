@@ -3,6 +3,17 @@
   <div style="height: 93vh">
     <div style="padding: 30px; padding-bottom: 0px">
       <!-- 데이터 선택창 -->
+      <v-row>
+        <v-col cols="3">
+          <v-select
+            v-model="mainSelectedItems"
+            :items="mainSelect"
+            label="Main Components"
+            variant="outlined"
+          >
+          </v-select>
+        </v-col>
+      </v-row>
       <v-sheet style="display: flex; height: 8vh">
         <v-row>
           <!-- 첫번째 선택박스 -->
@@ -292,19 +303,6 @@
           :disabled="downloadBtnDisabled"
           >데이터 다운로드</v-btn
         >
-
-        <!-- <v-btn
-          :loading="downloadBtnLoading"
-          :color="textColor"
-          :style="{
-            'background-color': btnColor,
-            'margin-top': '0px',
-            'margin-left': '20px',
-          }"
-          @click="dataDownload()"
-          :disabled="downloadBtnDisabled"
-          >데이터 다운로드</v-btn
-        > -->
       </v-card-actions>
     </div>
     <!-- 데이터 저장중 모달 persistent -->
@@ -398,42 +396,11 @@ watch(themeMode, (newValue) => {
   themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
 });
 
-
-
 const tab = ref(0);
 
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const downloadBtnLoading = ref(false);
-
-// downloadState의 값이 변경될 때마다 호출되는 함수를 정의합니다.
-// watch(downloadBtnLoading, (newValue, oldValue) => {
-//   // newValue는 새로운 값, oldValue는 이전 값입니다.
-//   console.log("downloadState 값 변경됨:", oldValue, "->", newValue);
-// });
-
-// 세션 스토리지의 'downloading' 데이터를 감시하여 값이 변경될 때 실행되는 함수
-// watch(() => sessionStorage.getItem("downloading"), (newValue) => {
-//   // newValue가 "true" 문자열이면 true로, 그 외에는 false로 변경
-//   console.log("세션스토리지 바뀌므");
-//   downloadBtnLoading.value = newValue === "true";
-// });
-
-// onMounted(() => {
-//   // 페이지 로드 후 downloadState의 값이 변경되었음을 확인합니다.
-//   console.log("페이지 로드됨. downloadState 초기값:", downloadBtnLoading.value);
-
-//   // downloadState의 값에 따라 다른 동작을 수행합니다.
-//   if (downloadBtnLoading.value === "true") {
-//     console.log("downloadState 값이 true입니다. 다운로드를 시작합니다.");
-//     downloadBtnLoading.value = true;
-//   } else if (downloadBtnLoading.value === "false") {
-//     console.log("downloadState 값이 false입니다. 다운로드를 중지합니다.");
-//     downloadBtnLoading.value = false;
-//   } else {
-//     console.warn("downloadState 값이 유효하지 않습니다.");
-//   }
-// });
 
 // 데이터 테이블
 const itemsPerPage = ref(18);
@@ -466,25 +433,38 @@ watch(selectedData, (newVal, oldVal) => {
 const pageCount = ref(0);
 
 // 셀렉바 메뉴
+const mainSelect = ref([
+  "Ship Information",
+  "Kass Information",
+  "System Information",
+  "Control Information",
+  "관제 Information",
+]);
 const firstSelect = ref([
-  "DGPS",
-  "GYRO",
-  "ANEMOMETER",
-  "RADAR",
-  "AIS",
-  "ECDIS",
-  "AUTOPILOT",
-  "SPEEDLOG",
-  "CanThrottle",
-  "AUTOPILOTCONTACT",
-  "NO.1ENGINEPANEL",
-  "NO.2ENGINEPANEL",
+  // "DGPS",
+  // "GYRO",
+  // "ANEMOMETER",
+  // "RADAR",
+  // "AIS",
+  // "ECDIS",
+  // "AUTOPILOT",
+  // "SPEEDLOG",
+  // "CanThrottle",
+  // "AUTOPILOTCONTACT",
+  // "NO.1ENGINEPANEL",
+  // "NO.2ENGINEPANEL",
 ]);
 const secondSelect = ref([]);
+const mainSelectedItems = ref([]);
 const firstSelectedItems = ref([]);
 const contentsSelectedItems = ref([]);
 
 //전체 선택
+const likesAllData = computed(
+  () => mainSelectedItems.value.length === mainSelect.value.length
+);
+const likesSomeData = computed(() => mainSelectedItems.value.length > 0);
+
 const likesAllData1 = computed(
   () => firstSelectedItems.value.length === firstSelect.value.length
 );
@@ -496,6 +476,14 @@ const likesAllData2 = computed(
 const likesSomeData2 = computed(() => contentsSelectedItems.value.length > 0);
 
 // 전체 선택
+const selectAllItem = () => {
+  if (likesAllData.value) {
+    mainSelectedItems.value = [];
+  } else {
+    mainSelectedItems.value = [...mainSelect.value];
+  }
+};
+
 const selectAllItem1 = () => {
   if (likesAllData1.value) {
     firstSelectedItems.value = [];
@@ -511,6 +499,41 @@ const selectAllItem2 = () => {
     contentsSelectedItems.value = [...secondSelect.value];
   }
 };
+
+// select1이 변경될 때 second 배열 업데이트
+watchEffect(() => {
+  firstSelect.value = []; // 기존 secondSelect 초기화
+  firstSelectedItems.value = [];
+  if (mainSelectedItems.value.includes("Ship Information")) {
+    firstSelect.value.push(
+      "DGPS",
+      "GYRO",
+      "ANEMOMETER",
+      "RADAR",
+      "AIS",
+      "ECDIS",
+      "AUTOPILOT",
+      "SPEEDLOG",
+      "CANTHROTTLE",
+      "AUTOPILOTCONTACT",
+      "NO.1ENGINEPANEL",
+      "NO.2ENGINEPANEL"
+    );
+  }
+  if (mainSelectedItems.value.includes("Kass Information")) {
+    firstSelect.value.push("MTIE1.ISA", "MTIE5.VDGS", "MTIE5.DBS", "MOF1.ANS", "MOF2.SYNC", "MTIE5.SAS", "MTIE4.XINNOS_VDGS_EMUL");
+  }
+  if (mainSelectedItems.value.includes("System Information")) {
+    firstSelect.value.push("MANAGEMENT");
+    firstSelectedItems.value.push("MANAGEMENT");
+  }
+  if (mainSelectedItems.value.includes("Control Information")) {
+    firstSelect.value.push("RUDDER","ENGINE","MODE");
+  }
+  if (mainSelectedItems.value.includes("관제 Information")) {
+    firstSelect.value.push("AIS", "VTS");
+  }
+});
 
 // select1이 변경될 때 second 배열 업데이트
 watchEffect(() => {
@@ -540,7 +563,7 @@ watchEffect(() => {
   if (firstSelectedItems.value.includes("SPEEDLOG")) {
     secondSelect.value.push("VBW", "VHW", "VLW");
   }
-  if (firstSelectedItems.value.includes("CanThrottle")) {
+  if (firstSelectedItems.value.includes("CANTHROTTLE")) {
     secondSelect.value.push(
       "CAN_Online_State",
       "Engine_RPM",
@@ -621,8 +644,6 @@ const endDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
 
 const searchType = ref("N/A");
 
-const daterange = ref([startDate.value, endDate.value]);
-
 const searchStart = ref();
 const searchEnd = ref();
 
@@ -639,7 +660,6 @@ const voyageCheck = () => {
     searchType.value = "period";
     console.log(dateRange.value[0].toISOString());
     console.log(dateRange.value[1].toISOString());
-    let start, end;
     if (
       !isNaN(Date.parse(dateRange.value[0])) &&
       !isNaN(Date.parse(dateRange.value[1]))
@@ -651,8 +671,6 @@ const voyageCheck = () => {
       console.error("Invalid date values in dateRange");
       // 여기에서 적절한 대체 값이나 오류 처리를 추가할 수 있습니다.
     }
-    // searchStart.value = start;
-    // searchEnd.value = end;
   } else {
     const index = voyage.value.indexOf(selectedvoyage.value);
     date_readonly.value = true;
@@ -676,85 +694,6 @@ let sheetName = [];
 
 const downloadFormat = ref(["csv", "txt"]);
 const selectDownlodFormat = ref("csv");
-let workbook;
-let worksheet;
-// // 데이터 다운로드
-// const dataloadWorker = new Worker("worker.js");
-
-// const dataload = () => {
-//   if (!selectedData.value || selectedData.value.length === 0) {
-//     alert("선택안됌");
-//   } else {
-//     try {
-//       dataloadWorker.postMessage({
-//         selectedData: selectedData.value,
-//         selectDownlodFormat: selectDownlodFormat.value,
-//         downloadData: downloadData.map(item => item.value),
-//         daterange: daterange.value,
-//       });
-
-//       dataloadWorker.onmessage = (event) => {
-//         const { blob, fileName } = event.data;
-
-//         if (blob) {
-//           saveAs(blob, fileName);
-//           alert("완료");
-//         } else {
-//           alert(`다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`);
-//         }
-//       };
-//     } catch (error) {
-//       console.error(error);
-//     }
-//   }
-// };
-// const dataload = async () => {
-//     if (!selectedData.value || selectedData.value.length === 0) {
-//     alert("선택안됌");
-//   } else {
-//     try {
-//       const zip = new JSZip();
-//       const dataValues = Object.values(selectedData.value);
-
-//       if (selectDownlodFormat.value === "xlsx") {
-//         // xlsx 선택 시
-//         workbook = XLSX.utils.book_new();
-//         for (let i = 0; i < downloadData.length; i++) {
-//           worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-//           XLSX.utils.book_append_sheet(workbook, worksheet, sheetName[i]);
-//         }
-//         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
-//       } else {
-//         for (let i = 0; i < downloadData.length; i++) {
-//           let content, fileName;
-
-//           if (selectDownlodFormat.value === "csv") {
-//             // csv 선택 시
-//             content = Papa.unparse(downloadData[i].value);
-//             fileName = `${dataValues[i]}_csv.csv`;
-//           } else if (selectDownlodFormat.value === "txt") {
-//             // txt 선택 시
-//             content = JSON.stringify(downloadData[i].value, null, 2);
-//             fileName = `${dataValues[i]}_txt.txt`;
-//           }
-
-//           // xlsx가 아닌 경우 파일을 zip에 추가
-//           if (selectDownlodFormat.value !== "xlsx") {
-//             zip.file(fileName, content);
-//           }
-//         }
-//         // zip 파일 다운로드
-//         const zipBlob = await zip.generateAsync({ type: "blob" });
-//         saveAs(zipBlob, `${daterange.value}_${selectDownlodFormat.value}.zip`);
-//       }
-//     } catch (error) {
-//       alert(
-//         `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
-//       );
-//       console.error(error);
-//     }
-//   }
-// }
 
 const dataDownloadServer = async () => {
   try {
@@ -797,8 +736,6 @@ const dataDownloadServer = async () => {
     console.log(match);
     console.log("File name:", fileName);
 
-    // 파일 형식 확인
-    const contentType = "application/zip"; // ZIP 파일 형식에 따라 MIME 타입 설정
     const blob = new Blob([loadData.data]);
     // Blob 객체를 다운로드할 수 있는 URL로 변환
     const url = window.URL.createObjectURL(blob);
@@ -814,7 +751,7 @@ const dataDownloadServer = async () => {
 
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
-    
+
     // downloadDialog.value = false;
   } catch (error) {
     downloadBtnLoading.value = false;
@@ -845,61 +782,12 @@ const dataDownloadServer = async () => {
   }
 };
 
-
 const cancleLoading = () => {
   canceling.value = true;
   downloadBtnLoading.value = false;
   cancelDownload();
   //location.reload();
 };
-
-// const dataDownload = async () => {
-//   if (!selectedData.value || selectedData.value.length === 0) {
-//     alert("선택안됌");
-//   } else {
-//     try {
-//       const zip = new JSZip();
-//       const dataValues = Object.values(selectedData.value);
-
-//       if (selectDownlodFormat.value === "xlsx") {
-//         // xlsx 선택 시
-//         workbook = XLSX.utils.book_new();
-//         for (let i = 0; i < downloadData.length; i++) {
-//           worksheet = XLSX.utils.json_to_sheet(downloadData[i].value);
-//           XLSX.utils.book_append_sheet(workbook, worksheet, sheetName[i]);
-//         }
-//         XLSX.writeFile(workbook, `${daterange.value}_xlsx.xlsx`);
-//       } else {
-//         for (let i = 0; i < downloadData.length; i++) {
-//           let content, fileName;
-
-//           if (selectDownlodFormat.value === "csv") {
-//             // csv 선택 시
-//             content = Papa.unparse(downloadData[i].value);
-//             fileName = `${dataValues[i]}_csv.csv`;
-//           } else if (selectDownlodFormat.value === "txt") {
-//             // txt 선택 시
-//             content = JSON.stringify(downloadData[i].value, null, 2);
-//             fileName = `${dataValues[i]}_txt.txt`;
-//           }
-
-//           // xlsx가 아닌 경우 파일을 zip에 추가
-//           if (selectDownlodFormat.value !== "xlsx") {
-//             zip.file(fileName, content);
-//           }
-//         }
-//         // zip 파일 다운로드
-//         const zipBlob = await zip.generateAsync({ type: "blob" });
-//         saveAs(zipBlob, `${daterange.value}_${selectDownlodFormat.value}.zip`);
-//       }
-//     } catch (error) {
-//       alert(
-//         `다운로드 할 데이터가 존재하지 않습니다. 선택한 형식: ${selectDownlodFormat.value}`
-//       );
-//       console.error(error);
-//     }
-//   }
-// };
 
 // 검색 이벤트
 
@@ -1173,7 +1061,6 @@ const updateData = async (data, header, page) => {
   // 미리 보여질 일부 데이터를 설정
   const initialData = data.slice(0 + (page - 1) * 18, 18 + (page - 1) * 18);
   headerName.value = header;
-  console.log("설마 여기서? : " + initialData);
   dataSet.value = initialData;
 };
 

@@ -75,6 +75,16 @@ NO.2ENGINE_PANEL_65378
 NO.2ENGINE_PANEL_65376
 NO.2ENGINE_PANEL_65379
 
+
+
+
+
+
+
+
+
+
+
 "dgps/gll",
   "dgps/gga",
   "dgps/rmc",
