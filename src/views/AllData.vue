@@ -521,14 +521,26 @@ watchEffect(() => {
     );
   }
   if (mainSelectedItems.value.includes("Kass Information")) {
-    firstSelect.value.push("MTIE1.ISA", "MTIE5.VDGS", "MTIE5.DBS", "MOF1.ANS", "MOF2.SYNC", "MTIE5.SAS", "MTIE4.XINNOS_VDGS_EMUL");
+    firstSelect.value.push(
+      "MTIE1.ISA",
+      "MTIE5.VDGS",
+      "MTIE5.DBS",
+      "MOF1.ANS",
+      "MOF2.SYNC",
+      "MOF1.GNW",
+      "MTIE5.SAS",
+      "MTIE4.XINNOS_VDGS_EMUL",
+      "MTIE4.XINNOS_STAS_EMUL",
+      "MTIE4.XINNOS_STAS",
+      "MTIE4.XINNOS_VDGS"
+    );
   }
   if (mainSelectedItems.value.includes("System Information")) {
     firstSelect.value.push("MANAGEMENT");
     firstSelectedItems.value.push("MANAGEMENT");
   }
   if (mainSelectedItems.value.includes("Control Information")) {
-    firstSelect.value.push("RUDDER","ENGINE","MODE");
+    firstSelect.value.push("RUDDER", "ENGINE", "MODE");
   }
   if (mainSelectedItems.value.includes("관제 Information")) {
     firstSelect.value.push("AIS", "VTS");
@@ -539,6 +551,10 @@ watchEffect(() => {
 watchEffect(() => {
   secondSelect.value = []; // 기존 secondSelect 초기화
   contentsSelectedItems.value = [];
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Ship Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (firstSelectedItems.value.includes("DGPS")) {
     secondSelect.value.push("GLL", "GGA", "RMC", "VTG", "ZDA", "GSV", "GSA");
   }
@@ -610,6 +626,79 @@ watchEffect(() => {
       "NO.2ENGINE_PANEL_65379"
     );
   }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Kass Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (firstSelectedItems.value.includes("MTIE1.ISA")) {
+    secondSelect.value.push("SITUATIONAL");
+  }
+  if (firstSelectedItems.value.includes("MTIE5.VDGS")) {
+    secondSelect.value.push("VIRTUALNAV");
+  }
+  if (firstSelectedItems.value.includes("MTIE5.DBS")) {
+    secondSelect.value.push("SITUATIONALAWARENESS");
+  }
+  if (firstSelectedItems.value.includes("MOF1.ANS")) {
+    secondSelect.value.push("ROUTEDECISION");
+  }
+  if (firstSelectedItems.value.includes("MOF2.SYNC")) {
+    secondSelect.value.push("MARINEGATEWAY");
+  }
+  if (firstSelectedItems.value.includes("MTIE5.SAS")) {
+    secondSelect.value.push("SAS");
+  }
+  if (firstSelectedItems.value.includes("MTIE4.XINNOS_VDGS_EMUL")) {
+    secondSelect.value.push( "VIRTUALME1_1", "VIRTUALME1_2", "VIRTUALME1_3", "VIRTUALME1_4", "VIRTUALME1_5",
+      "VIRTUALME1_6", "VIRTUALME1_7", "VIRTUALME1_8", "VIRTUALME1_9", "VIRTUALME1_10",
+      "VIRTUALME1_11", "VIRTUALME1_12", "VIRTUALME1_13", "VIRTUALME1_14", "VIRTUALME2_1",
+      "VIRTUALME2_2", "VIRTUALME2_3", "VIRTUALME2_4", "VIRTUALME2_5", "VIRTUALME2_6",
+      "VIRTUALME2_7", "VIRTUALME2_8", "VIRTUALME2_9", "VIRTUALME2_10", "VIRTUALME2_11",
+      "VIRTUALME2_12", "VIRTUALME2_13", "VIRTUALME2_14", "VIRTUALMP1_1", "VIRTUALMP1_2",
+      "VIRTUALMP1_3", "VIRTUALMP1_4", "VIRTUALMP1_5", "VIRTUALMP2_1", "VIRTUALMP2_2",
+      "VIRTUALMP2_3", "VIRTUALMP2_4", "VIRTUALMP2_5", "VIRTUALPMS_1", "VIRTUALPMS_2",
+      "VIRTUALPMS_3",
+    );
+  }
+  if (firstSelectedItems.value.includes("MOF1.GNW")) {
+    secondSelect.value.push("WAYPOINT");
+  }
+  if (firstSelectedItems.value.includes("MTIE4.XINNOS_STAS_EMUL")) {
+    secondSelect.value.push("ME1_EMUL", "ME2_EMUL");
+  }  
+  if (firstSelectedItems.value.includes("MTIE4.XINNOS_STAS")) {
+    secondSelect.value.push("ME1", "ME2");
+  }  
+  if (firstSelectedItems.value.includes("MTIE4.XINNOS_VDGS")) {
+    secondSelect.value.push(
+      "NO.1ENGINE_PANEL_61444", "NO.1ENGINE_PANEL_65262", "NO.1ENGINE_PANEL_65263", "NO.1ENGINE_PANEL_65272", "NO.1ENGINE_PANEL_65271",
+      "NO.1ENGINE_PANEL_65253", "NO.1ENGINE_PANEL_65270", "NO.1ENGINE_PANEL_65276", "NO.1ENGINE_PANEL_65360", "NO.1ENGINE_PANEL_65361_LAMP",
+      "NO.1ENGINE_PANEL_65361_STATUS", "NO.1ENGINE_PANEL_65378", "NO.1ENGINE_PANEL_65376", "NO.1ENGINE_PANEL_65379", "NO.2ENGINE_PANEL_61444",
+      "NO.2ENGINE_PANEL_65262", "NO.2ENGINE_PANEL_65263", "NO.2ENGINE_PANEL_65272", "NO.2ENGINE_PANEL_65271", "NO.2ENGINE_PANEL_65253",
+      "NO.2ENGINE_PANEL_65270", "NO.2ENGINE_PANEL_65276", "NO.2ENGINE_PANEL_65360", "NO.2ENGINE_PANEL_65361_LAMP", "NO.2ENGINE_PANEL_65361_STATUS",
+      "NO.2ENGINE_PANEL_65378", "NO.2ENGINE_PANEL_65376", "NO.2ENGINE_PANEL_65379"
+    );
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Control Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (firstSelectedItems.value.includes("RUDDER")) {
+    secondSelect.value.push("REQUESTCOMMAND_R", "RESPONSECOMMAND_R");
+  } 
+  if (firstSelectedItems.value.includes("ENGINE")) {
+    secondSelect.value.push("REQUESTCOMMAND_E", "RESPONSECOMMAND_E");
+  } 
+  if (firstSelectedItems.value.includes("MODE")) {
+    secondSelect.value.push("REQUESTCOMMAND_M", "RESPONSECOMMAND_M");
+  } 
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // System Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (firstSelectedItems.value.includes("MANAGEMENT")) {
+    secondSelect.value.push("SUBSCRIBELIST", "CONNECTSTATE", "SYSTEMSTATE", "ALARMINFO", "MODEINFO", "COM", "ENGINECONTROL", "RUDDERCONTROL", "SHORE_MODE_REQUEST", "SHORE_ENGINE_CONTROL", "SHORE_RUDDER_CONTROL");
+  } 
 });
 
 // 항차 선택
@@ -914,6 +1003,12 @@ const getVariableName = (item) => {
     "NO.2ENGINE_PANEL_65378": "no2enginepanel/no2engine_panel_65378",
     "NO.2ENGINE_PANEL_65376": "no2enginepanel/no2engine_panel_65376",
     "NO.2ENGINE_PANEL_65379": "no2enginepanel/no2engine_panel_65379",
+
+
+
+
+
+
     // 다른 headerName에 대한 매핑 추가
   };
 

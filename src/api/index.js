@@ -2,6 +2,7 @@
 import axios from "axios";
 
 const apiLocation = "ias.bdpbackend.com";
+// const apiLocation = "192.168.0.73:9999";
 
 // 취소 토큰 생성
 let cancelTokenSource = axios.CancelToken.source();

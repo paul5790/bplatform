@@ -502,6 +502,10 @@ const video = ref(null);
 const cctvDialog = ref(false);
 
 const openCCTV = () => {
+  if(sessionStorage.getItem("isAdmin") != "ADMIN"){
+    alert("ADMIN 이상만 사용 가능합니다.");
+    return;
+  }
   let hls = new Hls();
   let url = "http://192.168.0.50:8081/stream/index.m3u8";
   hls.loadSource(url);

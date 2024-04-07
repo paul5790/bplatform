@@ -3,9 +3,8 @@
     <!-- <v-btn color="blue" @click="errorMethod">오류발생 버튼</v-btn> -->
     <v-select
       v-model="selectedLog"
-      label="select"
       :items="selectionLog"
-      variant="underlined"
+      variant="solo"
       style="width: 150px; height: 5vh; margin-top: 10px; margin-left: 10px;"
       density="compact"
     ></v-select>

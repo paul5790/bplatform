@@ -97,9 +97,14 @@ watch(selectedtrialNum, async (newTrialNum) => {
   } else {
     await fetchAllData();
   }
-
-
-  option.value.title.text = `${newTrialNum} 데이터 저장 용량 (${AllData.value}MB)`;
+  let titleData;
+  if(AllData.value > 1000){
+    titleData = `${(AllData.value/1000).toFixed(2)}GB`
+  }
+  else{
+    titleData = `${(AllData.value)}MB`
+  }
+  option.value.title.text = `${newTrialNum} 데이터 저장 용량 (${titleData})`;
   // const num = parseInt(newTrialNum.match(/\d+/)[0]);
   // trialNum.value = num;
   // fetchData();

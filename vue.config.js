@@ -5,16 +5,15 @@ module.exports = defineConfig({
   devServer: {
     port: 3911,
     proxy: {
-      '/api': {
-        target: "http://192.168.0.44:9999",
-        changeOrigin : true,
+      "/api": {
+        target: "http://ias.bdpbackend.com",
+        changeOrigin: true,
         pathRewrite: {
-          '^/api': ''
-        }
+          "^/api": "",
+        },
       },
     },
   },
 
-  pluginOptions: {
-  },
+  pluginOptions: {},
 });
