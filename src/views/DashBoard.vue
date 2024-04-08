@@ -122,7 +122,7 @@ const charts = ref([
   {
     id: 3,
     cols: 4,
-    component: EchartDrillDownMulti,
+    component: EchartHalfDoughnut,
     style: {
       height: "43vh",
       backgroundColor: themeColor.value,

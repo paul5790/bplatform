@@ -435,10 +435,10 @@ const pageCount = ref(0);
 // 셀렉바 메뉴
 const mainSelect = ref([
   "Ship Information",
-  "Kass Information",
-  "System Information",
-  "Control Information",
-  "관제 Information",
+  // "Kass Information",
+  // "System Information",
+  // "Control Information",
+  // "관제 Information",
 ]);
 const firstSelect = ref([
   // "DGPS",

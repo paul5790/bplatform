@@ -16,11 +16,11 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <!-- <OSMap
+                  <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
                     :state="mapstart"
-                  /> -->
+                  />
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -438,7 +438,7 @@
       <v-card-text>
         <v-container>
           <v-row>
-            <v-col cols="12"><p style="font-size: 13px">~cctv~</p></v-col>
+            <v-col cols="12"><p style="font-size: 13px">cctv 부제목</p></v-col>
             
             <video ref="video" width="1280" controls muted="muted"></video>
           </v-row>

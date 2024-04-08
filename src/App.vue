@@ -202,7 +202,8 @@ axios.interceptors.response.use(
   (error) => {
     const alertShow = ref(sessionStorage.getItem("showDashboard") === "true");
     if (
-      (error.response.status === 401 || error.response.status === 500) && error.response.data === "Token Expired" &&
+      (error.response.status === 401 || error.response.status === 500) &&
+      error.response.data === "Token Expired" &&
       alertShow.value
     ) {
       // 401 또는 500 상태 코드가 발생한 경우 로그아웃 처리
@@ -413,9 +414,12 @@ const login = async () => {
 
     // 사용자 정보 요청
     const userDataResponse = await readMineData(response);
+    console.log("userlog : " + userDataResponse.value);
 
     const tokenPayload = jwtDecode(response);
     decodedTokenData.value = tokenPayload;
+    const id = tokenPayload.id;
+
     console.log(decodedTokenData.value);
 
     expirationTime.value = decodedTokenData.value.exp * 1000; // 초 단위를 밀리초로 변환
@@ -428,8 +432,7 @@ const login = async () => {
     // ...
     const userName = userDataResponse.userName;
     const userGroup = userDataResponse.userGroup;
-    console.log(userName);
-    console.log(userGroup);
+    sessionStorage.setItem("id", id);
     sessionStorage.setItem("userid", userName);
     sessionStorage.setItem("isAdmin", userGroup);
 
@@ -442,9 +445,28 @@ const login = async () => {
 
     // 세션 스토리지에 사용자 로그인 상태를 저장
     sessionStorage.setItem("showDashboard", showDashboard.value.toString());
+
+    // let errorItem = {
+    //   id: sessionStorage.getItem("userid") || "",
+    //   requestMethod: error.response ? error.response.config.method : "unknown",
+    //   requestUrl: error.response
+    //     ? error.response.request.responseURL
+    //     : "unknown",
+    //   page: error.response ? error.response.status : "unknown",
+    //   log: `${userName}(${id}) 로그인`,
+    // };
+    // try {
+    //   createErrorData(tokenid.value, errorItem);
+    //   alert("다운로드 할 데이터를 다시 확인해주세요.");
+    // } catch (error) {
+    //   console.error(error);
+    // }
+
+    // 이벤트 로그 메시지
   } catch (error) {
     alert(error.response?.data || error.message);
     console.error(error.response?.data || error.message);
+    // 에러메시지
 
     // userid.value = "";
     // password.value = "";
