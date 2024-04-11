@@ -13,97 +13,97 @@
           >
           </v-select>
         </v-col>
+        <!-- 첫번째 선택박스 -->
+        <v-col class="auto-width">
+          <v-select
+            v-model="firstSelectedItems"
+            :items="firstSelect"
+            label="Sub Components"
+            variant="outlined"
+            multiple
+          >
+            <template v-slot:selection="{ item, index }">
+              <div v-if="index < 2">
+                <span>{{ item.title }}</span>
+                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                <span
+                  v-if="
+                    firstSelectedItems.length > 1 &&
+                    index !== firstSelectedItems.length - 1
+                  "
+                  >,
+                </span>
+                <span v-else-if="firstSelectedItems.length >= 3"> </span>
+              </div>
+              <span
+                v-if="index === 2"
+                class="text-grey text-caption align-self-center"
+              >
+                (+{{ firstSelectedItems.length - 2 }} others)
+              </span>
+            </template>
+            <template v-slot:prepend-item>
+              <v-list-item title="Select All" @click="selectAllItem1">
+                <template v-slot:prepend>
+                  <v-checkbox-btn
+                    :indeterminate="likesSomeData1 && !likesAllData1"
+                    :model-value="likesSomeData1"
+                  ></v-checkbox-btn>
+                </template>
+              </v-list-item>
+
+              <v-divider class="mt-2"></v-divider>
+            </template>
+          </v-select>
+        </v-col>
+
+        <!-- 두번째 선택박스 -->
+        <v-col class="auto-width">
+          <v-select
+            v-model="contentsSelectedItems"
+            :items="secondSelect"
+            label="Contents"
+            variant="outlined"
+            multiple
+          >
+            <template v-slot:selection="{ item, index }">
+              <div v-if="index < 2">
+                <span>{{ item.title }}</span>
+                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                <span
+                  v-if="
+                    contentsSelectedItems.length > 1 &&
+                    index !== contentsSelectedItems.length - 1
+                  "
+                  >,
+                </span>
+                <span v-else-if="contentsSelectedItems.length >= 3"> </span>
+              </div>
+              <span
+                v-if="index === 2"
+                class="text-grey text-caption align-self-center"
+              >
+                (+{{ contentsSelectedItems.length - 2 }} others)
+              </span>
+            </template>
+            <template v-slot:prepend-item>
+              <v-list-item title="Select All" @click="selectAllItem2">
+                <template v-slot:prepend>
+                  <v-checkbox-btn
+                    :indeterminate="likesSomeData2 && !likesAllData2"
+                    :model-value="likesSomeData2"
+                  ></v-checkbox-btn>
+                </template>
+              </v-list-item>
+
+              <v-divider class="mt-2"></v-divider>
+            </template>
+          </v-select>
+        </v-col>
       </v-row>
       <v-sheet style="display: flex; height: 8vh">
         <v-row>
-          <!-- 첫번째 선택박스 -->
-          <v-col cols="3">
-            <v-select
-              v-model="firstSelectedItems"
-              :items="firstSelect"
-              label="Sub Components"
-              variant="outlined"
-              multiple
-            >
-              <template v-slot:selection="{ item, index }">
-                <div v-if="index < 2">
-                  <span>{{ item.title }}</span>
-                  <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                  <span
-                    v-if="
-                      firstSelectedItems.length > 1 &&
-                      index !== firstSelectedItems.length - 1
-                    "
-                    >,
-                  </span>
-                  <span v-else-if="firstSelectedItems.length >= 3"> </span>
-                </div>
-                <span
-                  v-if="index === 2"
-                  class="text-grey text-caption align-self-center"
-                >
-                  (+{{ firstSelectedItems.length - 2 }} others)
-                </span>
-              </template>
-              <template v-slot:prepend-item>
-                <v-list-item title="Select All" @click="selectAllItem1">
-                  <template v-slot:prepend>
-                    <v-checkbox-btn
-                      :indeterminate="likesSomeData1 && !likesAllData1"
-                      :model-value="likesSomeData1"
-                    ></v-checkbox-btn>
-                  </template>
-                </v-list-item>
-
-                <v-divider class="mt-2"></v-divider>
-              </template>
-            </v-select>
-          </v-col>
-
-          <!-- 두번째 선택박스 -->
-          <v-col cols="3">
-            <v-select
-              v-model="contentsSelectedItems"
-              :items="secondSelect"
-              label="Contents"
-              variant="outlined"
-              multiple
-            >
-              <template v-slot:selection="{ item, index }">
-                <div v-if="index < 2">
-                  <span>{{ item.title }}</span>
-                  <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                  <span
-                    v-if="
-                      contentsSelectedItems.length > 1 &&
-                      index !== contentsSelectedItems.length - 1
-                    "
-                    >,
-                  </span>
-                  <span v-else-if="contentsSelectedItems.length >= 3"> </span>
-                </div>
-                <span
-                  v-if="index === 2"
-                  class="text-grey text-caption align-self-center"
-                >
-                  (+{{ contentsSelectedItems.length - 2 }} others)
-                </span>
-              </template>
-              <template v-slot:prepend-item>
-                <v-list-item title="Select All" @click="selectAllItem2">
-                  <template v-slot:prepend>
-                    <v-checkbox-btn
-                      :indeterminate="likesSomeData2 && !likesAllData2"
-                      :model-value="likesSomeData2"
-                    ></v-checkbox-btn>
-                  </template>
-                </v-list-item>
-
-                <v-divider class="mt-2"></v-divider>
-              </template>
-            </v-select>
-          </v-col>
-
+          <v-col cols="6"></v-col>
           <v-col cols="2">
             <v-select
               v-model="selectedvoyage"
@@ -400,6 +400,7 @@ const tab = ref(0);
 
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
+const userId = ref(sessionStorage.getItem("id") || "");
 const downloadBtnLoading = ref(false);
 
 // 데이터 테이블
@@ -435,10 +436,10 @@ const pageCount = ref(0);
 // 셀렉바 메뉴
 const mainSelect = ref([
   "Ship Information",
-  // "Kass Information",
-  // "System Information",
-  // "Control Information",
-  // "관제 Information",
+  "Kass Information",
+  "System Information",
+  "Control Information",
+  "관제 Information",
 ]);
 const firstSelect = ref([
   // "DGPS",
@@ -649,15 +650,48 @@ watchEffect(() => {
     secondSelect.value.push("SAS");
   }
   if (firstSelectedItems.value.includes("MTIE4.XINNOS_VDGS_EMUL")) {
-    secondSelect.value.push( "VIRTUALME1_1", "VIRTUALME1_2", "VIRTUALME1_3", "VIRTUALME1_4", "VIRTUALME1_5",
-      "VIRTUALME1_6", "VIRTUALME1_7", "VIRTUALME1_8", "VIRTUALME1_9", "VIRTUALME1_10",
-      "VIRTUALME1_11", "VIRTUALME1_12", "VIRTUALME1_13", "VIRTUALME1_14", "VIRTUALME2_1",
-      "VIRTUALME2_2", "VIRTUALME2_3", "VIRTUALME2_4", "VIRTUALME2_5", "VIRTUALME2_6",
-      "VIRTUALME2_7", "VIRTUALME2_8", "VIRTUALME2_9", "VIRTUALME2_10", "VIRTUALME2_11",
-      "VIRTUALME2_12", "VIRTUALME2_13", "VIRTUALME2_14", "VIRTUALMP1_1", "VIRTUALMP1_2",
-      "VIRTUALMP1_3", "VIRTUALMP1_4", "VIRTUALMP1_5", "VIRTUALMP2_1", "VIRTUALMP2_2",
-      "VIRTUALMP2_3", "VIRTUALMP2_4", "VIRTUALMP2_5", "VIRTUALPMS_1", "VIRTUALPMS_2",
-      "VIRTUALPMS_3",
+    secondSelect.value.push(
+      "VIRTUALME1_1",
+      "VIRTUALME1_2",
+      "VIRTUALME1_3",
+      "VIRTUALME1_4",
+      "VIRTUALME1_5",
+      "VIRTUALME1_6",
+      "VIRTUALME1_7",
+      "VIRTUALME1_8",
+      "VIRTUALME1_9",
+      "VIRTUALME1_10",
+      "VIRTUALME1_11",
+      "VIRTUALME1_12",
+      "VIRTUALME1_13",
+      "VIRTUALME1_14",
+      "VIRTUALME2_1",
+      "VIRTUALME2_2",
+      "VIRTUALME2_3",
+      "VIRTUALME2_4",
+      "VIRTUALME2_5",
+      "VIRTUALME2_6",
+      "VIRTUALME2_7",
+      "VIRTUALME2_8",
+      "VIRTUALME2_9",
+      "VIRTUALME2_10",
+      "VIRTUALME2_11",
+      "VIRTUALME2_12",
+      "VIRTUALME2_13",
+      "VIRTUALME2_14",
+      "VIRTUALMP1_1",
+      "VIRTUALMP1_2",
+      "VIRTUALMP1_3",
+      "VIRTUALMP1_4",
+      "VIRTUALMP1_5",
+      "VIRTUALMP2_1",
+      "VIRTUALMP2_2",
+      "VIRTUALMP2_3",
+      "VIRTUALMP2_4",
+      "VIRTUALMP2_5",
+      "VIRTUALPMS_1",
+      "VIRTUALPMS_2",
+      "VIRTUALPMS_3"
     );
   }
   if (firstSelectedItems.value.includes("MOF1.GNW")) {
@@ -665,18 +699,40 @@ watchEffect(() => {
   }
   if (firstSelectedItems.value.includes("MTIE4.XINNOS_STAS_EMUL")) {
     secondSelect.value.push("ME1_EMUL", "ME2_EMUL");
-  }  
+  }
   if (firstSelectedItems.value.includes("MTIE4.XINNOS_STAS")) {
     secondSelect.value.push("ME1", "ME2");
-  }  
+  }
   if (firstSelectedItems.value.includes("MTIE4.XINNOS_VDGS")) {
     secondSelect.value.push(
-      "NO.1ENGINE_PANEL_61444", "NO.1ENGINE_PANEL_65262", "NO.1ENGINE_PANEL_65263", "NO.1ENGINE_PANEL_65272", "NO.1ENGINE_PANEL_65271",
-      "NO.1ENGINE_PANEL_65253", "NO.1ENGINE_PANEL_65270", "NO.1ENGINE_PANEL_65276", "NO.1ENGINE_PANEL_65360", "NO.1ENGINE_PANEL_65361_LAMP",
-      "NO.1ENGINE_PANEL_65361_STATUS", "NO.1ENGINE_PANEL_65378", "NO.1ENGINE_PANEL_65376", "NO.1ENGINE_PANEL_65379", "NO.2ENGINE_PANEL_61444",
-      "NO.2ENGINE_PANEL_65262", "NO.2ENGINE_PANEL_65263", "NO.2ENGINE_PANEL_65272", "NO.2ENGINE_PANEL_65271", "NO.2ENGINE_PANEL_65253",
-      "NO.2ENGINE_PANEL_65270", "NO.2ENGINE_PANEL_65276", "NO.2ENGINE_PANEL_65360", "NO.2ENGINE_PANEL_65361_LAMP", "NO.2ENGINE_PANEL_65361_STATUS",
-      "NO.2ENGINE_PANEL_65378", "NO.2ENGINE_PANEL_65376", "NO.2ENGINE_PANEL_65379"
+      "V_NO.1ENGINE_PANEL_61444",
+      "V_NO.1ENGINE_PANEL_65262",
+      "V_NO.1ENGINE_PANEL_65263",
+      "V_NO.1ENGINE_PANEL_65272",
+      "V_NO.1ENGINE_PANEL_65271",
+      "V_NO.1ENGINE_PANEL_65253",
+      "V_NO.1ENGINE_PANEL_65270",
+      "V_NO.1ENGINE_PANEL_65276",
+      "V_NO.1ENGINE_PANEL_65360",
+      "V_NO.1ENGINE_PANEL_65361_LAMP",
+      "V_NO.1ENGINE_PANEL_65361_STATUS",
+      "V_NO.1ENGINE_PANEL_65378",
+      "V_NO.1ENGINE_PANEL_65376",
+      "V_NO.1ENGINE_PANEL_65379",
+      "V_NO.2ENGINE_PANEL_61444",
+      "V_NO.2ENGINE_PANEL_65262",
+      "V_NO.2ENGINE_PANEL_65263",
+      "V_NO.2ENGINE_PANEL_65272",
+      "V_NO.2ENGINE_PANEL_65271",
+      "V_NO.2ENGINE_PANEL_65253",
+      "V_NO.2ENGINE_PANEL_65270",
+      "V_NO.2ENGINE_PANEL_65276",
+      "V_NO.2ENGINE_PANEL_65360",
+      "V_NO.2ENGINE_PANEL_65361_LAMP",
+      "V_NO.2ENGINE_PANEL_65361_STATUS",
+      "V_NO.2ENGINE_PANEL_65378",
+      "V_NO.2ENGINE_PANEL_65376",
+      "V_NO.2ENGINE_PANEL_65379"
     );
   }
 
@@ -685,20 +741,32 @@ watchEffect(() => {
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (firstSelectedItems.value.includes("RUDDER")) {
     secondSelect.value.push("REQUESTCOMMAND_R", "RESPONSECOMMAND_R");
-  } 
+  }
   if (firstSelectedItems.value.includes("ENGINE")) {
     secondSelect.value.push("REQUESTCOMMAND_E", "RESPONSECOMMAND_E");
-  } 
+  }
   if (firstSelectedItems.value.includes("MODE")) {
     secondSelect.value.push("REQUESTCOMMAND_M", "RESPONSECOMMAND_M");
-  } 
+  }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // System Infomation
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   if (firstSelectedItems.value.includes("MANAGEMENT")) {
-    secondSelect.value.push("SUBSCRIBELIST", "CONNECTSTATE", "SYSTEMSTATE", "ALARMINFO", "MODEINFO", "COM", "ENGINECONTROL", "RUDDERCONTROL", "SHORE_MODE_REQUEST", "SHORE_ENGINE_CONTROL", "SHORE_RUDDER_CONTROL");
-  } 
+    secondSelect.value.push(
+      "SUBSCRIBELIST",
+      "CONNECTSTATE",
+      "SYSTEMSTATE",
+      "ALARMINFO",
+      "MODEINFO",
+      "COM",
+      "ENGINECONTROL",
+      "RUDDERCONTROL",
+      "SHORE_MODE_REQUEST",
+      "SHORE_ENGINE_CONTROL",
+      "SHORE_RUDDER_CONTROL"
+    );
+  }
 });
 
 // 항차 선택
@@ -779,7 +847,6 @@ const voyageCheck = () => {
     endDate.value.setHours(endDate.value.getHours());
   }
 };
-let sheetName = [];
 
 const downloadFormat = ref(["csv", "txt"]);
 const selectDownlodFormat = ref("csv");
@@ -841,6 +908,17 @@ const dataDownloadServer = async () => {
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
 
+    let Item = {
+      user_id: userId.value ? userId.value : "unknown",
+      page: `데이터 조회`,
+      log: `데이터 다운로드 요청`,
+    };
+    try {
+      // createErrorData(response, Item);
+    } catch (error) {
+      console.error(error);
+    }
+
     // downloadDialog.value = false;
   } catch (error) {
     downloadBtnLoading.value = false;
@@ -895,8 +973,6 @@ const searchData = async () => {
       // headerVariables.forEach((variable) => (variable.value = []));
       // dataVariables.forEach((variable) => (variable.value = []));
       await voyageCheck();
-      downloadData = [];
-      sheetName = [];
       selectedData.value = contentsSelectedItems.value;
       variableName = getVariableName(selectedData.value).value;
 
@@ -915,7 +991,7 @@ const searchData = async () => {
 
       startTime.value = start.toISOString().slice(0, 19);
       endTime.value = end.toISOString().slice(0, 19);
-
+      console.log(variableName);
       await fetchData(variableName); // 초기 데이터 요청
 
       console.log("dataSetv = " + dataSet.value.length);
@@ -923,7 +999,11 @@ const searchData = async () => {
         loading.value = false;
         lastloading.value = false;
       }
-
+      try {
+        // createErrorData(response, Item);
+      } catch (error) {
+        console.error(error);
+      }
       searchstart.value = true;
     } catch {
       loading.value = false;
@@ -1004,9 +1084,68 @@ const getVariableName = (item) => {
     "NO.2ENGINE_PANEL_65376": "no2enginepanel/no2engine_panel_65376",
     "NO.2ENGINE_PANEL_65379": "no2enginepanel/no2engine_panel_65379",
 
+    SITUATIONAL: "MTIE1ISA/SITUATIONAL",
+    VIRTUALNAV: "MTIE5VDGS/VIRTUALNAV",
+    SITUATIONALAWARENESS: "MTIE5DBS/SITUATIONALAWARENESS",
+    ROUTEDECISION: "MOF1ANS/ROUTEDECISION",
+    MARINEGATEWAY: "MOF2SYNC/MARINEGATEWAY",
+    WAYPOINT: "MOF1GNW/WAYPOINT",
+    SAS: "MTIE5SAS/SAS",
 
+    ME1: "MTIE4.XINNOS_STAS/ME1",
+    ME2: "MTIE4.XINNOS_STAS/ME2",
 
+    "V_NO.1ENGINE_PANEL_61444": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_61444",
+    "V_NO.1ENGINE_PANEL_65262": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65262",
+    "V_NO.1ENGINE_PANEL_65263": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65263",
+    "V_NO.1ENGINE_PANEL_65271": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65271",
+    "V_NO.1ENGINE_PANEL_65270": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65270",
+    "V_NO.1ENGINE_PANEL_65360": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65360",
+    "V_NO.1ENGINE_PANEL_65361_LAMP":
+      "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65361_LAMP",
+    "V_NO.1ENGINE_PANEL_65272": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65272",
+    "V_NO.1ENGINE_PANEL_65253": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65253",
+    "V_NO.1ENGINE_PANEL_65276": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65276",
+    "V_NO.2ENGINE_PANEL_61444": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_61444",
+    "V_NO.2ENGINE_PANEL_65262": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65262",
+    "V_NO.2ENGINE_PANEL_65263": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65263",
+    "V_NO.2ENGINE_PANEL_65271": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65271",
+    "V_NO.2ENGINE_PANEL_65270": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65270",
+    "V_NO.2ENGINE_PANEL_65360": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65360",
+    "V_NO.2ENGINE_PANEL_65361_LAMP":
+      "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65361_LAMP",
+    "V_NO.2ENGINE_PANEL_65272": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65272",
+    "V_NO.2ENGINE_PANEL_65253": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65253",
+    "V_NO.2ENGINE_PANEL_65276": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65276",
+    "V_NO.1ENGINE_PANEL_65361_STATUS":
+      "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65361_STATUS",
+    "V_NO.1ENGINE_PANEL_65378": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65378",
+    "V_NO.1ENGINE_PANEL_65376": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65376",
+    "V_NO.1ENGINE_PANEL_65379": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65379",
+    "V_NO.2ENGINE_PANEL_65361_STATUS":
+      "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65361_STATUS",
+    "V_NO.2ENGINE_PANEL_65378": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65378",
+    "V_NO.2ENGINE_PANEL_65376": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65376",
+    "V_NO.2ENGINE_PANEL_65379": "MTIE4XINNOS_VDGS/NO2ENGINE_PANEL_65379",
 
+    "SUBSCRIBELIST": "MANAGEMENT/SUBSCRIBELIST",
+    "CONNECTSTATE": "MANAGEMENT/CONNECTSTATE",
+    "SYSTEMSTATE": "MANAGEMENT/SYSTEMSTATE",
+    "ALARMINFO": "MANAGEMENT/ALARMINFO",
+    "MODEINFO": "MANAGEMENT/MODEINFO",
+    "COM": "MANAGEMENT/COM",
+    "ENGINECONTROL": "MANAGEMENT/ENGINECONTROL",
+    "RUDDERCONTROL": "MANAGEMENT/RUDDERCONTROL",
+    "SHORE_MODE_REQUEST": "MANAGEMENT/SHORE_MODE_REQUEST",
+    "SHORE_ENGINE_CONTROL": "MANAGEMENT/SHORE_ENGINE_CONTROL",
+    "SHORE_RUDDER_CONTROL": "MANAGEMENT/SHORE_RUDDER_CONTROL",
+
+    "REQUESTCOMMAND_R": "RUDDER/REQUESTCOMMAND_R",
+    "RESPONSECOMMAND_R": "RUDDER/RESPONSECOMMAND_R",
+    "REQUESTCOMMAND_E": "ENGINE/REQUESTCOMMAND_E",
+    "RESPONSECOMMAND_E": "ENGINE/RESPONSECOMMAND_E",
+    "REQUESTCOMMAND_M": "MODE/REQUESTCOMMAND_M",
+    "RESPONSECOMMAND_M": "MODE/RESPONSECOMMAND_M",
 
 
     // 다른 headerName에 대한 매핑 추가
@@ -1125,9 +1264,10 @@ const fetchData = async (data) => {
           });
           updateTable();
           console.log(data[i]);
-          switchValue(data[i], dataheader, response);
+          await switchValue(data[i], dataheader, response);
         } else {
-          switchValue(data[i], dataheader, response);
+          await switchValue(data[i], dataheader, response);
+          updateTable();
           loading.value = false;
           console.log("로딩오프?" + loading.value);
           break;
@@ -1575,6 +1715,548 @@ const updateTable = async () => {
         page.value
       );
       break;
+    
+    case "SITUATIONAL":
+      pageCount.value = Math.ceil(
+        SITUATIONAL.value.length / itemsPerPage.value
+      );
+      updateData(
+        SITUATIONAL.value,
+        SITUATIONALheader.value,
+        page.value
+      );
+      break;
+    case "VIRTUALNAV":
+      pageCount.value = Math.ceil(
+        VIRTUALNAV.value.length / itemsPerPage.value
+      );
+      updateData(
+        VIRTUALNAV.value,
+        VIRTUALNAVheader.value,
+        page.value
+      );
+      break;
+    case "SITUATIONALAWARENESS":
+      pageCount.value = Math.ceil(
+        SITUATIONALAWARENESS.value.length / itemsPerPage.value
+      );
+      updateData(
+        SITUATIONALAWARENESS.value,
+        SITUATIONALAWARENESSheader.value,
+        page.value
+      );
+      break;
+    case "ROUTEDECISION":
+      pageCount.value = Math.ceil(
+        ROUTEDECISION.value.length / itemsPerPage.value
+      );
+      updateData(
+        ROUTEDECISION.value,
+        ROUTEDECISIONheader.value,
+        page.value
+      );
+      break;
+    case "MARINEGATEWAY":
+      pageCount.value = Math.ceil(
+        MARINEGATEWAY.value.length / itemsPerPage.value
+      );
+      updateData(
+        MARINEGATEWAY.value,
+        MARINEGATEWAYheader.value,
+        page.value
+      );
+      break;
+    case "WAYPOINT":
+      pageCount.value = Math.ceil(
+        WAYPOINT.value.length / itemsPerPage.value
+      );
+      updateData(
+        WAYPOINT.value,
+        WAYPOINTheader.value,
+        page.value
+      );
+      break;
+    case "SAS":
+      pageCount.value = Math.ceil(
+        SAS.value.length / itemsPerPage.value
+      );
+      updateData(
+        SAS.value,
+        SASheader.value,
+        page.value
+      );
+      break;
+    case "ME1":
+      pageCount.value = Math.ceil(
+        ME1.value.length / itemsPerPage.value
+      );
+      updateData(
+        ME1.value,
+        ME1header.value,
+        page.value
+      );
+      break;
+    case "ME2":
+      pageCount.value = Math.ceil(
+        ME2.value.length / itemsPerPage.value
+      );
+      updateData(
+        ME2.value,
+        ME2header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_61444":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_61444.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_61444.value,
+        V_NO1ENGINE_PANEL_61444header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65262":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65262.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65262.value,
+        V_NO1ENGINE_PANEL_65262header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65263":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65263.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65263.value,
+        V_NO1ENGINE_PANEL_65263header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65271":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65271.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65271.value,
+        V_NO1ENGINE_PANEL_65271header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65270":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65270.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65270.value,
+        V_NO1ENGINE_PANEL_65270header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65360":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65360.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65360.value,
+        V_NO1ENGINE_PANEL_65360header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65361_LAMP":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65361_LAMP.value,
+        V_NO1ENGINE_PANEL_65361_LAMPheader.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65272":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65272.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65272.value,
+        V_NO1ENGINE_PANEL_65272header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65253":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65253.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65253.value,
+        V_NO1ENGINE_PANEL_65253header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65276":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65276.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65276.value,
+        V_NO1ENGINE_PANEL_65276header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_61444":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_61444.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_61444.value,
+        V_NO2ENGINE_PANEL_61444header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65262":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65262.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65262.value,
+        V_NO2ENGINE_PANEL_65262header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65263":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65263.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65263.value,
+        V_NO2ENGINE_PANEL_65263header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65271":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65271.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65271.value,
+        V_NO2ENGINE_PANEL_65271header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65270":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65270.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65270.value,
+        V_NO2ENGINE_PANEL_65270header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65360":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65360.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65360.value,
+        V_NO2ENGINE_PANEL_65360header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65361_LAMP":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65361_LAMP.value,
+        V_NO2ENGINE_PANEL_65361_LAMPheader.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65272":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65272.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65272.value,
+        V_NO2ENGINE_PANEL_65272header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65253":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65253.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65253.value,
+        V_NO2ENGINE_PANEL_65253header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65276":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65276.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65276.value,
+        V_NO2ENGINE_PANEL_65276header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65361_STATUS":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65361_STATUS.value,
+        V_NO1ENGINE_PANEL_65361_STATUSheader.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65378":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65378.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65378.value,
+        V_NO1ENGINE_PANEL_65378header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65376":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65376.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65376.value,
+        V_NO1ENGINE_PANEL_65376header.value,
+        page.value
+      );
+      break;
+    case "V_NO.1ENGINE_PANEL_65379":
+      pageCount.value = Math.ceil(
+        V_NO1ENGINE_PANEL_65379.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO1ENGINE_PANEL_65379.value,
+        V_NO1ENGINE_PANEL_65379header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65361_STATUS":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65361_STATUS.value,
+        V_NO2ENGINE_PANEL_65361_STATUSheader.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65378":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65378.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65378.value,
+        V_NO2ENGINE_PANEL_65378header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65376":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65376.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65376.value,
+        V_NO2ENGINE_PANEL_65376header.value,
+        page.value
+      );
+      break;
+    case "V_NO.2ENGINE_PANEL_65379":
+      pageCount.value = Math.ceil(
+        V_NO2ENGINE_PANEL_65379.value.length / itemsPerPage.value
+      );
+      updateData(
+        V_NO2ENGINE_PANEL_65379.value,
+        V_NO2ENGINE_PANEL_65379header.value,
+        page.value
+      );
+      break;
+    case "SUBSCRIBELIST":
+      pageCount.value = Math.ceil(
+        SUBSCRIBELIST.value.length / itemsPerPage.value
+      );
+      updateData(
+        SUBSCRIBELIST.value,
+        SUBSCRIBELISTheader.value,
+        page.value
+      );
+      break;
+    case "CONNECTSTATE":
+      pageCount.value = Math.ceil(
+        CONNECTSTATE.value.length / itemsPerPage.value
+      );
+      updateData(
+        CONNECTSTATE.value,
+        CONNECTSTATEheader.value,
+        page.value
+      );
+      break;
+    case "SYSTEMSTATE":
+      pageCount.value = Math.ceil(
+        SYSTEMSTATE.value.length / itemsPerPage.value
+      );
+      updateData(
+        SYSTEMSTATE.value,
+        SYSTEMSTATEheader.value,
+        page.value
+      );
+      break;
+    case "ALARMINFO":
+      pageCount.value = Math.ceil(
+        ALARMINFO.value.length / itemsPerPage.value
+      );
+      updateData(
+        ALARMINFO.value,
+        ALARMINFOheader.value,
+        page.value
+      );
+      break;
+    case "MODEINFO":
+      pageCount.value = Math.ceil(
+        MODEINFO.value.length / itemsPerPage.value
+      );
+      updateData(
+        MODEINFO.value,
+        MODEINFOheader.value,
+        page.value
+      );
+      break;
+    case "COM":
+      pageCount.value = Math.ceil(
+        COM.value.length / itemsPerPage.value
+      );
+      updateData(
+        COM.value,
+        COMheader.value,
+        page.value
+      );
+      break;
+    case "ENGINECONTROL":
+      pageCount.value = Math.ceil(
+        ENGINECONTROL.value.length / itemsPerPage.value
+      );
+      updateData(
+        ENGINECONTROL.value,
+        ENGINECONTROLheader.value,
+        page.value
+      );
+      break;
+    case "RUDDERCONTROL":
+      pageCount.value = Math.ceil(
+        RUDDERCONTROL.value.length / itemsPerPage.value
+      );
+      updateData(
+        RUDDERCONTROL.value,
+        RUDDERCONTROLheader.value,
+        page.value
+      );
+      break;
+    case "SHORE_MODE_REQUEST":
+      pageCount.value = Math.ceil(
+        SHORE_MODE_REQUEST.value.length / itemsPerPage.value
+      );
+      updateData(
+        SHORE_MODE_REQUEST.value,
+        SHORE_MODE_REQUESTheader.value,
+        page.value
+      );
+      break;
+    case "SHORE_ENGINE_CONTROL":
+      pageCount.value = Math.ceil(
+        SHORE_ENGINE_CONTROL.value.length / itemsPerPage.value
+      );
+      updateData(
+        SHORE_ENGINE_CONTROL.value,
+        SHORE_ENGINE_CONTROLheader.value,
+        page.value
+      );
+      break;
+    case "SHORE_RUDDER_CONTROL":
+      pageCount.value = Math.ceil(
+        SHORE_RUDDER_CONTROL.value.length / itemsPerPage.value
+      );
+      updateData(
+        SHORE_RUDDER_CONTROL.value,
+        SHORE_RUDDER_CONTROLheader.value,
+        page.value
+      );
+      break;
+    case "REQUESTCOMMAND_R":
+      pageCount.value = Math.ceil(
+        REQUESTCOMMAND_R.value.length / itemsPerPage.value
+      );
+      updateData(
+        REQUESTCOMMAND_R.value,
+        REQUESTCOMMAND_Rheader.value,
+        page.value
+      );
+      break;
+    case "RESPONSECOMMAND_R":
+      pageCount.value = Math.ceil(
+        RESPONSECOMMAND_R.value.length / itemsPerPage.value
+      );
+      updateData(
+        RESPONSECOMMAND_R.value,
+        RESPONSECOMMAND_Rheader.value,
+        page.value
+      );
+      break;
+    case "REQUESTCOMMAND_E":
+      pageCount.value = Math.ceil(
+        REQUESTCOMMAND_E.value.length / itemsPerPage.value
+      );
+      updateData(
+        REQUESTCOMMAND_E.value,
+        REQUESTCOMMAND_Eheader.value,
+        page.value
+      );
+      break;
+    case "RESPONSECOMMAND_E":
+      pageCount.value = Math.ceil(
+        RESPONSECOMMAND_E.value.length / itemsPerPage.value
+      );
+      updateData(
+        RESPONSECOMMAND_E.value,
+        RESPONSECOMMAND_Eheader.value,
+        page.value
+      );
+      break;
+    case "REQUESTCOMMAND_M":
+      pageCount.value = Math.ceil(
+        REQUESTCOMMAND_M.value.length / itemsPerPage.value
+      );
+      updateData(
+        REQUESTCOMMAND_M.value,
+        REQUESTCOMMAND_Mheader.value,
+        page.value
+      );
+      break;
+    case "RESPONSECOMMAND_M":
+      pageCount.value = Math.ceil(
+        RESPONSECOMMAND_M.value.length / itemsPerPage.value
+      );
+      updateData(
+        RESPONSECOMMAND_M.value,
+        RESPONSECOMMAND_Mheader.value,
+        page.value
+      );
+      break;
+      
     default:
       console.error("Invalid tab value:", selectedTab);
   }
@@ -1611,7 +2293,6 @@ const Engine_RPMheader = ref([]);
 const Rudderheader = ref([]);
 const Rudder_Scaleheader = ref([]);
 const AUTOPILOTCONTACTheader = ref([]);
-
 const NO1ENGINE_PANEL_61444header = ref([]);
 const NO1ENGINE_PANEL_65262header = ref([]);
 const NO1ENGINE_PANEL_65263header = ref([]);
@@ -1640,6 +2321,66 @@ const NO2ENGINE_PANEL_65361_STATUSheader = ref([]);
 const NO2ENGINE_PANEL_65378header = ref([]);
 const NO2ENGINE_PANEL_65376header = ref([]);
 const NO2ENGINE_PANEL_65379header = ref([]);
+
+const SITUATIONALheader = ref([]);
+const VIRTUALNAVheader = ref([]);
+const SITUATIONALAWARENESSheader = ref([]);
+const ROUTEDECISIONheader = ref([]);
+const MARINEGATEWAYheader = ref([]);
+const WAYPOINTheader = ref([]);
+const SASheader = ref([]);
+const ME1header = ref([]);
+const ME2header = ref([]);
+const V_NO1ENGINE_PANEL_61444header = ref([]);
+const V_NO1ENGINE_PANEL_65262header = ref([]);
+const V_NO1ENGINE_PANEL_65263header = ref([]);
+const V_NO1ENGINE_PANEL_65271header = ref([]);
+const V_NO1ENGINE_PANEL_65270header = ref([]);
+const V_NO1ENGINE_PANEL_65360header = ref([]);
+const V_NO1ENGINE_PANEL_65361_LAMPheader = ref([]);
+const V_NO1ENGINE_PANEL_65272header = ref([]);
+const V_NO1ENGINE_PANEL_65253header = ref([]);
+const V_NO1ENGINE_PANEL_65276header = ref([]);
+const V_NO2ENGINE_PANEL_61444header = ref([]);
+const V_NO2ENGINE_PANEL_65262header = ref([]);
+const V_NO2ENGINE_PANEL_65263header = ref([]);
+const V_NO2ENGINE_PANEL_65271header = ref([]);
+const V_NO2ENGINE_PANEL_65270header = ref([]);
+const V_NO2ENGINE_PANEL_65360header = ref([]);
+const V_NO2ENGINE_PANEL_65361_LAMPheader = ref([]);
+const V_NO2ENGINE_PANEL_65272header = ref([]);
+const V_NO2ENGINE_PANEL_65253header = ref([]);
+const V_NO2ENGINE_PANEL_65276header = ref([]);
+const V_NO1ENGINE_PANEL_65361_STATUSheader = ref([]);
+const V_NO1ENGINE_PANEL_65378header = ref([]);
+const V_NO1ENGINE_PANEL_65376header = ref([]);
+const V_NO1ENGINE_PANEL_65379header = ref([]);
+const V_NO2ENGINE_PANEL_65361_STATUSheader = ref([]);
+const V_NO2ENGINE_PANEL_65378header = ref([]);
+const V_NO2ENGINE_PANEL_65376header = ref([]);
+const V_NO2ENGINE_PANEL_65379header = ref([]);
+
+const SUBSCRIBELISTheader = ref([]);
+const CONNECTSTATEheader = ref([]);
+const SYSTEMSTATEheader = ref([]);
+const ALARMINFOheader = ref([]);
+const MODEINFOheader = ref([]);
+const COMheader = ref([]);
+const ENGINECONTROLheader = ref([]);
+const RUDDERCONTROLheader = ref([]);
+const SHORE_MODE_REQUESTheader = ref([]);
+const SHORE_ENGINE_CONTROLheader = ref([]);
+const SHORE_RUDDER_CONTROLheader = ref([]);
+
+const REQUESTCOMMAND_Rheader = ref([]);
+const RESPONSECOMMAND_Rheader = ref([]);
+const REQUESTCOMMAND_Eheader = ref([]);
+const RESPONSECOMMAND_Eheader = ref([]);
+const REQUESTCOMMAND_Mheader = ref([]);
+const RESPONSECOMMAND_Mheader = ref([]);
+
+
+
 
 const GLL = ref([]);
 const GGA = ref([]);
@@ -1697,211 +2438,460 @@ const NO2ENGINE_PANEL_65378 = ref([]);
 const NO2ENGINE_PANEL_65376 = ref([]);
 const NO2ENGINE_PANEL_65379 = ref([]);
 
-let downloadData = [];
+const SITUATIONAL = ref([]);
+const VIRTUALNAV = ref([]);
+const SITUATIONALAWARENESS = ref([]);
+const ROUTEDECISION = ref([]);
+const MARINEGATEWAY = ref([]);
+const WAYPOINT = ref([]);
+const SAS = ref([]);
+const ME1 = ref([]);
+const ME2 = ref([]);
+const V_NO1ENGINE_PANEL_61444 = ref([]);
+const V_NO1ENGINE_PANEL_65262 = ref([]);
+const V_NO1ENGINE_PANEL_65263 = ref([]);
+const V_NO1ENGINE_PANEL_65271 = ref([]);
+const V_NO1ENGINE_PANEL_65270 = ref([]);
+const V_NO1ENGINE_PANEL_65360 = ref([]);
+const V_NO1ENGINE_PANEL_65361_LAMP = ref([]);
+const V_NO1ENGINE_PANEL_65272 = ref([]);
+const V_NO1ENGINE_PANEL_65253 = ref([]);
+const V_NO1ENGINE_PANEL_65276 = ref([]);
+const V_NO2ENGINE_PANEL_61444 = ref([]);
+const V_NO2ENGINE_PANEL_65262 = ref([]);
+const V_NO2ENGINE_PANEL_65263 = ref([]);
+const V_NO2ENGINE_PANEL_65271 = ref([]);
+const V_NO2ENGINE_PANEL_65270 = ref([]);
+const V_NO2ENGINE_PANEL_65360 = ref([]);
+const V_NO2ENGINE_PANEL_65361_LAMP = ref([]);
+const V_NO2ENGINE_PANEL_65272 = ref([]);
+const V_NO2ENGINE_PANEL_65253 = ref([]);
+const V_NO2ENGINE_PANEL_65276 = ref([]);
+const V_NO1ENGINE_PANEL_65361_STATUS = ref([]);
+const V_NO1ENGINE_PANEL_65378 = ref([]);
+const V_NO1ENGINE_PANEL_65376 = ref([]);
+const V_NO1ENGINE_PANEL_65379 = ref([]);
+const V_NO2ENGINE_PANEL_65361_STATUS = ref([]);
+const V_NO2ENGINE_PANEL_65378 = ref([]);
+const V_NO2ENGINE_PANEL_65376 = ref([]);
+const V_NO2ENGINE_PANEL_65379 = ref([]);
+
+const SUBSCRIBELIST = ref([]);
+const CONNECTSTATE = ref([]);
+const SYSTEMSTATE = ref([]);
+const ALARMINFO = ref([]);
+const MODEINFO = ref([]);
+const COM = ref([]);
+const ENGINECONTROL = ref([]);
+const RUDDERCONTROL = ref([]);
+const SHORE_MODE_REQUEST = ref([]);
+const SHORE_ENGINE_CONTROL = ref([]);
+const SHORE_RUDDER_CONTROL = ref([]);
+
+const REQUESTCOMMAND_R = ref([]);
+const RESPONSECOMMAND_R = ref([]);
+const REQUESTCOMMAND_E = ref([]);
+const RESPONSECOMMAND_E = ref([]);
+const REQUESTCOMMAND_M = ref([]);
+const RESPONSECOMMAND_M = ref([]);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 const dataHandlers = {
-  "dgps/gll": { header: GLLheader, data: GLL, sheetName: "GLL" },
-  "dgps/gga": { header: GGAheader, data: GGA, sheetName: "GGA" },
-  "dgps/rmc": { header: RMCheader, data: RMC, sheetName: "RMC" },
-  "dgps/vtg": { header: VTGheader, data: VTG, sheetName: "VTG" },
-  "dgps/zda": { header: ZDAheader, data: ZDA, sheetName: "ZDA" },
-  "dgps/gsv": { header: GSVheader, data: GSV, sheetName: "GSV" },
-  "dgps/gsa": { header: GSAheader, data: GSA, sheetName: "GSA" },
-  "gyro/hdt": { header: HDTheader, data: HDT, sheetName: "HDT" },
-  "gyro/rot": { header: ROTheader, data: ROT, sheetName: "ROT" },
-  "anemometer/mwv": { header: MWVheader, data: MWV, sheetName: "MWV" },
+  "dgps/gll": { header: GLLheader, data: GLL, },
+  "dgps/gga": { header: GGAheader, data: GGA, },
+  "dgps/rmc": { header: RMCheader, data: RMC, },
+  "dgps/vtg": { header: VTGheader, data: VTG, },
+  "dgps/zda": { header: ZDAheader, data: ZDA, },
+  "dgps/gsv": { header: GSVheader, data: GSV, },
+  "dgps/gsa": { header: GSAheader, data: GSA, },
+  "gyro/hdt": { header: HDTheader, data: HDT, },
+  "gyro/rot": { header: ROTheader, data: ROT, },
+  "anemometer/mwv": { header: MWVheader, data: MWV, },
   "radar/screen": {
     header: RADAR_SCREENheader,
     data: RADAR_SCREEN,
-    sheetName: "RADAR_SCREEN",
   },
-  "ais/vdm": { header: VDMheader, data: VDM, sheetName: "VDM" },
-  "ais/vdo": { header: VDOheader, data: VDO, sheetName: "VDO" },
+  "ais/vdm": { header: VDMheader, data: VDM, },
+  "ais/vdo": { header: VDOheader, data: VDO, },
   "ecdis/routeinfo": {
     header: ROUTEINFOheader,
     data: ROUTEINFO,
-    sheetName: "ROUTEINFO",
   },
   "ecdis/waypoints": {
     header: WAYPOINTSheader,
     data: WAYPOINTS,
-    sheetName: "WAYPOINTS",
   },
-  "ecdis/rtz": { header: RTZheader, data: RTZ, sheetName: "RTZ" },
+  "ecdis/rtz": { header: RTZheader, data: RTZ, },
   "ecdis/screen": {
     header: ECDIS_SCREENheader,
     data: ECDIS_SCREEN,
-    sheetName: "ECDIS_SCREEN",
   },
-  "autopilot/rsa": { header: RSAheader, data: RSA, sheetName: "RSA" },
-  "autopilot/htd": { header: HTDheader, data: HTD, sheetName: "HTD" },
-  "speedlog/vbw": { header: VBWheader, data: VBW, sheetName: "VBW" },
-  "speedlog/vhw": { header: VHWheader, data: VHW, sheetName: "VHW" },
-  "speedlog/vlw": { header: VLWheader, data: VLW, sheetName: "VLW" },
+  "autopilot/rsa": { header: RSAheader, data: RSA, },
+  "autopilot/htd": { header: HTDheader, data: HTD, },
+  "speedlog/vbw": { header: VBWheader, data: VBW, },
+  "speedlog/vhw": { header: VHWheader, data: VHW, },
+  "speedlog/vlw": { header: VLWheader, data: VLW, },
   "canthrottle/canonlinestate": {
     header: CAN_Online_Stateheader,
     data: CAN_Online_State,
-    sheetName: "CAN_Online_State",
   },
   "canthrottle/enginerpm": {
     header: Engine_RPMheader,
     data: Engine_RPM,
-    sheetName: "Engine_RPM",
   },
   "canthrottle/rudder": {
     header: Rudderheader,
     data: Rudder,
-    sheetName: "Rudder",
   },
   "canthrottle/rudderscale": {
     header: Rudder_Scaleheader,
     data: Rudder_Scale,
-    sheetName: "Rudder_Scale",
   },
   "autopilotcontact/autopilotcontact": {
     header: AUTOPILOTCONTACTheader,
     data: AUTOPILOTCONTACT,
-    sheetName: "AUTOPILOTCONTACT",
   },
   "no1enginepanel/no1engine_panel_61444": {
     header: NO1ENGINE_PANEL_61444header,
     data: NO1ENGINE_PANEL_61444,
-    sheetName: "NO.1ENGINE_PANEL_61444",
   },
   "no1enginepanel/no1engine_panel_65262": {
     header: NO1ENGINE_PANEL_65262header,
     data: NO1ENGINE_PANEL_65262,
-    sheetName: "NO.1ENGINE_PANEL_65262",
   },
   "no1enginepanel/no1engine_panel_65263": {
     header: NO1ENGINE_PANEL_65263header,
     data: NO1ENGINE_PANEL_65263,
-    sheetName: "NO.1ENGINE_PANEL_65263",
   },
   "no1enginepanel/no1engine_panel_65272": {
     header: NO1ENGINE_PANEL_65272header,
     data: NO1ENGINE_PANEL_65272,
-    sheetName: "NO.1ENGINE_PANEL_65272",
   },
   "no1enginepanel/no1engine_panel_65271": {
     header: NO1ENGINE_PANEL_65271header,
     data: NO1ENGINE_PANEL_65271,
-    sheetName: "NO1ENGINE_PANEL_65271",
   },
   "no1enginepanel/no1engine_panel_65253": {
     header: NO1ENGINE_PANEL_65253header,
     data: NO1ENGINE_PANEL_65253,
-    sheetName: "NO1ENGINE_PANEL_65253",
   },
   "no1enginepanel/no1engine_panel_65270": {
     header: NO1ENGINE_PANEL_65270header,
     data: NO1ENGINE_PANEL_65270,
-    sheetName: "NO1ENGINE_PANEL_65270",
   },
   "no1enginepanel/no1engine_panel_65276": {
     header: NO1ENGINE_PANEL_65276header,
     data: NO1ENGINE_PANEL_65276,
-    sheetName: "NO1ENGINE_PANEL_65276",
   },
   "no1enginepanel/no1engine_panel_65360": {
     header: NO1ENGINE_PANEL_65360header,
     data: NO1ENGINE_PANEL_65360,
-    sheetName: "NO1ENGINE_PANEL_65360",
   },
   "no1enginepanel/no1engine_panel_65361_lamp": {
     header: NO1ENGINE_PANEL_65361_LAMPheader,
     data: NO1ENGINE_PANEL_65361_LAMP,
-    sheetName: "NO1ENGINE_PANEL_65361_LAMP",
   },
   "no1enginepanel/no1engine_panel_65361_status": {
     header: NO1ENGINE_PANEL_65361_STATUSheader,
     data: NO1ENGINE_PANEL_65361_STATUS,
-    sheetName: "NO1ENGINE_PANEL_65361_STATUS",
   },
   "no1enginepanel/no1engine_panel_65378": {
     header: NO1ENGINE_PANEL_65378header,
     data: NO1ENGINE_PANEL_65378,
-    sheetName: "NO1ENGINE_PANEL_65378",
   },
   "no1enginepanel/no1engine_panel_65376": {
     header: NO1ENGINE_PANEL_65376header,
     data: NO1ENGINE_PANEL_65376,
-    sheetName: "NO1ENGINE_PANEL_65376",
   },
   "no1enginepanel/no1engine_panel_65379": {
     header: NO1ENGINE_PANEL_65379header,
     data: NO1ENGINE_PANEL_65379,
-    sheetName: "NO1ENGINE_PANEL_65379",
   },
   "no2enginepanel/no2engine_panel_61444": {
     header: NO2ENGINE_PANEL_61444header,
     data: NO2ENGINE_PANEL_61444,
-    sheetName: "NO2ENGINE_PANEL_61444",
   },
   "no2enginepanel/no2engine_panel_65262": {
     header: NO2ENGINE_PANEL_65262header,
     data: NO2ENGINE_PANEL_65262,
-    sheetName: "NO2ENGINE_PANEL_65262",
   },
   "no2enginepanel/no2engine_panel_65263": {
     header: NO2ENGINE_PANEL_65263header,
     data: NO2ENGINE_PANEL_65263,
-    sheetName: "NO2ENGINE_PANEL_65263",
   },
   "no2enginepanel/no2engine_panel_65272": {
     header: NO2ENGINE_PANEL_65272header,
     data: NO2ENGINE_PANEL_65272,
-    sheetName: "NO2ENGINE_PANEL_65272",
   },
   "no2enginepanel/no2engine_panel_65271": {
     header: NO2ENGINE_PANEL_65271header,
     data: NO2ENGINE_PANEL_65271,
-    sheetName: "NO2ENGINE_PANEL_65271",
   },
   "no2enginepanel/no2engine_panel_65253": {
     header: NO2ENGINE_PANEL_65253header,
     data: NO2ENGINE_PANEL_65253,
-    sheetName: "NO2ENGINE_PANEL_65253",
   },
   "no2enginepanel/no2engine_panel_65270": {
     header: NO2ENGINE_PANEL_65270header,
     data: NO2ENGINE_PANEL_65270,
-    sheetName: "NO2ENGINE_PANEL_65270",
   },
   "no2enginepanel/no2engine_panel_65276": {
     header: NO2ENGINE_PANEL_65276header,
     data: NO2ENGINE_PANEL_65276,
-    sheetName: "NO2ENGINE_PANEL_65276",
   },
   "no2enginepanel/no2engine_panel_65360": {
     header: NO2ENGINE_PANEL_65360header,
     data: NO2ENGINE_PANEL_65360,
-    sheetName: "NO2ENGINE_PANEL_65360",
   },
   "no2enginepanel/no2engine_panel_65361_lamp": {
     header: NO2ENGINE_PANEL_65361_LAMPheader,
     data: NO2ENGINE_PANEL_65361_LAMP,
-    sheetName: "NO2ENGINE_PANEL_65361_LAMP",
   },
   "no2enginepanel/no2engine_panel_65361_status": {
     header: NO2ENGINE_PANEL_65361_STATUSheader,
     data: NO2ENGINE_PANEL_65361_STATUS,
-    sheetName: "NO2ENGINE_PANEL_65361_STATUS",
   },
   "no2enginepanel/no2engine_panel_65378": {
     header: NO2ENGINE_PANEL_65378header,
     data: NO2ENGINE_PANEL_65378,
-    sheetName: "NO2ENGINE_PANEL_65378",
   },
   "no2enginepanel/no2engine_panel_65376": {
     header: NO2ENGINE_PANEL_65376header,
     data: NO2ENGINE_PANEL_65376,
-    sheetName: "NO2ENGINE_PANEL_65376",
   },
   "no2enginepanel/no2engine_panel_65379": {
     header: NO2ENGINE_PANEL_65379header,
     data: NO2ENGINE_PANEL_65379,
-    sheetName: "NO2ENGINE_PANEL_65379",
+  },
+  "MTIE1ISA/SITUATIONAL": {
+    header: SITUATIONALheader,
+    data: SITUATIONAL,
+  },
+  "MTIE5VDGS/VIRTUALNAV": {
+    header: VIRTUALNAVheader,
+    data: VIRTUALNAV,
+  },
+  "MTIE5DBS/SITUATIONALAWARENESS": {
+    header: SITUATIONALAWARENESSheader,
+    data: SITUATIONALAWARENESS,
+  },
+  "MOF1ANS/ROUTEDECISION": {
+    header: ROUTEDECISIONheader,
+    data: ROUTEDECISION,
+  },
+  "MOF2SYNC/MARINEGATEWAY": {
+    header: MARINEGATEWAYheader,
+    data: MARINEGATEWAY,
+  },
+  "MOF1GNW/WAYPOINT": {
+    header: WAYPOINTheader,
+    data: WAYPOINT,
+  },
+  "MTIE5SAS/SAS": {
+    header: SASheader,
+    data: SAS,
+  },
+  "MTIE4.XINNOS_STAS/ME1": {
+    header: ME1header,
+    data: ME1,
+  },
+  "MTIE4.XINNOS_STAS/ME2": {
+    header: ME2header,
+    data: ME2,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_61444": {
+    header: V_NO1ENGINE_PANEL_61444header,
+    data: V_NO1ENGINE_PANEL_61444,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65262": {
+    header: V_NO1ENGINE_PANEL_65262header,
+    data: V_NO1ENGINE_PANEL_65262,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65263": {
+    header: V_NO1ENGINE_PANEL_65263header,
+    data: V_NO1ENGINE_PANEL_65263,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65271": {
+    header: V_NO1ENGINE_PANEL_65271header,
+    data: V_NO1ENGINE_PANEL_65271,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65270": {
+    header: V_NO1ENGINE_PANEL_65270header,
+    data: V_NO1ENGINE_PANEL_65270,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65360": {
+    header: V_NO1ENGINE_PANEL_65360header,
+    data: V_NO1ENGINE_PANEL_65360,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65361_LAMP": {
+    header: V_NO1ENGINE_PANEL_65361_LAMPheader,
+    data: V_NO1ENGINE_PANEL_65361_LAMP,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65272": {
+    header: V_NO1ENGINE_PANEL_65272header,
+    data: V_NO1ENGINE_PANEL_65272,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65253": {
+    header: V_NO1ENGINE_PANEL_65253header,
+    data: V_NO1ENGINE_PANEL_65253,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65276": {
+    header: V_NO1ENGINE_PANEL_65276header,
+    data: V_NO1ENGINE_PANEL_65276,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_61444": {
+    header: V_NO2ENGINE_PANEL_61444header,
+    data: V_NO2ENGINE_PANEL_61444,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65262": {
+    header: V_NO2ENGINE_PANEL_65262header,
+    data: V_NO2ENGINE_PANEL_65262,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65263": {
+    header: V_NO2ENGINE_PANEL_65263header,
+    data: V_NO2ENGINE_PANEL_65263,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65271": {
+    header: V_NO2ENGINE_PANEL_65271header,
+    data: V_NO2ENGINE_PANEL_65271,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65270": {
+    header: V_NO2ENGINE_PANEL_65270header,
+    data: V_NO2ENGINE_PANEL_65270,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65360": {
+    header: V_NO2ENGINE_PANEL_65360header,
+    data: V_NO2ENGINE_PANEL_65360,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65361_LAMP": {
+    header: V_NO2ENGINE_PANEL_65361_LAMPheader,
+    data: V_NO2ENGINE_PANEL_65361_LAMP,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65272": {
+    header: V_NO2ENGINE_PANEL_65272header,
+    data: V_NO2ENGINE_PANEL_65272,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65253": {
+    header: V_NO2ENGINE_PANEL_65253header,
+    data: V_NO2ENGINE_PANEL_65253,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65276": {
+    header: V_NO2ENGINE_PANEL_65276header,
+    data: V_NO2ENGINE_PANEL_65276,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65361_STATUS": {
+    header: V_NO1ENGINE_PANEL_65361_STATUSheader,
+    data: V_NO1ENGINE_PANEL_65361_STATUS,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65378": {
+    header: V_NO1ENGINE_PANEL_65378header,
+    data: V_NO1ENGINE_PANEL_65378,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65376": {
+    header: V_NO1ENGINE_PANEL_65376header,
+    data: V_NO1ENGINE_PANEL_65376,
+  },
+  "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65379": {
+    header: V_NO1ENGINE_PANEL_65379header,
+    data: V_NO1ENGINE_PANEL_65379,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65361_STATUS": {
+    header: V_NO2ENGINE_PANEL_65361_STATUSheader,
+    data: V_NO2ENGINE_PANEL_65361_STATUS,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65378": {
+    header: V_NO2ENGINE_PANEL_65378header,
+    data: V_NO2ENGINE_PANEL_65378,
+  },
+  "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65376": {
+    header: V_NO2ENGINE_PANEL_65376header,
+    data: V_NO2ENGINE_PANEL_65376,
+  },
+  "MTIE4XINNOS_VDGS/NO2ENGINE_PANEL_65379": {
+    header: V_NO2ENGINE_PANEL_65379header,
+    data: V_NO2ENGINE_PANEL_65379,
+  },
+  "MANAGEMENT/SUBSCRIBELIST": {
+    header: SUBSCRIBELISTheader,
+    data: SUBSCRIBELIST,
+  },
+  "MANAGEMENT/CONNECTSTATE": {
+    header: CONNECTSTATEheader,
+    data: CONNECTSTATE,
+  },
+  "MANAGEMENT/SYSTEMSTATE": {
+    header: SYSTEMSTATEheader,
+    data: SYSTEMSTATE,
+  },
+  "MANAGEMENT/ALARMINFO": {
+    header: ALARMINFOheader,
+    data: ALARMINFO,
+  },
+  "MANAGEMENT/MODEINFO": {
+    header: MODEINFOheader,
+    data: MODEINFO,
+  },
+  "MANAGEMENT/COM": {
+    header: COMheader,
+    data: COM,
+  },
+  "MANAGEMENT/ENGINECONTROL": {
+    header: ENGINECONTROLheader,
+    data: ENGINECONTROL,
+  },
+  "MANAGEMENT/RUDDERCONTROL": {
+    header: RUDDERCONTROLheader,
+    data: RUDDERCONTROL,
+  },
+  "MANAGEMENT/SHORE_MODE_REQUEST": {
+    header: SHORE_MODE_REQUESTheader,
+    data: SHORE_MODE_REQUEST,
+  },
+  "MANAGEMENT/SHORE_ENGINE_CONTROL": {
+    header: SHORE_ENGINE_CONTROLheader,
+    data: SHORE_ENGINE_CONTROL,
+  },
+  "MANAGEMENT/SHORE_RUDDER_CONTROL": {
+    header: SHORE_RUDDER_CONTROLheader,
+    data: SHORE_RUDDER_CONTROL,
+  },
+  "RUDDER/REQUESTCOMMAND_R": {
+    header: REQUESTCOMMAND_Rheader,
+    data: REQUESTCOMMAND_R,
+  },
+  "RUDDER/RESPONSECOMMAND_R": {
+    header: RESPONSECOMMAND_Rheader,
+    data: RESPONSECOMMAND_R,
+  },
+  "ENGINE/REQUESTCOMMAND_E": {
+    header: REQUESTCOMMAND_Eheader,
+    data: REQUESTCOMMAND_E,
+  },
+  "ENGINE/RESPONSECOMMAND_E": {
+    header: RESPONSECOMMAND_Eheader,
+    data: RESPONSECOMMAND_E,
+  },
+  "MODE/REQUESTCOMMAND_M": {
+    header: REQUESTCOMMAND_Mheader,
+    data: REQUESTCOMMAND_M,
+  },
+  "MODE/RESPONSECOMMAND_M": {
+    header: RESPONSECOMMAND_Mheader,
+    data: RESPONSECOMMAND_M,
   },
 };
 
@@ -1910,8 +2900,6 @@ const switchValue = (axiosItem, dataheader, response) => {
   if (handler) {
     handler.header.value = dataheader.value;
     handler.data.value = response;
-    downloadData.push(handler.data);
-    sheetName.push(handler.sheetName);
   }
 };
 
@@ -2089,6 +3077,169 @@ const handleSortUpdate = (newOptions) => {
     case "NO2ENGINE_PANEL_65379":
       sortData(NO2ENGINE_PANEL_65379.value, sortByKey, sortOrder);
       break;
+
+    case "SITUATIONAL":
+      sortData(SITUATIONAL.value, sortByKey, sortOrder);
+      break;
+    case "VIRTUALNAV":
+      sortData(VIRTUALNAV.value, sortByKey, sortOrder);
+      break;
+    case "SITUATIONALAWARENESS":
+      sortData(SITUATIONALAWARENESS.value, sortByKey, sortOrder);
+      break;
+    case "ROUTEDECISION":
+      sortData(ROUTEDECISION.value, sortByKey, sortOrder);
+      break;
+    case "MARINEGATEWAY":
+      sortData(MARINEGATEWAY.value, sortByKey, sortOrder);
+      break;
+    case "WAYPOINT":
+      sortData(WAYPOINT.value, sortByKey, sortOrder);
+      break;
+    case "SAS":
+      sortData(SAS.value, sortByKey, sortOrder);
+      break;
+    case "ME1":
+      sortData(ME1.value, sortByKey, sortOrder);
+      break;
+    case "ME2":
+      sortData(ME2.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_61444":
+      sortData(V_NO1ENGINE_PANEL_61444.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65262":
+      sortData(V_NO1ENGINE_PANEL_65262.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65263":
+      sortData(V_NO1ENGINE_PANEL_65263.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65271":
+      sortData(V_NO1ENGINE_PANEL_65271.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65270":
+      sortData(V_NO1ENGINE_PANEL_65270.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65360":
+      sortData(V_NO1ENGINE_PANEL_65360.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65361_LAMP":
+      sortData(V_NO1ENGINE_PANEL_65361_LAMP.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65272":
+      sortData(V_NO1ENGINE_PANEL_65272.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65253":
+      sortData(V_NO1ENGINE_PANEL_65253.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65276":
+      sortData(V_NO1ENGINE_PANEL_65276.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_61444":
+      sortData(V_NO2ENGINE_PANEL_61444.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65262":
+      sortData(V_NO2ENGINE_PANEL_65262.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65263":
+      sortData(V_NO2ENGINE_PANEL_65263.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65271":
+      sortData(V_NO2ENGINE_PANEL_65271.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65270":
+      sortData(V_NO2ENGINE_PANEL_65270.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65360":
+      sortData(V_NO2ENGINE_PANEL_65360.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65361_LAMP":
+      sortData(V_NO2ENGINE_PANEL_65361_LAMP.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65272":
+      sortData(V_NO2ENGINE_PANEL_65272.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65253":
+      sortData(V_NO2ENGINE_PANEL_65253.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65276":
+      sortData(V_NO2ENGINE_PANEL_65276.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65361_STATUS":
+      sortData(V_NO1ENGINE_PANEL_65361_STATUS.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65378":
+      sortData(V_NO1ENGINE_PANEL_65378.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65376":
+      sortData(V_NO1ENGINE_PANEL_65376.value, sortByKey, sortOrder);
+      break;
+    case "V_NO1ENGINE_PANEL_65379":
+      sortData(V_NO1ENGINE_PANEL_65379.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65361_STATUS":
+      sortData(V_NO2ENGINE_PANEL_65361_STATUS.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65378":
+      sortData(V_NO2ENGINE_PANEL_65378.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65376":
+      sortData(V_NO2ENGINE_PANEL_65376.value, sortByKey, sortOrder);
+      break;
+    case "V_NO2ENGINE_PANEL_65379":
+      sortData(V_NO2ENGINE_PANEL_65379.value, sortByKey, sortOrder);
+      break;
+    case "SUBSCRIBELIST":
+      sortData(SUBSCRIBELIST.value, sortByKey, sortOrder);
+      break;
+    case "CONNECTSTATE":
+      sortData(CONNECTSTATE.value, sortByKey, sortOrder);
+      break;
+    case "SYSTEMSTATE":
+      sortData(SYSTEMSTATE.value, sortByKey, sortOrder);
+      break;
+    case "ALARMINFO":
+      sortData(ALARMINFO.value, sortByKey, sortOrder);
+      break;
+    case "MODEINFO":
+      sortData(MODEINFO.value, sortByKey, sortOrder);
+      break;
+    case "COM":
+      sortData(COM.value, sortByKey, sortOrder);
+      break;
+    case "ENGINECONTROL":
+      sortData(ENGINECONTROL.value, sortByKey, sortOrder);
+      break;
+    case "RUDDERCONTROL":
+      sortData(RUDDERCONTROL.value, sortByKey, sortOrder);
+      break;
+    case "SHORE_MODE_REQUEST":
+      sortData(SHORE_MODE_REQUEST.value, sortByKey, sortOrder);
+      break;
+    case "SHORE_ENGINE_CONTROL":
+      sortData(SHORE_ENGINE_CONTROL.value, sortByKey, sortOrder);
+      break;
+    case "SHORE_RUDDER_CONTROL":
+      sortData(SHORE_RUDDER_CONTROL.value, sortByKey, sortOrder);
+      break;
+    case "REQUESTCOMMAND_R":
+      sortData(REQUESTCOMMAND_R.value, sortByKey, sortOrder);
+      break;
+    case "RESPONSECOMMAND_R":
+      sortData(RESPONSECOMMAND_R.value, sortByKey, sortOrder);
+      break;
+    case "REQUESTCOMMAND_E":
+      sortData(REQUESTCOMMAND_E.value, sortByKey, sortOrder);
+      break;
+    case "RESPONSECOMMAND_E":
+      sortData(RESPONSECOMMAND_E.value, sortByKey, sortOrder);
+      break;
+    case "REQUESTCOMMAND_M":
+      sortData(REQUESTCOMMAND_M.value, sortByKey, sortOrder);
+      break;
+    case "RESPONSECOMMAND_M":
+      sortData(RESPONSECOMMAND_M.value, sortByKey, sortOrder);
+      break;
     // 다른 데이터에 대한 처리 추가
     // ...
     default:
@@ -2215,5 +3366,9 @@ select:focus {
   --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
   --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
   --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
+}
+
+.auto-width {
+  width: auto;
 }
 </style>

@@ -269,6 +269,7 @@ const themeColor = ref(
 
 // 왼쪽 셀렉바 설정
 const tokenid = ref(sessionStorage.getItem("token") || "");
+const userId = ref(sessionStorage.getItem("id") || "");
 const analysisData = ref([]);
 const analysisTime = ref([]);
 const subComponents = ref([
@@ -644,6 +645,17 @@ const searchData = async () => {
           processData(fuel_LEVEL_2, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no2engine_panel_65276/Fuel Level", "fuel_LEVEL");
           break;
       }
+
+      let Item = {
+        user_id: userId.value ? userId.value : "unknown",
+        page: `데이터 분석`,
+        log: `${selectedItem.value} 데이터 조회`,
+      };
+      try {
+        // createErrorData(response, Item);
+      } catch (error) {
+        console.error(error);
+      }
       
       const datasetRaw2 = ref([["time", "value"]]);
         datasetRaw2.value = [];
@@ -921,6 +933,17 @@ const captureImage = async () => {
 
       // URL 객체 해제
       URL.revokeObjectURL(blobUrl);
+
+      let Item = {
+        user_id: userId.value ? userId.value : "unknown",
+        page: `데이터 분석`,
+        log: `${selectedItem.value} 그래프 캡쳐`,
+      };
+      try {
+        // createErrorData(response, Item);
+      } catch (error) {
+        console.error(error);
+      }
     } catch (error) {
       console.error("Error capturing image:", error);
     }

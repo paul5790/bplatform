@@ -446,21 +446,16 @@ const login = async () => {
     // 세션 스토리지에 사용자 로그인 상태를 저장
     sessionStorage.setItem("showDashboard", showDashboard.value.toString());
 
-    // let errorItem = {
-    //   id: sessionStorage.getItem("userid") || "",
-    //   requestMethod: error.response ? error.response.config.method : "unknown",
-    //   requestUrl: error.response
-    //     ? error.response.request.responseURL
-    //     : "unknown",
-    //   page: error.response ? error.response.status : "unknown",
-    //   log: `${userName}(${id}) 로그인`,
-    // };
-    // try {
-    //   createErrorData(tokenid.value, errorItem);
-    //   alert("다운로드 할 데이터를 다시 확인해주세요.");
-    // } catch (error) {
-    //   console.error(error);
-    // }
+    let Item = {
+      user_id: id ? id : "unknown",
+      page: `로그인 페이지`,
+      log: `${userName}(${id}) 로그인`,
+    };
+    try {
+      // createErrorData(response, Item);
+    } catch (error) {
+      console.error(error);
+    }
 
     // 이벤트 로그 메시지
   } catch (error) {

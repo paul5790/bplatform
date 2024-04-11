@@ -14,6 +14,18 @@
 
         <v-list-item @click="passwordchangeDialog = true">
           <v-list-item-title>비밀번호 재설정</v-list-item-title>
+
+          <v-list-item-subtitle>
+            {{ userName }}님의 비밀번호를 변경함
+          </v-list-item-subtitle>
+        </v-list-item>
+
+        <v-list-item @click="passwordcheckingDialog = true">
+          <v-list-item-title>초기 비밀번호 재설정</v-list-item-title>
+
+          <v-list-item-subtitle>
+            초기 비밀번호를 변경함 &nbsp;&nbsp;&nbsp;&nbsp;   <span style="font-size: 10px; color: #ff3333;">*ADMIN만 가능</span>
+          </v-list-item-subtitle>
         </v-list-item>
       </v-list>
 
@@ -57,6 +69,9 @@
           </v-btn-toggle>
         </v-list-item>
       </v-list>
+      <v-btn @click="resetPasswordDialog = true">
+        z
+      </v-btn>
 
       <!-- 개인정보 변경 -->
       <v-dialog v-model="privacyDialog" max-width="1024">
@@ -203,6 +218,83 @@
               >취소</v-btn
             >
             <v-btn color="blue-darken-1" variant="text" @click="passwordOK()"
+              >입력</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <!-- 비밀번호 확인 팝업 -->
+      <v-dialog v-model="passwordcheckingDialog" max-width="500">
+        <v-card>
+          <v-card-title>비밀번호 확인</v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12"
+                  ><p style="font-size: 13px">비밀번호</p></v-col
+                >
+                <v-col cols="12">
+                  <v-text-field
+                    :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+                    :type="visible ? 'text' : 'password'"
+                    label="비밀번호 확인"
+                    variant="solo"
+                    :rules="rules.oldPassword"
+                    required
+                    v-model="Cpw"
+                    @click:append-inner="visible = !visible"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click="passwordCheckingcancle()"
+              >취소</v-btn
+            >
+            <v-btn color="blue-darken-1" variant="text" @click="passwordChecking()"
+              >입력</v-btn
+            >
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <!-- 초기 비밀번호 재설정 팝업 -->
+      <v-dialog v-model="resetPasswordDialog" max-width="500">
+        <v-card>
+          <v-card-title>초기 비밀번호 설정</v-card-title>
+          <v-card-text>
+            <v-container>
+              <v-row>
+                <v-col cols="12">
+                  <v-text-field
+                    :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
+                    :type="visible ? 'text' : 'password'"
+                    label="초기 비밀번호"
+                    variant="solo"
+                    :rules="rules.oldPassword"
+                    required
+                    v-model="Rpw"
+                    @click:append-inner="visible = !visible"
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click="resetPasswordcancle()"
+              >취소</v-btn
+            >
+            <v-btn color="blue-darken-1" variant="text" @click="resetPassword()"
               >입력</v-btn
             >
           </v-card-actions>
@@ -1480,6 +1572,8 @@ import {
   updateSetTime,
   readLossTimeData,
   updateLossTimeData,
+  readPwData,
+  resetPwData,
 } from "../api/index.js";
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
@@ -1510,10 +1604,17 @@ const userNumber = ref();
 const pw = ref();
 const newpw = ref();
 const newpwcheck = ref();
+const pwCheck = ref();
+
+// 초기 비밀번호 설정
+const Cpw = ref();
+const Rpw = ref();
 
 // Dialog 관리
 const privacyDialog = ref(false);
 const passwordchangeDialog = ref(false);
+const passwordcheckingDialog = ref(false);
+const resetPasswordDialog = ref(false);
 const losstimeDialog = ref(false);
 const ALLlosstimeDialog = ref(false); // 소실주기 전체
 const realtimeDialog = ref(false);
@@ -1806,6 +1907,45 @@ const passwordOK = async () => {
   }
 };
 
+const passwordChecking = async () => {
+  let passwordCheck = {
+    "password": Cpw.value
+  };
+  try {
+    let A = await readPwData(tokenid.value, passwordCheck);
+    console.log(A);
+    if (A === true) {
+      passwordcheckingDialog.value = false;
+      resetPasswordDialog.value = true;
+      Cpw.value = null;
+    } else {
+      alert("비밀번호가 올바르지 않습니다.");
+    }
+  } catch (error) {
+    alert("오류가 발생했습니다.");
+    console.error("Error in passwordChecking:", error);
+  }
+}
+
+const resetPassword = async () => {
+  let passwordCheck = {
+    "password": Rpw.value
+  };
+  try {
+    let A = await resetPwData(tokenid.value, passwordCheck);
+    console.log(A);
+    resetPasswordDialog.value = false;
+    Rpw.value = null;
+    alert("초기 비밀번호를 수정하였습니다.");
+  } catch (error) {
+    alert("오류가 발생했습니다.");
+    console.error("Error in passwordChecking:", error);
+  }
+}
+
+
+
+
 // 비밀번호 변경 취소
 const passwordcancle = () => {
   pw.value = null;
@@ -1813,6 +1953,16 @@ const passwordcancle = () => {
   newpwcheck.value = null;
   passwordchangeDialog.value = false;
 };
+
+const passwordCheckingcancle = () => {
+  pwCheck.value = null;
+  passwordcheckingDialog.value = false;
+}
+
+const resetPasswordcancle = () => {
+  pwCheck.value = null;
+  resetPasswordDialog.value = false;
+}
 
 const axiostime = async () => {
   const data = {

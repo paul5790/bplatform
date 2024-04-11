@@ -16,11 +16,11 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <OSMap
+                  <!-- <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
                     :state="mapstart"
-                  />
+                  /> -->
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -406,7 +406,9 @@
             display: 'flex',
           }"
         >
-          <v-btn style="width: 100%; height: 100%" @click="openCCTV()">CCTV 확인</v-btn>
+          <v-btn style="width: 100%; height: 100%" @click="openCCTV()"
+            >CCTV 확인</v-btn
+          >
         </v-sheet>
         <v-sheet
           :style="{
@@ -431,30 +433,28 @@
       </v-col>
     </v-row>
   </v-card>
-  <!-- 개인정보 변경 -->
-  <v-dialog v-model="cctvDialog" max-width="1350" max-height="1000">
+  <!-- CCTV 화면 -->
+  <v-dialog v-model="cctvDialog" persistent max-width="1335">
     <v-card>
       <v-card-title>cctv</v-card-title>
       <v-card-text>
         <v-container>
-          <v-row>
-            <v-col cols="12"><p style="font-size: 13px">cctv 부제목</p></v-col>
-            
-            <video ref="video" width="1280" controls muted="muted"></video>
+          <v-row class="video-container">
+            <video ref="videoD" controls muted="muted"></video>
           </v-row>
         </v-container>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn
-          color="blue-darken-1"
-          variant="text"
-          @click="closeCCTV()"
-          >나가기</v-btn
+        <v-btn color="blue-darken-1" variant="text" @click="closeCCTV()"
+          >닫기</v-btn
         >
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <!-- <v-dialog v-model="cctvDialog">
+            <video ref="videoD" width="1280" controls muted="muted"></video>
+  </v-dialog> -->
 </template>
 
 <script setup>
@@ -478,6 +478,7 @@ import {
   onBeforeUnmount,
   onUnmounted,
   watch,
+  nextTick,
 } from "vue";
 import { onMessage, onOpen, onClose, onError } from "vue3-websocket";
 
@@ -499,15 +500,14 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 const checkTime = ref();
 
 const video = ref(null);
+const videoD = ref(null);
+const url = "http://ias.bdpbackend.com/stream/index.m3u8";
 const cctvDialog = ref(false);
+let hls; // Hls 인스턴스를 전역 변수로 선언
+let hls1; // Hls 인스턴스를 전역 변수로 선언
 
-const openCCTV = () => {
-  if(sessionStorage.getItem("isAdmin") != "ADMIN"){
-    alert("ADMIN 이상만 사용 가능합니다.");
-    return;
-  }
-  let hls = new Hls();
-  let url = "http://192.168.0.50:8081/stream/index.m3u8";
+onMounted(() => {
+  hls = new Hls();
   hls.loadSource(url);
   hls.attachMedia(video.value);
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -515,12 +515,33 @@ const openCCTV = () => {
       console.error("비디오 재생 오류:", error);
     });
   });
+});
+
+const openCCTV = () => {
   cctvDialog.value = true;
-}
+  if (sessionStorage.getItem("isAdmin") != "ADMIN") {
+    alert("ADMIN 이상만 사용 가능합니다.");
+    return;
+  }
+  setCCTV();
+};
+
+const setCCTV = () => {
+  nextTick(() => {
+    hls1 = new Hls();
+    hls1.loadSource(url);
+    hls1.attachMedia(videoD.value);
+    hls1.on(Hls.Events.MANIFEST_PARSED, () => {
+      videoD.value.play().catch((error) => {
+        console.error("비디오 재생 오류:", error);
+      });
+    });
+  });
+};
 
 const closeCCTV = () => {
   cctvDialog.value = false;
-}
+};
 
 const fetchData = async () => {
   try {
@@ -1793,4 +1814,18 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 70vh; /* 비디오가 차지하는 높이 조절 */
+}
+
+.video-container video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+</style>

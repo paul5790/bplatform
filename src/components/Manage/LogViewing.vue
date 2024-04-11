@@ -1,49 +1,101 @@
 <template>
-  <v-sheet>
+  <v-sheet class="manager-sheet">
     <!-- <v-btn color="blue" @click="errorMethod">오류발생 버튼</v-btn> -->
-    <v-select
-      v-model="selectedLog"
-      :items="selectionLog"
-      variant="solo"
-      style="width: 150px; height: 5vh; margin-top: 10px; margin-left: 10px;"
-      density="compact"
-    ></v-select>
-    <v-data-table
-      style="margin-top: 10px"
-      v-model:page="page"
-      class="elevation-1"
-      :headers="headers"
-      :items="items"
-      :items-per-page="itemsPerPage"
-      hide-default-footer
-      density="compact"
+    <v-card
+      class="scrollable-card"
+      style="
+        flex: 1;
+        height: 75vh;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+      "
     >
-      <template v-slot:bottom>
-        <div class="text-center pt-2">
-          <v-pagination
-            v-model="page"
-            :length="pageCount"
-            :total-visible="6"
-            rounded="circle"
-          ></v-pagination>
-        </div>
-      </template>
-    </v-data-table>
+      <v-card-item style="padding-top: 0px">
+        <v-row justify="space-between">
+          <v-col cols="auto">
+            <v-select
+              v-model="selectedLog"
+              :items="selectionLog"
+              variant="solo"
+              style="
+                width: 210px;
+                height: 5vh;
+                margin-top: 10px;
+                margin-left: 10px;
+              "
+              density="compact"
+            ></v-select>
+          </v-col>
+          <v-col cols="3">
+            <v-text-field
+              v-model="search"
+              label="Search"
+              prepend-inner-icon="mdi-magnify"
+              variant="underlined"
+              hide-details
+              single-line
+            ></v-text-field>
+          </v-col>
+        </v-row>
+        <v-data-table
+          style="margin-top: 10px"
+          v-model:page="page"
+          class="elevation-1"
+          :headers="headers"
+          :search="search"
+          :items="items"
+          :items-per-page="itemsPerPage"
+          hide-default-footer
+          density="compact"
+        >
+          <template v-slot:bottom>
+            <div class="text-center pt-2">
+              <v-pagination
+                v-model="page"
+                :length="pageCount"
+                :total-visible="6"
+                rounded="circle"
+              ></v-pagination>
+            </div>
+          </template>
+        </v-data-table>
+      </v-card-item>
+    </v-card>
   </v-sheet>
 </template>
 
 <script setup>
-import { computed, ref, watchEffect } from "vue";
+import { computed, ref, watchEffect, watch, onMounted } from "vue";
 import { readErrorData, createErrorData } from "../../api/index.js";
 import moment from "moment";
 const page = ref(1);
 const itemsPerPage = ref(16);
 
-const selectionLog = ref(["Error", "Event"]);
+const search = ref();
+
+const selectionLog = ref(["Web Dashboard Log", "Window App Log"]);
 const selectedLog = ref(selectionLog.value[0]);
 
+watch(selectedLog, (newValue, oldValue) => {
+  switch (newValue) {
+    case 'Web Dashboard Log':
+      console.log('Selected Option 1');
+      items.value = [];
+      webData();
+      break;
+    case 'Window App Log':
+      console.log('Selected Option 2');
+      items.value = [];
+      appData();
+      break;
+    default:
+      console.log('Unknown option selected');
+  }
+});
+
 watchEffect(() => {
-  console.log('selectedLog changed:', selectedLog.value);
+  console.log("selectedLog changed:", selectedLog.value);
 });
 
 const pageCount = computed(() => {
@@ -64,12 +116,14 @@ const headers = ref([
 
 const items = ref([]);
 
-const fetchData = async () => {
+const webData = async () => {
   try {
     const response = await readErrorData(tokenid.value);
     console.log(response);
     for (let i = 0; i < response.length; i++) {
-      const koreanTime = moment(response[i].timeStamp).add(9, 'hours').format('YYYY-MM-DD HH:mm:ss');
+      const koreanTime = moment(response[i].timeStamp)
+        .add(9, "hours")
+        .format("YYYY-MM-DD HH:mm:ss");
       items.value.push({
         name: response[i].id || "",
         utc: koreanTime || "",
@@ -91,7 +145,35 @@ const fetchData = async () => {
   }
 };
 
-fetchData();
+const appData = async () => {
+  try {
+    const response = await readErrorData(tokenid.value);
+    console.log(response);
+    for (let i = 0; i < response.length; i++) {
+      const koreanTime = moment(response[i].timeStamp)
+        .add(9, "hours")
+        .format("YYYY-MM-DD HH:mm:ss");
+      items.value.push({
+        name: response[i].id || "",
+        utc: koreanTime || "",
+        // target: response[i].userGroup || "",
+        // method: response[i].requestMethod || "",
+        // state: response[i].statusCode || "",
+        url: response[i].requestUrl || "",
+        log: response[i].log || "",
+      });
+      // items.value.push(response.data[i]);
+    }
+    items.value.sort((a, b) => {
+      const dateA = new Date(a.utc);
+      const dateB = new Date(b.utc);
+      return dateB - dateA;
+    });
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
 const errorMethod = () => {
   let errorItem = {
@@ -110,6 +192,11 @@ const errorMethod = () => {
     console.error(error);
   }
 };
+
+onMounted(() => {
+  // 컴포넌트가 마운트될 때 실행되는 코드
+  webData();
+});
 
 // // 데이터 테이블 바디
 // const items = ref([

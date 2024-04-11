@@ -775,6 +775,7 @@ const message = ref("항차 테이블 정보 로딩중...");
 const overlay = ref(false);
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
+const userId = ref(sessionStorage.getItem("id") || "");
 
 const pageCount = computed(() => {
   return Math.ceil(items.value.length / itemsPerPage.value);
@@ -1055,6 +1056,17 @@ const startData = async () => {
     sessionStorage.removeItem("endTimeUtc");
     sessionStorage.removeItem("description");
 
+    let Item = {
+      user_id: userId.value ? userId.value : "unknown",
+      page: `관리자 설정`,
+      log: `${division} 항차 측정 완료`,
+    };
+    try {
+      // createErrorData(response, Item);
+    } catch (error) {
+      console.error(error);
+    }
+
     // console.log(response.data);
     overlay.value = false;
     alert("항차 측정이 종료됩니다.");
@@ -1151,6 +1163,16 @@ const editData = async () => {
         try {
           await createTrialData(tokenid.value, data);
           overlay.value = false;
+          let Item = {
+            user_id: userId.value ? userId.value : "unknown",
+            page: `관리자 설정`,
+            log: `${division} 항차 추가 완료`,
+          };
+          try {
+            // createErrorData(response, Item);
+          } catch (error) {
+            console.error(error);
+          }
           alert("항차 추가가 완료되었습니다.");
           nullDialog2();
           // console.log("API 응답 데이터:", response.data);
@@ -1240,7 +1262,7 @@ const changeData = async () => {
     } else if (startDate.getTime() === endDate.getTime()) {
       alert("시작시간과 종료시간이 같습니다.");
     } else {
-      console.log(selectedData.value);
+      console.log(selectedData.value[0].division);
       try {
         const data = {
           seatrialId: selecteddivision.value,
@@ -1257,10 +1279,19 @@ const changeData = async () => {
         console.log(data);
         try {
           await updateTrialData(tokenid.value, data);
-
+          let Item = {
+            user_id: userId.value ? userId.value : "unknown",
+            page: `관리자 설정`,
+            log: `${selectedData.value[0].division} 항차 수정 완료`,
+          };
+          try {
+            // createErrorData(response, Item);
+          } catch (error) {
+            console.error(error);
+          }
           alert("선택된 항차의 수정이 완료되었습니다.");
           nullDialog3();
-          location.reload();
+          // location.reload();
         } catch (error) {
           console.log(1127);
           if (
@@ -1316,7 +1347,16 @@ const deleteData = async () => {
   };
   try {
     await deleteTrialData(tokenid.value, data);
-
+    let Item = {
+      user_id: userId.value ? userId.value : "unknown",
+      page: `관리자 설정`,
+      log: `${selectedData.value[0].division} 항차 삭제 완료`,
+    };
+    try {
+      // createErrorData(response, Item);
+    } catch (error) {
+      console.error(error);
+    }
     alert("선택한 항차의 삭제가 완료되었습니다.");
     overlayemit(false);
     overlay.value = false;

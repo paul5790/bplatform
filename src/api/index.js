@@ -43,6 +43,48 @@ export const createMineData = async (data) => {
   }
 };
 
+// 비밀번호 확인
+export const readPwData = async (tokenid, pw) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/admin/check`,
+      pw,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+// 비밀번호 확인
+export const resetPwData = async (tokenid, pw) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/admin/set/initialpassword`,
+      pw,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 // 개인정보 가져오기
 export const readMineData = async (tokenid) => {
   try {
