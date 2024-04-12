@@ -20,7 +20,7 @@
           </v-list-item-subtitle>
         </v-list-item>
 
-        <v-list-item @click="passwordcheckingDialog = true">
+        <v-list-item v-if="permission === 'ADMIN'" @click="passwordcheckingDialog = true">
           <v-list-item-title>초기 비밀번호 재설정</v-list-item-title>
 
           <v-list-item-subtitle>
@@ -69,9 +69,6 @@
           </v-btn-toggle>
         </v-list-item>
       </v-list>
-      <v-btn @click="resetPasswordDialog = true">
-        z
-      </v-btn>
 
       <!-- 개인정보 변경 -->
       <v-dialog v-model="privacyDialog" max-width="1024">
@@ -244,6 +241,7 @@
                     required
                     v-model="Cpw"
                     @click:append-inner="visible = !visible"
+                    @keyup.enter="passwordChecking()"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -281,6 +279,7 @@
                     required
                     v-model="Rpw"
                     @click:append-inner="visible = !visible"
+                    @keyup.enter="resetPassword()"
                   ></v-text-field>
                 </v-col>
               </v-row>
@@ -1523,7 +1522,7 @@
             <v-btn
               color="blue-darken-1"
               variant="text"
-              @click="updateTimeRefs(), setTimeRefs()"
+              @click="updateTimeRefs()"
               >설정</v-btn
             >
           </v-card-actions>
@@ -1591,6 +1590,7 @@ const darkMode = () => {
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const permission = ref(sessionStorage.getItem("isAdmin"));
+
 
 // 개인정보 변경
 const userName = ref();
@@ -1841,6 +1841,7 @@ const updateTimeRefs = async () => {
   };
   await updateLossTimeData(tokenid.value, data);
   setTimeRefs();
+  alert("설정이 완료되었습니다.")
 };
 
 const updateTenRefs = () => {
@@ -1851,6 +1852,7 @@ const updateTenRefs = () => {
 
 onMounted(() => {
   getInfo();
+  sessionStorage.setItem("page", "사용자 환경설정");
 });
 
 // 개인정보 변경

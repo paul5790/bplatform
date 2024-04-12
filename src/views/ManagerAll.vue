@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import VoyageManage from "../components/Manage/VoyageManage";
 import UserSetting from "../components/Manage/UserSetting";
 import LogViewing from "../components/Manage/LogViewing";
@@ -83,6 +83,9 @@ import {
   lightNoNselectedTabTextAdmin
 } from "../color/color.js";
 
+onMounted(() => {
+  sessionStorage.setItem("page", "관리자 설정");
+});
 
 // 다크모드
 const themeMode = ref(localStorage.getItem("themeMode") || "light");

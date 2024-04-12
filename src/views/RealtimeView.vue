@@ -16,11 +16,11 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <!-- <OSMap
+                  <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
                     :state="mapstart"
-                  /> -->
+                  />
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -468,7 +468,7 @@ import EchartHeading from "../components/EchartGraph/EchartHeading.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
-import { readLampTimeData } from "../api/index.js";
+import { readLampTimeData, cctvUrl } from "../api/index.js";
 import { darkbackcolor, whitebackcolor } from "../color/color.js";
 // 웹소켓 관련, Web Socket
 import {
@@ -499,23 +499,10 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 
 const checkTime = ref();
 
-const video = ref(null);
 const videoD = ref(null);
-const url = "http://ias.bdpbackend.com/stream/index.m3u8";
-const cctvDialog = ref(false);
-let hls; // Hls 인스턴스를 전역 변수로 선언
-let hls1; // Hls 인스턴스를 전역 변수로 선언
 
-onMounted(() => {
-  hls = new Hls();
-  hls.loadSource(url);
-  hls.attachMedia(video.value);
-  hls.on(Hls.Events.MANIFEST_PARSED, () => {
-    video.value.play().catch((error) => {
-      console.error("비디오 재생 오류:", error);
-    });
-  });
-});
+const cctvDialog = ref(false);
+let hls1; // Hls 인스턴스를 전역 변수로 선언
 
 const openCCTV = () => {
   cctvDialog.value = true;
@@ -527,6 +514,7 @@ const openCCTV = () => {
 };
 
 const setCCTV = () => {
+  const url = cctvUrl;
   nextTick(() => {
     hls1 = new Hls();
     hls1.loadSource(url);
@@ -556,6 +544,7 @@ const fetchData = async () => {
 };
 
 onMounted(() => {
+  sessionStorage.setItem("page", "실시간 모니터링");
   fetchData();
 });
 

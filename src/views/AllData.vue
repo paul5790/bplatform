@@ -14,7 +14,7 @@
           </v-select>
         </v-col>
         <!-- 첫번째 선택박스 -->
-        <v-col class="auto-width">
+        <v-col cols="3">
           <v-select
             v-model="firstSelectedItems"
             :items="firstSelect"
@@ -58,7 +58,7 @@
         </v-col>
 
         <!-- 두번째 선택박스 -->
-        <v-col class="auto-width">
+        <v-col cols="3">
           <v-select
             v-model="contentsSelectedItems"
             :items="secondSelect"
@@ -419,6 +419,9 @@ const downloadBtnDisabled = ref(true);
 // dialog
 const downloadDialog = ref(false);
 
+// 데이터 조회
+const postType = ref();
+
 // 데이터 다운로드
 let variableName;
 const canceling = ref(false);
@@ -427,9 +430,23 @@ const endTime = ref();
 const startISOTime = ref();
 const endISOTime = ref();
 
-watch(selectedData, (newVal, oldVal) => {
-  tab.value = 0;
-});
+const selectedvoyage = ref();
+
+// 시운전 시간 받아오기
+const date_readonly = ref(true);
+const dateRange = ref(); // 반응적인(ref) 배열로 초기화
+
+const startDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
+const endDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
+
+const searchType = ref("N/A");
+const searchStart = ref();
+const searchEnd = ref();
+
+// 다운로드
+const downloadFormat = ref(["csv", "txt"]);
+const selectDownlodFormat = ref("csv");
+
 
 const pageCount = ref(0);
 
@@ -441,20 +458,7 @@ const mainSelect = ref([
   "Control Information",
   "관제 Information",
 ]);
-const firstSelect = ref([
-  // "DGPS",
-  // "GYRO",
-  // "ANEMOMETER",
-  // "RADAR",
-  // "AIS",
-  // "ECDIS",
-  // "AUTOPILOT",
-  // "SPEEDLOG",
-  // "CanThrottle",
-  // "AUTOPILOTCONTACT",
-  // "NO.1ENGINEPANEL",
-  // "NO.2ENGINEPANEL",
-]);
+const firstSelect = ref([]);
 const secondSelect = ref([]);
 const mainSelectedItems = ref([]);
 const firstSelectedItems = ref([]);
@@ -464,7 +468,6 @@ const contentsSelectedItems = ref([]);
 const likesAllData = computed(
   () => mainSelectedItems.value.length === mainSelect.value.length
 );
-const likesSomeData = computed(() => mainSelectedItems.value.length > 0);
 
 const likesAllData1 = computed(
   () => firstSelectedItems.value.length === firstSelect.value.length
@@ -475,15 +478,6 @@ const likesAllData2 = computed(
   () => contentsSelectedItems.value.length === secondSelect.value.length
 );
 const likesSomeData2 = computed(() => contentsSelectedItems.value.length > 0);
-
-// 전체 선택
-const selectAllItem = () => {
-  if (likesAllData.value) {
-    mainSelectedItems.value = [];
-  } else {
-    mainSelectedItems.value = [...mainSelect.value];
-  }
-};
 
 const selectAllItem1 = () => {
   if (likesAllData1.value) {
@@ -501,273 +495,17 @@ const selectAllItem2 = () => {
   }
 };
 
-// select1이 변경될 때 second 배열 업데이트
-watchEffect(() => {
-  firstSelect.value = []; // 기존 secondSelect 초기화
-  firstSelectedItems.value = [];
-  if (mainSelectedItems.value.includes("Ship Information")) {
-    firstSelect.value.push(
-      "DGPS",
-      "GYRO",
-      "ANEMOMETER",
-      "RADAR",
-      "AIS",
-      "ECDIS",
-      "AUTOPILOT",
-      "SPEEDLOG",
-      "CANTHROTTLE",
-      "AUTOPILOTCONTACT",
-      "NO.1ENGINEPANEL",
-      "NO.2ENGINEPANEL"
-    );
-  }
-  if (mainSelectedItems.value.includes("Kass Information")) {
-    firstSelect.value.push(
-      "MTIE1.ISA",
-      "MTIE5.VDGS",
-      "MTIE5.DBS",
-      "MOF1.ANS",
-      "MOF2.SYNC",
-      "MOF1.GNW",
-      "MTIE5.SAS",
-      "MTIE4.XINNOS_VDGS_EMUL",
-      "MTIE4.XINNOS_STAS_EMUL",
-      "MTIE4.XINNOS_STAS",
-      "MTIE4.XINNOS_VDGS"
-    );
-  }
-  if (mainSelectedItems.value.includes("System Information")) {
-    firstSelect.value.push("MANAGEMENT");
-    firstSelectedItems.value.push("MANAGEMENT");
-  }
-  if (mainSelectedItems.value.includes("Control Information")) {
-    firstSelect.value.push("RUDDER", "ENGINE", "MODE");
-  }
-  if (mainSelectedItems.value.includes("관제 Information")) {
-    firstSelect.value.push("AIS", "VTS");
-  }
-});
 
-// select1이 변경될 때 second 배열 업데이트
-watchEffect(() => {
-  secondSelect.value = []; // 기존 secondSelect 초기화
-  contentsSelectedItems.value = [];
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Ship Infomation
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if (firstSelectedItems.value.includes("DGPS")) {
-    secondSelect.value.push("GLL", "GGA", "RMC", "VTG", "ZDA", "GSV", "GSA");
-  }
-  if (firstSelectedItems.value.includes("GYRO")) {
-    secondSelect.value.push("HDT", "ROT");
-  }
-  if (firstSelectedItems.value.includes("ANEMOMETER")) {
-    secondSelect.value.push("MWV");
-  }
-  if (firstSelectedItems.value.includes("RADAR")) {
-    secondSelect.value.push("RADAR_SCREEN");
-  }
-  if (firstSelectedItems.value.includes("AIS")) {
-    secondSelect.value.push("VDM", "VDO");
-  }
-  if (firstSelectedItems.value.includes("ECDIS")) {
-    secondSelect.value.push("ROUTEINFO", "WAYPOINTS", "RTZ", "ECDIS_SCREEN");
-  }
-  if (firstSelectedItems.value.includes("AUTOPILOT")) {
-    secondSelect.value.push("RSA", "HTD");
-  }
-  if (firstSelectedItems.value.includes("SPEEDLOG")) {
-    secondSelect.value.push("VBW", "VHW", "VLW");
-  }
-  if (firstSelectedItems.value.includes("CANTHROTTLE")) {
-    secondSelect.value.push(
-      "CAN_Online_State",
-      "Engine_RPM",
-      "Rudder",
-      "Rudder_Scale"
-    );
-  }
-  if (firstSelectedItems.value.includes("AUTOPILOTCONTACT")) {
-    secondSelect.value.push("AUTOPILOTCONTACT");
-  }
-  if (firstSelectedItems.value.includes("NO.1ENGINEPANEL")) {
-    secondSelect.value.push(
-      "NO.1ENGINE_PANEL_61444",
-      "NO.1ENGINE_PANEL_65262",
-      "NO.1ENGINE_PANEL_65263",
-      "NO.1ENGINE_PANEL_65272",
-      "NO.1ENGINE_PANEL_65271",
-      "NO.1ENGINE_PANEL_65253",
-      "NO.1ENGINE_PANEL_65270",
-      "NO.1ENGINE_PANEL_65276",
-      "NO.1ENGINE_PANEL_65360",
-      "NO.1ENGINE_PANEL_65361_LAMP",
-      "NO.1ENGINE_PANEL_65361_STATUS",
-      "NO.1ENGINE_PANEL_65378",
-      "NO.1ENGINE_PANEL_65376",
-      "NO.1ENGINE_PANEL_65379"
-    );
-  }
-  if (firstSelectedItems.value.includes("NO.2ENGINEPANEL")) {
-    secondSelect.value.push(
-      "NO.2ENGINE_PANEL_61444",
-      "NO.2ENGINE_PANEL_65262",
-      "NO.2ENGINE_PANEL_65263",
-      "NO.2ENGINE_PANEL_65272",
-      "NO.2ENGINE_PANEL_65271",
-      "NO.2ENGINE_PANEL_65253",
-      "NO.2ENGINE_PANEL_65270",
-      "NO.2ENGINE_PANEL_65276",
-      "NO.2ENGINE_PANEL_65360",
-      "NO.2ENGINE_PANEL_65361_LAMP",
-      "NO.2ENGINE_PANEL_65361_STATUS",
-      "NO.2ENGINE_PANEL_65378",
-      "NO.2ENGINE_PANEL_65376",
-      "NO.2ENGINE_PANEL_65379"
-    );
-  }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Kass Infomation
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if (firstSelectedItems.value.includes("MTIE1.ISA")) {
-    secondSelect.value.push("SITUATIONAL");
-  }
-  if (firstSelectedItems.value.includes("MTIE5.VDGS")) {
-    secondSelect.value.push("VIRTUALNAV");
-  }
-  if (firstSelectedItems.value.includes("MTIE5.DBS")) {
-    secondSelect.value.push("SITUATIONALAWARENESS");
-  }
-  if (firstSelectedItems.value.includes("MOF1.ANS")) {
-    secondSelect.value.push("ROUTEDECISION");
-  }
-  if (firstSelectedItems.value.includes("MOF2.SYNC")) {
-    secondSelect.value.push("MARINEGATEWAY");
-  }
-  if (firstSelectedItems.value.includes("MTIE5.SAS")) {
-    secondSelect.value.push("SAS");
-  }
-  if (firstSelectedItems.value.includes("MTIE4.XINNOS_VDGS_EMUL")) {
-    secondSelect.value.push(
-      "VIRTUALME1_1",
-      "VIRTUALME1_2",
-      "VIRTUALME1_3",
-      "VIRTUALME1_4",
-      "VIRTUALME1_5",
-      "VIRTUALME1_6",
-      "VIRTUALME1_7",
-      "VIRTUALME1_8",
-      "VIRTUALME1_9",
-      "VIRTUALME1_10",
-      "VIRTUALME1_11",
-      "VIRTUALME1_12",
-      "VIRTUALME1_13",
-      "VIRTUALME1_14",
-      "VIRTUALME2_1",
-      "VIRTUALME2_2",
-      "VIRTUALME2_3",
-      "VIRTUALME2_4",
-      "VIRTUALME2_5",
-      "VIRTUALME2_6",
-      "VIRTUALME2_7",
-      "VIRTUALME2_8",
-      "VIRTUALME2_9",
-      "VIRTUALME2_10",
-      "VIRTUALME2_11",
-      "VIRTUALME2_12",
-      "VIRTUALME2_13",
-      "VIRTUALME2_14",
-      "VIRTUALMP1_1",
-      "VIRTUALMP1_2",
-      "VIRTUALMP1_3",
-      "VIRTUALMP1_4",
-      "VIRTUALMP1_5",
-      "VIRTUALMP2_1",
-      "VIRTUALMP2_2",
-      "VIRTUALMP2_3",
-      "VIRTUALMP2_4",
-      "VIRTUALMP2_5",
-      "VIRTUALPMS_1",
-      "VIRTUALPMS_2",
-      "VIRTUALPMS_3"
-    );
-  }
-  if (firstSelectedItems.value.includes("MOF1.GNW")) {
-    secondSelect.value.push("WAYPOINT");
-  }
-  if (firstSelectedItems.value.includes("MTIE4.XINNOS_STAS_EMUL")) {
-    secondSelect.value.push("ME1_EMUL", "ME2_EMUL");
-  }
-  if (firstSelectedItems.value.includes("MTIE4.XINNOS_STAS")) {
-    secondSelect.value.push("ME1", "ME2");
-  }
-  if (firstSelectedItems.value.includes("MTIE4.XINNOS_VDGS")) {
-    secondSelect.value.push(
-      "V_NO.1ENGINE_PANEL_61444",
-      "V_NO.1ENGINE_PANEL_65262",
-      "V_NO.1ENGINE_PANEL_65263",
-      "V_NO.1ENGINE_PANEL_65272",
-      "V_NO.1ENGINE_PANEL_65271",
-      "V_NO.1ENGINE_PANEL_65253",
-      "V_NO.1ENGINE_PANEL_65270",
-      "V_NO.1ENGINE_PANEL_65276",
-      "V_NO.1ENGINE_PANEL_65360",
-      "V_NO.1ENGINE_PANEL_65361_LAMP",
-      "V_NO.1ENGINE_PANEL_65361_STATUS",
-      "V_NO.1ENGINE_PANEL_65378",
-      "V_NO.1ENGINE_PANEL_65376",
-      "V_NO.1ENGINE_PANEL_65379",
-      "V_NO.2ENGINE_PANEL_61444",
-      "V_NO.2ENGINE_PANEL_65262",
-      "V_NO.2ENGINE_PANEL_65263",
-      "V_NO.2ENGINE_PANEL_65272",
-      "V_NO.2ENGINE_PANEL_65271",
-      "V_NO.2ENGINE_PANEL_65253",
-      "V_NO.2ENGINE_PANEL_65270",
-      "V_NO.2ENGINE_PANEL_65276",
-      "V_NO.2ENGINE_PANEL_65360",
-      "V_NO.2ENGINE_PANEL_65361_LAMP",
-      "V_NO.2ENGINE_PANEL_65361_STATUS",
-      "V_NO.2ENGINE_PANEL_65378",
-      "V_NO.2ENGINE_PANEL_65376",
-      "V_NO.2ENGINE_PANEL_65379"
-    );
-  }
 
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // Control Infomation
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if (firstSelectedItems.value.includes("RUDDER")) {
-    secondSelect.value.push("REQUESTCOMMAND_R", "RESPONSECOMMAND_R");
-  }
-  if (firstSelectedItems.value.includes("ENGINE")) {
-    secondSelect.value.push("REQUESTCOMMAND_E", "RESPONSECOMMAND_E");
-  }
-  if (firstSelectedItems.value.includes("MODE")) {
-    secondSelect.value.push("REQUESTCOMMAND_M", "RESPONSECOMMAND_M");
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  // System Infomation
-  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  if (firstSelectedItems.value.includes("MANAGEMENT")) {
-    secondSelect.value.push(
-      "SUBSCRIBELIST",
-      "CONNECTSTATE",
-      "SYSTEMSTATE",
-      "ALARMINFO",
-      "MODEINFO",
-      "COM",
-      "ENGINECONTROL",
-      "RUDDERCONTROL",
-      "SHORE_MODE_REQUEST",
-      "SHORE_ENGINE_CONTROL",
-      "SHORE_RUDDER_CONTROL"
-    );
-  }
-});
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Method
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // 항차 선택
 const voyage = ref(["직접 선택"]);
@@ -776,6 +514,9 @@ const voyage = ref(["직접 선택"]);
 const setStartTime = ref([]);
 const setEndTime = ref([]);
 const selectedtrialNum = ref();
+
+
+
 
 const getTrialDate = async () => {
   try {
@@ -789,67 +530,150 @@ const getTrialDate = async () => {
     console.error(error);
   }
 };
-onMounted(getTrialDate);
-const selectedvoyage = ref();
 
-// 시운전 시간 받아오기
-const date_readonly = ref(true);
-const dateRange = ref(); // 반응적인(ref) 배열로 초기화
-
-const startDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
-const endDate = ref(); // 현재 날짜와 시간을 기본값으로 사용
-
-const searchType = ref("N/A");
-
-const searchStart = ref();
-const searchEnd = ref();
-
-watchEffect(() => {
-  if (selectedvoyage.value === "직접 선택") date_readonly.value = false;
-  else date_readonly.value = true;
+onMounted(() => {
+  getTrialDate();
+  sessionStorage.setItem("page", "데이터 조회");
 });
 
-const voyageCheck = () => {
-  const index = voyage.value.indexOf(selectedvoyage.value);
-  selectedtrialNum.value = index;
-  if (selectedvoyage.value === "직접 선택") {
-    date_readonly.value = false;
-    searchType.value = "period";
-    console.log(dateRange.value[0].toISOString());
-    console.log(dateRange.value[1].toISOString());
-    if (
-      !isNaN(Date.parse(dateRange.value[0])) &&
-      !isNaN(Date.parse(dateRange.value[1]))
-    ) {
-      searchStart.value = dateRange.value[0].toISOString();
-      searchEnd.value = dateRange.value[1].toISOString();
-    } else {
-      // 예외처리: dateRange.value[0] 또는 dateRange.value[1]이 Invalid Date인 경우
-      console.error("Invalid date values in dateRange");
-      // 여기에서 적절한 대체 값이나 오류 처리를 추가할 수 있습니다.
-    }
+
+// 검색 이벤트
+const searchData = async () => {
+  if (
+    !firstSelectedItems.value ||
+    !contentsSelectedItems.value ||
+    !selectedvoyage.value
+  ) {
+    alert("조회할 데이터 범위를 선택해주세요.");
   } else {
-    const index = voyage.value.indexOf(selectedvoyage.value);
-    date_readonly.value = true;
-    searchType.value = "seatrial";
+    try {
+      loading.value = true;
+      lastloading.value = true;
+      downloadBtnDisabled.value = false;
+      selectedData.value = contentsSelectedItems.value;
+      variableName = getVariableName(selectedData.value).value;
 
-    const date1 = ref(setStartTime.value[index - 1]);
-    const date2 = ref(setEndTime.value[index - 1]);
+      let start = new Date(dateRange.value[0]);
+      let end = new Date(dateRange.value[1]);
 
-    // Date 객체로 변환
-    startDate.value = new Date(date1.value);
-    endDate.value = new Date(date2.value);
+      startISOTime.value = start.toISOString().slice(0, 19);
+      endISOTime.value = end.toISOString().slice(0, 19);
 
-    // 시간 범위 설정
-    dateRange.value = [startDate.value, endDate.value];
+      start.setHours(start.getHours() + 9);
+      end.setHours(end.getHours() + 9);
+      startDate.value = start.toISOString();
+      endDate.value = end.toISOString();
 
-    startDate.value.setHours(startDate.value.getHours());
-    endDate.value.setHours(endDate.value.getHours());
+      tab.value = 0;
+
+      startTime.value = start.toISOString().slice(0, 19);
+      endTime.value = end.toISOString().slice(0, 19);
+      console.log(variableName);
+
+
+      
+      await fetchData(variableName); // 초기 데이터 요청
+
+      console.log("dataSetv = " + dataSet.value.length);
+      if (dataSet.value.length <= 0) {
+        loading.value = false;
+        
+      }
+      lastloading.value = false;
+      try {
+        // createErrorData(response, Item);
+      } catch (error) {
+        console.error(error);
+      }
+      searchstart.value = true;
+    } catch {
+      loading.value = false;
+      lastloading.value = false;
+      alert("조회할 데이터 범위를 선택해주세요.");
+    }
   }
 };
 
-const downloadFormat = ref(["csv", "txt"]);
-const selectDownlodFormat = ref("csv");
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const fetchData = async (data) => {
+  if (data.length != 0) {
+    for (let i = 0; i < data.length; i++) {
+      try {
+        const [Sc, Co] = data[i].split('/');
+
+        let dataFomat;
+        if(postType.value == "period"){
+          dataFomat = {
+            "subComponent":Sc,
+            "content":Co,
+            "seatrialNumber":"N/A", 
+            "period":[searchStart.value,searchEnd.value]
+          }
+        } else if(postType.value == "seatrial") {
+          dataFomat = {
+            "subComponent":Sc,
+            "content":Co,
+            "seatrialNumber":selectedtrialNum.value, 
+            "period":["N/A","N/A"]
+          }
+        }
+        console.log("dataSet : " + JSON.stringify(dataFomat));
+        const response = await readDataTrial(
+          tokenid.value,
+          dataFomat,
+          postType.value
+        );
+        
+        // dataSet.value = response;
+        
+        const dataheader = ref();
+        const importantKeys = [
+          "seatrial_ID",
+          "timestamp_EQUIPMENT",
+          "timestamp_PUBLISH",
+          "ship_ID",
+        ];
+        dataheader.value = [
+          ...importantKeys,
+          ...Object.keys(response[0]).filter(
+            (key) => !importantKeys.includes(key)
+          ),
+        ].map((key) => {
+          let modifiedKey = key;
+          return {
+            title: modifiedKey,
+            align: "start",
+            key,
+            width:
+              key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
+                ? 280
+                : undefined,
+          };
+        });
+        updateTable();
+        await switchValue(data[i], dataheader, response);
+
+        if (data.length === 1) {
+          loading.value = false;
+        } else {
+          if (i === 1) {
+            loading.value = false;
+          }
+          if (i == data.length - 1) {
+            lastloading.value = false;
+          }
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  } else {
+    alert("데이터를 선택하세요.")
+  }
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const dataDownloadServer = async () => {
   try {
@@ -908,11 +732,6 @@ const dataDownloadServer = async () => {
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
 
-    let Item = {
-      user_id: userId.value ? userId.value : "unknown",
-      page: `데이터 조회`,
-      log: `데이터 다운로드 요청`,
-    };
     try {
       // createErrorData(response, Item);
     } catch (error) {
@@ -956,63 +775,6 @@ const cancleLoading = () => {
   //location.reload();
 };
 
-// 검색 이벤트
-
-const searchData = async () => {
-  if (
-    !firstSelectedItems.value ||
-    !contentsSelectedItems.value ||
-    !selectedvoyage.value
-  ) {
-    alert("조회할 데이터 범위를 선택해주세요.");
-  } else {
-    try {
-      loading.value = true;
-      lastloading.value = true;
-      downloadBtnDisabled.value = false;
-      // headerVariables.forEach((variable) => (variable.value = []));
-      // dataVariables.forEach((variable) => (variable.value = []));
-      await voyageCheck();
-      selectedData.value = contentsSelectedItems.value;
-      variableName = getVariableName(selectedData.value).value;
-
-      let start = new Date(dateRange.value[0]);
-      let end = new Date(dateRange.value[1]);
-
-      startISOTime.value = start.toISOString().slice(0, 19);
-      endISOTime.value = end.toISOString().slice(0, 19);
-
-      start.setHours(start.getHours() + 9);
-      end.setHours(end.getHours() + 9);
-      startDate.value = start.toISOString();
-      endDate.value = end.toISOString();
-
-      tab.value = 0;
-
-      startTime.value = start.toISOString().slice(0, 19);
-      endTime.value = end.toISOString().slice(0, 19);
-      console.log(variableName);
-      await fetchData(variableName); // 초기 데이터 요청
-
-      console.log("dataSetv = " + dataSet.value.length);
-      if (dataSet.value.length <= 0) {
-        loading.value = false;
-        lastloading.value = false;
-      }
-      try {
-        // createErrorData(response, Item);
-      } catch (error) {
-        console.error(error);
-      }
-      searchstart.value = true;
-    } catch {
-      loading.value = false;
-      lastloading.value = false;
-      alert("조회할 데이터 범위를 선택해주세요.");
-    }
-  }
-};
-
 const getVariableName = (item) => {
   const nameMappings = {
     GLL: "dgps/gll",
@@ -1051,38 +813,38 @@ const getVariableName = (item) => {
 
     AUTOPILOTCONTACT: "autopilotcontact/autopilotcontact",
 
-    "NO.1ENGINE_PANEL_61444": "no1enginepanel/no1engine_panel_61444",
-    "NO.1ENGINE_PANEL_65262": "no1enginepanel/no1engine_panel_65262",
-    "NO.1ENGINE_PANEL_65263": "no1enginepanel/no1engine_panel_65263",
-    "NO.1ENGINE_PANEL_65272": "no1enginepanel/no1engine_panel_65272",
-    "NO.1ENGINE_PANEL_65271": "no1enginepanel/no1engine_panel_65271",
-    "NO.1ENGINE_PANEL_65253": "no1enginepanel/no1engine_panel_65253",
-    "NO.1ENGINE_PANEL_65270": "no1enginepanel/no1engine_panel_65270",
-    "NO.1ENGINE_PANEL_65276": "no1enginepanel/no1engine_panel_65276",
-    "NO.1ENGINE_PANEL_65360": "no1enginepanel/no1engine_panel_65360",
-    "NO.1ENGINE_PANEL_65361_LAMP": "no1enginepanel/no1engine_panel_65361_lamp",
-    "NO.1ENGINE_PANEL_65361_STATUS":
+    "NO1ENGINE_PANEL_61444": "no1enginepanel/no1engine_panel_61444",
+    "NO1ENGINE_PANEL_65262": "no1enginepanel/no1engine_panel_65262",
+    "NO1ENGINE_PANEL_65263": "no1enginepanel/no1engine_panel_65263",
+    "NO1ENGINE_PANEL_65272": "no1enginepanel/no1engine_panel_65272",
+    "NO1ENGINE_PANEL_65271": "no1enginepanel/no1engine_panel_65271",
+    "NO1ENGINE_PANEL_65253": "no1enginepanel/no1engine_panel_65253",
+    "NO1ENGINE_PANEL_65270": "no1enginepanel/no1engine_panel_65270",
+    "NO1ENGINE_PANEL_65276": "no1enginepanel/no1engine_panel_65276",
+    "NO1ENGINE_PANEL_65360": "no1enginepanel/no1engine_panel_65360",
+    "NO1ENGINE_PANEL_65361_LAMP": "no1enginepanel/no1engine_panel_65361_lamp",
+    "NO1ENGINE_PANEL_65361_STATUS":
       "no1enginepanel/no1engine_panel_65361_status",
 
-    "NO.1ENGINE_PANEL_65378": "no1enginepanel/no1engine_panel_65378",
-    "NO.1ENGINE_PANEL_65376": "no1enginepanel/no1engine_panel_65376",
-    "NO.1ENGINE_PANEL_65379": "no1enginepanel/no1engine_panel_65379",
-    "NO.2ENGINE_PANEL_61444": "no2enginepanel/no2engine_panel_61444",
-    "NO.2ENGINE_PANEL_65262": "no2enginepanel/no2engine_panel_65262",
-    "NO.2ENGINE_PANEL_65263": "no2enginepanel/no2engine_panel_65263",
-    "NO.2ENGINE_PANEL_65272": "no2enginepanel/no2engine_panel_65272",
-    "NO.2ENGINE_PANEL_65271": "no2enginepanel/no2engine_panel_65271",
-    "NO.2ENGINE_PANEL_65253": "no2enginepanel/no2engine_panel_65253",
-    "NO.2ENGINE_PANEL_65270": "no2enginepanel/no2engine_panel_65270",
-    "NO.2ENGINE_PANEL_65276": "no2enginepanel/no2engine_panel_65276",
-    "NO.2ENGINE_PANEL_65360": "no2enginepanel/no2engine_panel_65360",
-    "NO.2ENGINE_PANEL_65361_LAMP": "no2enginepanel/no2engine_panel_65361_lamp",
-    "NO.2ENGINE_PANEL_65361_STATUS":
+    "NO1ENGINE_PANEL_65378": "no1enginepanel/no1engine_panel_65378",
+    "NO1ENGINE_PANEL_65376": "no1enginepanel/no1engine_panel_65376",
+    "NO1ENGINE_PANEL_65379": "no1enginepanel/no1engine_panel_65379",
+    "NO2ENGINE_PANEL_61444": "no2enginepanel/no2engine_panel_61444",
+    "NO2ENGINE_PANEL_65262": "no2enginepanel/no2engine_panel_65262",
+    "NO2ENGINE_PANEL_65263": "no2enginepanel/no2engine_panel_65263",
+    "NO2ENGINE_PANEL_65272": "no2enginepanel/no2engine_panel_65272",
+    "NO2ENGINE_PANEL_65271": "no2enginepanel/no2engine_panel_65271",
+    "NO2ENGINE_PANEL_65253": "no2enginepanel/no2engine_panel_65253",
+    "NO2ENGINE_PANEL_65270": "no2enginepanel/no2engine_panel_65270",
+    "NO2ENGINE_PANEL_65276": "no2enginepanel/no2engine_panel_65276",
+    "NO2ENGINE_PANEL_65360": "no2enginepanel/no2engine_panel_65360",
+    "NO2ENGINE_PANEL_65361_LAMP": "no2enginepanel/no2engine_panel_65361_lamp",
+    "NO2ENGINE_PANEL_65361_STATUS":
       "no2enginepanel/no2engine_panel_65361_status",
 
-    "NO.2ENGINE_PANEL_65378": "no2enginepanel/no2engine_panel_65378",
-    "NO.2ENGINE_PANEL_65376": "no2enginepanel/no2engine_panel_65376",
-    "NO.2ENGINE_PANEL_65379": "no2enginepanel/no2engine_panel_65379",
+    "NO2ENGINE_PANEL_65378": "no2enginepanel/no2engine_panel_65378",
+    "NO2ENGINE_PANEL_65376": "no2enginepanel/no2engine_panel_65376",
+    "NO2ENGINE_PANEL_65379": "no2enginepanel/no2engine_panel_65379",
 
     SITUATIONAL: "MTIE1ISA/SITUATIONAL",
     VIRTUALNAV: "MTIE5VDGS/VIRTUALNAV",
@@ -1095,38 +857,38 @@ const getVariableName = (item) => {
     ME1: "MTIE4.XINNOS_STAS/ME1",
     ME2: "MTIE4.XINNOS_STAS/ME2",
 
-    "V_NO.1ENGINE_PANEL_61444": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_61444",
-    "V_NO.1ENGINE_PANEL_65262": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65262",
-    "V_NO.1ENGINE_PANEL_65263": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65263",
-    "V_NO.1ENGINE_PANEL_65271": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65271",
-    "V_NO.1ENGINE_PANEL_65270": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65270",
-    "V_NO.1ENGINE_PANEL_65360": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65360",
-    "V_NO.1ENGINE_PANEL_65361_LAMP":
+    "V_NO1ENGINE_PANEL_61444": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_61444",
+    "V_NO1ENGINE_PANEL_65262": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65262",
+    "V_NO1ENGINE_PANEL_65263": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65263",
+    "V_NO1ENGINE_PANEL_65271": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65271",
+    "V_NO1ENGINE_PANEL_65270": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65270",
+    "V_NO1ENGINE_PANEL_65360": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65360",
+    "V_NO1ENGINE_PANEL_65361_LAMP":
       "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65361_LAMP",
-    "V_NO.1ENGINE_PANEL_65272": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65272",
-    "V_NO.1ENGINE_PANEL_65253": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65253",
-    "V_NO.1ENGINE_PANEL_65276": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65276",
-    "V_NO.2ENGINE_PANEL_61444": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_61444",
-    "V_NO.2ENGINE_PANEL_65262": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65262",
-    "V_NO.2ENGINE_PANEL_65263": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65263",
-    "V_NO.2ENGINE_PANEL_65271": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65271",
-    "V_NO.2ENGINE_PANEL_65270": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65270",
-    "V_NO.2ENGINE_PANEL_65360": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65360",
-    "V_NO.2ENGINE_PANEL_65361_LAMP":
+    "V_NO1ENGINE_PANEL_65272": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65272",
+    "V_NO1ENGINE_PANEL_65253": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65253",
+    "V_NO1ENGINE_PANEL_65276": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65276",
+    "V_NO2ENGINE_PANEL_61444": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_61444",
+    "V_NO2ENGINE_PANEL_65262": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65262",
+    "V_NO2ENGINE_PANEL_65263": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65263",
+    "V_NO2ENGINE_PANEL_65271": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65271",
+    "V_NO2ENGINE_PANEL_65270": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65270",
+    "V_NO2ENGINE_PANEL_65360": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65360",
+    "V_NO2ENGINE_PANEL_65361_LAMP":
       "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65361_LAMP",
-    "V_NO.2ENGINE_PANEL_65272": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65272",
-    "V_NO.2ENGINE_PANEL_65253": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65253",
-    "V_NO.2ENGINE_PANEL_65276": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65276",
-    "V_NO.1ENGINE_PANEL_65361_STATUS":
+    "V_NO2ENGINE_PANEL_65272": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65272",
+    "V_NO2ENGINE_PANEL_65253": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65253",
+    "V_NO2ENGINE_PANEL_65276": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65276",
+    "V_NO1ENGINE_PANEL_65361_STATUS":
       "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65361_STATUS",
-    "V_NO.1ENGINE_PANEL_65378": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65378",
-    "V_NO.1ENGINE_PANEL_65376": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65376",
-    "V_NO.1ENGINE_PANEL_65379": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65379",
-    "V_NO.2ENGINE_PANEL_65361_STATUS":
+    "V_NO1ENGINE_PANEL_65378": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65378",
+    "V_NO1ENGINE_PANEL_65376": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65376",
+    "V_NO1ENGINE_PANEL_65379": "MTIE4XINNOS_VDGS/V_NO1ENGINE_PANEL_65379",
+    "V_NO2ENGINE_PANEL_65361_STATUS":
       "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65361_STATUS",
-    "V_NO.2ENGINE_PANEL_65378": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65378",
-    "V_NO.2ENGINE_PANEL_65376": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65376",
-    "V_NO.2ENGINE_PANEL_65379": "MTIE4XINNOS_VDGS/NO2ENGINE_PANEL_65379",
+    "V_NO2ENGINE_PANEL_65378": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65378",
+    "V_NO2ENGINE_PANEL_65376": "MTIE4XINNOS_VDGS/V_NO2ENGINE_PANEL_65376",
+    "V_NO2ENGINE_PANEL_65379": "MTIE4XINNOS_VDGS/NO2ENGINE_PANEL_65379",
 
     "SUBSCRIBELIST": "MANAGEMENT/SUBSCRIBELIST",
     "CONNECTSTATE": "MANAGEMENT/CONNECTSTATE",
@@ -1160,137 +922,7 @@ const getVariableName = (item) => {
   }
 };
 
-const fetchData = async (data) => {
-  if (searchType.value == "seatrial") {
-    for (let i = 0; i < data.length; i++) {
-      try {
-        const response = await readDataTrial(
-          tokenid.value,
-          data[i],
-          selectedtrialNum.value
-        );
-        dataSet.value = response;
 
-        const dataheader = ref();
-        if (response && response.length > 0) {
-          const importantKeys = [
-            "seatrial_ID",
-            "timestamp_EQUIPMENT",
-            "timestamp_PUBLISH",
-            "ship_ID",
-          ];
-          dataheader.value = [
-            ...importantKeys,
-            ...Object.keys(response[0]).filter(
-              (key) => !importantKeys.includes(key)
-            ),
-          ].map((key) => {
-            let modifiedKey = key;
-            return {
-              title: modifiedKey,
-              align: "start",
-              key,
-              width:
-                key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
-                  ? 280
-                  : undefined,
-            };
-          });
-          updateTable();
-          await switchValue(data[i], dataheader, response);
-        } else {
-          await switchValue(data[i], dataheader, response);
-          updateTable();
-        }
-
-        if (data.length === 1) {
-          loading.value = false;
-        } else {
-          if (i === 1) {
-            loading.value = false;
-          }
-          if (i == data.length - 1) {
-            lastloading.value = false;
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  } else {
-    for (let i = 0; i < data.length; i++) {
-      const upperData = ref(data[i].toUpperCase());
-      const subComponunt = ref();
-      const content = ref();
-      [subComponunt.value, content.value] = upperData.value.split("/");
-      try {
-        console.log("이거 잘봐" + searchStart.value + searchEnd.value);
-        const response = await readDataDate(
-          tokenid.value,
-          subComponunt.value,
-          content.value,
-          searchStart.value,
-          searchEnd.value
-        );
-
-        dataSet.value = response;
-        console.log("response : " + response.length);
-        console.log("dataSet : " + dataSet.value.length);
-
-        const dataheader = ref();
-        if (response && response.length > 0) {
-          const importantKeys = [
-            "seatrial_ID",
-            "timestamp_EQUIPMENT",
-            "timestamp_PUBLISH",
-            "ship_ID",
-          ];
-          dataheader.value = [
-            ...importantKeys,
-            ...Object.keys(response[0]).filter(
-              (key) => !importantKeys.includes(key)
-            ),
-          ].map((key) => {
-            let modifiedKey = key;
-            return {
-              title: modifiedKey,
-              align: "start",
-              key,
-              width:
-                key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
-                  ? 280
-                  : undefined,
-            };
-          });
-          updateTable();
-          console.log(data[i]);
-          await switchValue(data[i], dataheader, response);
-        } else {
-          await switchValue(data[i], dataheader, response);
-          updateTable();
-          loading.value = false;
-          console.log("로딩오프?" + loading.value);
-          break;
-        }
-        if (data.length === 1) {
-          loading.value = false;
-          console.log("1");
-        } else {
-          if (i === 1) {
-            loading.value = false;
-            console.log("2");
-          } else if (i == data.length - 1) {
-            //
-          }
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  }
-  console.log(loading.value);
-  console.log("로딩오프?" + loading.value);
-};
 
 const updateData = async (data, header, page) => {
   // 미리 보여질 일부 데이터를 설정
@@ -1435,7 +1067,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_61444":
+    case "NO1ENGINE_PANEL_61444":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_61444.value.length / itemsPerPage.value
       );
@@ -1445,7 +1077,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65262":
+    case "NO1ENGINE_PANEL_65262":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65262.value.length / itemsPerPage.value
       );
@@ -1455,7 +1087,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65263":
+    case "NO1ENGINE_PANEL_65263":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65263.value.length / itemsPerPage.value
       );
@@ -1465,7 +1097,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65272":
+    case "NO1ENGINE_PANEL_65272":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65272.value.length / itemsPerPage.value
       );
@@ -1475,7 +1107,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65271":
+    case "NO1ENGINE_PANEL_65271":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65271.value.length / itemsPerPage.value
       );
@@ -1485,7 +1117,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65253":
+    case "NO1ENGINE_PANEL_65253":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65253.value.length / itemsPerPage.value
       );
@@ -1495,7 +1127,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65270":
+    case "NO1ENGINE_PANEL_65270":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65270.value.length / itemsPerPage.value
       );
@@ -1505,7 +1137,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65276":
+    case "NO1ENGINE_PANEL_65276":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65276.value.length / itemsPerPage.value
       );
@@ -1515,7 +1147,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65360":
+    case "NO1ENGINE_PANEL_65360":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65360.value.length / itemsPerPage.value
       );
@@ -1525,7 +1157,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65361_LAMP":
+    case "NO1ENGINE_PANEL_65361_LAMP":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
       );
@@ -1535,7 +1167,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65361_STATUS":
+    case "NO1ENGINE_PANEL_65361_STATUS":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
       );
@@ -1545,7 +1177,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65378":
+    case "NO1ENGINE_PANEL_65378":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65378.value.length / itemsPerPage.value
       );
@@ -1555,7 +1187,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65376":
+    case "NO1ENGINE_PANEL_65376":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65376.value.length / itemsPerPage.value
       );
@@ -1565,7 +1197,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.1ENGINE_PANEL_65379":
+    case "NO1ENGINE_PANEL_65379":
       pageCount.value = Math.ceil(
         NO1ENGINE_PANEL_65379.value.length / itemsPerPage.value
       );
@@ -1575,7 +1207,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_61444":
+    case "NO2ENGINE_PANEL_61444":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_61444.value.length / itemsPerPage.value
       );
@@ -1585,7 +1217,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65262":
+    case "NO2ENGINE_PANEL_65262":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65262.value.length / itemsPerPage.value
       );
@@ -1595,7 +1227,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65263":
+    case "NO2ENGINE_PANEL_65263":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65263.value.length / itemsPerPage.value
       );
@@ -1605,7 +1237,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65272":
+    case "NO2ENGINE_PANEL_65272":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65272.value.length / itemsPerPage.value
       );
@@ -1615,7 +1247,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65271":
+    case "NO2ENGINE_PANEL_65271":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65271.value.length / itemsPerPage.value
       );
@@ -1625,7 +1257,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65253":
+    case "NO2ENGINE_PANEL_65253":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65253.value.length / itemsPerPage.value
       );
@@ -1635,7 +1267,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65270":
+    case "NO2ENGINE_PANEL_65270":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65270.value.length / itemsPerPage.value
       );
@@ -1645,7 +1277,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65276":
+    case "NO2ENGINE_PANEL_65276":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65276.value.length / itemsPerPage.value
       );
@@ -1655,7 +1287,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65360":
+    case "NO2ENGINE_PANEL_65360":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65360.value.length / itemsPerPage.value
       );
@@ -1665,7 +1297,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65361_LAMP":
+    case "NO2ENGINE_PANEL_65361_LAMP":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
       );
@@ -1675,7 +1307,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65361_STATUS":
+    case "NO2ENGINE_PANEL_65361_STATUS":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
       );
@@ -1685,7 +1317,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65378":
+    case "NO2ENGINE_PANEL_65378":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65378.value.length / itemsPerPage.value
       );
@@ -1695,7 +1327,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65376":
+    case "NO2ENGINE_PANEL_65376":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65376.value.length / itemsPerPage.value
       );
@@ -1705,7 +1337,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "NO.2ENGINE_PANEL_65379":
+    case "NO2ENGINE_PANEL_65379":
       pageCount.value = Math.ceil(
         NO2ENGINE_PANEL_65379.value.length / itemsPerPage.value
       );
@@ -1806,7 +1438,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_61444":
+    case "V_NO1ENGINE_PANEL_61444":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_61444.value.length / itemsPerPage.value
       );
@@ -1816,7 +1448,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65262":
+    case "V_NO1ENGINE_PANEL_65262":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65262.value.length / itemsPerPage.value
       );
@@ -1826,7 +1458,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65263":
+    case "V_NO1ENGINE_PANEL_65263":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65263.value.length / itemsPerPage.value
       );
@@ -1836,7 +1468,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65271":
+    case "V_NO1ENGINE_PANEL_65271":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65271.value.length / itemsPerPage.value
       );
@@ -1846,7 +1478,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65270":
+    case "V_NO1ENGINE_PANEL_65270":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65270.value.length / itemsPerPage.value
       );
@@ -1856,7 +1488,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65360":
+    case "V_NO1ENGINE_PANEL_65360":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65360.value.length / itemsPerPage.value
       );
@@ -1866,7 +1498,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65361_LAMP":
+    case "V_NO1ENGINE_PANEL_65361_LAMP":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
       );
@@ -1876,7 +1508,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65272":
+    case "V_NO1ENGINE_PANEL_65272":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65272.value.length / itemsPerPage.value
       );
@@ -1886,7 +1518,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65253":
+    case "V_NO1ENGINE_PANEL_65253":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65253.value.length / itemsPerPage.value
       );
@@ -1896,7 +1528,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65276":
+    case "V_NO1ENGINE_PANEL_65276":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65276.value.length / itemsPerPage.value
       );
@@ -1906,7 +1538,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_61444":
+    case "V_NO2ENGINE_PANEL_61444":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_61444.value.length / itemsPerPage.value
       );
@@ -1916,7 +1548,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65262":
+    case "V_NO2ENGINE_PANEL_65262":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65262.value.length / itemsPerPage.value
       );
@@ -1926,7 +1558,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65263":
+    case "V_NO2ENGINE_PANEL_65263":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65263.value.length / itemsPerPage.value
       );
@@ -1936,7 +1568,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65271":
+    case "V_NO2ENGINE_PANEL_65271":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65271.value.length / itemsPerPage.value
       );
@@ -1946,7 +1578,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65270":
+    case "V_NO2ENGINE_PANEL_65270":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65270.value.length / itemsPerPage.value
       );
@@ -1956,7 +1588,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65360":
+    case "V_NO2ENGINE_PANEL_65360":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65360.value.length / itemsPerPage.value
       );
@@ -1966,7 +1598,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65361_LAMP":
+    case "V_NO2ENGINE_PANEL_65361_LAMP":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65361_LAMP.value.length / itemsPerPage.value
       );
@@ -1976,7 +1608,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65272":
+    case "V_NO2ENGINE_PANEL_65272":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65272.value.length / itemsPerPage.value
       );
@@ -1986,7 +1618,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65253":
+    case "V_NO2ENGINE_PANEL_65253":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65253.value.length / itemsPerPage.value
       );
@@ -1996,7 +1628,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65276":
+    case "V_NO2ENGINE_PANEL_65276":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65276.value.length / itemsPerPage.value
       );
@@ -2006,7 +1638,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65361_STATUS":
+    case "V_NO1ENGINE_PANEL_65361_STATUS":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
       );
@@ -2016,7 +1648,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65378":
+    case "V_NO1ENGINE_PANEL_65378":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65378.value.length / itemsPerPage.value
       );
@@ -2026,7 +1658,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65376":
+    case "V_NO1ENGINE_PANEL_65376":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65376.value.length / itemsPerPage.value
       );
@@ -2036,7 +1668,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.1ENGINE_PANEL_65379":
+    case "V_NO1ENGINE_PANEL_65379":
       pageCount.value = Math.ceil(
         V_NO1ENGINE_PANEL_65379.value.length / itemsPerPage.value
       );
@@ -2046,7 +1678,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65361_STATUS":
+    case "V_NO2ENGINE_PANEL_65361_STATUS":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65361_STATUS.value.length / itemsPerPage.value
       );
@@ -2056,7 +1688,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65378":
+    case "V_NO2ENGINE_PANEL_65378":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65378.value.length / itemsPerPage.value
       );
@@ -2066,7 +1698,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65376":
+    case "V_NO2ENGINE_PANEL_65376":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65376.value.length / itemsPerPage.value
       );
@@ -2076,7 +1708,7 @@ const updateTable = async () => {
         page.value
       );
       break;
-    case "V_NO.2ENGINE_PANEL_65379":
+    case "V_NO2ENGINE_PANEL_65379":
       pageCount.value = Math.ceil(
         V_NO2ENGINE_PANEL_65379.value.length / itemsPerPage.value
       );
@@ -2494,20 +2126,6 @@ const REQUESTCOMMAND_E = ref([]);
 const RESPONSECOMMAND_E = ref([]);
 const REQUESTCOMMAND_M = ref([]);
 const RESPONSECOMMAND_M = ref([]);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 const dataHandlers = {
@@ -2993,7 +2611,7 @@ const handleSortUpdate = (newOptions) => {
     case "AUTOPILOTCONTACT":
       sortData(AUTOPILOTCONTACT.value, sortByKey, sortOrder);
       break;
-    case "NO.1ENGINE_PANEL_61444":
+    case "NO1ENGINE_PANEL_61444":
       sortData(NO1ENGINE_PANEL_61444.value, sortByKey, sortOrder);
       break;
     case "NO1ENGINE_PANEL_65262":
@@ -3246,6 +2864,330 @@ const handleSortUpdate = (newOptions) => {
       console.error("Invalid tab value:", selectedData.value[tab.value]);
   }
 };
+
+// main이 변경될 때 select1 배열 업데이트
+watchEffect(() => {
+  firstSelect.value = []; // 기존 초기화
+  firstSelectedItems.value = [];
+  if (mainSelectedItems.value.includes("Ship Information")) {
+    firstSelect.value.push(
+      "DGPS",
+      "GYRO",
+      "ANEMOMETER",
+      "RADAR",
+      "AIS",
+      "ECDIS",
+      "AUTOPILOT",
+      "SPEEDLOG",
+      "CANTHROTTLE",
+      "AUTOPILOTCONTACT",
+      "NO1ENGINEPANEL",
+      "NO2ENGINEPANEL"
+    );
+  }
+  if (mainSelectedItems.value.includes("Kass Information")) {
+    firstSelect.value.push(
+      "MTIE1ISA",
+      "MTIE5VDGS",
+      "MTIE5DBS",
+      "MOF1ANS",
+      "MOF2SYNC",
+      "MOF1GNW",
+      "MTIE5SAS",
+      "MTIE4XINNOS_VDGS_EMUL",
+      "MTIE4XINNOS_STAS_EMUL",
+      "MTIE4XINNOS_STAS",
+      "MTIE4XINNOS_VDGS"
+    );
+  }
+  if (mainSelectedItems.value.includes("System Information")) {
+    firstSelect.value.push("MANAGEMENT");
+    firstSelectedItems.value.push("MANAGEMENT");
+  }
+  if (mainSelectedItems.value.includes("Control Information")) {
+    firstSelect.value.push("RUDDER", "ENGINE", "MODE");
+  }
+  if (mainSelectedItems.value.includes("관제 Information")) {
+    firstSelect.value.push("AIS", "VTS");
+  }
+});
+
+// select1이 변경될 때 second 배열 업데이트
+watchEffect(() => {
+  secondSelect.value = []; // 기존 secondSelect 초기화
+  contentsSelectedItems.value = [];
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Ship Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (firstSelectedItems.value.includes("DGPS")) {
+    secondSelect.value.push("GLL", "GGA", "RMC", "VTG", "ZDA", "GSV", "GSA");
+  }
+  if (firstSelectedItems.value.includes("GYRO")) {
+    secondSelect.value.push("HDT", "ROT");
+  }
+  if (firstSelectedItems.value.includes("ANEMOMETER")) {
+    secondSelect.value.push("MWV");
+  }
+  if (firstSelectedItems.value.includes("RADAR")) {
+    secondSelect.value.push("RADAR_SCREEN");
+  }
+  if (firstSelectedItems.value.includes("AIS")) {
+    secondSelect.value.push("VDM", "VDO");
+  }
+  if (firstSelectedItems.value.includes("ECDIS")) {
+    secondSelect.value.push("ROUTEINFO", "WAYPOINTS", "RTZ", "ECDIS_SCREEN");
+  }
+  if (firstSelectedItems.value.includes("AUTOPILOT")) {
+    secondSelect.value.push("RSA", "HTD");
+  }
+  if (firstSelectedItems.value.includes("SPEEDLOG")) {
+    secondSelect.value.push("VBW", "VHW", "VLW");
+  }
+  if (firstSelectedItems.value.includes("CANTHROTTLE")) {
+    secondSelect.value.push(
+      "CAN_Online_State",
+      "Engine_RPM",
+      "Rudder",
+      "Rudder_Scale"
+    );
+  }
+  if (firstSelectedItems.value.includes("AUTOPILOTCONTACT")) {
+    secondSelect.value.push("AUTOPILOTCONTACT");
+  }
+  if (firstSelectedItems.value.includes("NO1ENGINEPANEL")) {
+    secondSelect.value.push(
+      "NO1ENGINE_PANEL_61444",
+      "NO1ENGINE_PANEL_65262",
+      "NO1ENGINE_PANEL_65263",
+      "NO1ENGINE_PANEL_65272",
+      "NO1ENGINE_PANEL_65271",
+      "NO1ENGINE_PANEL_65253",
+      "NO1ENGINE_PANEL_65270",
+      "NO1ENGINE_PANEL_65276",
+      "NO1ENGINE_PANEL_65360",
+      "NO1ENGINE_PANEL_65361_LAMP",
+      "NO1ENGINE_PANEL_65361_STATUS",
+      "NO1ENGINE_PANEL_65378",
+      "NO1ENGINE_PANEL_65376",
+      "NO1ENGINE_PANEL_65379"
+    );
+  }
+  if (firstSelectedItems.value.includes("NO2ENGINEPANEL")) {
+    secondSelect.value.push(
+      "NO2ENGINE_PANEL_61444",
+      "NO2ENGINE_PANEL_65262",
+      "NO2ENGINE_PANEL_65263",
+      "NO2ENGINE_PANEL_65272",
+      "NO2ENGINE_PANEL_65271",
+      "NO2ENGINE_PANEL_65253",
+      "NO2ENGINE_PANEL_65270",
+      "NO2ENGINE_PANEL_65276",
+      "NO2ENGINE_PANEL_65360",
+      "NO2ENGINE_PANEL_65361_LAMP",
+      "NO2ENGINE_PANEL_65361_STATUS",
+      "NO2ENGINE_PANEL_65378",
+      "NO2ENGINE_PANEL_65376",
+      "NO2ENGINE_PANEL_65379"
+    );
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Kass Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (firstSelectedItems.value.includes("MTIE1ISA")) {
+    secondSelect.value.push("SITUATIONAL");
+  }
+  if (firstSelectedItems.value.includes("MTIE5VDGS")) {
+    secondSelect.value.push("VIRTUALNAV");
+  }
+  if (firstSelectedItems.value.includes("MTIE5DBS")) {
+    secondSelect.value.push("SITUATIONALAWARENESS");
+  }
+  if (firstSelectedItems.value.includes("MOF1ANS")) {
+    secondSelect.value.push("ROUTEDECISION");
+  }
+  if (firstSelectedItems.value.includes("MOF2SYNC")) {
+    secondSelect.value.push("MARINEGATEWAY");
+  }
+  if (firstSelectedItems.value.includes("MTIE5SAS")) {
+    secondSelect.value.push("SAS");
+  }
+  if (firstSelectedItems.value.includes("MTIE4XINNOS_VDGS_EMUL")) {
+    secondSelect.value.push(
+      "VIRTUALME1_1",
+      "VIRTUALME1_2",
+      "VIRTUALME1_3",
+      "VIRTUALME1_4",
+      "VIRTUALME1_5",
+      "VIRTUALME1_6",
+      "VIRTUALME1_7",
+      "VIRTUALME1_8",
+      "VIRTUALME1_9",
+      "VIRTUALME1_10",
+      "VIRTUALME1_11",
+      "VIRTUALME1_12",
+      "VIRTUALME1_13",
+      "VIRTUALME1_14",
+      "VIRTUALME2_1",
+      "VIRTUALME2_2",
+      "VIRTUALME2_3",
+      "VIRTUALME2_4",
+      "VIRTUALME2_5",
+      "VIRTUALME2_6",
+      "VIRTUALME2_7",
+      "VIRTUALME2_8",
+      "VIRTUALME2_9",
+      "VIRTUALME2_10",
+      "VIRTUALME2_11",
+      "VIRTUALME2_12",
+      "VIRTUALME2_13",
+      "VIRTUALME2_14",
+      "VIRTUALMP1_1",
+      "VIRTUALMP1_2",
+      "VIRTUALMP1_3",
+      "VIRTUALMP1_4",
+      "VIRTUALMP1_5",
+      "VIRTUALMP2_1",
+      "VIRTUALMP2_2",
+      "VIRTUALMP2_3",
+      "VIRTUALMP2_4",
+      "VIRTUALMP2_5",
+      "VIRTUALPMS_1",
+      "VIRTUALPMS_2",
+      "VIRTUALPMS_3"
+    );
+  }
+  if (firstSelectedItems.value.includes("MOF1GNW")) {
+    secondSelect.value.push("WAYPOINT");
+  }
+  if (firstSelectedItems.value.includes("MTIE4XINNOS_STAS_EMUL")) {
+    secondSelect.value.push("ME1_EMUL", "ME2_EMUL");
+  }
+  if (firstSelectedItems.value.includes("MTIE4XINNOS_STAS")) {
+    secondSelect.value.push("ME1", "ME2");
+  }
+  if (firstSelectedItems.value.includes("MTIE4XINNOS_VDGS")) {
+    secondSelect.value.push(
+      "NO1ENGINE_PANEL_61444",
+      "NO1ENGINE_PANEL_65262",
+      "NO1ENGINE_PANEL_65263",
+      "NO1ENGINE_PANEL_65272",
+      "NO1ENGINE_PANEL_65271",
+      "NO1ENGINE_PANEL_65253",
+      "NO1ENGINE_PANEL_65270",
+      "NO1ENGINE_PANEL_65276",
+      "NO1ENGINE_PANEL_65360",
+      "NO1ENGINE_PANEL_65361_LAMP",
+      "NO1ENGINE_PANEL_65361_STATUS",
+      "NO1ENGINE_PANEL_65378",
+      "NO1ENGINE_PANEL_65376",
+      "NO1ENGINE_PANEL_65379",
+      "NO2ENGINE_PANEL_61444",
+      "NO2ENGINE_PANEL_65262",
+      "NO2ENGINE_PANEL_65263",
+      "NO2ENGINE_PANEL_65272",
+      "NO2ENGINE_PANEL_65271",
+      "NO2ENGINE_PANEL_65253",
+      "NO2ENGINE_PANEL_65270",
+      "NO2ENGINE_PANEL_65276",
+      "NO2ENGINE_PANEL_65360",
+      "NO2ENGINE_PANEL_65361_LAMP",
+      "NO2ENGINE_PANEL_65361_STATUS",
+      "NO2ENGINE_PANEL_65378",
+      "NO2ENGINE_PANEL_65376",
+      "NO2ENGINE_PANEL_65379"
+    );
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Control Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (firstSelectedItems.value.includes("RUDDER")) {
+    secondSelect.value.push("REQUESTCOMMAND", "RESPONSECOMMAND");
+  }
+  if (firstSelectedItems.value.includes("ENGINE")) {
+    secondSelect.value.push("REQUESTCOMMAND", "RESPONSECOMMAND");
+  }
+  if (firstSelectedItems.value.includes("MODE")) {
+    secondSelect.value.push("REQUESTCOMMAND", "RESPONSECOMMAND");
+  }
+
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // System Infomation
+  ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  if (firstSelectedItems.value.includes("MANAGEMENT")) {
+    secondSelect.value.push(
+      "SUBSCRIBELIST",
+      "CONNECTSTATE",
+      "SYSTEMSTATE",
+      "ALARMINFO",
+      "MODEINFO",
+      "COM",
+      "ENGINECONTROL",
+      "RUDDERCONTROL",
+      "SHORE_MODE_REQUEST",
+      "SHORE_ENGINE_CONTROL",
+      "SHORE_RUDDER_CONTROL"
+    );
+  }
+});
+
+watch(selectedData, () => {
+  tab.value = 0;
+});
+
+watch(dateRange, (newValue, oldValue) => {
+  searchStart.value = newValue[0].toISOString();
+  searchEnd.value = newValue[1].toISOString();
+  // 여기에 추가적인 로직을 넣을 수 있습니다.
+});
+
+watch(selectedvoyage, (newValue, oldValue) => {
+  const index = voyage.value.indexOf(selectedvoyage.value);
+  selectedtrialNum.value = index;
+  if (newValue === "직접 선택") {
+    date_readonly.value = false;
+    postType.value = "period"
+    console.log("직접 선택");
+    
+    date_readonly.value = false;
+    searchType.value = "period";
+    console.log(dateRange.value[0].toISOString());
+    console.log(dateRange.value[1].toISOString());
+    if (
+      !isNaN(Date.parse(dateRange.value[0])) &&
+      !isNaN(Date.parse(dateRange.value[1]))
+    ) {
+      searchStart.value = dateRange.value[0].toISOString();
+      searchEnd.value = dateRange.value[1].toISOString();
+    } else {
+      // 예외처리: dateRange.value[0] 또는 dateRange.value[1]이 Invalid Date인 경우
+      console.error("Invalid date values in dateRange");
+    }
+  } else {
+    date_readonly.value = true;
+    postType.value = "seatrial"
+    console.log("직접 선택이 아님");
+
+    const index = voyage.value.indexOf(selectedvoyage.value);
+    date_readonly.value = true;
+    searchType.value = "seatrial";
+
+    const date1 = ref(setStartTime.value[index - 1]);
+    const date2 = ref(setEndTime.value[index - 1]);
+
+    // Date 객체로 변환
+    startDate.value = new Date(date1.value);
+    endDate.value = new Date(date2.value);
+
+    // 시간 범위 설정
+    dateRange.value = [startDate.value, endDate.value];
+
+    startDate.value.setHours(startDate.value.getHours());
+    endDate.value.setHours(endDate.value.getHours());
+  }
+});
 
 const sortData = (data, sortByKey, sortOrder) => {
   if (!data || !data.length || !sortByKey) {

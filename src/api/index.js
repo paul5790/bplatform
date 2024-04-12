@@ -3,6 +3,7 @@ import axios from "axios";
 
 const apiLocation = "ias.bdpbackend.com";
 // const apiLocation = "192.168.0.73:9999";
+export const cctvUrl = `http://${apiLocation}/stream/index.m3u8`;
 
 // 취소 토큰 생성
 let cancelTokenSource = axios.CancelToken.source();
@@ -232,11 +233,32 @@ export const deleteUserData = async (tokenid, data) => {
   }
 };
 
-// 에러 로그 가져오기
-export const readErrorData = async (tokenid) => {
+// 웹 로그 가져오기
+export const readWebLogData = async (tokenid) => {
   try {
     const response = await axios.post(
-      `http://${apiLocation}/log/get/webapp/error`,
+      `http://${apiLocation}/admin/get/log/webapp`,
+      {},
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+// 웹 로그 가져오기
+export const readAppLogData = async (tokenid) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/admin/get/log/winapp`,
       {},
       {
         headers: {
@@ -489,12 +511,12 @@ export const deleteTrialData = async (tokenid, data) => {
   }
 };
 
-// 데이터 조회하기 (항차)
-export const readDataTrial = async (tokenid, data, selectedtrialNum) => {
+// 데이터 조회하기
+export const readDataTrial = async (tokenid, data, type) => {
   try {
     const response = await axios.post(
-      `http://${apiLocation}/data/${data}/${selectedtrialNum}`,
-      {},
+      `http://${apiLocation}/data/${type}`,
+      data,
       {
         headers: {
           "Content-Type": "application/json",
@@ -502,7 +524,7 @@ export const readDataTrial = async (tokenid, data, selectedtrialNum) => {
         },
       }
     );
-
+    console.log("EEE");
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);

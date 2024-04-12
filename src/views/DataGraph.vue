@@ -286,9 +286,12 @@ const trialrun = ref(["직접 선택"]);
 const setStartTime = ref([]);
 const setEndTime = ref([]);
 
+// 데이터 조회
+const postType = ref();
+
 // 선택된 데이터
 const selectedsubComponent = ref(null);
-const selectedItem = ref(null);
+const selectedItem = ref();
 const selectedtrialrun = ref(null);
 const selectedtrialNum = ref();
 const selectedcontentsItem = ref("Contents/Item");
@@ -325,6 +328,7 @@ watchEffect(() => {
   if (selectedtrialrun.value === "직접 선택") {
     date_readonly.value = false;
     voyagesearch.value = false;
+    postType.value = "period";
 
     const start = new Date(dateRange.value[0]);
     const end = new Date(dateRange.value[1]);
@@ -343,6 +347,7 @@ watchEffect(() => {
     const index = trialrun.value.indexOf(selectedtrialrun.value);
     date_readonly.value = true;
     voyagesearch.value = true;
+    postType.value = "seatrial";
 
     const date1 = ref(setStartTime.value[index - 1]);
     const date2 = ref(setEndTime.value[index - 1]);
@@ -453,15 +458,28 @@ const startDate = new Date();
 const endDate = new Date();
 onMounted(() => {
   date.value = [startDate, endDate];
+  sessionStorage.setItem("page", "데이터 분석");
 });
 
 const fetchData = async (component, type, item, trialNum, startDate, endDate) => {
   try {
-    const dataType = `${component.toLowerCase()}/${type.toLowerCase()}`;
+    let dataFomat;
     if (voyagesearch.value) {
-      return await readDataTrial(tokenid.value, dataType, trialNum);
+      dataFomat = {
+        "subComponent":component,
+        "content":type,
+        "seatrialNumber":trialNum, 
+        "period":["N/A","N/A"]
+      }
+      return await readDataTrial(tokenid.value, dataFomat, postType.value);
     } else {
-      return await readDataDate(tokenid.value, component, type, startDate, endDate);
+      dataFomat = {
+        "subComponent":component,
+        "content":type,
+        "seatrialNumber":"N/A", 
+        "period":[startDate,endDate]
+      }
+      return await readDataTrial(tokenid.value, dataFomat, postType.value);
     }
   } catch (error) {
     console.error(error);
@@ -470,11 +488,23 @@ const fetchData = async (component, type, item, trialNum, startDate, endDate) =>
 };
 const fetchEngineData = async (url, component, type, item, trialNum, startDate, endDate) => {
   try {
-    const dataType = url;
+    let dataFomat;
     if (voyagesearch.value) {
-      return await readDataTrial(tokenid.value, dataType, trialNum);
+      dataFomat = {
+        "subComponent":component,
+        "content":type,
+        "seatrialNumber":trialNum, 
+        "period":["N/A","N/A"]
+      }
+      return await readDataTrial(tokenid.value, dataFomat, postType.value);
     } else {
-      return await readDataDate(tokenid.value, component, type, startDate, endDate);
+      dataFomat = {
+        "subComponent":component,
+        "content":type,
+        "seatrialNumber":"N/A", 
+        "period":[startDate,endDate]
+      }
+      return await readDataDate(tokenid.value, dataFomat, postType.value);
     }
   } catch (error) {
     console.error(error);
@@ -499,6 +529,8 @@ const searchData = async () => {
     loading.value = true;
     first.value = false;
 
+    console.log(selectedItem.value);
+
     try {
       analysisData.value = [];
       analysisTime.value = [];
@@ -513,22 +545,22 @@ const searchData = async () => {
         fetchData("SPEEDLOG", "VHW", selectedItem.value === "선박 속도" ? "speedn" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
         fetchData("AUTOPILOT", "RSA", selectedItem.value === "스타보트 센서" || selectedItem.value === "포트 센서" ? "starboardruddersensor,portruddersensor" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
         
-        fetchEngineData("no1enginepanel/no1engine_panel_61444", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65262", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65263", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65272", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65271", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65253", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65270", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65276", "NO.1ENGINEPANEL", "NO.1ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_61444", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65262", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65263", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65272", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65271", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65253", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65270", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65276", "NO.2ENGINEPANEL", "NO.2ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_61444", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65262", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65263", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65272", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65271", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65253", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65270", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no1enginepanel/no1engine_panel_65276", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_61444", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65262", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65263", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65272", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65271", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65253", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65270", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
+        fetchEngineData("no2enginepanel/no2engine_panel_65276", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
       ]);
 
       switch (selectedItem.value) {
@@ -645,12 +677,6 @@ const searchData = async () => {
           processData(fuel_LEVEL_2, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no2engine_panel_65276/Fuel Level", "fuel_LEVEL");
           break;
       }
-
-      let Item = {
-        user_id: userId.value ? userId.value : "unknown",
-        page: `데이터 분석`,
-        log: `${selectedItem.value} 데이터 조회`,
-      };
       try {
         // createErrorData(response, Item);
       } catch (error) {
@@ -934,11 +960,7 @@ const captureImage = async () => {
       // URL 객체 해제
       URL.revokeObjectURL(blobUrl);
 
-      let Item = {
-        user_id: userId.value ? userId.value : "unknown",
-        page: `데이터 분석`,
-        log: `${selectedItem.value} 그래프 캡쳐`,
-      };
+
       try {
         // createErrorData(response, Item);
       } catch (error) {

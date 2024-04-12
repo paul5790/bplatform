@@ -163,6 +163,7 @@ onMounted(() => {
   window.addEventListener("resize", updateCols);
   // 초기에도 업데이트 수행
   updateCols();
+  sessionStorage.setItem("page", "대시보드");
 });
 
 // 컴포넌트가 소멸될 때 이벤트 리스너 해제

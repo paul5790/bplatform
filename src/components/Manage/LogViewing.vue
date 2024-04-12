@@ -2,7 +2,6 @@
   <v-sheet class="manager-sheet">
     <!-- <v-btn color="blue" @click="errorMethod">오류발생 버튼</v-btn> -->
     <v-card
-      class="scrollable-card"
       style="
         flex: 1;
         height: 75vh;
@@ -38,18 +37,18 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        <v-data-table
+        <v-data-table-virtual
           style="margin-top: 10px"
-          v-model:page="page"
+          
           class="elevation-1"
-          :headers="headers"
+          :headers="selectedLog === 'Web Dashboard Log' ? webheaders : appheaders"
           :search="search"
           :items="items"
-          :items-per-page="itemsPerPage"
+          
           hide-default-footer
           density="compact"
         >
-          <template v-slot:bottom>
+          <!-- <template v-slot:bottom>
             <div class="text-center pt-2">
               <v-pagination
                 v-model="page"
@@ -58,8 +57,8 @@
                 rounded="circle"
               ></v-pagination>
             </div>
-          </template>
-        </v-data-table>
+          </template> -->
+        </v-data-table-virtual>
       </v-card-item>
     </v-card>
   </v-sheet>
@@ -67,7 +66,7 @@
 
 <script setup>
 import { computed, ref, watchEffect, watch, onMounted } from "vue";
-import { readErrorData, createErrorData } from "../../api/index.js";
+import { readWebLogData, createErrorData, readAppLogData } from "../../api/index.js";
 import moment from "moment";
 const page = ref(1);
 const itemsPerPage = ref(16);
@@ -104,30 +103,39 @@ const pageCount = computed(() => {
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
-const headers = ref([
-  { title: "시간", key: "utc" },
-  //{ title: "타겟", key: "target" },
-  { title: "호출 메서드", key: "method" },
-  { title: "상태코드", key: "state" },
-  { title: "호출 URL", key: "url" },
-  { title: "응답 메시지", key: "log" },
-  { title: "유저", key: "name" },
+const webheaders = ref([
+  { title: "유저", key: "id" },
+  { title: "시간", key: "utc", width: 180  },
+  { title: "상태", key: "state" },
+  { title: "타입", key: "type" },
+  { title: "URL", key: "url" },
+  { title: "로그", key: "log" },
+]);
+
+const appheaders = ref([
+  { title: "유저", key: "id", width: 90 },
+  { title: "시간1", key: "utc", width: 180 },
+  { title: "타입", key: "type" },
+  { title: "로그", key: "log", width: 400 },
+  { title: "상세", key: "details" },
 ]);
 
 const items = ref([]);
 
 const webData = async () => {
   try {
-    const response = await readErrorData(tokenid.value);
+    console.log("시작");
+    const response = await readWebLogData(tokenid.value);
+    console.log("끝");
     console.log(response);
     for (let i = 0; i < response.length; i++) {
       const koreanTime = moment(response[i].timeStamp)
-        .add(9, "hours")
+        .add(0, "hours")
         .format("YYYY-MM-DD HH:mm:ss");
       items.value.push({
-        name: response[i].id || "",
+        id: response[i].userId || "",
         utc: koreanTime || "",
-        // target: response[i].userGroup || "",
+        type: response[i].type || "",
         method: response[i].requestMethod || "",
         state: response[i].statusCode || "",
         url: response[i].requestUrl || "",
@@ -147,20 +155,18 @@ const webData = async () => {
 
 const appData = async () => {
   try {
-    const response = await readErrorData(tokenid.value);
+    const response = await readAppLogData(tokenid.value);
     console.log(response);
     for (let i = 0; i < response.length; i++) {
       const koreanTime = moment(response[i].timeStamp)
         .add(9, "hours")
         .format("YYYY-MM-DD HH:mm:ss");
       items.value.push({
-        name: response[i].id || "",
+        id: response[i].id || "",
         utc: koreanTime || "",
-        // target: response[i].userGroup || "",
-        // method: response[i].requestMethod || "",
-        // state: response[i].statusCode || "",
-        url: response[i].requestUrl || "",
+        type: response[i].type || "",
         log: response[i].log || "",
+        details: response[i].details || "",
       });
       // items.value.push(response.data[i]);
     }
