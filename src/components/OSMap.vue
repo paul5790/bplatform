@@ -52,11 +52,11 @@ onMounted(() => {
   intervalId = setInterval(() => {
     if (state.value === "start") {
       updateMapCheck.value = true;
-      console.log(updateMapCheck.value);
+      // console.log(updateMapCheck.value);
       executeUpdateMap();
     } else {
       updateMapCheck.value = false;
-      console.log(updateMapCheck.value);
+      // console.log(updateMapCheck.value);
     }
   }, 5000);
 });
@@ -71,7 +71,7 @@ const updateValue = () => {
   state.value = props.state;
   latview.value = props.lat;
   lonview.value = props.lon;
-  console.log("updateValue");
+  // console.log("updateValue");
 
   latvalue.value = (props.lat / 100).toFixed(2);
   lonvalue.value = (props.lon / 100).toFixed(2);
@@ -90,8 +90,17 @@ const updateMap = () => {
     });
 
     // 새로운 위치로 마커 및 맵 생성
+
+    const blueIcon = new L.Icon({
+      iconUrl: "/image/marker-icon-2x-blue.png",
+      shadowUrl: "/image/marker-shadow.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
     console.log(latview.value / 100, lonview.value / 100);
-    L.marker([latview.value / 100, lonview.value / 100])
+    L.marker([latview.value / 100, lonview.value / 100], { icon: blueIcon })
       .addTo(map)
       .bindPopup("Realtime Location.")
       .openPopup();

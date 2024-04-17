@@ -358,16 +358,7 @@ const resetPW= () => {
   console.log(data);
   try{
     resetPassword(tokenid.value, data);
-    let Item = {
-      user_id: userId.value ? userId.value : "unknown",
-      page: `관리자 설정`,
-      log: `사용자 ${selectedId.value}의 비밀번호 초기화`,
-    };
-    try {
-      // createErrorData(response, Item);
-    } catch (error) {
-      console.error(error);
-    }
+    
     alert("비밀번호가 초기화 되었습니다.")
   }
   catch(error) {

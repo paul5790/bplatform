@@ -446,17 +446,6 @@ const login = async () => {
     // 세션 스토리지에 사용자 로그인 상태를 저장
     sessionStorage.setItem("showDashboard", showDashboard.value.toString());
 
-    let Item = {
-      user_id: id ? id : "unknown",
-      page: `로그인 페이지`,
-      log: `${userName}(${id}) 로그인`,
-    };
-    try {
-      // createErrorData(response, Item);
-    } catch (error) {
-      console.error(error);
-    }
-
     // 이벤트 로그 메시지
   } catch (error) {
     alert(error.response?.data || error.message);

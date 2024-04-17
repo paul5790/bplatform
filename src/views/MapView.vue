@@ -7,7 +7,7 @@
 <script setup props="props">
 import L from "leaflet";
 import { ref, toRefs, onMounted, defineProps } from "vue";
-import { readWaypoint, readAis, createErrorData } from "../api/index.js";
+import { readWaypoint, readAis } from "../api/index.js";
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const props = defineProps({
@@ -44,7 +44,15 @@ const initializeMap = (waypoints, wid, ais, startlocation, endlocation) => {
     L.polyline(ais.value, { color: "blue", weight: 2 }).addTo(state.map);
 
     // 마커 추가 (예제 마커)
-    L.marker(startlocation.value)
+    const blueIcon = new L.Icon({
+      iconUrl: "/image/marker-icon-2x-blue.png",
+      shadowUrl: "/image/marker-shadow.png",
+      iconSize: [25, 41],
+      iconAnchor: [12, 41],
+      popupAnchor: [1, -34],
+      shadowSize: [41, 41],
+    });
+    L.marker(startlocation.value, { icon: blueIcon })
       .addTo(state.map)
       .bindPopup("start")
       .openPopup();
@@ -76,21 +84,7 @@ const initializeMap = (waypoints, wid, ais, startlocation, endlocation) => {
         .bindPopup(`waypoint${wid.value[i]}`);
     }
   } catch (error) {
-    let errorItem = {
-      id: sessionStorage.getItem("userid") || "",
-      requestMethod: error.response ? error.response.config.method : "unknown",
-      requestUrl: error.response
-        ? error.response.request.responseURL
-        : "unknown",
-      statusCode: error.response ? error.response.status : "unknown",
-      log: error.name ? error.name : "unknown",
-    };
-    console.log(errorItem);
-    try {
-      createErrorData(tokenid.value, errorItem);
-    } catch (error) {
-      console.error(error);
-    }
+    console.error(error);
   }
 };
 
@@ -148,19 +142,6 @@ onMounted(async () => {
     initializeMap(waypoints, id, ais, startlocation, endlocation);
   } catch (error) {
     console.error(error);
-    let errorItem = {
-      id: sessionStorage.getItem("userid") || "",
-      requestMethod: error.response ? error.response.config.method : "unknown",
-      requestUrl: error.response ? error.response.request.responseURL : "unknown",
-      statusCode: error.response ? error.response.status : "unknown",
-      log: error.name ? error.name : "no-data",
-    };
-    console.log(errorItem);
-    try {
-      createErrorData(tokenid.value, errorItem);
-    } catch (error) {
-      console.error(error);
-    }
   }
 });
 </script>

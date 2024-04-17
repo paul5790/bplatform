@@ -33,7 +33,6 @@ import {
   readTrialData,
   readDataStorage,
   readDataTrialStorage,
-  createErrorData,
 } from "../../api/index.js";
 import { darkText, lightText } from "../../color/color.js";
 
@@ -116,7 +115,6 @@ const fetchAllData = async () => {
     dataFilter(data);
   } catch (error) {
     console.error(error);
-    errorLog(error);
   }
 };
 
@@ -126,7 +124,6 @@ const fetchTrialData = async (trialnum) => {
     dataFilter1(data);
   } catch (error) {
     console.error(error);
-    errorLog(error);
   }
 };
 
@@ -367,22 +364,6 @@ const option = ref({
     },
   ],
 });
-
-const errorLog = (error) => {
-  let errorItem = {
-    id: sessionStorage.getItem("userid") || "",
-    requestMethod: error.response ? error.response.config.method : "unknown",
-    requestUrl: error.response ? error.response.request.responseURL : "unknown",
-    statusCode: error.response ? error.response.status : "unknown",
-    log: error.name ? error.name : "unknown",
-  };
-  try {
-    createErrorData(tokenid.value, errorItem);
-    alert("데이터 오류");
-  } catch (error) {
-    console.error(error);
-  }
-};
 </script>
 
 <style scoped>

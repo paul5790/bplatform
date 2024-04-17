@@ -275,27 +275,6 @@ export const readAppLogData = async (tokenid) => {
   }
 };
 
-// 에러 로그 생성하기
-export const createErrorData = async (tokenid, data) => {
-  try {
-    const response = await axios.post(
-      `http://${apiLocation}/log/set/webapp/error`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
-
 // 실시간 데이터 주기
 export const updateSetTime = async (tokenid, data) => {
   try {

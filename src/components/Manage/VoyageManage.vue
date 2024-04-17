@@ -727,7 +727,6 @@ import {
   updateTrialData,
   deleteTrialData,
   readTrialData,
-  createErrorData,
 } from "../../api/index.js";
 import {
   darkbackcolor,
@@ -1056,16 +1055,7 @@ const startData = async () => {
     sessionStorage.removeItem("endTimeUtc");
     sessionStorage.removeItem("description");
 
-    let Item = {
-      user_id: userId.value ? userId.value : "unknown",
-      page: `관리자 설정`,
-      log: `${division} 항차 측정 완료`,
-    };
-    try {
-      // createErrorData(response, Item);
-    } catch (error) {
-      console.error(error);
-    }
+    
 
     // console.log(response.data);
     overlay.value = false;
@@ -1074,19 +1064,6 @@ const startData = async () => {
   } catch (error) {
     console.error(error);
     alert(error.response?.data || "An error occurred during signup.");
-    let errorItem = {
-      id: sessionStorage.getItem("userid") || "",
-      requestMethod: error.response ? error.response.config.method : "unknown",
-      requestUrl: error.response ? error.response.request.responseURL : "unknown",
-      statusCode: error.response ? error.response.status : "unknown",
-      log: error.name ? error.name : "unknown",
-    };
-    console.log(errorItem);
-    try {
-      createErrorData(tokenid.value, errorItem);
-    } catch (error) {
-      console.error(error);
-    }
     overlay.value = false;
     alert("")
   }
@@ -1163,16 +1140,7 @@ const editData = async () => {
         try {
           await createTrialData(tokenid.value, data);
           overlay.value = false;
-          let Item = {
-            user_id: userId.value ? userId.value : "unknown",
-            page: `관리자 설정`,
-            log: `${division} 항차 추가 완료`,
-          };
-          try {
-            // createErrorData(response, Item);
-          } catch (error) {
-            console.error(error);
-          }
+          
           alert("항차 추가가 완료되었습니다.");
           nullDialog2();
           // console.log("API 응답 데이터:", response.data);
@@ -1194,23 +1162,7 @@ const editData = async () => {
         }
       } catch (error) {
         console.error("An error occurred in waitStart:", error);
-        let errorItem = {
-          id: sessionStorage.getItem("userid") || "",
-          requestMethod: error.response
-            ? error.response.config.method
-            : "unknown",
-          requestUrl: error.response
-            ? error.response.request.responseURL
-            : "unknown",
-          statusCode: error.response ? error.response.status : "unknown",
-          log: error.name ? error.name : "unknown",
-        };
-        console.log(errorItem);
-        try {
-          createErrorData(tokenid.value, errorItem);
-        } catch (error) {
-          console.error(error);
-        }
+        
       }
     }
   }
@@ -1279,16 +1231,7 @@ const changeData = async () => {
         console.log(data);
         try {
           await updateTrialData(tokenid.value, data);
-          let Item = {
-            user_id: userId.value ? userId.value : "unknown",
-            page: `관리자 설정`,
-            log: `${selectedData.value[0].division} 항차 수정 완료`,
-          };
-          try {
-            // createErrorData(response, Item);
-          } catch (error) {
-            console.error(error);
-          }
+          
           alert("선택된 항차의 수정이 완료되었습니다.");
           nullDialog3();
           // location.reload();
@@ -1310,29 +1253,11 @@ const changeData = async () => {
       } catch (error) {
         console.error(error);
         alert("선택된 항차 목록이 존재하지 않습니다.");
-        let errorItem = {
-          id: sessionStorage.getItem("userid") || "",
-          requestMethod: error.response
-            ? error.response.config.method
-            : "unknown",
-          requestUrl: error.response
-            ? error.response.request.responseURL
-            : "unknown",
-          statusCode: error.response ? error.response.status : "unknown",
-          log: error.name ? error.name : "unknown",
-        };
-        console.log(errorItem);
-        try {
-          createErrorData(tokenid.value, errorItem);
-        } catch (error) {
-          console.error(error);
-        }
-        console.log(1145);
+
       }
     }
   } else {
     alert("선택된 날짜에 항차가 이미 존재합니다.");
-    console.log(1151);
   }
 };
 
@@ -1347,36 +1272,13 @@ const deleteData = async () => {
   };
   try {
     await deleteTrialData(tokenid.value, data);
-    let Item = {
-      user_id: userId.value ? userId.value : "unknown",
-      page: `관리자 설정`,
-      log: `${selectedData.value[0].division} 항차 삭제 완료`,
-    };
-    try {
-      // createErrorData(response, Item);
-    } catch (error) {
-      console.error(error);
-    }
+    
     alert("선택한 항차의 삭제가 완료되었습니다.");
     overlayemit(false);
     overlay.value = false;
     location.reload();
   } catch (error) {
-    let errorItem = {
-      id: sessionStorage.getItem("userid") || "",
-      requestMethod: error.response ? error.response.config.method : "unknown",
-      requestUrl: error.response
-        ? error.response.request.responseURL
-        : "unknown",
-      statusCode: error.response ? error.response.status : "unknown",
-      log: error.name ? error.name : "unknown",
-    };
-    console.log(errorItem);
-    try {
-      createErrorData(tokenid.value, errorItem);
-    } catch (error) {
-      console.error(error);
-    }
+    console.log("삭제 에러");
   }
 };
 

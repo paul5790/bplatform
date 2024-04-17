@@ -347,7 +347,6 @@ import {
   readDataTrial,
   readDataDate,
   downloadDataFile,
-  createErrorData,
   cancelDownload,
 } from "../api/index.js";
 import JSZip from "jszip";
@@ -456,7 +455,6 @@ const mainSelect = ref([
   "Kass Information",
   "System Information",
   "Control Information",
-  "관제 Information",
 ]);
 const firstSelect = ref([]);
 const secondSelect = ref([]);
@@ -514,8 +512,6 @@ const voyage = ref(["직접 선택"]);
 const setStartTime = ref([]);
 const setEndTime = ref([]);
 const selectedtrialNum = ref();
-
-
 
 
 const getTrialDate = async () => {
@@ -580,11 +576,7 @@ const searchData = async () => {
         
       }
       lastloading.value = false;
-      try {
-        // createErrorData(response, Item);
-      } catch (error) {
-        console.error(error);
-      }
+      
       searchstart.value = true;
     } catch {
       loading.value = false;
@@ -676,6 +668,10 @@ const fetchData = async (data) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const dataDownloadServer = async () => {
+  if (sessionStorage.getItem("isAdmin") != "ADMIN") {
+    alert("ADMIN 이상만 사용 가능합니다.");
+    return;
+  }
   try {
     canceling.value = false;
     // downloadDialog.value = true;
@@ -732,12 +728,6 @@ const dataDownloadServer = async () => {
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
 
-    try {
-      // createErrorData(response, Item);
-    } catch (error) {
-      console.error(error);
-    }
-
     // downloadDialog.value = false;
   } catch (error) {
     downloadBtnLoading.value = false;
@@ -747,23 +737,7 @@ const dataDownloadServer = async () => {
       downloadBtnLoading.value = false;
       canceling.value = false;
     } else {
-      let errorItem = {
-        id: sessionStorage.getItem("userid") || "",
-        requestMethod: error.response
-          ? error.response.config.method
-          : "unknown",
-        requestUrl: error.response
-          ? error.response.request.responseURL
-          : "unknown",
-        statusCode: error.response ? error.response.status : "unknown",
-        log: error.name ? error.name : "unknown",
-      };
-      try {
-        createErrorData(tokenid.value, errorItem);
-        alert("다운로드 할 데이터를 다시 확인해주세요.");
-      } catch (error) {
-        console.error(error);
-      }
+      alert("다운로드 할 데이터를 다시 확인해주세요.");
     }
   }
 };

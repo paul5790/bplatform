@@ -480,7 +480,319 @@ import {
   watch,
   nextTick,
 } from "vue";
-import { onMessage, onOpen, onClose, onError } from "vue3-websocket";
+import socket, { onMessage, onOpen, onClose, onError } from "vue3-websocket";
+import { createApp } from "vue";
+import App from "./RealtimeView.vue";
+
+// createApp(App).use(socket, "ws://ias.bdpbackend.com/ws/shipinfo1")
+
+const ws = new WebSocket("ws://ias.bdpbackend.com/ws/shipinfo");
+
+ws.onopen = function (event) {
+  console.log("Connection opened");
+};
+
+const headerNameC = ref();
+ws.onmessage = function (event) {
+  console.log("Message received: " + event.data);
+  try {
+    const parsedMessage = JSON.parse(event.data);
+    let headerName = parsedMessage.Package.Header.Author;
+    let variableName = getVariableName(headerName);
+    headerNameC.value = parsedMessage.Package.Header.Author;
+    checkdata.value[variableName] = parsedMessage.Package.Header.TimeSpan.End;
+    clearTimeout(messageTimeout);
+    // console.log(headerName);
+    // console.log(parsedMessage);
+    checkingData(headerName);
+    // 'Package' 내의 데이터 중 "DataSet"의 첫 번째 항목 추출
+    // 위치
+    if (headerName === "DGPS/GGA") {
+      latitude.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[2]
+      ).toFixed(4);
+      mapstart.value = "start";
+      clearTimeout(GGAtimeout1); // 이전 타임아웃을 취소
+      GGAtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        latitude.value = null;
+        mapstart.value = "stop";
+      }, checkTime.value);
+      longitude.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[4]
+      ).toFixed(4);
+      clearTimeout(GGAtimeout2); // 이전 타임아웃을 취소
+      GGAtimeout2 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        longitude.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "ANEMOMETER/MWV") {
+      windspeed.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[3]
+      ).toFixed(2);
+      clearTimeout(MWVtimeout1); // 이전 타임아웃을 취소
+      MWVtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        windspeed.value = null;
+      }, checkTime.value);
+      windangle.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[1]
+      ).toFixed(2);
+      clearTimeout(MWVtimeout2); // 이전 타임아웃을 취소
+      MWVtimeout2 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        windangle.value = null;
+      }, checkTime.value);
+    }
+    // 헤딩값
+    if (headerName === "GYRO/HDT") {
+      heading.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[1]
+      ).toFixed(2);
+      clearTimeout(HDTtimeout1); // 이전 타임아웃을 취소
+      HDTtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        heading.value = null;
+      }, checkTime.value);
+    }
+    // 스피드
+    if (headerName === "SPEEDLOG/VHW") {
+      speed.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[5]
+      ).toFixed(2);
+      clearTimeout(VHWtimeout1); // 이전 타임아웃을 취소
+      VHWtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        speed.value = null;
+      }, checkTime.value);
+    }
+    // 러더
+    if (headerName === "AUTOPILOT/RSA") {
+      star.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[1]
+      ).toFixed(2);
+      clearTimeout(RSAtimeout1); // 이전 타임아웃을 취소
+      RSAtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        star.value = null;
+      }, checkTime.value);
+      port.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[3]
+      ).toFixed(2);
+      clearTimeout(RSAtimeout2); // 이전 타임아웃을 취소
+      RSAtimeout2 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        port.value = null;
+      }, checkTime.value);
+    }
+    // 엔진1
+    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_61444") {
+      engine1Speed.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0]
+      ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_61444timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1Speed.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65262") {
+      engine1oilTemperature.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0]
+      ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65262timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1oilTemperature.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65263") {
+      engine1oilPressure.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0] / 100
+      ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65263timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1oilPressure.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65272") {
+      engine1transmissionPressure.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0] / 100
+      ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65272timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1transmissionPressure.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65270") {
+      engine1gasTemperature.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[2]
+      ).toFixed(2);
+      clearTimeout(NO1ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65270timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1gasTemperature.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_LAMP") {
+      for (let i = 0; i < 16; i++) {
+        if (
+          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+            .Value[i] === "1"
+        ) {
+          if (i === 0) checkdata1.value[9] = "ok";
+          if (i === 1) checkdata1.value[12] = "ok";
+          if (i === 2) checkdata1.value[14] = "ok";
+          if (i === 3) checkdata1.value[4] = "ok";
+          if (i === 4) checkdata1.value[2] = "ok";
+          if (i === 5) checkdata1.value[3] = "ok";
+          if (i === 6) checkdata1.value[1] = "ok";
+          if (i === 7) checkdata1.value[6] = "ok";
+          if (i === 8) checkdata1.value[5] = "ok";
+          if (i === 9) checkdata1.value[10] = "ok";
+          if (i === 10) checkdata1.value[15] = "ok";
+          if (i === 11) checkdata1.value[16] = "ok";
+          if (i === 12) checkdata1.value[11] = "ok";
+          if (i === 13) checkdata1.value[13] = "ok";
+          if (i === 14) checkdata1.value[7] = "ok";
+          if (i === 15) checkdata1.value[8] = "ok";
+        } else {
+          if (i === 0) checkdata1.value[9] = "no";
+          if (i === 1) checkdata1.value[12] = "no";
+          if (i === 2) checkdata1.value[14] = "no";
+          if (i === 3) checkdata1.value[4] = "no";
+          if (i === 4) checkdata1.value[2] = "no";
+          if (i === 5) checkdata1.value[3] = "no";
+          if (i === 6) checkdata1.value[1] = "no";
+          if (i === 7) checkdata1.value[6] = "no";
+          if (i === 8) checkdata1.value[5] = "no";
+          if (i === 9) checkdata1.value[10] = "no";
+          if (i === 10) checkdata1.value[15] = "no";
+          if (i === 11) checkdata1.value[16] = "no";
+          if (i === 12) checkdata1.value[11] = "no";
+          if (i === 13) checkdata1.value[13] = "no";
+          if (i === 14) checkdata1.value[7] = "no";
+          if (i === 15) checkdata1.value[8] = "no";
+        }
+      }
+      clearTimeout(NO1ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
+      NO1ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1gasTemperature.value = null;
+      }, 3000);
+    }
+    // 엔진2
+    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_61444") {
+      engine2Speed.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0]
+      ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_61444timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2Speed.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65262") {
+      engine2oilTemperature.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0]
+      ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65262timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2oilTemperature.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65263") {
+      engine2oilPressure.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0] / 100
+      ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65263timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2oilPressure.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65272") {
+      engine2transmissionPressure.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[0] / 100
+      ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65272timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2transmissionPressure.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65270") {
+      engine2gasTemperature.value = Number(
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[2]
+      ).toFixed(2);
+      clearTimeout(NO2ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65270timeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine2gasTemperature.value = null;
+      }, checkTime.value);
+    }
+    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_LAMP") {
+      for (let i = 0; i < 16; i++) {
+        if (
+          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+            .Value[i] === "1"
+        ) {
+          onlamp(i);
+        } else {
+          offlamp(i);
+        }
+      }
+      clearTimeout(NO2ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
+      NO2ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
+        // 3초 이상 데이터가 오지 않으면 "no"로 변경
+        engine1gasTemperature.value = null;
+      }, 3000);
+    }
+  } catch (error) {
+    console.error(error);
+    // resetCheckdata();
+  }
+};
+
+ws.onerror = function (event) {
+  console.error("WebSocket error observed:", event);
+  resetCheckdata();
+  offlamp(16);
+};
+
+ws.onclose = function (event) {
+  console.log("Connection closed");
+  resetCheckdata();
+  offlamp(16);
+};
+
+onBeforeUnmount(() => {
+  // 페이지(컴포넌트)가 종료되기 전에 웹소켓 연결을 닫습니다.
+  ws.close();
+  console.log("bye");
+});
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
 
@@ -654,9 +966,9 @@ console.log(checkdata.value.gll);
 console.log(checkdata.value.gga);
 console.log(checkdata.value.rmc);
 
-const socket = inject("socket");
+// const socket1 = inject("socket");
 
-const sendMessage = () => socket.value.send(text.value);
+// const sendMessage = () => socket1.value.send(text.value);
 
 // 센서 데이터
 const latitude = ref();
@@ -830,309 +1142,310 @@ let NO2ENGINE_PANEL_65272timeout1 = null;
 let NO2ENGINE_PANEL_65270timeout1 = null;
 let NO2ENGINE_PANEL_65361_LAMPtimeout1 = null;
 let messageTimeout;
-onOpen(() => {
-  console.log("WS connection is stable! ~uWu~");
-});
-const headerNameC = ref();
 
-onMessage((message) => {
-  try {
-    const parsedMessage = JSON.parse(message.data);
-    let headerName = parsedMessage.Package.Header.Author;
-    let variableName = getVariableName(headerName);
-    headerNameC.value = parsedMessage.Package.Header.Author;
-    checkdata.value[variableName] = parsedMessage.Package.Header.TimeSpan.End;
+// onOpen(() => {
+//   console.log("WS connection is stable! ~uWu~");
+// });
+// const headerNameC = ref();
 
-    clearTimeout(messageTimeout);
-    // console.log(headerName);
-    // console.log(parsedMessage);
-    checkingData(headerName);
-    // 'Package' 내의 데이터 중 "DataSet"의 첫 번째 항목 추출
-    // 위치
-    if (headerName === "DGPS/GGA") {
-      latitude.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[2]
-      ).toFixed(4);
-      mapstart.value = "start";
-      clearTimeout(GGAtimeout1); // 이전 타임아웃을 취소
-      GGAtimeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        latitude.value = null;
-        mapstart.value = "stop";
-      }, checkTime.value);
-      longitude.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[4]
-      ).toFixed(4);
-      clearTimeout(GGAtimeout2); // 이전 타임아웃을 취소
-      GGAtimeout2 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        longitude.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "ANEMOMETER/MWV") {
-      windspeed.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[3]
-      ).toFixed(2);
-      clearTimeout(MWVtimeout1); // 이전 타임아웃을 취소
-      MWVtimeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        windspeed.value = null;
-      }, checkTime.value);
+// onMessage((message) => {
+//   try {
+//     const parsedMessage = JSON.parse(message.data);
+//     let headerName = parsedMessage.Package.Header.Author;
+//     let variableName = getVariableName(headerName);
+//     headerNameC.value = parsedMessage.Package.Header.Author;
+//     checkdata.value[variableName] = parsedMessage.Package.Header.TimeSpan.End;
 
-      windangle.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[1]
-      ).toFixed(2);
-      clearTimeout(MWVtimeout2); // 이전 타임아웃을 취소
-      MWVtimeout2 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        windangle.value = null;
-      }, checkTime.value);
-    }
+//     clearTimeout(messageTimeout);
+//     // console.log(headerName);
+//     // console.log(parsedMessage);
+//     checkingData(headerName);
+//     // 'Package' 내의 데이터 중 "DataSet"의 첫 번째 항목 추출
+//     // 위치
+//     if (headerName === "DGPS/GGA") {
+//       latitude.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[2]
+//       ).toFixed(4);
+//       mapstart.value = "start";
+//       clearTimeout(GGAtimeout1); // 이전 타임아웃을 취소
+//       GGAtimeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         latitude.value = null;
+//         mapstart.value = "stop";
+//       }, checkTime.value);
+//       longitude.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[4]
+//       ).toFixed(4);
+//       clearTimeout(GGAtimeout2); // 이전 타임아웃을 취소
+//       GGAtimeout2 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         longitude.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "ANEMOMETER/MWV") {
+//       windspeed.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[3]
+//       ).toFixed(2);
+//       clearTimeout(MWVtimeout1); // 이전 타임아웃을 취소
+//       MWVtimeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         windspeed.value = null;
+//       }, checkTime.value);
 
-    // 헤딩값
-    if (headerName === "GYRO/HDT") {
-      heading.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[1]
-      ).toFixed(2);
-      clearTimeout(HDTtimeout1); // 이전 타임아웃을 취소
-      HDTtimeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        heading.value = null;
-      }, checkTime.value);
-    }
-    // 스피드
-    if (headerName === "SPEEDLOG/VHW") {
-      speed.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[5]
-      ).toFixed(2);
-      clearTimeout(VHWtimeout1); // 이전 타임아웃을 취소
-      VHWtimeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        speed.value = null;
-      }, checkTime.value);
-    }
-    // 러더
-    if (headerName === "AUTOPILOT/RSA") {
-      star.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[1]
-      ).toFixed(2);
-      clearTimeout(RSAtimeout1); // 이전 타임아웃을 취소
-      RSAtimeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        star.value = null;
-      }, checkTime.value);
-      port.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[3]
-      ).toFixed(2);
-      clearTimeout(RSAtimeout2); // 이전 타임아웃을 취소
-      RSAtimeout2 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        port.value = null;
-      }, checkTime.value);
-    }
+//       windangle.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[1]
+//       ).toFixed(2);
+//       clearTimeout(MWVtimeout2); // 이전 타임아웃을 취소
+//       MWVtimeout2 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         windangle.value = null;
+//       }, checkTime.value);
+//     }
 
-    // 엔진1
-    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_61444") {
-      engine1Speed.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0]
-      ).toFixed(2);
-      clearTimeout(NO1ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
-      NO1ENGINE_PANEL_61444timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine1Speed.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65262") {
-      engine1oilTemperature.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0]
-      ).toFixed(2);
-      clearTimeout(NO1ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
-      NO1ENGINE_PANEL_65262timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine1oilTemperature.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65263") {
-      engine1oilPressure.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0] / 100
-      ).toFixed(2);
-      clearTimeout(NO1ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
-      NO1ENGINE_PANEL_65263timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine1oilPressure.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65272") {
-      engine1transmissionPressure.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0] / 100
-      ).toFixed(2);
-      clearTimeout(NO1ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
-      NO1ENGINE_PANEL_65272timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine1transmissionPressure.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65270") {
-      engine1gasTemperature.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[2]
-      ).toFixed(2);
-      clearTimeout(NO1ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
-      NO1ENGINE_PANEL_65270timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine1gasTemperature.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_LAMP") {
-      for (let i = 0; i < 16; i++) {
-        if (
-          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-            .Value[i] === "1"
-        ) {
-          if (i === 0) checkdata1.value[9] = "ok";
-          if (i === 1) checkdata1.value[12] = "ok";
-          if (i === 2) checkdata1.value[14] = "ok";
-          if (i === 3) checkdata1.value[4] = "ok";
-          if (i === 4) checkdata1.value[2] = "ok";
-          if (i === 5) checkdata1.value[3] = "ok";
-          if (i === 6) checkdata1.value[1] = "ok";
-          if (i === 7) checkdata1.value[6] = "ok";
-          if (i === 8) checkdata1.value[5] = "ok";
-          if (i === 9) checkdata1.value[10] = "ok";
-          if (i === 10) checkdata1.value[15] = "ok";
-          if (i === 11) checkdata1.value[16] = "ok";
-          if (i === 12) checkdata1.value[11] = "ok";
-          if (i === 13) checkdata1.value[13] = "ok";
-          if (i === 14) checkdata1.value[7] = "ok";
-          if (i === 15) checkdata1.value[8] = "ok";
-        } else {
-          if (i === 0) checkdata1.value[9] = "no";
-          if (i === 1) checkdata1.value[12] = "no";
-          if (i === 2) checkdata1.value[14] = "no";
-          if (i === 3) checkdata1.value[4] = "no";
-          if (i === 4) checkdata1.value[2] = "no";
-          if (i === 5) checkdata1.value[3] = "no";
-          if (i === 6) checkdata1.value[1] = "no";
-          if (i === 7) checkdata1.value[6] = "no";
-          if (i === 8) checkdata1.value[5] = "no";
-          if (i === 9) checkdata1.value[10] = "no";
-          if (i === 10) checkdata1.value[15] = "no";
-          if (i === 11) checkdata1.value[16] = "no";
-          if (i === 12) checkdata1.value[11] = "no";
-          if (i === 13) checkdata1.value[13] = "no";
-          if (i === 14) checkdata1.value[7] = "no";
-          if (i === 15) checkdata1.value[8] = "no";
-        }
-      }
-      clearTimeout(NO1ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
-      NO1ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine1gasTemperature.value = null;
-      }, 3000);
-    }
+//     // 헤딩값
+//     if (headerName === "GYRO/HDT") {
+//       heading.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[1]
+//       ).toFixed(2);
+//       clearTimeout(HDTtimeout1); // 이전 타임아웃을 취소
+//       HDTtimeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         heading.value = null;
+//       }, checkTime.value);
+//     }
+//     // 스피드
+//     if (headerName === "SPEEDLOG/VHW") {
+//       speed.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[5]
+//       ).toFixed(2);
+//       clearTimeout(VHWtimeout1); // 이전 타임아웃을 취소
+//       VHWtimeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         speed.value = null;
+//       }, checkTime.value);
+//     }
+//     // 러더
+//     if (headerName === "AUTOPILOT/RSA") {
+//       star.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[1]
+//       ).toFixed(2);
+//       clearTimeout(RSAtimeout1); // 이전 타임아웃을 취소
+//       RSAtimeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         star.value = null;
+//       }, checkTime.value);
+//       port.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[3]
+//       ).toFixed(2);
+//       clearTimeout(RSAtimeout2); // 이전 타임아웃을 취소
+//       RSAtimeout2 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         port.value = null;
+//       }, checkTime.value);
+//     }
 
-    // 엔진2
-    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_61444") {
-      engine2Speed.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0]
-      ).toFixed(2);
-      clearTimeout(NO2ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
-      NO2ENGINE_PANEL_61444timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine2Speed.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65262") {
-      engine2oilTemperature.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0]
-      ).toFixed(2);
-      clearTimeout(NO2ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
-      NO2ENGINE_PANEL_65262timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine2oilTemperature.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65263") {
-      engine2oilPressure.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0] / 100
-      ).toFixed(2);
-      clearTimeout(NO2ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
-      NO2ENGINE_PANEL_65263timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine2oilPressure.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65272") {
-      engine2transmissionPressure.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[0] / 100
-      ).toFixed(2);
-      clearTimeout(NO2ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
-      NO2ENGINE_PANEL_65272timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine2transmissionPressure.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65270") {
-      engine2gasTemperature.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[2]
-      ).toFixed(2);
-      clearTimeout(NO2ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
-      NO2ENGINE_PANEL_65270timeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine2gasTemperature.value = null;
-      }, checkTime.value);
-    }
-    if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_LAMP") {
-      for (let i = 0; i < 16; i++) {
-        if (
-          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-            .Value[i] === "1"
-        ) {
-          onlamp(i);
-        } else {
-          offlamp(i);
-        }
-      }
-      clearTimeout(NO2ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
-      NO2ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
-        // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        engine1gasTemperature.value = null;
-      }, 3000);
-    }
-  } catch (error) {
-    console.error(error);
-    // resetCheckdata();
-  }
-});
+//     // 엔진1
+//     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_61444") {
+//       engine1Speed.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0]
+//       ).toFixed(2);
+//       clearTimeout(NO1ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
+//       NO1ENGINE_PANEL_61444timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine1Speed.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65262") {
+//       engine1oilTemperature.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0]
+//       ).toFixed(2);
+//       clearTimeout(NO1ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
+//       NO1ENGINE_PANEL_65262timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine1oilTemperature.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65263") {
+//       engine1oilPressure.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0] / 100
+//       ).toFixed(2);
+//       clearTimeout(NO1ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
+//       NO1ENGINE_PANEL_65263timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine1oilPressure.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65272") {
+//       engine1transmissionPressure.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0] / 100
+//       ).toFixed(2);
+//       clearTimeout(NO1ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
+//       NO1ENGINE_PANEL_65272timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine1transmissionPressure.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65270") {
+//       engine1gasTemperature.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[2]
+//       ).toFixed(2);
+//       clearTimeout(NO1ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
+//       NO1ENGINE_PANEL_65270timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine1gasTemperature.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.1ENGINEPANEL/NO.1ENGINE_PANEL_65361_LAMP") {
+//       for (let i = 0; i < 16; i++) {
+//         if (
+//           parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//             .Value[i] === "1"
+//         ) {
+//           if (i === 0) checkdata1.value[9] = "ok";
+//           if (i === 1) checkdata1.value[12] = "ok";
+//           if (i === 2) checkdata1.value[14] = "ok";
+//           if (i === 3) checkdata1.value[4] = "ok";
+//           if (i === 4) checkdata1.value[2] = "ok";
+//           if (i === 5) checkdata1.value[3] = "ok";
+//           if (i === 6) checkdata1.value[1] = "ok";
+//           if (i === 7) checkdata1.value[6] = "ok";
+//           if (i === 8) checkdata1.value[5] = "ok";
+//           if (i === 9) checkdata1.value[10] = "ok";
+//           if (i === 10) checkdata1.value[15] = "ok";
+//           if (i === 11) checkdata1.value[16] = "ok";
+//           if (i === 12) checkdata1.value[11] = "ok";
+//           if (i === 13) checkdata1.value[13] = "ok";
+//           if (i === 14) checkdata1.value[7] = "ok";
+//           if (i === 15) checkdata1.value[8] = "ok";
+//         } else {
+//           if (i === 0) checkdata1.value[9] = "no";
+//           if (i === 1) checkdata1.value[12] = "no";
+//           if (i === 2) checkdata1.value[14] = "no";
+//           if (i === 3) checkdata1.value[4] = "no";
+//           if (i === 4) checkdata1.value[2] = "no";
+//           if (i === 5) checkdata1.value[3] = "no";
+//           if (i === 6) checkdata1.value[1] = "no";
+//           if (i === 7) checkdata1.value[6] = "no";
+//           if (i === 8) checkdata1.value[5] = "no";
+//           if (i === 9) checkdata1.value[10] = "no";
+//           if (i === 10) checkdata1.value[15] = "no";
+//           if (i === 11) checkdata1.value[16] = "no";
+//           if (i === 12) checkdata1.value[11] = "no";
+//           if (i === 13) checkdata1.value[13] = "no";
+//           if (i === 14) checkdata1.value[7] = "no";
+//           if (i === 15) checkdata1.value[8] = "no";
+//         }
+//       }
+//       clearTimeout(NO1ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
+//       NO1ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine1gasTemperature.value = null;
+//       }, 3000);
+//     }
 
-onClose(() => {
-  console.log("No way, connection has been closed 😥");
-  resetCheckdata();
-  offlamp(16);
-});
+//     // 엔진2
+//     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_61444") {
+//       engine2Speed.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0]
+//       ).toFixed(2);
+//       clearTimeout(NO2ENGINE_PANEL_61444timeout1); // 이전 타임아웃을 취소
+//       NO2ENGINE_PANEL_61444timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine2Speed.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65262") {
+//       engine2oilTemperature.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0]
+//       ).toFixed(2);
+//       clearTimeout(NO2ENGINE_PANEL_65262timeout1); // 이전 타임아웃을 취소
+//       NO2ENGINE_PANEL_65262timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine2oilTemperature.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65263") {
+//       engine2oilPressure.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0] / 100
+//       ).toFixed(2);
+//       clearTimeout(NO2ENGINE_PANEL_65263timeout1); // 이전 타임아웃을 취소
+//       NO2ENGINE_PANEL_65263timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine2oilPressure.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65272") {
+//       engine2transmissionPressure.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[0] / 100
+//       ).toFixed(2);
+//       clearTimeout(NO2ENGINE_PANEL_65272timeout1); // 이전 타임아웃을 취소
+//       NO2ENGINE_PANEL_65272timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine2transmissionPressure.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65270") {
+//       engine2gasTemperature.value = Number(
+//         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//           .Value[2]
+//       ).toFixed(2);
+//       clearTimeout(NO2ENGINE_PANEL_65270timeout1); // 이전 타임아웃을 취소
+//       NO2ENGINE_PANEL_65270timeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine2gasTemperature.value = null;
+//       }, checkTime.value);
+//     }
+//     if (headerName === "NO.2ENGINEPANEL/NO.2ENGINE_PANEL_65361_LAMP") {
+//       for (let i = 0; i < 16; i++) {
+//         if (
+//           parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+//             .Value[i] === "1"
+//         ) {
+//           onlamp(i);
+//         } else {
+//           offlamp(i);
+//         }
+//       }
+//       clearTimeout(NO2ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
+//       NO2ENGINE_PANEL_65361_LAMPtimeout1 = setTimeout(() => {
+//         // 3초 이상 데이터가 오지 않으면 "no"로 변경
+//         engine1gasTemperature.value = null;
+//       }, 3000);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     // resetCheckdata();
+//   }
+// });
 
-onError((error) => {
-  console.error("Error: ", error);
-  resetCheckdata();
-  offlamp(16);
-});
+// onClose(() => {
+//   console.log("No way, connection has been closed 😥");
+//   resetCheckdata();
+//   offlamp(16);
+// });
+
+// onError((error) => {
+//   console.error("Error: ", error);
+//   resetCheckdata();
+//   offlamp(16);
+// });
 
 const checkingData = (headerName) => {
   if (headerName === "DGPS/GLL") {

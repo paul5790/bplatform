@@ -37,6 +37,7 @@
             ></v-text-field>
           </v-col>
         </v-row>
+        
         <v-data-table-virtual
           style="margin-top: 10px"
           
@@ -66,7 +67,7 @@
 
 <script setup>
 import { computed, ref, watchEffect, watch, onMounted } from "vue";
-import { readWebLogData, createErrorData, readAppLogData } from "../../api/index.js";
+import { readWebLogData, readAppLogData } from "../../api/index.js";
 import moment from "moment";
 const page = ref(1);
 const itemsPerPage = ref(16);
@@ -102,6 +103,24 @@ const pageCount = computed(() => {
 });
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
+
+
+async function api () {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(Array.from({ length: 10 }, (k, v) => v + items.value.at(-1) + 1))
+    }, 1000)
+  })
+}
+async function load ({ done }) {
+  // Perform API call
+  const res = await api()
+
+  items.value.push(...res)
+
+  done('ok')
+}
+
 
 const webheaders = ref([
   { title: "유저", key: "id" },
@@ -175,25 +194,6 @@ const appData = async () => {
       const dateB = new Date(b.utc);
       return dateB - dateA;
     });
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-
-const errorMethod = () => {
-  let errorItem = {
-    id: sessionStorage.getItem("userid") || "",
-    requestMethod: "post",
-    requestUrl: "http://192.168.0.19:3911/#/manager",
-    statusCode: "400",
-    log: "virtual error data",
-  };
-  console.log(errorItem);
-  try {
-    createErrorData(tokenid.value, errorItem);
-    alert("에러 설정 완료.");
-    location.reload();
   } catch (error) {
     console.error(error);
   }

@@ -677,11 +677,6 @@ const searchData = async () => {
           processData(fuel_LEVEL_2, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no2engine_panel_65276/Fuel Level", "fuel_LEVEL");
           break;
       }
-      try {
-        // createErrorData(response, Item);
-      } catch (error) {
-        console.error(error);
-      }
       
       const datasetRaw2 = ref([["time", "value"]]);
         datasetRaw2.value = [];
@@ -960,12 +955,6 @@ const captureImage = async () => {
       // URL 객체 해제
       URL.revokeObjectURL(blobUrl);
 
-
-      try {
-        // createErrorData(response, Item);
-      } catch (error) {
-        console.error(error);
-      }
     } catch (error) {
       console.error("Error capturing image:", error);
     }
