@@ -259,6 +259,7 @@
                       :total-visible="10"
                     >
                     </v-pagination>
+                    <button>hi</button>
                   </div>
                 </template>
               </v-data-table>

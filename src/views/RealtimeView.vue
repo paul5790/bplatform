@@ -840,6 +840,12 @@ const setCCTV = () => {
 };
 
 const closeCCTV = () => {
+  if (hls1) {
+    hls1.detachMedia(); // 비디오 요소 연결 해제
+    hls1.stopLoad(); // 로드 중단
+    hls1.destroy(); // Hls 인스턴스 파기
+    hls1 = null; // 변수 초기화
+  }
   cctvDialog.value = false;
 };
 

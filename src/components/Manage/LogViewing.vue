@@ -38,28 +38,29 @@
           </v-col>
         </v-row>
         
-        <v-data-table-virtual
+        <v-data-table
           style="margin-top: 10px"
-          
+          v-model:page="page"
           class="elevation-1"
-          :headers="selectedLog === 'Web Dashboard Log' ? webheaders : appheaders"
+          :headers="headers"
           :search="search"
           :items="items"
-          
+          :items-per-page="itemsPerPage"
           hide-default-footer
           density="compact"
+          return-object
         >
-          <!-- <template v-slot:bottom>
+          <template v-slot:bottom>
             <div class="text-center pt-2">
               <v-pagination
                 v-model="page"
                 :length="pageCount"
-                :total-visible="6"
+                :total-visible="9"
                 rounded="circle"
               ></v-pagination>
             </div>
-          </template> -->
-        </v-data-table-virtual>
+          </template>
+        </v-data-table>
       </v-card-item>
     </v-card>
   </v-sheet>
@@ -70,7 +71,7 @@ import { computed, ref, watchEffect, watch, onMounted } from "vue";
 import { readWebLogData, readAppLogData } from "../../api/index.js";
 import moment from "moment";
 const page = ref(1);
-const itemsPerPage = ref(16);
+const itemsPerPage = ref(14);
 
 const search = ref();
 

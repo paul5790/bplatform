@@ -1,7 +1,7 @@
 // src/api/index.js
 import axios from "axios";
 
-const apiLocation = "ias.bdpbackend.com";
+const apiLocation = "192.168.0.50:9998";
 // const apiLocation = "192.168.0.73:9999";
 export const cctvUrl = `http://${apiLocation}/stream/index.m3u8`;
 

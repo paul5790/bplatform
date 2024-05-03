@@ -52,6 +52,9 @@ const fetchData = async () => {
     serverRemainingSize.value = parseFloat(
       response.serverRemainingSize
     ).toFixed(2);
+    serverInUsedSize.value = 80.0;
+    dbSize.value = 1.1;
+    serverRemainingSize.value = 20.0;
   } catch (error) {
     console.error(error);
   }
@@ -90,6 +93,7 @@ const option = ref({
     textStyle: {
       color: textColor.value, // 텍스트 컬러 설정
     },
+    selectedMode: false, // 레전드 클릭 비활성화
   },
   series: [
     {
@@ -97,6 +101,7 @@ const option = ref({
       radius: ["55%", "85%"],
       center: ["40%", "70%"], // 이 부분을 수정하여 위치 조절
       startAngle: 180,
+      endAngle: 360,
       label: {
         show: false,
       },
@@ -139,36 +144,71 @@ const option = ref({
 
 // 데이터 변경 감지하여 차트 업데이트
 watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
-  option.value.series[0].data = [
-    {
-      value: serverInUsedSize.value,
-      name: `OS 및 기타: ${serverInUsedSize.value}GB`,
-      itemStyle: { color: "#E0E0E0" },
-    },
-    {
-      value: dbSize.value,
-      name: `DB 사용량: ${dbSize.value}GB`,
-      itemStyle: { color: "#43A047" },
-    },
-    {
-      value: serverRemainingSize.value,
-      name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
-      itemStyle: { color: "#E1F3DD" },
-    },
-    {
-      value: totalSize.value,
-      itemStyle: {
-        color: "none",
-        decal: {
-          symbol: "none",
+  if(serverInUsedSize.value + dbSize.value > serverRemainingSize.value * 4){
+    option.value.series[0].data = [
+      {
+        value: serverInUsedSize.value,
+        name: `OS 및 기타: ${serverInUsedSize.value}GB`,
+        itemStyle: { color: "#E0E0E0" },
+      },
+      {
+        value: dbSize.value,
+        name: `DB 사용량: ${dbSize.value}GB`,
+        itemStyle: { color: "#CC0033" },
+      },
+      {
+        value: serverRemainingSize.value,
+        name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
+        itemStyle: { color: "#FF6666" },
+      },
+      {
+        value: totalSize.value,
+        itemStyle: {
+          color: "none",
+          decal: {
+            symbol: "none",
+          },
         },
+        label: {
+          show: false,
+        },
+        name: `전체 용량: ${totalSize.value.toFixed(2)}GB`,
       },
-      label: {
-        show: false,
+    ];
+  }
+  else{
+    option.value.series[0].data = [
+      {
+        value: serverInUsedSize.value,
+        name: `OS 및 기타: ${serverInUsedSize.value}GB`,
+        itemStyle: { color: "#E0E0E0" },
       },
-      name: `전체 용량: ${totalSize.value.toFixed(2)}GB`,
-    },
-  ];
+      {
+        value: dbSize.value,
+        name: `DB 사용량: ${dbSize.value}GB`,
+        itemStyle: { color: "#43A047" },
+      },
+      {
+        value: serverRemainingSize.value,
+        name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
+        itemStyle: { color: "#E1F3DD" },
+      },
+      // {
+      //   value: totalSize.value,
+      //   itemStyle: {
+      //     color: "none",
+      //     decal: {
+      //       symbol: "none",
+      //     },
+      //   },
+      //   label: {
+      //     show: false,
+      //   },
+      //   name: `전체 용량: ${totalSize.value.toFixed(2)}GB`,
+      // },
+    ];
+  }
+  
 });
 </script>
 

@@ -738,13 +738,35 @@ const searchData = async () => {
           },
           dataZoom: [
             {
-              show: true,
-              realtime: true,
-              start: 0,
-              end: 100,
-              xAxisIndex: [0, 1],
+              type: 'slider',
+              xAxisIndex: 0,
+              filterMode: 'none',
               height: "2%",
             },
+            {
+              type: 'slider',
+              yAxisIndex: 0,
+              filterMode: 'none',
+              width: "2%",
+            },
+            {
+              type: 'inside',
+              xAxisIndex: 0,
+              filterMode: 'none'
+            },
+            {
+              type: 'inside',
+              yAxisIndex: 0,
+              filterMode: 'none'
+            }
+            // {
+            //   show: true,
+            //   realtime: true,
+            //   start: 0,
+            //   end: 100,
+            //   xAxisIndex: [0, 1],
+            //   height: "2%",
+            // },
           ],
           xAxis: {
             type: "category",

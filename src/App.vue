@@ -268,7 +268,7 @@ const signupBtn = async () => {
       password: `${newpassword.value}`,
       userName: `${newname.value}`,
       department: `${newaffiliation.value}`,
-      eMail: `${newemail.value}`,
+      email: `${newemail.value}`,
       phoneNumber: `${newphone.value}`,
     };
 

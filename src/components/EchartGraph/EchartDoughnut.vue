@@ -325,6 +325,7 @@ const option = ref({
     textStyle: {
       color: textColor.value, // 텍스트 컬러 설정
     },
+    
   },
   series: [
     {
