@@ -147,7 +147,7 @@
                     <v-select
                       v-model="selectedsubComponent"
                       :items="subComponents"
-                      label="구성 요소"
+                      label="구성 요소테스트"
                       variant="outlined"
                       class="custom-select"
                       style="margin-top: 3vh"
