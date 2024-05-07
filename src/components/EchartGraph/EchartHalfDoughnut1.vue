@@ -84,7 +84,7 @@ const option = ref({
   },
   tooltip: {
     trigger: "item",
-    formatter: "{b}",
+    formatter: `{b} / ${totalSize.value}GB`,
   },
   legend: {
     orient: "vertical", // 수직 방향으로 표시
@@ -108,7 +108,7 @@ const option = ref({
       data: [
         {
           value: serverInUsedSize,
-          name: `OS 및 기타: ${serverInUsedSize.value}GB`,
+          name: `OS 및 기타 : ${serverInUsedSize.value}GB`,
           label: {
             show: false,
           },
@@ -116,12 +116,12 @@ const option = ref({
         },
         {
           value: dbSize,
-          name: `DB 사용량: ${dbSize.value}GB`,
+          name: `DB 사용량 : ${dbSize.value}GB`,
           itemStyle: { color: "#43A047" },
         },
         {
           value: serverRemainingSize,
-          name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
+          name: `사용 가능한 공간 : ${serverRemainingSize.value}GB`,
           itemStyle: { color: "#D0E0D0" },
         },
         {
@@ -135,7 +135,7 @@ const option = ref({
           label: {
             show: false,
           },
-          name: `전체 용량: ${totalSize.value}GB`,
+          name: `전체 용량 : ${totalSize.value}GB`,
         },
       ],
     },
@@ -144,22 +144,62 @@ const option = ref({
 
 // 데이터 변경 감지하여 차트 업데이트
 watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
+  option.value.tooltip = {
+    trigger: "item",
+    formatter: function(params) {
+    // params.value는 {b}에 해당하는 값입니다.
+    // 이 값을 2배로 곱한 값을 표시합니다.
+    return `${params.name}  (${(params.value/totalSize.value*100).toFixed(1)}%)`;
+  }
+  }
   if(serverInUsedSize.value + dbSize.value > serverRemainingSize.value * 4){
     option.value.series[0].data = [
       {
         value: serverInUsedSize.value,
-        name: `OS 및 기타: ${serverInUsedSize.value}GB`,
+        name: `OS 및 기타 : ${serverInUsedSize.value}GB`,
         itemStyle: { color: "#E0E0E0" },
       },
       {
         value: dbSize.value,
-        name: `DB 사용량: ${dbSize.value}GB`,
+        name: `DB 사용량 : ${dbSize.value}GB`,
         itemStyle: { color: "#CC0033" },
       },
       {
         value: serverRemainingSize.value,
-        name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
+        name: `사용 가능한 공간 : ${serverRemainingSize.value}GB`,
         itemStyle: { color: "#FF6666" },
+      },
+      {
+        value: totalSize.value,
+        itemStyle: {
+          color: "none",
+          decal: {
+            symbol: "none",
+          },
+        },
+        label: {
+          show: false,
+        },
+        name: `전체 용량 : ${totalSize.value.toFixed(2)}GB`,
+      },
+    ];
+  }
+  else{
+    option.value.series[0].data = [
+      {
+        value: serverInUsedSize.value,
+        name: `OS 및 기타 : ${serverInUsedSize.value}GB`,
+        itemStyle: { color: "#E0E0E0" },
+      },
+      {
+        value: dbSize.value,
+        name: `DB 사용량 : ${dbSize.value}GB`,
+        itemStyle: { color: "#43A047" },
+      },
+      {
+        value: serverRemainingSize.value,
+        name: `사용 가능한 공간 : ${serverRemainingSize.value}GB`,
+        itemStyle: { color: "#E1F3DD" },
       },
       {
         value: totalSize.value,
@@ -174,38 +214,6 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
         },
         name: `전체 용량: ${totalSize.value.toFixed(2)}GB`,
       },
-    ];
-  }
-  else{
-    option.value.series[0].data = [
-      {
-        value: serverInUsedSize.value,
-        name: `OS 및 기타: ${serverInUsedSize.value}GB`,
-        itemStyle: { color: "#E0E0E0" },
-      },
-      {
-        value: dbSize.value,
-        name: `DB 사용량: ${dbSize.value}GB`,
-        itemStyle: { color: "#43A047" },
-      },
-      {
-        value: serverRemainingSize.value,
-        name: `사용 가능한 공간: ${serverRemainingSize.value}GB`,
-        itemStyle: { color: "#E1F3DD" },
-      },
-      // {
-      //   value: totalSize.value,
-      //   itemStyle: {
-      //     color: "none",
-      //     decal: {
-      //       symbol: "none",
-      //     },
-      //   },
-      //   label: {
-      //     show: false,
-      //   },
-      //   name: `전체 용량: ${totalSize.value.toFixed(2)}GB`,
-      // },
     ];
   }
   

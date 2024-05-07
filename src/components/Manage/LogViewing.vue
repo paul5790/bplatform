@@ -37,30 +37,34 @@
             ></v-text-field>
           </v-col>
         </v-row>
-        
-        <v-data-table
-          style="margin-top: 10px"
-          v-model:page="page"
-          class="elevation-1"
-          :headers="headers"
-          :search="search"
-          :items="items"
-          :items-per-page="itemsPerPage"
-          hide-default-footer
-          density="compact"
-          return-object
+        <v-window
+          class="scrollable-card"
         >
-          <template v-slot:bottom>
-            <div class="text-center pt-2">
-              <v-pagination
-                v-model="page"
-                :length="pageCount"
-                :total-visible="9"
-                rounded="circle"
-              ></v-pagination>
-            </div>
-          </template>
-        </v-data-table>
+          <v-data-table
+            style="margin-top: 10px"
+            v-model:page="page"
+            class="elevation-1"
+            :headers="headers"
+            :search="search"
+            :items="items"
+            :items-per-page="itemsPerPage"
+            hide-default-footer
+            density="compact"
+            :dense="true"
+            return-object
+          >
+            <template v-slot:bottom>
+              <div class="text-center pt-2">
+                <v-pagination
+                  v-model="page"
+                  :length="pageCount"
+                  :total-visible="9"
+                  rounded="circle"
+                ></v-pagination>
+              </div>
+            </template>
+          </v-data-table>
+        </v-window>
       </v-card-item>
     </v-card>
   </v-sheet>
@@ -80,18 +84,18 @@ const selectedLog = ref(selectionLog.value[0]);
 
 watch(selectedLog, (newValue, oldValue) => {
   switch (newValue) {
-    case 'Web Dashboard Log':
-      console.log('Selected Option 1');
+    case "Web Dashboard Log":
+      console.log("Selected Option 1");
       items.value = [];
       webData();
       break;
-    case 'Window App Log':
-      console.log('Selected Option 2');
+    case "Window App Log":
+      console.log("Selected Option 2");
       items.value = [];
       appData();
       break;
     default:
-      console.log('Unknown option selected');
+      console.log("Unknown option selected");
   }
 });
 
@@ -105,27 +109,25 @@ const pageCount = computed(() => {
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
-
-async function api () {
-  return new Promise(resolve => {
+async function api() {
+  return new Promise((resolve) => {
     setTimeout(() => {
-      resolve(Array.from({ length: 10 }, (k, v) => v + items.value.at(-1) + 1))
-    }, 1000)
-  })
+      resolve(Array.from({ length: 10 }, (k, v) => v + items.value.at(-1) + 1));
+    }, 1000);
+  });
 }
-async function load ({ done }) {
+async function load({ done }) {
   // Perform API call
-  const res = await api()
+  const res = await api();
 
-  items.value.push(...res)
+  items.value.push(...res);
 
-  done('ok')
+  done("ok");
 }
-
 
 const webheaders = ref([
   { title: "유저", key: "id" },
-  { title: "시간", key: "utc", width: 180  },
+  { title: "시간", key: "utc", width: 180 },
   { title: "상태", key: "state" },
   { title: "타입", key: "type" },
   { title: "URL", key: "url" },
@@ -153,8 +155,8 @@ const webData = async () => {
         .add(0, "hours")
         .format("YYYY-MM-DD HH:mm:ss");
       items.value.push({
-        id: response[i].userId || "",
         utc: koreanTime || "",
+        // id: response[i].userId || "",
         type: response[i].type || "",
         method: response[i].requestMethod || "",
         state: response[i].statusCode || "",
