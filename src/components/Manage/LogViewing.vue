@@ -41,7 +41,7 @@
           class="scrollable-card"
         >
           <v-data-table
-            style="margin-top: 10px"
+            style="margin-top: 20px"
             v-model:page="page"
             class="elevation-1"
             :headers="headers"
@@ -49,8 +49,7 @@
             :items="items"
             :items-per-page="itemsPerPage"
             hide-default-footer
-            density="compact"
-            :dense="true"
+            :density="'dense'"
             return-object
           >
             <template v-slot:bottom>
@@ -75,7 +74,7 @@ import { computed, ref, watchEffect, watch, onMounted } from "vue";
 import { readWebLogData, readAppLogData } from "../../api/index.js";
 import moment from "moment";
 const page = ref(1);
-const itemsPerPage = ref(14);
+const itemsPerPage = ref(20);
 
 const search = ref();
 

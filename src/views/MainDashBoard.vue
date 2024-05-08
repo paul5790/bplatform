@@ -61,6 +61,16 @@
             :value="`/alldata`"
             @click="handleListItemClick(`데이터 조회`)"
           ></v-list-item>
+          <v-list-item
+            v-if="permission === 'ADMIN' || permission === 'USER'"
+            :key="6"
+            :to="`/alldata1`"
+            :exact="true"
+            :title="`데이터 조회1`"
+            :prepend-icon="`mdi-database-search-outline`"
+            :value="`/alldata1`"
+            @click="handleListItemClick(`데이터 조회`)"
+          ></v-list-item>
 
           <v-list-item
             v-if="permission === 'Guest'"

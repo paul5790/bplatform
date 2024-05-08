@@ -232,8 +232,8 @@
                   padding-top: 5px;
                   padding-bottom: 10px;
                   background-image: url('/image/kriso_kren.png');
-                  background-size: auto 60%;
-                  background-position: center 30%;
+                  background-size: auto 85%;
+                  background-position: top center;
                   background-repeat: no-repeat;
                 "
                 @update:options="handleSortUpdate"

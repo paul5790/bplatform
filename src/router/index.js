@@ -18,6 +18,11 @@ const routes = [
     component: () => import("../views/AllData.vue"),
   },
   {
+    path: "/alldata1",
+    name: "alldata1",
+    component: () => import("../views/AllData1.vue"),
+  },
+  {
     path: "/mapview",
     name: "mapview",
     component: () => import("../views/MapView.vue"),
