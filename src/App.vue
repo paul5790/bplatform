@@ -94,7 +94,7 @@
               size="large"
               variant="tonal"
               class="halfbtn"
-              @click="termsDialog = true"
+              @click="ruleCheck()"
             >
               가입하기
             </v-btn>
@@ -165,167 +165,92 @@
       </div>
     </div>
 
-    <v-dialog v-model="termsDialog" max-width="800">
+    <v-dialog v-model="termsDialog" max-width="700">
       <v-card title="서비스 이용약관 동의">
-        <v-card-text>
-          1.<br />
-          Lorem ipsum dolor sit amet, semper quis, sapien id natoque elit.
-          Nostra urna at, magna at neque sed sed ante imperdiet, dolor mauris
-          cursus velit, velit non, sem nec. Volutpat sem ridiculus placerat leo,
-          augue in, duis erat proin condimentum in a eget, sed fermentum sed
-          vestibulum varius ac, vestibulum volutpat orci ut elit eget tortor.
-          Ultrices nascetur nulla gravida ante arcu. Pharetra rhoncus morbi
-          ipsum, nunc tempor debitis, ipsum pellentesque, vitae id quam ut
-          mauris dui tempor, aptent non. Quisque turpis. Phasellus quis lectus
-          luctus orci eget rhoncus. Amet donec vestibulum mattis commodo, nulla
-          aliquet, nibh praesent, elementum nulla. Sit lacus pharetra tempus
-          magna neque pellentesque, nulla vel erat.
+        <v-card-text style="margin-top: 20px">
+          <v-card
+            class="scrollable-card-1"
+            style="padding: 30px; overflow-y: auto"
+            max-height="550"
+            variant="outlined"
+            color="#333366"
+          >
+            <v-row style="height: 100px">
+              <v-col style="margin-top: 17px"
+                >1. 제공된 데이터는 신청서에 기재된 목적 및 범위에 한하여
+                사용한다.</v-col
+              >
+              <v-col cols="1">
+                <v-checkbox v-model="checkbox1"></v-checkbox
+              ></v-col>
+            </v-row>
 
-          <br /><br /><br />
+            <v-row style="height: 100px">
+              <v-col style="margin-top: 10px"
+                >2. 신청서 기재사항 변경(수정) 시 데이터 활용 신청서를 재송부
+                하여야 한다.</v-col
+              >
+              <v-col cols="1">
+                <v-checkbox v-model="checkbox2"></v-checkbox
+              ></v-col>
+            </v-row>
 
-          2.<br />
-          Justo ex quisque nulla accusamus venenatis, sed quis. Nibh phasellus
-          gravida metus in, fusce aenean ut erat commodo eros. Ut turpis, dui
-          integer, nonummy pede placeat nec in sit leo. Faucibus porttitor illo
-          taciti odio, amet viverra scelerisque quis quis et tortor, curabitur
-          morbi a. Enim tempor at, rutrum elit condimentum, amet rutrum vitae
-          tempor torquent nunc. Praesent vestibulum integer maxime felis. Neque
-          aenean quia vitae nostra, tempus elit enim id dui, at egestas
-          pulvinar. Integer libero vestibulum, quis blandit scelerisque mattis
-          fermentum nulla, tortor donec vestibulum dolor amet eget, elit nullam.
-          Aliquam leo phasellus aliquam curabitur metus a, nulla justo mattis
-          duis interdum vel, mollis vitae et id, vestibulum erat ridiculus sit
-          pulvinar justo sed. Vehicula convallis, et nulla wisi, amet vestibulum
-          risus, quam ac egestas.
+            <v-row style="height: 100px">
+              <v-col style="margin-top: 10px"
+                >3. 자료 분석과정에서 알게 된 개별자료 및 개인정보 관련 사항에
+                대한 공개 혹은 누설을 금지한다.</v-col
+              >
+              <v-col cols="1">
+                <v-checkbox v-model="checkbox3"></v-checkbox
+              ></v-col>
+            </v-row>
 
-          <br /><br /><br />
+            <v-row style="height: 100px">
+              <v-col style="margin-top: 10px"
+                >4. 제공된 데이터를 인용 또는 공표 등 대외적으로 활용할 경우
+                센터와 사전 협의하여야 한다.</v-col
+              >
+              <v-col cols="1">
+                <v-checkbox v-model="checkbox4"></v-checkbox
+              ></v-col>
+            </v-row>
 
-          3.<br />
-          Et vitae, nulla gravida erat scelerisque nullam nunc pellentesque, a
-          dictumst cras augue, purus imperdiet non. Varius montes cursus varius
-          vel tortor, nec leo a qui, magni cras, velit vel consectetuer lobortis
-          vel. Nibh erat et wisi felis leo porttitor, sapien nibh sapien pede
-          mi, sed eget porttitor, repellendus arcu ac quis. Luctus vulputate aut
-          est sem magna, placerat accumsan nunc vestibulum ipsum ac auctor,
-          maecenas lorem in ut nec mauris tortor, doloribus varius sem tortor
-          vestibulum mollis, eleifend tortor felis tempus lacus eu eu. Eleifend
-          vel eu, nullam maecenas mauris nec nunc euismod, tortor porta
-          ridiculus potenti, massa tristique nam magna, et wisi placerat et erat
-          ante. Eget pede erat in facilisis, fermentum venenatis sodales. Ac
-          tortor sociis et non animi tristique, rhoncus malesuada, ut arcu
-          volutpat scelerisque sollicitudin, elit curabitur dui pede purus
-          dolor, integer aenean risus taciti nulla eleifend accumsan. At
-          pulvinar diam parturient, interdum mi velit aliquet et a. Arcu at ac
-          placerat eget justo semper, purus sociis curabitur mi ipsum consequat
-          ut, mollis vestibulum, est ante ornare lacus sem. Neque magna mauris,
-          commodo quisque, praesent semper suscipit lobortis nam. Justo
-          malesuada cursus ac nunc litora nunc. Tellus ac, in lobortis nunc,
-          montes lectus purus fermentum.
+            <v-row style="height: 100px">
+              <v-col style="margin-top: 10px"
+                >5. 제공된 데이터를 사용하여 도출된 모든 연구 성과에는 센터에서
+                지정하는 방법에 따라 데이터의 출처를 명시한다.</v-col
+              >
+              <v-col cols="1">
+                <v-checkbox v-model="checkbox5"></v-checkbox
+              ></v-col>
+            </v-row>
 
-          <br /><br /><br />
+            <v-row style="height: 100px">
+              <v-col style="margin-top: 10px"
+                >6. 센터 요청 시 자료처리 및 분석과정, 결과의 활용 등에 대한
+                기술노트를 작성 및 제출하여야 한다.</v-col
+              >
+              <v-col cols="1">
+                <v-checkbox v-model="checkbox6"></v-checkbox
+              ></v-col>
+            </v-row>
 
-          4.<br />
-          Ac sit wisi. Sodales aliquam, sed vestibulum nullam arcu sit risus
-          arcu, id luctus vitae lorem nibh, integer nec nullam class cursus mi,
-          purus arcu lectus. Vel ante suscipit volutpat potenti mattis sed, wisi
-          eu placerat aliquam erat, lectus morbi lobortis at assumenda.
-          Consequat neque purus ipsum voluptas odio, netus vestibulum ut nec,
-          suspendisse pellentesque nec enim in. Wisi dictum sed semper a, ipsum
-          erat tellus habitasse est, erat sem ornare, vitae quisque ultricies.
-          Dui sed blandit. Tempor et faucibus justo sed luctus, nec vitae vitae.
-          Nunc nibh pede, ipsum vestibulum aenean leo ante ultricies, nam cras
-          quis sed penatibus amet. In mauris a. Integer metus mauris tortor, et
-          rutrum vestibulum ultricies, ut phasellus in ullamcorper ut mollit, eu
-          justo. Cursus pretium venenatis. Cras pellentesque vel sodales
-          accumsan aenean. Feugiat metus sit nec in aliquet amet, porttitor
-          pretium vulputate massa. Consequat ipsum luctus quisque adipiscing
-          libero. Wisi sollicitudin. Eget vitae ac lobortis, lorem natoque
-          vestibulum et, aliquet faucibus at morbi nibh, vel condimentum. Massa
-          unde orci sed id sed, odio donec congue nec praesent amet. Hymenaeos
-          velit lacus, quis vivamus libero tempus duis, eu nisi eu, ipsum at
-          accumsan pede justo morbi donec, massa et libero sit risus neque
-          tortor. Ut sed sed etiam hendrerit dapibus, quis metus suspendisse
-          nibh.
-
-          <br /><br /><br />
-
-          5.<br />
-          Fringilla tempor felis augue magna. Cum arcu a, id vitae. Pellentesque
-          pharetra in cras sociis adipiscing est. Nibh nec mattis at maecenas,
-          nisl orci aliquam nulla justo egestas venenatis, elementum duis vel
-          porta eros, massa vitae, eligendi imperdiet amet. Nec neque luctus
-          suscipit, justo sem praesent, ut nisl quisque, volutpat torquent wisi
-          tellus aliquam reprehenderit, curabitur cras at quis massa porttitor
-          mauris. Eros sed ultrices. Amet dignissim justo urna feugiat mauris
-          litora, etiam accumsan, lobortis a orci suspendisse. Semper ac mauris,
-          varius bibendum pretium, orci urna nunc ullamcorper auctor, saepe sem
-          integer quam, at feugiat egestas duis. Urna ligula ante. Leo elementum
-          nonummy. Sagittis mauris est in ipsum, nulla amet non justo, proin id
-          potenti platea posuere sit ut, nunc sit erat bibendum. Nibh id auctor,
-          ab nulla vivamus ultrices, posuere morbi nunc tellus gravida vivamus.
-
-          <br /><br /><br />
-
-          6.<br />
-          Mauris nec, facilisi quam fermentum, ut mauris integer, orci tellus
-          tempus diam ut in pellentesque. Wisi faucibus tempor et odio leo diam,
-          eleifend quis integer curabitur sit scelerisque ac, mauris consequat
-          luctus quam penatibus fringilla dis, vitae lacus in, est eu ac tempus.
-          Consectetuer amet ipsum amet dui, sed blandit id sed. Tellus integer,
-          dignissim id pede sodales quis, felis dolorem id mauris orci, orci
-          tempus ut. Nullam hymenaeos. Curabitur in a, tortor ut praesent
-          placerat tincidunt interdum, ac dignissim metus nonummy hendrerit
-          wisi, etiam ut.
-
-          <br /><br /><br />
-
-          7.<br />
-          Semper praesent integer fusce, tortor suspendisse, augue ligula orci
-          ante asperiores ullamcorper. In sit per mi sed sed, mi vestibulum mus
-          nam, morbi mauris neque vitae aliquam proin senectus. Ac amet arcu
-          mollis ante congue elementum, inceptos eget optio quam pellentesque
-          quis lobortis, sollicitudin sed vestibulum sollicitudin, lectus
-          parturient nullam, leo orci ligula ultrices. At tincidunt enim,
-          suspendisse est sit sem ac. Amet tellus molestie est purus magna
-          augue, non etiam et in wisi id. Non commodo, metus lorem facilisi
-          lobortis ac velit, montes neque sed risus consectetuer fringilla
-          dolor. Quam justo et integer aliquam, cursus nulla enim orci, nam
-          cursus adipiscing, integer torquent non, fringilla per maecenas.
-          Libero ipsum sed tellus purus et. Duis molestie placerat erat donec
-          ut. Dolor enim erat massa faucibus ultrices in, ante ultricies orci
-          lacus, libero consectetuer mauris magna feugiat neque dapibus, donec
-          pretium et. Aptent dui, aliquam et et amet nostra ligula.
-
-          <br /><br /><br />
-
-          8.<br />
-          Augue curabitur duis dui volutpat, tempus sed ut pede donec. Interdum
-          luctus, lectus nulla aenean elit, id sit magna, vulputate ultrices
-          pellentesque vel id fermentum morbi. Tortor et. Adipiscing augue lorem
-          cum non lacus, rutrum sodales laoreet duis tortor, modi placerat
-          facilisis et malesuada eros ipsum, vehicula tempus. Ac vivamus amet
-          non aliquam venenatis lectus, sociosqu adipiscing consequat nec arcu
-          odio. Blandit orci nec nec, posuere in pretium, enim ut, consectetuer
-          nullam urna, risus vel. Nullam odio vehicula massa sed, etiam sociis
-          mauris, lacus ullamcorper, libero imperdiet non sodales placerat justo
-          vehicula. Nec morbi imperdiet. Fermentum sem libero iaculis bibendum
-          et eros, eget maecenas non nunc, ad pellentesque. Ut nec diam
-          elementum interdum. Elementum vitae tellus lacus vitae, ipsum
-          phasellus, corporis vehicula in ac sed massa vivamus, rutrum elit,
-          ultricies metus volutpat.
-
-          <br /><br /><br />
-
-          9.<br />
-          Semper wisi et, sollicitudin nunc vestibulum, cursus accumsan nunc
-          pede tempus mi ipsum, ligula sed. Non condimentum ac dolor sit. Mollis
-          eu aliquam, vel mattis mollis massa ut dolor ante, tempus lacinia
-          arcu. Urna vestibulum lorem, nulla fermentum, iaculis ut congue ac
-          vivamus. Nam libero orci, pulvinar nulla, enim pellentesque
-          consectetuer leo, feugiat rhoncus rhoncus vel. Magna sociosqu donec,
-          dictum cursus ullamcorper viverra. Ultricies quis orci lorem,
-          suspendisse ut vestibulum integer, purus sed lorem pulvinar habitasse
-          turpis.
+            <v-row style="height: 100px">
+              <v-col style="margin-top: 10px"
+                >7. 준수사항 위반 시 해사안전법, 통계법, 개인정보보호법 등 관련
+                규정에 의거하여 처벌될 수 있으므로 데이터가 유출되지 않도록
+                한다.</v-col
+              >
+              <v-col cols="1">
+                <v-checkbox v-model="checkbox7"></v-checkbox
+              ></v-col>
+            </v-row>
+            <v-checkbox
+              v-model="checkboxA"
+              style="margin-top: 40px"
+              label="전체 동의하기"
+            ></v-checkbox>
+          </v-card>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -334,11 +259,12 @@
             variant="text"
             @click="termsDialog = false"
           ></v-btn>
+
           <v-btn
             color="surface-variant"
             text="동의"
             variant="flat"
-            @click="(termsDialog = false), signupBtn()"
+            @click="signupBtn()"
           ></v-btn>
         </v-card-actions>
       </v-card>
@@ -417,7 +343,36 @@ const rulesemail = ref(false);
 const rulesname = ref(false);
 const rulesaf = ref(false);
 
-const termsDialog = ref(false);
+const termsDialog = ref(true);
+const checkbox1 = ref(false);
+const checkbox2 = ref(false);
+const checkbox3 = ref(false);
+const checkbox4 = ref(false);
+const checkbox5 = ref(false);
+const checkbox6 = ref(false);
+const checkbox7 = ref(false);
+const checkboxA = ref(false);
+
+// checkboxValue 변수의 변경을 감시하고 상태가 변경될 때마다 호출될 함수
+watch(checkboxA, (newValue, oldValue) => {
+  if (newValue == true) {
+    checkbox1.value = true;
+    checkbox2.value = true;
+    checkbox3.value = true;
+    checkbox4.value = true;
+    checkbox5.value = true;
+    checkbox6.value = true;
+    checkbox7.value = true;
+  } else {
+    checkbox1.value = false;
+    checkbox2.value = false;
+    checkbox3.value = false;
+    checkbox4.value = false;
+    checkbox5.value = false;
+    checkbox6.value = false;
+    checkbox7.value = false;
+  }
+});
 
 // 회원 가입 관리
 const showSignup = ref(
@@ -431,65 +386,90 @@ const movesignup = () => {
   sessionStorage.setItem("showSignup", showSignup.value.toString());
 };
 
+const ruleCheck = () => {
+  if (
+      rulesid.value &&
+      rulespw.value &&
+      rulescpw.value &&
+      rulesemail.value &&
+      rulesname.value &&
+      rulesaf.value === true
+    ) {
+      termsDialog.value = true
+    } else {
+      console.log(
+        rulesid.value,
+        rulespw.value,
+        rulescpw.value,
+        rulesemail.value,
+        rulesname.value,
+        rulesaf.value
+      );
+      // 유효성 검사를 통과하지 못한 경우
+      alert(
+        "입력을 하지 않았거나 유효성 검사를 통과하지 못한 항목이 있습니다.\n다시 확인해주세요."
+      );
+      // showSignup을 true로 유지
+    }
+}
+
 const signupBtn = async () => {
   console.log(newid.value);
 
   if (
-    rulesid.value &&
-    rulespw.value &&
-    rulescpw.value &&
-    rulesemail.value &&
-    rulesname.value &&
-    rulesaf.value === true
+    checkbox1.value == true &&
+    checkbox2.value == true &&
+    checkbox3.value == true &&
+    checkbox4.value == true &&
+    checkbox5.value == true &&
+    checkbox6.value == true &&
+    checkbox7.value == true
   ) {
-    // 유효성 검사를 모두 통과한 경우
+    
+      // 유효성 검사를 모두 통과한 경우
 
-    // 데이터 활용 신청서의 데이터 사용자 준수사항 등에 대한 약관 동의 절차
+      // 데이터 활용 신청서의 데이터 사용자 준수사항 등에 대한 약관 동의 절차
 
-    const data = {
-      id: `${newid.value}`,
-      password: `${newpassword.value}`,
-      userName: `${newname.value}`,
-      department: `${newaffiliation.value}`,
-      email: `${newemail.value}`,
-      phoneNumber: `${newphone.value}`,
-    };
+      const data = {
+        id: `${newid.value}`,
+        password: `${newpassword.value}`,
+        userName: `${newname.value}`,
+        department: `${newaffiliation.value}`,
+        email: `${newemail.value}`,
+        phoneNumber: `${newphone.value}`,
+      };
 
-    try {
-      // 회원가입 기능
-      const response = await createMineData(data);
+      try {
+        // 회원가입 기능
+        const response = await createMineData(data);
 
-      console.log(response.data);
-      alert("가입이 완료되었습니다.");
+        console.log(response.data);
+        alert("가입이 완료되었습니다.");
 
-      showSignup.value = false;
-      sessionStorage.setItem("showSignup", showSignup.value.toString());
+        termsDialog.value = false;
+        showSignup.value = false;
+        checkbox1.value = false;
+        checkbox2.value = false;
+        checkbox3.value = false;
+        checkbox4.value = false;
+        checkbox5.value = false;
+        checkbox6.value = false;
+        checkbox7.value = false;
+        sessionStorage.setItem("showSignup", showSignup.value.toString());
 
-      newid.value = "";
-      newpassword.value = "";
-      checknewpassword.value = "";
-      newemail.value = "";
-      newname.value = "";
-      newaffiliation.value = "";
-      newphone.value = "";
-    } catch (error) {
-      console.error(error);
-      alert(error.response?.data || "An error occurred during signup.");
-    }
+        newid.value = "";
+        newpassword.value = "";
+        checknewpassword.value = "";
+        newemail.value = "";
+        newname.value = "";
+        newaffiliation.value = "";
+        newphone.value = "";
+      } catch (error) {
+        console.error(error);
+        alert(error.response?.data || "An error occurred during signup.");
+      }
   } else {
-    console.log(
-      rulesid.value,
-      rulespw.value,
-      rulescpw.value,
-      rulesemail.value,
-      rulesname.value,
-      rulesaf.value
-    );
-    // 유효성 검사를 통과하지 못한 경우
-    alert(
-      "입력을 하지 않았거나 유효성 검사를 통과하지 못한 항목이 있습니다.\n다시 확인해주세요."
-    );
-    // showSignup을 true로 유지
+    alert("모든 약관을 확인하고 체크박스에 체크해주세요.");
   }
 };
 
