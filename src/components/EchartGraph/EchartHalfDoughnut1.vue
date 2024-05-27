@@ -52,9 +52,9 @@ const fetchData = async () => {
     serverRemainingSize.value = parseFloat(
       response.serverRemainingSize
     ).toFixed(2);
-    serverInUsedSize.value = 80.0;
-    dbSize.value = 1.1;
-    serverRemainingSize.value = 20.0;
+    // serverInUsedSize.value = 80.0;
+    // dbSize.value = 1.1;
+    // serverRemainingSize.value = 20.0;
   } catch (error) {
     console.error(error);
   }

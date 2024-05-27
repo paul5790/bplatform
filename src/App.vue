@@ -343,7 +343,7 @@ const rulesemail = ref(false);
 const rulesname = ref(false);
 const rulesaf = ref(false);
 
-const termsDialog = ref(true);
+const termsDialog = ref(false);
 const checkbox1 = ref(false);
 const checkbox2 = ref(false);
 const checkbox3 = ref(false);

@@ -3,157 +3,57 @@
   <div style="height: 93vh">
     <div style="padding: 30px; padding-bottom: 0px">
       <!-- 데이터 선택창 -->
-      <v-row>
-        <v-col cols="3">
-          <v-select
-            v-model="mainSelectedItems"
-            :items="mainSelect"
-            label="Main Components"
-            variant="outlined"
-          >
-          </v-select>
-        </v-col>
-        <!-- 첫번째 선택박스 -->
-        <v-col cols="3">
-          <v-select
-            v-model="firstSelectedItems"
-            :items="firstSelect"
-            label="Sub Components"
-            variant="outlined"
-            multiple
-          >
-            <template v-slot:selection="{ item, index }">
-              <div v-if="index < 2">
-                <span>{{ item.title }}</span>
-                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                <span
-                  v-if="
-                    firstSelectedItems.length > 1 &&
-                    index !== firstSelectedItems.length - 1
-                  "
-                  >,
-                </span>
-                <span v-else-if="firstSelectedItems.length >= 3"> </span>
-              </div>
-              <span
-                v-if="index === 2"
-                class="text-grey text-caption align-self-center"
-              >
-                (+{{ firstSelectedItems.length - 2 }} others)
-              </span>
-            </template>
-            <template v-slot:prepend-item>
-              <v-list-item title="Select All" @click="selectAllItem1">
-                <template v-slot:prepend>
-                  <v-checkbox-btn
-                    :indeterminate="likesSomeData1 && !likesAllData1"
-                    :model-value="likesSomeData1"
-                  ></v-checkbox-btn>
-                </template>
-              </v-list-item>
+    
+     <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-select
+          v-model="selectDownlodFormat"
+          :items="downloadFormat"
+          density="compact"
+          label="format"
+          style="max-width: 150px; margin-top: 10px"
+          variant="solo"
+        ></v-select>
+        <!-- <v-btn
+          :loading="downloadBtnLoading"
+          :color="textColor"
+          :style="{
+            'background-color': btnColor,
+            'margin-top': '0px',
+            'margin-left': '20px',
+          }"
+          @click="dataload()"
+          :disabled="downloadBtnDisabled"
+          >{{ downloadBtnLoadingpercent }}</v-btn
+        > -->
 
-              <v-divider class="mt-2"></v-divider>
-            </template>
-          </v-select>
-        </v-col>
-
-        <!-- 두번째 선택박스 -->
-        <v-col cols="3">
-          <v-select
-            v-model="contentsSelectedItems"
-            :items="secondSelect"
-            label="Contents"
-            variant="outlined"
-            multiple
-          >
-            <template v-slot:selection="{ item, index }">
-              <div v-if="index < 2">
-                <span>{{ item.title }}</span>
-                <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
-                <span
-                  v-if="
-                    contentsSelectedItems.length > 1 &&
-                    index !== contentsSelectedItems.length - 1
-                  "
-                  >,
-                </span>
-                <span v-else-if="contentsSelectedItems.length >= 3"> </span>
-              </div>
-              <span
-                v-if="index === 2"
-                class="text-grey text-caption align-self-center"
-              >
-                (+{{ contentsSelectedItems.length - 2 }} others)
-              </span>
-            </template>
-            <template v-slot:prepend-item>
-              <v-list-item title="Select All" @click="selectAllItem2">
-                <template v-slot:prepend>
-                  <v-checkbox-btn
-                    :indeterminate="likesSomeData2 && !likesAllData2"
-                    :model-value="likesSomeData2"
-                  ></v-checkbox-btn>
-                </template>
-              </v-list-item>
-
-              <v-divider class="mt-2"></v-divider>
-            </template>
-          </v-select>
-        </v-col>
-      </v-row>
-      <v-sheet style="display: flex; height: 8vh">
-        <v-row>
-          <v-col cols="6"></v-col>
-          <v-col cols="2">
-            <v-select
-              v-model="selectedvoyage"
-              :items="voyage"
-              label="voyage"
-              variant="outlined"
-            >
-            </v-select>
-          </v-col>
-
-          <!-- 날짜 설정 -->
-          <v-col cols="3">
-            <VueDatePicker
-              :class="
-                themeMode === 'dark' ? 'dp__theme_dark' : 'dp__theme_light'
-              "
-              style="--dp-input-padding: 15px"
-              v-model="dateRange"
-              range
-              :dark="themeMode === 'dark'"
-              :readonly="date_readonly"
-            />
-          </v-col>
-
-          <!-- 검색 버튼 -->
-          <v-col cols="1">
-            <v-btn
-              class=""
-              :color="btnColor"
-              style="display: flex; margin-top: 2px; height: 50px; width: 130px"
-              @click="searchData()"
-              >검색</v-btn
-            >
-          </v-col>
-        </v-row>
-      </v-sheet>
-      <v-sheet
-        style="
-          height: 2vh;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-        "
-      >
-        <div></div>
-        <div style="font-size: 12px; font-weight: bold">
-          * 날짜 검색은 한국 표준시를 기준으로 작성하며, 데이터는 UTC 기준으로
-          보여짐&nbsp;&nbsp;
-        </div>
-      </v-sheet>
+        <v-btn
+          :loading="downloadBtnLoading"
+          :color="textColor"
+          :style="{
+            'background-color': btnColor,
+            'margin-top': '0px',
+            'margin-left': '20px',
+            width: '160px',
+          }"
+          @click="dataDownloadServer()"
+          :disabled="downloadBtnDisabled"
+          >데이터 다운로드</v-btn
+        >
+        <v-btn
+          :loading="downloadBtnLoading"
+          :color="textColor"
+          :style="{
+            'background-color': btnColor,
+            'margin-top': '0px',
+            'margin-left': '20px',
+            width: '160px',
+          }"
+          @click="dataDownloadServer()"
+          :disabled="downloadBtnDisabled"
+          >재 검색</v-btn
+        >
+      </v-card-actions>
 
       <!-- 탭 기능 구현 -->
       <v-tabs
@@ -271,7 +171,11 @@
                     <v-text-field
                       label="Page"
                       variant="solo-inverted"
-                      style="max-width: 70px; margin-left: 10px; text-align: center;"
+                      style="
+                        max-width: 70px;
+                        margin-left: 10px;
+                        text-align: center;
+                      "
                       @keyup.enter="keyPage"
                       v-model="page"
                     ></v-text-field>
@@ -283,43 +187,7 @@
         </v-window-item>
       </v-window>
       <!-- 데이터 다운로드 -->
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-select
-          v-model="selectDownlodFormat"
-          :items="downloadFormat"
-          density="compact"
-          label="format"
-          style="max-width: 150px; margin-top: 20px"
-          variant="solo"
-        ></v-select>
-        <!-- <v-btn
-          :loading="downloadBtnLoading"
-          :color="textColor"
-          :style="{
-            'background-color': btnColor,
-            'margin-top': '0px',
-            'margin-left': '20px',
-          }"
-          @click="dataload()"
-          :disabled="downloadBtnDisabled"
-          >{{ downloadBtnLoadingpercent }}</v-btn
-        > -->
-
-        <v-btn
-          :loading="downloadBtnLoading"
-          :color="textColor"
-          :style="{
-            'background-color': btnColor,
-            'margin-top': '0px',
-            'margin-left': '20px',
-            width: '200px',
-          }"
-          @click="dataDownloadServer()"
-          :disabled="downloadBtnDisabled"
-          >데이터 다운로드</v-btn
-        >
-      </v-card-actions>
+      
     </div>
     <!-- 데이터 저장중 모달 persistent -->
     <v-dialog v-model="downloadDialog" max-width="300">
@@ -337,6 +205,174 @@
                 rounded
               ></v-progress-linear>
             </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue"
+            variant="text"
+            @click="(downloadDialog = false), cancleLoading()"
+            >취소</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="searchDataDialog" max-width="1200">
+      <v-card>
+        <v-card-text>
+          <v-row style="margin-top: 30px;">
+            <v-col cols="6">
+              <v-select
+                v-model="mainSelectedItems"
+                :items="mainSelect"
+                label="Main Components"
+                variant="outlined"
+              >
+              </v-select>
+            </v-col>
+            <!-- 첫번째 선택박스 -->
+            <v-col cols="6">
+              <v-select
+                v-model="firstSelectedItems"
+                :items="firstSelect"
+                label="Sub Components"
+                variant="outlined"
+                multiple
+              >
+                <template v-slot:selection="{ item, index }">
+                  <div v-if="index < 2">
+                    <span>{{ item.title }}</span>
+                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                    <span
+                      v-if="
+                        firstSelectedItems.length > 1 &&
+                        index !== firstSelectedItems.length - 1
+                      "
+                      >,
+                    </span>
+                    <span v-else-if="firstSelectedItems.length >= 3"> </span>
+                  </div>
+                  <span
+                    v-if="index === 2"
+                    class="text-grey text-caption align-self-center"
+                  >
+                    (+{{ firstSelectedItems.length - 2 }} others)
+                  </span>
+                </template>
+                <template v-slot:prepend-item>
+                  <v-list-item title="Select All" @click="selectAllItem1">
+                    <template v-slot:prepend>
+                      <v-checkbox-btn
+                        :indeterminate="likesSomeData1 && !likesAllData1"
+                        :model-value="likesSomeData1"
+                      ></v-checkbox-btn>
+                    </template>
+                  </v-list-item>
+
+                  <v-divider class="mt-2"></v-divider>
+                </template>
+              </v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <!-- 두번째 선택박스 -->
+            <v-col cols="6">
+              <v-select
+                v-model="contentsSelectedItems"
+                :items="secondSelect"
+                label="Contents"
+                variant="outlined"
+                multiple
+              >
+                <template v-slot:selection="{ item, index }">
+                  <div v-if="index < 2">
+                    <span>{{ item.title }}</span>
+                    <!-- 선택된 항목이 2개 이상이고 현재 항목이 마지막 항목이 아니면 ','를 추가 -->
+                    <span
+                      v-if="
+                        contentsSelectedItems.length > 1 &&
+                        index !== contentsSelectedItems.length - 1
+                      "
+                      >,
+                    </span>
+                    <span v-else-if="contentsSelectedItems.length >= 3"> </span>
+                  </div>
+                  <span
+                    v-if="index === 2"
+                    class="text-grey text-caption align-self-center"
+                  >
+                    (+{{ contentsSelectedItems.length - 2 }} others)
+                  </span>
+                </template>
+                <template v-slot:prepend-item>
+                  <v-list-item title="Select All" @click="selectAllItem2">
+                    <template v-slot:prepend>
+                      <v-checkbox-btn
+                        :indeterminate="likesSomeData2 && !likesAllData2"
+                        :model-value="likesSomeData2"
+                      ></v-checkbox-btn>
+                    </template>
+                  </v-list-item>
+
+                  <v-divider class="mt-2"></v-divider>
+                </template>
+              </v-select>
+            </v-col>
+            <v-col cols="6">
+              <v-select
+                v-model="contentsSelectedItems"
+                :items="secondSelect"
+                label="Contents"
+                variant="outlined"
+                multiple
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-select
+                v-model="selectedvoyage"
+                :items="voyage"
+                label="voyage"
+                variant="outlined"
+              >
+              </v-select>
+            </v-col>
+
+            <!-- 날짜 설정 -->
+            <v-col cols="6">
+              <VueDatePicker
+                :class="
+                  themeMode === 'dark' ? 'dp__theme_dark' : 'dp__theme_light'
+                "
+                style="--dp-input-padding: 15px"
+                v-model="dateRange"
+                range
+                :dark="themeMode === 'dark'"
+                :readonly="date_readonly"
+              />
+            </v-col>
+          </v-row>
+          <v-row>
+            <!-- 검색 버튼 -->
+            <v-col cols="4"></v-col>
+            <v-col cols="4">
+              <v-btn
+                class=""
+                :color="btnColor"
+                style="
+                  display: flex;
+                  margin-top: 2px;
+                  height: 50px;
+                  width: 800px;
+                "
+                @click="searchData()"
+                >검색</v-btn
+              >
+            </v-col>
+            <v-col cols="4"></v-col>
           </v-row>
         </v-card-text>
         <v-card-actions>
@@ -433,6 +469,8 @@ const downloadBtnDisabled = ref(true);
 
 // dialog
 const downloadDialog = ref(false);
+
+const searchDataDialog = ref(true);
 
 // 데이터 조회
 const postType = ref();

@@ -46,7 +46,7 @@
             class="elevation-1"
             :headers="headers"
             :search="search"
-            :items="items"
+            :items="filteredItems"
             :items-per-page="itemsPerPage"
             hide-default-footer
             :density="'dense'"
@@ -103,26 +103,22 @@ watchEffect(() => {
 });
 
 const pageCount = computed(() => {
-  return Math.ceil(items.value.length / itemsPerPage.value);
+  return Math.ceil(filteredItems.value.length / itemsPerPage.value);
+});
+
+const filteredItems = computed(() => {
+  if (!search.value) {
+    return items.value;
+  }
+  return items.value.filter(item => {
+    return Object.values(item).some(value =>
+      String(value).toLowerCase().includes(search.value.toLowerCase())
+    );
+  });
 });
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
-async function api() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(Array.from({ length: 10 }, (k, v) => v + items.value.at(-1) + 1));
-    }, 1000);
-  });
-}
-async function load({ done }) {
-  // Perform API call
-  const res = await api();
-
-  items.value.push(...res);
-
-  done("ok");
-}
 
 const webheaders = ref([
   { title: "유저", key: "id" },
@@ -206,188 +202,6 @@ onMounted(() => {
   webData();
 });
 
-// // 데이터 테이블 바디
-// const items = ref([
-//   {
-//     name: "유저 #1",
-//     utc: "2023-08-29T08:28:43",
-//     target: "window App",
-//     location: "post",
-//     state: "404",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #2",
-//     utc: "2023-09-27T08:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "404",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #3",
-//     utc: "2023-10-20T04:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "404",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #4",
-//     utc: "2023-10-29T18:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "404",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #5",
-//     utc: "2023-08-29T08:28:43",
-//     target: "window App",
-//     location: "post",
-//     state: "404",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #6",
-//     utc: "2023-09-27T08:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #7",
-//     utc: "2023-10-20T04:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #8",
-//     utc: "2023-10-29T18:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #9",
-//     utc: "2023-08-29T08:28:43",
-//     target: "window App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #10",
-//     utc: "2023-09-27T08:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #11",
-//     utc: "2023-10-20T04:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #12",
-//     utc: "2023-10-29T18:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #13",
-//     utc: "2023-08-29T08:28:43",
-//     target: "window App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #14",
-//     utc: "2023-09-27T08:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #15",
-//     utc: "2023-10-20T04:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #16",
-//     utc: "2023-10-29T18:28:43",
-//     target: "web App",
-//     location: "post",
-//     state: "400",
-//     url: "/shipinfo/api/dgps/gll",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #17",
-//     utc: "2023-08-29T08:28:43",
-//     target: "window App",
-//     location: "post",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #18",
-//     utc: "2023-09-27T08:28:43",
-//     target: "web App",
-//     location: "post",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #19",
-//     utc: "2023-10-20T04:28:43",
-//     target: "web App",
-//     location: "post",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #20",
-//     utc: "2023-10-29T18:28:43",
-//     target: "web App",
-//     location: "post",
-//     log: "No value present",
-//   },
-//   {
-//     name: "유저 #21",
-//     utc: "2023-08-29T08:28:43",
-//     target: "window App",
-//     location: "post",
-//     log: "No value present",
-//   },
-// ]);
 </script>
 
 <style scoped>

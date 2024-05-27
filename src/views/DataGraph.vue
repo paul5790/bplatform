@@ -91,12 +91,7 @@
             >
               <v-card style="flex: 1">
                 <v-card-item id="graph"
-                :style="{
-                    backgroundImage: 'url(/image/kriso_kren.png)', // 이미지 경로 설정
-                    backgroundSize: 'auto 60%', // 이미지 크기 조정
-                    backgroundPosition: 'center', // 이미지 위치 조정
-                    backgroundRepeat: 'no-repeat',
-                  }">
+                :style="tableStyle">
                   <v-card-title>
                     <span class="text-h6">{{ selectedcontentsItem }}</span>
                   </v-card-title>
@@ -223,7 +218,7 @@
 </template>
 
 <script setup>
-import { ref, provide, onMounted, watchEffect } from "vue";
+import { ref, provide, onMounted, watchEffect, computed } from "vue";
 import html2canvas from "html2canvas";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
@@ -272,6 +267,17 @@ const textColor = ref(themeMode.value === "light" ? lightText : darkText);
 const themeColor = ref(
   themeMode.value === "light" ? whitebackcolor : darkbackcolor
 );
+
+
+const tableStyle = computed(() => {
+  const imageUrl = themeMode.value === "light" ? '/image/kriso_kren_n.png' : '/image/kriso_kren_d.png';
+  return {
+    backgroundImage: `url(${imageUrl})`,
+    backgroundSize: 'auto 60%', // 이미지 크기 조정
+    backgroundPosition: 'center', // 이미지 위치 조정
+    backgroundRepeat: 'no-repeat',
+  };
+});
 
 // 왼쪽 셀렉바 설정
 const tokenid = ref(sessionStorage.getItem("token") || "");

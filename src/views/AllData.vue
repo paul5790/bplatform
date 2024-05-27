@@ -228,14 +228,7 @@
                 :headers="headerName"
                 :items="dataSet"
                 return-object
-                style="
-                  padding-top: 5px;
-                  padding-bottom: 10px;
-                  background-image: url('/image/kriso_kren.png');
-                  background-size: auto 60%;
-                  background-position: center 30%;
-                  background-repeat: no-repeat;
-                "
+                :style="tableStyle"
                 @update:options="handleSortUpdate"
               >
                 <template v-slot:no-data>
@@ -270,7 +263,7 @@
                     ></v-pagination>
                     <v-text-field
                       label="Page"
-                      variant="solo-inverted"
+                      variant="outlined"
                       style="max-width: 70px; margin-left: 10px; text-align: center;"
                       @keyup.enter="keyPage"
                       v-model="page"
@@ -409,6 +402,18 @@ const themeNoNSelectedTabTextColor = ref(
 );
 watch(themeMode, (newValue) => {
   themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
+});
+
+const tableStyle = computed(() => {
+  const imageUrl = themeMode.value === "light" ? '/image/kriso_kren_n.png' : '/image/kriso_kren_d.png';
+  return {
+    paddingTop: '5px',
+    paddingBottom: '10px',
+    backgroundImage: `url(${imageUrl})`,
+    backgroundSize: 'auto 60%',
+    backgroundPosition: 'center 30%',
+    backgroundRepeat: 'no-repeat'
+  };
 });
 
 const tab = ref(0);
@@ -3124,6 +3129,7 @@ const sortData = (data, sortByKey, sortOrder) => {
 </script>
 
 <style scoped>
+
 .all-app {
   padding: 30px;
   padding-left: 50px;
@@ -3216,4 +3222,6 @@ select:focus {
 .pagination-center {
   margin: -50 auto;
 }
+
+
 </style>
