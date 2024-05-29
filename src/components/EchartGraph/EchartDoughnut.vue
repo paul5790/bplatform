@@ -13,7 +13,7 @@
       :elevation="elevation"
       style="display: flex; flex-direction: column; align-items: center"
     >
-      <v-chart class="chart" :option="option" autoresize />
+      <v-chart class="chart" :option="option" autoresize @legendselectchanged="handleLegendSelectChange"/>
     </v-sheet>
   </div>
 </template>
@@ -300,7 +300,7 @@ function getLegendData() {
   ];
 
   // 데이터가 0이거나 null인 항목은 필터링하여 제외합니다.
-  return legendData.filter(item => item.value != 0 && item.value != null);
+  return legendData.filter(item => item.value != 0 && item.value != null || item.name === '전체');
 }
 
 const option = ref({
@@ -324,6 +324,16 @@ const option = ref({
     right: "10%",
     textStyle: {
       color: textColor.value, // 텍스트 컬러 설정
+    },
+    formatter: (name) => {
+      if (name === '전체') {
+        return '전체';
+      }
+      const item = option.value.legend.data.find(d => d.name === name);
+      if (item) {
+        return `${item.name} (${item.value}MB)`;
+      }
+      return name;
     },
     
   },
@@ -365,6 +375,20 @@ const option = ref({
     },
   ],
 });
+
+// 추가: 모든 항목을 토글하는 함수
+function handleLegendSelectChange(params) {
+  if (params.name === '전체') {
+    const isSelected = params.selected['전체'];
+    const newSelected = {};
+    option.value.legend.data.forEach(item => {
+      if (item.name !== '전체') {
+        newSelected[item.name] = isSelected;
+      }
+    });
+    option.value.legend.selected = newSelected;
+  }
+}
 </script>
 
 <style scoped>

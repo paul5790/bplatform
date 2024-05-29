@@ -70,11 +70,25 @@
         >
           <v-card-item style="padding-top: 10px">
             <v-window class="scrollable-card">
-              <v-data-table :items="consoles">
+              <v-data-table-virtual :items="consoles" class="limited-height">
                 <template v-slot:item="{ item }">
-                  <v-checkbox v-model="item.exclusive"></v-checkbox>
+                  <tr>
+                    <td>{{ item.name }}</td>
+                    <td>
+                      <v-checkbox style="padding-top: 0px" v-model="item.td1"></v-checkbox>
+                    </td>
+                    <td>
+                      <v-checkbox v-model="item.td2"></v-checkbox>
+                    </td>
+                    <td>
+                      <v-checkbox v-model="item.td3"></v-checkbox>
+                    </td>
+                    <td>
+                      <v-checkbox v-model="item.td4"></v-checkbox>
+                    </td>
+                  </tr>
                 </template>
-              </v-data-table>
+              </v-data-table-virtual>
             </v-window>
           </v-card-item>
         </v-card>
@@ -98,56 +112,78 @@ watch(themeMode, (newValue) => {
 
 const page = ref(1);
 const itemsPerPage = ref(12);
+const selectedItems = ref([]);
+
+watch(selectedItems, (newSelectedItems) => {
+  const userId = newSelectedItems.map((item) => item.userId);
+  const userName = newSelectedItems.map((item) => item.userName);
+  const userGroup = newSelectedItems.map((item) => item.department);
+  console.log(`Selected userId: ${userId.join(", ")}`);
+  console.log(`Selected userName: ${userName.join(", ")}`);
+  console.log(`Selected useruserGroup: ${userGroup.join(", ")}`);
+  let aa;
+  console.log(aa);
+  aa = null;
+  console.log(aa);
+});
 
 const search = ref();
 
 const selectionLog = ref(["Web Dashboard Log", "Window App Log"]);
 const selectedLog = ref(selectionLog.value[0]);
 
-const consoles = [
+const consoles = ref([
   {
-    name: "PlayStation 5",
-    manufacturer: "Sony",
-    year: 2020,
-    sales: "10M",
-    exclusive: true,
+    name: "DGPS",
+    view: false,
+    capture: false,
+    download: false,
+    td4: true,
   },
   {
-    name: "Xbox Series X",
-    manufacturer: "Microsoft",
-    year: 2020,
-    sales: "6.5M",
-    exclusive: false,
+    name: "GYRO",
+    view: false,
+    capture: true,
+    download: false,
+    td4: false,
   },
   {
-    name: "Nintendo Switch",
-    manufacturer: "Nintendo",
-    year: 2017,
-    sales: "89M",
-    exclusive: true,
+    name: "ANEMOMETER",
+    view: false,
+    capture: true,
+    download: false,
+    td4: false,
   },
   {
-    name: "PlayStation 4",
-    manufacturer: "Sony",
-    year: 2013,
-    sales: "116M",
-    exclusive: true,
+    name: "RADAR",
+    view: false,
+    capture: false,
+    download: false,
+    td4: true,
   },
   {
-    name: "Xbox One",
-    manufacturer: "Microsoft",
-    year: 2013,
-    sales: "50M",
-    exclusive: false,
+    name: "AIS",
+    view: false,
+    capture: false,
+    download: true,
+    td4: false,
   },
   {
-    name: "Nintendo Wii",
-    manufacturer: "Nintendo",
-    year: 2006,
-    sales: "101M",
-    exclusive: true,
+    name: "ECDIS",
+    view: true,
+    capture: false,
+    download: false,
+    td4: false,
   },
-];
+    {
+    name: "ECDIS",
+    view: true,
+    capture: false,
+    download: false,
+    td4: false,
+  },
+  
+]);
 
 watchEffect(() => {
   console.log("selectedLog changed:", selectedLog.value);
@@ -181,12 +217,12 @@ const userheaders = ref([
   { title: "소속", key: "department" },
 ]);
 
-const permissionheaders = ref([
-  { title: "유저", key: "userId", width: 300 },
-  { title: "시간1", key: "manufacturer" },
-  { title: "타입", key: "year" },
-  { title: "로그", key: "sales" },
-  { title: "상세", key: "exclusive" },
+const checkheaders = ref([
+  { text: "Name", value: "name" },
+  { text: "데이터 분석", value: "td1" },
+  { text: "분석 데이터 캡쳐", value: "td2" },
+  { text: "데이터 조회", value: "td3" },
+  { text: "데이터 다운로드", value: "td4" },
 ]);
 
 const items = ref([]);
@@ -241,5 +277,9 @@ onMounted(() => {
 }
 .table-row td {
   padding: 5px; /* 간격을 줄이는데 사용되는 패딩 값 */
+}
+
+.limited-height tr {
+  max-height: 20px;
 }
 </style>

@@ -486,7 +486,7 @@ import App from "./RealtimeView.vue";
 
 // createApp(App).use(socket, "ws://ias.bdpbackend.com/ws/shipinfo1")
 
-const ws = new WebSocket("ws://ias.bdpbackend.com/ws/shipinfo");
+const ws = new WebSocket("ws://bdpback.ias.xinnos.com/ws/shipinfo");
 
 ws.onopen = function (event) {
   console.log("Connection opened");
