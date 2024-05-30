@@ -139,7 +139,7 @@ const selectedLog = ref(selectionLog.value[0]);
 const consoles = ref([
   {
     name: "DGPS",
-    view: false,
+    view: true,
     capture: false,
     download: false,
   },

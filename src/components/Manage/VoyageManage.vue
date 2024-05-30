@@ -1231,10 +1231,9 @@ const changeData = async () => {
         console.log(data);
         try {
           await updateTrialData(tokenid.value, data);
-          
-          alert("선택된 항차의 수정이 완료되었습니다.");
           nullDialog3();
-          // location.reload();
+          alert("선택된 항차의 수정이 완료되었습니다.");
+          location.reload();
         } catch (error) {
           console.log(1127);
           if (
