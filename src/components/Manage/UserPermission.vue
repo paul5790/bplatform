@@ -70,21 +70,25 @@
         >
           <v-card-item style="padding-top: 10px">
             <v-window class="scrollable-card">
-              <v-data-table-virtual :items="consoles" class="limited-height">
+              <v-data-table-virtual
+                :items="consoles"
+                :headers="checkheaders"
+                class="limited-height"
+              >
                 <template v-slot:item="{ item }">
                   <tr>
                     <td>{{ item.name }}</td>
                     <td>
-                      <v-checkbox style="padding-top: 0px" v-model="item.td1"></v-checkbox>
+                      <v-checkbox
+                        style="padding-top: 0px"
+                        v-model="item.view"
+                      ></v-checkbox>
                     </td>
                     <td>
-                      <v-checkbox v-model="item.td2"></v-checkbox>
+                      <v-checkbox v-model="item.capture"></v-checkbox>
                     </td>
                     <td>
-                      <v-checkbox v-model="item.td3"></v-checkbox>
-                    </td>
-                    <td>
-                      <v-checkbox v-model="item.td4"></v-checkbox>
+                      <v-checkbox v-model="item.download"></v-checkbox>
                     </td>
                   </tr>
                 </template>
@@ -138,51 +142,43 @@ const consoles = ref([
     view: false,
     capture: false,
     download: false,
-    td4: true,
   },
   {
     name: "GYRO",
     view: false,
     capture: true,
     download: false,
-    td4: false,
   },
   {
     name: "ANEMOMETER",
     view: false,
     capture: true,
     download: false,
-    td4: false,
   },
   {
     name: "RADAR",
     view: false,
     capture: false,
     download: false,
-    td4: true,
   },
   {
     name: "AIS",
     view: false,
     capture: false,
     download: true,
-    td4: false,
   },
   {
     name: "ECDIS",
     view: true,
     capture: false,
     download: false,
-    td4: false,
   },
-    {
+  {
     name: "ECDIS",
     view: true,
     capture: false,
     download: false,
-    td4: false,
   },
-  
 ]);
 
 watchEffect(() => {
@@ -218,11 +214,10 @@ const userheaders = ref([
 ]);
 
 const checkheaders = ref([
-  { text: "Name", value: "name" },
-  { text: "데이터 분석", value: "td1" },
-  { text: "분석 데이터 캡쳐", value: "td2" },
-  { text: "데이터 조회", value: "td3" },
-  { text: "데이터 다운로드", value: "td4" },
+  { text: "Name", key: "name" },
+  { text: "데이터 조회", key: "view" },
+  { text: "분석 데이터 캡쳐", key: "capture" },
+  { text: "데이터 다운로드", key: "download" },
 ]);
 
 const items = ref([]);

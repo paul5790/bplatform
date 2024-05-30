@@ -490,6 +490,8 @@ const fetchData = async (component, type, item, trialNum, startDate, endDate) =>
       }
       return await readDataTrial(tokenid.value, dataFomat, postType.value);
     } else {
+      console.log(startDate);
+      console.log(endDate);
       dataFomat = {
         "subComponent":component,
         "content":type,
@@ -513,7 +515,7 @@ const fetchEngineData = async (url, component, type, item, trialNum, startDate, 
         "seatrialNumber":trialNum, 
         "period":["N/A","N/A"]
       }
-      return await readDataDate(tokenid.value, dataFomat, postType.value);
+      return await readDataTrial(tokenid.value, dataFomat, postType.value);
     } else {
       dataFomat = {
         "subComponent":component,
@@ -521,7 +523,7 @@ const fetchEngineData = async (url, component, type, item, trialNum, startDate, 
         "seatrialNumber":"N/A", 
         "period":[startDate,endDate]
       }
-      return await readDataDate(tokenid.value, dataFomat, postType.value);
+      return await readDataTrial(tokenid.value, dataFomat, postType.value);
     }
   } catch (error) {
     console.error(error);

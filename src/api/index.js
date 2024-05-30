@@ -535,6 +535,8 @@ export const readDataDate = async (
       }
     );
 
+    console.log("ee");
+
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);
