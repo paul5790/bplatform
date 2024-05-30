@@ -468,6 +468,11 @@ const date = ref();
 
 const startDate = new Date();
 const endDate = new Date();
+
+let gga, vtg, hdt, rot, mwv, vhw, rsa, engine_SPEED,engine_OIL_TEMPERATURE1,engine_OIL_PRESSURE,transmission_OIL_PRESSURE,charging_SYSTEM_POTENTIAL,engine_TOTAL_HOURS,engine_INTAKE_MANIFOLD_NO1_PRESSURE,fuel_LEVEL_1,
+      engine_SPEED2,engine_OIL_TEMPERATURE2,engine_OIL_PRESSURE2,transmission_OIL_PRESSURE2,charging_SYSTEM_POTENTIAL2,engine_TOTAL_HOURS2,engine_INTAKE_MANIFOLD_NO1_PRESSURE2,fuel_LEVEL_2;
+
+
 onMounted(() => {
   date.value = [startDate, endDate];
   sessionStorage.setItem("page", "데이터 분석");
@@ -508,7 +513,7 @@ const fetchEngineData = async (url, component, type, item, trialNum, startDate, 
         "seatrialNumber":trialNum, 
         "period":["N/A","N/A"]
       }
-      return await readDataTrial(tokenid.value, dataFomat, postType.value);
+      return await readDataDate(tokenid.value, dataFomat, postType.value);
     } else {
       dataFomat = {
         "subComponent":component,
@@ -525,6 +530,7 @@ const fetchEngineData = async (url, component, type, item, trialNum, startDate, 
 };
 
 const processData = (data, timestampKey, dataKey, unitValue, contentsItemValue, analysisName) => {
+  console.log(data);
   analysisData.value = data.map(item => item[dataKey]);
   analysisTime.value = data.map(item => item[timestampKey].slice(0, 19));
   unit.value = unitValue;
@@ -547,33 +553,102 @@ const searchData = async () => {
       analysisData.value = [];
       analysisTime.value = [];
 
-      const [gga, vtg, hdt, rot, mwv, vhw, rsa, engine_SPEED,engine_OIL_TEMPERATURE1,engine_OIL_PRESSURE,transmission_OIL_PRESSURE,charging_SYSTEM_POTENTIAL,engine_TOTAL_HOURS,engine_INTAKE_MANIFOLD_NO1_PRESSURE,fuel_LEVEL_1,
-      engine_SPEED2,engine_OIL_TEMPERATURE2,engine_OIL_PRESSURE2,transmission_OIL_PRESSURE2,charging_SYSTEM_POTENTIAL2,engine_TOTAL_HOURS2,engine_INTAKE_MANIFOLD_NO1_PRESSURE2,fuel_LEVEL_2,] = await Promise.all([
-        fetchData("DGPS", "GGA", selectedItem.value === "위도" || selectedItem.value === "경도" ? "latitude,longitude" : "altitude", selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchData("DGPS", "VTG", selectedItem.value === "SOG" || selectedItem.value === "COG" ? "speedovergroundknots,courseovergrounddegreestrue" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchData("GYRO", "HDT", selectedItem.value === "Heading" ? "heading" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchData("GYRO", "ROT", selectedItem.value === "회전 속도" ? "rateofturn" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchData("ANEMOMETER", "MWV", selectedItem.value === "풍향" || selectedItem.value === "풍속" ? "anemometerangle,anemometerspeed" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchData("SPEEDLOG", "VHW", selectedItem.value === "선박 속도" ? "speedn" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchData("AUTOPILOT", "RSA", selectedItem.value === "스타보트 센서" || selectedItem.value === "포트 센서" ? "starboardruddersensor,portruddersensor" : null, selectedtrialNum.value, startDate2.value, endDate2.value),
+      // [gga, vtg, hdt, rot, mwv, vhw, rsa, engine_SPEED,engine_OIL_TEMPERATURE1,engine_OIL_PRESSURE,transmission_OIL_PRESSURE,charging_SYSTEM_POTENTIAL,engine_TOTAL_HOURS,engine_INTAKE_MANIFOLD_NO1_PRESSURE,fuel_LEVEL_1,
+      // engine_SPEED2,engine_OIL_TEMPERATURE2,engine_OIL_PRESSURE2,transmission_OIL_PRESSURE2,charging_SYSTEM_POTENTIAL2,engine_TOTAL_HOURS2,engine_INTAKE_MANIFOLD_NO1_PRESSURE2,fuel_LEVEL_2,] = await Promise.all([
         
-        fetchEngineData("no1enginepanel/no1engine_panel_61444", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65262", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65263", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65272", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65271", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65253", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65270", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no1enginepanel/no1engine_panel_65276", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_61444", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65262", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65263", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65272", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65271", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65253", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65270", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-        fetchEngineData("no2enginepanel/no2engine_panel_65276", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value),
-      ]);
+      if (selectedItem.value === "위도" || selectedItem.value === "경도") {
+        gga = await fetchData("DGPS", "GGA", selectedItem.value === "위도" || selectedItem.value === "경도" ? "latitude,longitude" : "altitude", selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+      else if (selectedItem.value === "SOG" || selectedItem.value === "COG") {
+        vtg = await fetchData("DGPS", "VTG", selectedItem.value === "SOG" || selectedItem.value === "COG" ? "speedovergroundknots,courseovergrounddegreestrue" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "Heading") {
+        hdt = await fetchData("GYRO", "HDT", selectedItem.value === "Heading" ? "heading" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "회전 속도") {
+        rot = await fetchData("GYRO", "ROT", selectedItem.value === "회전 속도" ? "rateofturn" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "풍향" || selectedItem.value === "풍속") {
+        mwv = await fetchData("ANEMOMETER", "MWV", selectedItem.value === "풍향" || selectedItem.value === "풍속" ? "anemometerangle,anemometerspeed" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      
+      else if (selectedItem.value === "선박 속도") {
+        vhw = await fetchData("SPEEDLOG", "VHW", selectedItem.value === "선박 속도" ? "speedn" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "스타보트 센서" || selectedItem.value === "포트 센서") {
+        rsa = await fetchData("AUTOPILOT", "RSA", selectedItem.value === "스타보트 센서" || selectedItem.value === "포트 센서" ? "starboardruddersensor,portruddersensor" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+        
+      else if (selectedItem.value === "엔진1 속도") {
+        engine_SPEED = await fetchEngineData("no1enginepanel/no1engine_panel_61444", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진1 오일 온도") {
+        engine_OIL_TEMPERATURE1 = await fetchEngineData("no1enginepanel/no1engine_panel_65262", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진1 오일 압력" || selectedItem.value === "엔진1 냉각수 량") {
+        engine_OIL_PRESSURE = await fetchEngineData("no1enginepanel/no1engine_panel_65263", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진1 변속기 오일 압력") {
+        transmission_OIL_PRESSURE = await fetchEngineData("no1enginepanel/no1engine_panel_65272", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진1 충전 시스템 전압" || selectedItem.value === "엔진1 배터리 전압") {
+        charging_SYSTEM_POTENTIAL = await fetchEngineData("no1enginepanel/no1engine_panel_65271", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진1 누적 가동시간") {
+        engine_TOTAL_HOURS = await fetchEngineData("no1enginepanel/no1engine_panel_65253", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진1 배기가스 온도" || selectedItem.value === "엔진1 흡입 매니폴드 온도" || selectedItem.value === "엔진1 흡입 매니폴드 압력") {
+        engine_INTAKE_MANIFOLD_NO1_PRESSURE = await fetchEngineData("no1enginepanel/no1engine_panel_65270", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진1 연료 량") {
+        fuel_LEVEL_1 = await fetchEngineData("no1enginepanel/no1engine_panel_65276", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 속도") {
+        engine_SPEED2 = await fetchEngineData("no2enginepanel/no2engine_panel_61444", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 오일 온도") {
+        engine_OIL_TEMPERATURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65262", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 오일 압력" || selectedItem.value === "엔진2 냉각수 량") {
+        engine_OIL_PRESSURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65263", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 변속기 오일 압력") {
+        transmission_OIL_PRESSURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65272", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 충전 시스템 전압" || selectedItem.value === "엔진2 배터리 전압") {
+        charging_SYSTEM_POTENTIAL2 = await fetchEngineData("no2enginepanel/no2engine_panel_65271", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 누적 가동시간") {
+        engine_TOTAL_HOURS2 = await fetchEngineData("no2enginepanel/no2engine_panel_65253", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 배기가스 온도" || selectedItem.value === "엔진2 흡입 매니폴드 온도" || selectedItem.value === "엔진2 흡입 매니폴드 압력") {
+        engine_INTAKE_MANIFOLD_NO1_PRESSURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65270", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+        
+      else if (selectedItem.value === "엔진2 연료 량") {
+        fuel_LEVEL_2 = await fetchEngineData("no2enginepanel/no2engine_panel_65276", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+      }
+      
 
       switch (selectedItem.value) {
         case "위도":
