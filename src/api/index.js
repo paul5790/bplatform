@@ -65,7 +65,7 @@ export const readPwData = async (tokenid, pw) => {
   }
 };
 
-// 비밀번호 확인
+// 초기 비밀번호 수정
 export const resetPwData = async (tokenid, pw) => {
   try {
     const response = await axios.post(
@@ -149,7 +149,7 @@ export const updatePassword = async (tokenid, data) => {
   }
 };
 
-// 비밀번호 업데이트
+// 비밀번호 초기화
 export const resetPassword = async (tokenid, data) => {
   try {
     const response = await axios.post(
@@ -254,7 +254,7 @@ export const readWebLogData = async (tokenid) => {
   }
 };
 
-// 웹 로그 가져오기
+// 앱 로그 가져오기
 export const readAppLogData = async (tokenid) => {
   try {
     const response = await axios.post(
@@ -339,46 +339,46 @@ export const updateLossTimeData = async (tokenid, data) => {
 };
 
 // 데이터 주기 읽기
-export const readTimeData = async (tokenid) => {
-  try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/get/settime`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+// export const readTimeData = async (tokenid) => {
+//   try {
+//     const response = await axios.post(
+//       `http://${apiLocation}/info/get/settime`,
+//       {},
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${tokenid}`,
+//         },
+//       }
+//     );
 
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;
+//   }
+// };
 
 // 데이터 주기 읽기
-export const readLampTimeData = async (tokenid) => {
-  try {
-    const response = await axios.post(
-      `http://${apiLocation}/auth/userinfo/get/lamptime`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+// export const readLampTimeData = async (tokenid) => {
+//   try {
+//     const response = await axios.post(
+//       `http://${apiLocation}/auth/userinfo/get/lamptime`,
+//       {},
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${tokenid}`,
+//         },
+//       }
+//     );
 
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;
+//   }
+// };
 
 // 데이터 소실 빈도 확인
 export const readlossData = async (
@@ -511,40 +511,42 @@ export const readDataTrial = async (tokenid, data, type) => {
   }
 };
 
-// 데이터 조회하기 (날짜)
-export const readDataDate = async (
-  tokenid,
-  subComponunt,
-  content,
-  searchStart,
-  searchEnd
-) => {
-  try {
-    const response = await axios.post(
-      `http://${apiLocation}/data/period`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-          subcomp: `${subComponunt}`,
-          content: `${content}`,
-          start: `${searchStart}`,
-          end: `${searchEnd}`,
-        },
-      }
-    );
+// // 데이터 조회하기 (날짜)
+// export const readDataDate = async (
+//   tokenid,
+//   subComponunt,
+//   content,
+//   searchStart,
+//   searchEnd
+// ) => {
+//   try {
+//     const response = await axios.post(
+//       `http://${apiLocation}/data/period`,
+//       {},
+//       {
+//         headers: {
+//           "Content-Type": "application/json",
+//           Authorization: `Bearer ${tokenid}`,
+//           subcomp: `${subComponunt}`,
+//           content: `${content}`,
+//           start: `${searchStart}`,
+//           end: `${searchEnd}`,
+//         },
+//       }
+//     );
 
-    console.log("ee");
+//     console.log("ee");
 
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
+//     return response.data;
+//   } catch (error) {
+//     console.error("Error fetching data:", error);
+//     throw error;
+//   }
+// };
 
-// 데이터 다운로드
+
+
+//// 데이터 다운로드
 export const downloadDataFile = async (tokenid, data) => {
   try {
     const response = await axios.post(

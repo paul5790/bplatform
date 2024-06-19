@@ -73,8 +73,8 @@ const updateValue = () => {
   lonview.value = props.lon;
   // console.log("updateValue");
 
-  latvalue.value = (props.lat / 100).toFixed(2);
-  lonvalue.value = (props.lon / 100).toFixed(2);
+  latvalue.value = (props.lat / 100).toFixed(6);
+  lonvalue.value = (props.lon / 100).toFixed(6);
 };
 
 // 컴포넌트가 파괴될 때 clearInterval 호출

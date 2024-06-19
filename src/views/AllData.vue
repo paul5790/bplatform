@@ -715,7 +715,7 @@ const dataDownloadServer = async () => {
       seatrial: seatrial,
       signals: variableName,
     };
-    console.log(setData);
+    console.log("setData = " + setData.signals);
     const loadData = await downloadDataFile(tokenid.value, setData);
 
     sessionStorage.setItem("downloading", false);

@@ -1,5 +1,4 @@
 <template>
-  <v-btn @click="hi()">ㅎㅇ</v-btn>
   <v-card-title>
     <span class="text-h6">Contents/Item</span>
   </v-card-title>
@@ -53,11 +52,6 @@ for (let i = 0; i < datas.value.length; i++) {
   datasetRaw.value.push([times.value[i], datas.value[i]]);
 }
 
-const hi = () => {
-  console.log(times.value);
-console.log(datas.value.length);
-}
-
 const option = ref({
   dataset: [
     {
@@ -75,7 +69,7 @@ const option = ref({
       start: 0,
       end: 100,
       xAxisIndex: [0, 1],
-      height: "2%",
+      height: "10%", // 높이를 10%로 설정하여 높임
     },
   ],
   xAxis: {

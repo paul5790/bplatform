@@ -95,7 +95,7 @@
         </v-list>
       </v-navigation-drawer>
       <v-main>
-        <v-app-bar app hide-on-scroll style="height: 7vh">
+        <v-app-bar app hide-on-scroll style="height: 67px">
           <v-app-bar-nav-icon
             @click="toggleDrawer()"
             v-if="iconshow"

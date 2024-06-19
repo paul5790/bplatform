@@ -82,7 +82,7 @@ const headers = ref([
   { title: "Ship ID", align: "start", key: "shipid" },
   { title: "진행 시간", align: "start", key: "time" },
   { title: "시작시간", align: "start", key: "startdate" },
-  { title: "끝시간", align: "start", key: "enddate" },
+  { title: "종료시간", align: "start", key: "enddate" },
   { title: "항차 이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
   { title: "map", key: "actions", sortable: false },

@@ -2,7 +2,7 @@
   <v-chart class="chart" :option="option" autoresize />
 </template>
 
-<script setup props="props">
+<script setup>
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { GaugeChart } from "echarts/charts";
@@ -42,7 +42,7 @@ const option = ref({
     text: props.name,
     left: "center",
     textStyle: {
-      fontSize: 14, // 폰트 크기 설정
+      fontSize: 14,
       color: textColor.value,
     },
   },
@@ -55,7 +55,6 @@ const option = ref({
         lineStyle: {
           width: 12,
           color: [
-            
             [0.5, "#20d25a"],
             [1, "#ed060d"],
           ],
@@ -83,7 +82,7 @@ const option = ref({
           color: "#fff",
           width: 2,
         },
-        interval: 10, // 수정: 눈금 간격을 10으로 설정
+        interval: 10,
       },
       axisLabel: {
         color: "inherit",
@@ -96,35 +95,47 @@ const option = ref({
           if (value === 50) {
             return "STBD";
           }
-          if (value < 50 || value > -50) {
+          if (value < 50 && value > -50) {
             return value;
           }
+
         },
       },
       type: "gauge",
       detail: {
         valueAnimation: true,
-        formatter: "{value}",
+        formatter: function (value) {
+          return isNullValue.value ? "NaN" : value;
+        },
         color: "inherit",
         fontSize: 14,
       },
       data: [
         {
-          value: -10,
+          value: 0,
         },
       ],
     },
   ],
 });
 
+const isNullValue = ref(false);
+const updateDetailColor = () => {
+  option.value.series[0].detail.color = isNullValue.value ? "Black" : "inherit";
+};
+
 const updateValue = () => {
   if (isNaN(props.starport) || props.starport === undefined) {
-    option.value.series[0].data[0].value = null;
-    alert
+    option.value.series[0].data[0].value = 0;
+    isNullValue.value = true;
   } else {
     option.value.series[0].data[0].value = props.starport;
+    isNullValue.value = false;
   }
+  updateDetailColor();
 };
+
+watch(() => props.starport, updateValue);
 
 onMounted(() => {
   setInterval(updateValue, 1000);
@@ -141,4 +152,3 @@ body {
   margin: 0;
 }
 </style>
-

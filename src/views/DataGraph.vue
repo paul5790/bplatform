@@ -767,6 +767,8 @@ const searchData = async () => {
           break;
       }
       
+      ""
+      
       const datasetRaw2 = ref([["time", "value"]]);
         datasetRaw2.value = [];
         for (let i = 0; i <= analysisTime.value.length; i++) {
@@ -830,7 +832,8 @@ const searchData = async () => {
               type: 'slider',
               xAxisIndex: 0,
               filterMode: 'none',
-              height: "2%",
+              height: "6%", // 높이를 20%로 설정
+              bottom: "2%", // 위치를 아래로 조정
             },
             {
               type: 'slider',
@@ -1015,7 +1018,8 @@ const option = ref({
       start: 0,
       end: 100,
       xAxisIndex: [0, 1],
-      height: "2%",
+      height: "6%", // 높이를 20%로 설정
+      bottom: "2%", // 위치를 아래로 조정
     },
   ],
   xAxis: {

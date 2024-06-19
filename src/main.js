@@ -10,6 +10,7 @@ import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 import VueECharts from "vue-echarts";
 
+
 loadFonts();
 
 createApp(App)

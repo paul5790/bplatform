@@ -95,7 +95,7 @@
                             <EchartGaugeVolt
                               :name="'SpeedN'"
                               :unit="'kt'"
-                              :max_value="200"
+                              :max_value="15"
                               :value="parseFloat(speed)"
                             />
                           </v-sheet>
@@ -132,11 +132,13 @@
                               display: flex,
                             }"
                           >
+                          <BridgeHeading/>
                             <EchartHeading
                               :value="parseFloat(heading)"
                               :name="'Heading'"
-                            /> </v-sheet
-                        ></v-col>
+                            /> 
+                          </v-sheet>
+                        </v-col>
 
                         <v-col
                           :cols="getColsValue3()"
@@ -452,9 +454,6 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
-  <!-- <v-dialog v-model="cctvDialog">
-            <video ref="videoD" width="1280" controls muted="muted"></video>
-  </v-dialog> -->
 </template>
 
 <script setup>
@@ -465,6 +464,8 @@ import OSMap from "../components/OSMap.vue";
 import SocketChecking from "../components/SocketChecking.vue";
 import EngineLampChecking from "../components/EngineLampChecking.vue";
 import EchartHeading from "../components/EchartGraph/EchartHeading.vue";
+import BridgeHeading from "../components/OpenBridge/HeadingGraph.vue";
+import BridgeRudder from "../components/OpenBridge/RudderGraph.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
@@ -582,7 +583,7 @@ ws.onmessage = function (event) {
       clearTimeout(RSAtimeout1); // 이전 타임아웃을 취소
       RSAtimeout1 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        star.value = null;
+        star.value = 0;
       }, checkTime.value);
       port.value = Number(
         parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
@@ -591,7 +592,7 @@ ws.onmessage = function (event) {
       clearTimeout(RSAtimeout2); // 이전 타임아웃을 취소
       RSAtimeout2 = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
-        port.value = null;
+        port.value = 0;
       }, checkTime.value);
     }
     // 엔진1
@@ -817,11 +818,11 @@ const cctvDialog = ref(false);
 let hls1; // Hls 인스턴스를 전역 변수로 선언
 
 const openCCTV = () => {
-  cctvDialog.value = true;
   if (sessionStorage.getItem("isAdmin") != "ADMIN") {
     alert("ADMIN 이상만 사용 가능합니다.");
     return;
   }
+  cctvDialog.value = true;
   setCCTV();
 };
 
