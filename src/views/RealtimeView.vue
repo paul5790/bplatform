@@ -132,7 +132,6 @@
                               display: flex,
                             }"
                           >
-                          <BridgeHeading/>
                             <EchartHeading
                               :value="parseFloat(heading)"
                               :name="'Heading'"
