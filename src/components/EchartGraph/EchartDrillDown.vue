@@ -407,6 +407,22 @@ const axioslist = ref([
   "no2enginepanel/no2engine_panel_65379",
 ]);
 
+const createDataObject = (groupId, values, allValues) => {
+  console.log("red");
+  const valueSum = values.reduce((acc, val) => acc + val.value, 0);
+  const allValueSum = allValues.reduce((acc, val) => acc + val.value, 0);
+  const percent = ((valueSum / allValueSum) * 100).toFixed(2);
+
+  return {
+    value: valueSum,
+    groupId: groupId,
+    percent: percent,
+    itemStyle: {
+      color: percent > 30 ? '#FF6666' : undefined // 30% 초과 시 빨간색, 이하 시 기본 색상 (여기서는 파란색)
+    }
+  };
+};
+
 // 로딩
 const loading = ref(true);
 
@@ -464,7 +480,6 @@ provide(THEME_KEY);
 
 const chart = ref(null);
 
-// 초기 그래프 옵션 설정
 const option = ref({
   title: {
     text: "항차 별 데이터 소실 빈도",
@@ -482,12 +497,7 @@ const option = ref({
       let value = params.data ? params.data.value : null; // value 값
       let percent = params.data ? params.data.percent : null;
       // params.data가 존재하고 groupId, value, percent 속성이 존재하는지 확인
-      if (
-        params.data &&
-        groupId !== null &&
-        value !== null &&
-        percent !== null
-      ) {
+      if (params.data && groupId !== null && value !== null && percent !== null) {
         // 툴팁 형식 설정
         return `${groupId} : ${value}번 <br> 소실률 : ${percent}%`;
       } else {
@@ -528,7 +538,106 @@ const option = ref({
     type: "bar",
     id: "sales",
     data: [
-      // 다른 데이터도 추가 가능
+      createDataObject(
+        "DGPS",
+        [refs.GLL, refs.GGA, refs.RMC, refs.VTG, refs.ZDA, refs.GSV, refs.GSA],
+        [refs.ALLGLL, refs.ALLGGA, refs.ALLRMC, refs.ALLVTG, refs.ALLZDA, refs.ALLGSV, refs.ALLGSA]
+      ),
+      createDataObject("GYRO", [refs.HDT, refs.ROT], [refs.ALLHDT, refs.ALLROT]),
+      createDataObject("ANEMOMETER", [refs.MWV], [refs.ALLMWV]),
+      createDataObject("RADAR", [refs.RSCREEN], [refs.ALLRSCREEN]),
+      createDataObject("AIS", [refs.VDM, refs.VDO], [refs.ALLVDM, refs.ALLVDO]),
+      createDataObject(
+        "ECDIS",
+        [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ESCREEN],
+        [refs.ALLROUTEINFO, refs.ALLWAYPOINTS, refs.ALLRTZ, refs.ALLESCREEN]
+      ),
+      createDataObject("AUTOPILOT", [refs.RSA, refs.HTD], [refs.ALLRSA, refs.ALLHTD]),
+      createDataObject(
+        "SPEEDLOG",
+        [refs.VBW, refs.VHW, refs.VLW],
+        [refs.ALLVBW, refs.ALLVHW, refs.ALLVLW]
+      ),
+      createDataObject(
+        "CanThrottle",
+        [refs.CAN_Online_State, refs.Engine_RPM, refs.Rudder, refs.Rudder_Scale],
+        [refs.ALLCAN_Online_State, refs.ALLEngine_RPM, refs.ALLRudder, refs.ALLRudder_Scale]
+      ),
+      createDataObject(
+        "AUTOPILOTCONTACT",
+        [refs.AUTOPILOTCONTACT],
+        [refs.ALLAUTOPILOTCONTACT]
+      ),
+      createDataObject(
+        "NO.1ENGINE",
+        [
+          refs.NO1ENGINE_PANEL_61444,
+          refs.NO1ENGINE_PANEL_65262,
+          refs.NO1ENGINE_PANEL_65263,
+          refs.NO1ENGINE_PANEL_65272,
+          refs.NO1ENGINE_PANEL_65271,
+          refs.NO1ENGINE_PANEL_65253,
+          refs.NO1ENGINE_PANEL_65270,
+          refs.NO1ENGINE_PANEL_65276,
+          refs.NO1ENGINE_PANEL_65360,
+          refs.NO1ENGINE_PANEL_65361_LAMP,
+          refs.NO1ENGINE_PANEL_65361_STATUS,
+          refs.NO1ENGINE_PANEL_65378,
+          refs.NO1ENGINE_PANEL_65376,
+          refs.NO1ENGINE_PANEL_65379,
+        ],
+        [
+          refs.ALLNO1ENGINE_PANEL_61444,
+          refs.ALLNO1ENGINE_PANEL_65262,
+          refs.ALLNO1ENGINE_PANEL_65263,
+          refs.ALLNO1ENGINE_PANEL_65272,
+          refs.ALLNO1ENGINE_PANEL_65271,
+          refs.ALLNO1ENGINE_PANEL_65253,
+          refs.ALLNO1ENGINE_PANEL_65270,
+          refs.ALLNO1ENGINE_PANEL_65276,
+          refs.ALLNO1ENGINE_PANEL_65360,
+          refs.ALLNO1ENGINE_PANEL_65361_LAMP,
+          refs.ALLNO1ENGINE_PANEL_65361_STATUS,
+          refs.ALLNO1ENGINE_PANEL_65378,
+          refs.ALLNO1ENGINE_PANEL_65376,
+          refs.ALLNO1ENGINE_PANEL_65379,
+        ]
+      ),
+      createDataObject(
+        "NO.2ENGINE",
+        [
+          refs.NO2ENGINE_PANEL_61444,
+          refs.NO2ENGINE_PANEL_65262,
+          refs.NO2ENGINE_PANEL_65263,
+          refs.NO2ENGINE_PANEL_65272,
+          refs.NO2ENGINE_PANEL_65271,
+          refs.NO2ENGINE_PANEL_65253,
+          refs.NO2ENGINE_PANEL_65270,
+          refs.NO2ENGINE_PANEL_65276,
+          refs.NO2ENGINE_PANEL_65360,
+          refs.NO2ENGINE_PANEL_65361_LAMP,
+          refs.NO2ENGINE_PANEL_65361_STATUS,
+          refs.NO2ENGINE_PANEL_65378,
+          refs.NO2ENGINE_PANEL_65376,
+          refs.NO2ENGINE_PANEL_65379,
+        ],
+        [
+          refs.ALLNO2ENGINE_PANEL_61444,
+          refs.ALLNO2ENGINE_PANEL_65262,
+          refs.ALLNO2ENGINE_PANEL_65263,
+          refs.ALLNO2ENGINE_PANEL_65272,
+          refs.ALLNO2ENGINE_PANEL_65271,
+          refs.ALLNO2ENGINE_PANEL_65253,
+          refs.ALLNO2ENGINE_PANEL_65270,
+          refs.ALLNO2ENGINE_PANEL_65276,
+          refs.ALLNO2ENGINE_PANEL_65360,
+          refs.ALLNO2ENGINE_PANEL_65361_LAMP,
+          refs.ALLNO2ENGINE_PANEL_65361_STATUS,
+          refs.ALLNO2ENGINE_PANEL_65378,
+          refs.ALLNO2ENGINE_PANEL_65376,
+          refs.ALLNO2ENGINE_PANEL_65379,
+        ]
+      ),
     ],
     universalTransition: {
       enabled: true,
@@ -536,18 +645,12 @@ const option = ref({
     },
   },
 });
+
+
 let drilldownData = [];
 // 그래프 클릭 이벤트 핸들러
 
-const createDataObject = (groupId, values, allValues) => ({
-  value: values.reduce((acc, val) => acc + val.value, 0),
-  groupId: groupId,
-  percent: (
-    (values.reduce((acc, val) => acc + val.value, 0) /
-      allValues.reduce((acc, val) => acc + val.value, 0)) *
-    100
-  ).toFixed(2),
-});
+
 
 const handleChartClick = async (event) => {
   if (event.data) {
@@ -770,6 +873,9 @@ const updateDataObject = (id, value, allValue) => ({
   value: value,
   groupId: id,
   percent: ((value / allValue) * 100).toFixed(2),
+    itemStyle: {
+    color: ((value / allValue) * 100) > 30 ? '#FF6666' : undefined // 소실률이 30% 초과 시 빨간색
+  }
 });
 
 watch(selectedtrialNum, (newTrialNum) => {
@@ -793,135 +899,106 @@ const updateChart = () => {
         type: "bar",
         id: "sales",
         data: [
-          {
-            groupId: "DGPS",
-            ...calculateGroupPercentage(
-              [refs.GLL, refs.GGA, refs.RMC, refs.VTG, refs.ZDA, refs.GSV, refs.GSA],
-              [refs.ALLGLL, refs.ALLGGA, refs.ALLRMC, refs.ALLVTG, refs.ALLZDA, refs.ALLGSV, refs.ALLGSA]
-            ),
-          },
-          {
-            groupId: "GYRO",
-            ...calculateGroupPercentage([refs.HDT, refs.ROT], [refs.ALLHDT, refs.ALLROT]),
-          },
-          {
-            groupId: "ANEMOMETER",
-            ...calculateGroupPercentage([refs.MWV], [refs.ALLMWV]),
-          },
-          {
-            groupId: "RADAR",
-            ...calculateGroupPercentage([refs.RSCREEN], [refs.ALLRSCREEN]),
-          },
-          {
-            groupId: "AIS",
-            ...calculateGroupPercentage([refs.VDM, refs.VDO], [refs.ALLVDM, refs.ALLVDO]),
-          },
-          {
-            groupId: "ECDIS",
-            ...calculateGroupPercentage(
-              [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ESCREEN],
-              [refs.ALLROUTEINFO, refs.ALLWAYPOINTS, refs.ALLRTZ, refs.ALLESCREEN]
-            ),
-          },
-          {
-            groupId: "AUTOPILOT",
-            ...calculateGroupPercentage([refs.RSA, refs.HTD], [refs.ALLRSA, refs.ALLHTD]),
-          },
-          {
-            groupId: "SPEEDLOG",
-            ...calculateGroupPercentage(
-              [refs.VBW, refs.VHW, refs.VLW],
-              [refs.ALLVBW, refs.ALLVHW, refs.ALLVLW]
-            ),
-          },
-          {
-            groupId: "CanThrottle",
-            ...calculateGroupPercentage(
-              [refs.CAN_Online_State, refs.Engine_RPM, refs.Rudder, refs.Rudder_Scale],
-              [refs.ALLCAN_Online_State, refs.ALLEngine_RPM, refs.ALLRudder, refs.ALLRudder_Scale]
-            ),
-          },
-          {
-            groupId: "AUTOPILOTCONTACT",
-            ...calculateGroupPercentage(
-              [refs.AUTOPILOTCONTACT],
-              [refs.ALLAUTOPILOTCONTACT]
-            ),
-          },
-          {
-            groupId: "NO.1ENGINE",
-            ...calculateGroupPercentage(
-              [
-                refs.NO1ENGINE_PANEL_61444,
-                refs.NO1ENGINE_PANEL_65262,
-                refs.NO1ENGINE_PANEL_65263,
-                refs.NO1ENGINE_PANEL_65272,
-                refs.NO1ENGINE_PANEL_65271,
-                refs.NO1ENGINE_PANEL_65253,
-                refs.NO1ENGINE_PANEL_65270,
-                refs.NO1ENGINE_PANEL_65276,
-                refs.NO1ENGINE_PANEL_65360,
-                refs.NO1ENGINE_PANEL_65361_LAMP,
-                refs.NO1ENGINE_PANEL_65361_STATUS,
-                refs.NO1ENGINE_PANEL_65378,
-                refs.NO1ENGINE_PANEL_65376,
-                refs.NO1ENGINE_PANEL_65379,
-              ],
-              [
-                refs.ALLNO1ENGINE_PANEL_61444,
-                refs.ALLNO1ENGINE_PANEL_65262,
-                refs.ALLNO1ENGINE_PANEL_65263,
-                refs.ALLNO1ENGINE_PANEL_65272,
-                refs.ALLNO1ENGINE_PANEL_65271,
-                refs.ALLNO1ENGINE_PANEL_65253,
-                refs.ALLNO1ENGINE_PANEL_65270,
-                refs.ALLNO1ENGINE_PANEL_65276,
-                refs.ALLNO1ENGINE_PANEL_65360,
-                refs.ALLNO1ENGINE_PANEL_65361_LAMP,
-                refs.ALLNO1ENGINE_PANEL_65361_STATUS,
-                refs.ALLNO1ENGINE_PANEL_65378,
-                refs.ALLNO1ENGINE_PANEL_65376,
-                refs.ALLNO1ENGINE_PANEL_65379,
-              ]
-            ),
-          },
-          {
-            groupId: "NO.2ENGINE",
-            ...calculateGroupPercentage(
-              [
-                refs.NO2ENGINE_PANEL_61444,
-                refs.NO2ENGINE_PANEL_65262,
-                refs.NO2ENGINE_PANEL_65263,
-                refs.NO2ENGINE_PANEL_65272,
-                refs.NO2ENGINE_PANEL_65271,
-                refs.NO2ENGINE_PANEL_65253,
-                refs.NO2ENGINE_PANEL_65270,
-                refs.NO2ENGINE_PANEL_65276,
-                refs.NO2ENGINE_PANEL_65360,
-                refs.NO2ENGINE_PANEL_65361_LAMP,
-                refs.NO2ENGINE_PANEL_65361_STATUS,
-                refs.NO2ENGINE_PANEL_65378,
-                refs.NO2ENGINE_PANEL_65376,
-                refs.NO2ENGINE_PANEL_65379,
-              ],
-              [
-                refs.ALLNO2ENGINE_PANEL_61444,
-                refs.ALLNO2ENGINE_PANEL_65262,
-                refs.ALLNO2ENGINE_PANEL_65263,
-                refs.ALLNO2ENGINE_PANEL_65272,
-                refs.ALLNO2ENGINE_PANEL_65271,
-                refs.ALLNO2ENGINE_PANEL_65253,
-                refs.ALLNO2ENGINE_PANEL_65270,
-                refs.ALLNO2ENGINE_PANEL_65276,
-                refs.ALLNO2ENGINE_PANEL_65360,
-                refs.ALLNO2ENGINE_PANEL_65361_LAMP,
-                refs.ALLNO2ENGINE_PANEL_65361_STATUS,
-                refs.ALLNO2ENGINE_PANEL_65378,
-                refs.ALLNO2ENGINE_PANEL_65376,
-                refs.ALLNO2ENGINE_PANEL_65379,
-              ]
-            ),
-          },
+          createDataObject(
+            "DGPS",
+            [refs.GLL, refs.GGA, refs.RMC, refs.VTG, refs.ZDA, refs.GSV, refs.GSA],
+            [refs.ALLGLL, refs.ALLGGA, refs.ALLRMC, refs.ALLVTG, refs.ALLZDA, refs.ALLGSV, refs.ALLGSA]
+          ),
+          createDataObject("GYRO", [refs.HDT, refs.ROT], [refs.ALLHDT, refs.ALLROT]),
+          createDataObject("ANEMOMETER", [refs.MWV], [refs.ALLMWV]),
+          createDataObject("RADAR", [refs.RSCREEN], [refs.ALLRSCREEN]),
+          createDataObject("AIS", [refs.VDM, refs.VDO], [refs.ALLVDM, refs.ALLVDO]),
+          createDataObject(
+            "ECDIS",
+            [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ESCREEN],
+            [refs.ALLROUTEINFO, refs.ALLWAYPOINTS, refs.ALLRTZ, refs.ALLESCREEN]
+          ),
+          createDataObject("AUTOPILOT", [refs.RSA, refs.HTD], [refs.ALLRSA, refs.ALLHTD]),
+          createDataObject(
+            "SPEEDLOG",
+            [refs.VBW, refs.VHW, refs.VLW],
+            [refs.ALLVBW, refs.ALLVHW, refs.ALLVLW]
+          ),
+          createDataObject(
+            "CanThrottle",
+            [refs.CAN_Online_State, refs.Engine_RPM, refs.Rudder, refs.Rudder_Scale],
+            [refs.ALLCAN_Online_State, refs.ALLEngine_RPM, refs.ALLRudder, refs.ALLRudder_Scale]
+          ),
+          createDataObject(
+            "AUTOPILOTCONTACT",
+            [refs.AUTOPILOTCONTACT],
+            [refs.ALLAUTOPILOTCONTACT]
+          ),
+          createDataObject(
+            "NO.1ENGINE",
+            [
+              refs.NO1ENGINE_PANEL_61444,
+              refs.NO1ENGINE_PANEL_65262,
+              refs.NO1ENGINE_PANEL_65263,
+              refs.NO1ENGINE_PANEL_65272,
+              refs.NO1ENGINE_PANEL_65271,
+              refs.NO1ENGINE_PANEL_65253,
+              refs.NO1ENGINE_PANEL_65270,
+              refs.NO1ENGINE_PANEL_65276,
+              refs.NO1ENGINE_PANEL_65360,
+              refs.NO1ENGINE_PANEL_65361_LAMP,
+              refs.NO1ENGINE_PANEL_65361_STATUS,
+              refs.NO1ENGINE_PANEL_65378,
+              refs.NO1ENGINE_PANEL_65376,
+              refs.NO1ENGINE_PANEL_65379,
+            ],
+            [
+              refs.ALLNO1ENGINE_PANEL_61444,
+              refs.ALLNO1ENGINE_PANEL_65262,
+              refs.ALLNO1ENGINE_PANEL_65263,
+              refs.ALLNO1ENGINE_PANEL_65272,
+              refs.ALLNO1ENGINE_PANEL_65271,
+              refs.ALLNO1ENGINE_PANEL_65253,
+              refs.ALLNO1ENGINE_PANEL_65270,
+              refs.ALLNO1ENGINE_PANEL_65276,
+              refs.ALLNO1ENGINE_PANEL_65360,
+              refs.ALLNO1ENGINE_PANEL_65361_LAMP,
+              refs.ALLNO1ENGINE_PANEL_65361_STATUS,
+              refs.ALLNO1ENGINE_PANEL_65378,
+              refs.ALLNO1ENGINE_PANEL_65376,
+              refs.ALLNO1ENGINE_PANEL_65379,
+            ]
+          ),
+          createDataObject(
+            "NO.2ENGINE",
+            [
+              refs.NO2ENGINE_PANEL_61444,
+              refs.NO2ENGINE_PANEL_65262,
+              refs.NO2ENGINE_PANEL_65263,
+              refs.NO2ENGINE_PANEL_65272,
+              refs.NO2ENGINE_PANEL_65271,
+              refs.NO2ENGINE_PANEL_65253,
+              refs.NO2ENGINE_PANEL_65270,
+              refs.NO2ENGINE_PANEL_65276,
+              refs.NO2ENGINE_PANEL_65360,
+              refs.NO2ENGINE_PANEL_65361_LAMP,
+              refs.NO2ENGINE_PANEL_65361_STATUS,
+              refs.NO2ENGINE_PANEL_65378,
+              refs.NO2ENGINE_PANEL_65376,
+              refs.NO2ENGINE_PANEL_65379,
+            ],
+            [
+              refs.ALLNO2ENGINE_PANEL_61444,
+              refs.ALLNO2ENGINE_PANEL_65262,
+              refs.ALLNO2ENGINE_PANEL_65263,
+              refs.ALLNO2ENGINE_PANEL_65272,
+              refs.ALLNO2ENGINE_PANEL_65271,
+              refs.ALLNO2ENGINE_PANEL_65253,
+              refs.ALLNO2ENGINE_PANEL_65270,
+              refs.ALLNO2ENGINE_PANEL_65276,
+              refs.ALLNO2ENGINE_PANEL_65360,
+              refs.ALLNO2ENGINE_PANEL_65361_LAMP,
+              refs.ALLNO2ENGINE_PANEL_65361_STATUS,
+              refs.ALLNO2ENGINE_PANEL_65378,
+              refs.ALLNO2ENGINE_PANEL_65376,
+              refs.ALLNO2ENGINE_PANEL_65379,
+            ]
+          ),
         ],
         universalTransition: {
           enabled: true,

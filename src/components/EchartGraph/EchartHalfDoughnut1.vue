@@ -146,13 +146,16 @@ const option = ref({
 watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
   option.value.tooltip = {
     trigger: "item",
-    formatter: function(params) {
-    // params.value는 {b}에 해당하는 값입니다.
-    // 이 값을 2배로 곱한 값을 표시합니다.
-    return `${params.name}  (${(params.value/totalSize.value*100).toFixed(1)}%)`;
-  }
-  }
-  if(serverInUsedSize.value + dbSize.value > serverRemainingSize.value * 4){
+    formatter: function (params) {
+      // params.value는 {b}에 해당하는 값입니다.
+      // 이 값을 2배로 곱한 값을 표시합니다.
+      return `${params.name}  (${(
+        (params.value / totalSize.value) *
+        100
+      ).toFixed(1)}%)`;
+    },
+  };
+  if (serverInUsedSize.value + dbSize.value > serverRemainingSize.value * 4) {
     option.value.series[0].data = [
       {
         value: serverInUsedSize.value,
@@ -183,8 +186,7 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
         name: `전체 용량 : ${totalSize.value.toFixed(2)}GB`,
       },
     ];
-  }
-  else{
+  } else {
     option.value.series[0].data = [
       {
         value: serverInUsedSize.value,
@@ -216,7 +218,6 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
       },
     ];
   }
-  
 });
 </script>
 

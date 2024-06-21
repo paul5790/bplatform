@@ -18,6 +18,11 @@ const routes = [
     component: () => import("../components/ObRudder.vue"),
   },
   {
+    path: "/map",
+    name: "map",
+    component: () => import("../views/MapData.vue"),
+  },
+  {
     path: "/alldata",
     name: "alldata",
     component: () => import("../views/AllData.vue"),

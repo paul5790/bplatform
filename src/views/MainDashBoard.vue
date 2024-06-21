@@ -30,6 +30,18 @@
             :value="`/`"
             @click="handleListItemClick(`대시보드`)"
           ></v-list-item>
+
+          <v-list-item
+            v-if="permission === 'ADMIN' || permission === 'USER'"
+            :key="7"
+            :to="`/map`"
+            :exact="true"
+            :prepend-icon="`mdi-map`"
+            :title="`지도`"
+            :value="`/map`"
+            @click="handleListItemClick(`지도`)"
+          ></v-list-item>
+          
           <v-list-item
             v-if="permission === 'ADMIN' || permission === 'USER'"
             :key="1"
