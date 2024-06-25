@@ -81,19 +81,13 @@ import EchartHalfDoughnut from "../components/EchartGraph/EchartHalfDoughnut1";
 import EchartDoughnut from "../components/EchartGraph/EchartDoughnut.vue";
 import EchartDrillDown from "../components/EchartGraph/EchartDrillDown.vue";
 import EchartDrillDownMulti from "../components/EchartGraph/EchartDrillDownMulti.vue";
-import { darkbackcolor, whitebackcolor } from "../color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
 const guest = ref(true);
 const userid = ref(sessionStorage.getItem("isAdmin"));
 if (userid.value === "GUEST") guest.value = true;
 else guest.value = false;
 
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
-
-const themeColor = ref(themeMode.value === "light" ? whitebackcolor : darkbackcolor);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-  
-});
+const { themeColor } = themeConfig;
 const charts = ref([
   {
     id: 1,

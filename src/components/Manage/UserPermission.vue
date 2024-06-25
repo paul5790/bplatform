@@ -105,14 +105,9 @@
 import { computed, ref, watchEffect, watch, onMounted } from "vue";
 import { readUserData, readAppLogData } from "../../api/index.js";
 import moment from "moment";
-import { darkbackcolor, whitebackcolor } from "../../color/color.js";
-// 다크모드
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
+import { themeMode, themeConfig } from "@/utils/theme.js";
 
-const themeColor = ref(themeMode.value === "light" ? "#f7f7f7" : "#424242");
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
+const { themeColor } = themeConfig;
 
 const page = ref(1);
 const itemsPerPage = ref(12);

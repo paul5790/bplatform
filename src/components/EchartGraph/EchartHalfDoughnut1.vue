@@ -25,14 +25,9 @@ use([
   LegendComponent,
 ]);
 
-import { darkText, lightText } from "../../color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
 
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
-
-const textColor = ref(themeMode.value === "light" ? lightText : darkText);
-watch(themeMode, (newValue) => {
-  textColor.value = newValue === "light" ? lightText : darkText;
-});
+const { textColor } = themeConfig;
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 

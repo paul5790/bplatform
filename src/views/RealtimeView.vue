@@ -469,7 +469,8 @@ import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
 import { readLampTimeData, cctvUrl } from "../api/index.js";
-import { darkbackcolor, whitebackcolor } from "../color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
+
 // 웹소켓 관련, Web Socket
 import {
   ref,
@@ -794,14 +795,7 @@ onBeforeUnmount(() => {
   console.log("bye");
 });
 
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
-
-const themeColor = ref(
-  themeMode.value === "light" ? whitebackcolor : darkbackcolor
-);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
+const { themeColor } = themeConfig;
 
 const text = ref(""); // 보낼 데이터
 const responseMsg = ref(""); // 받아온 데이터

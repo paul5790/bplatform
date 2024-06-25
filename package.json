@@ -23,6 +23,7 @@
     "openbridge-css": "^0.2.1",
     "openbridge-web-components": "^0.2.2",
     "papaparse": "^5.4.1",
+    "pinia": "^2.1.7",
     "roboto-fontface": "*",
     "vue": "^3.2.13",
     "vue-chartjs": "^5.2.0",

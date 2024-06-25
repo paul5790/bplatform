@@ -10,7 +10,7 @@
     class="scrollable-card"
   >
     <v-card-title>
-      <span style="font-size: 19px; font-weight: 550">항차 리스트</span>
+      <span style="font-size: 19px; font-weight: 550">시험 리스트</span>
     </v-card-title>
     <v-data-table
       v-model:page="page"
@@ -83,7 +83,7 @@ const headers = ref([
   { title: "진행 시간", align: "start", key: "time" },
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "종료시간", align: "start", key: "enddate" },
-  { title: "항차 이름", align: "start", key: "name" },
+  { title: "시험 이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
   { title: "map", key: "actions", sortable: false },
   { title: "해역 위치", align: "start", key: "location" },
@@ -93,7 +93,7 @@ const headers = ref([
 ]);
 
 const items = ref([]);
-const message = ref("항차 테이블 정보 로딩중...");
+const message = ref("시험 테이블 정보 로딩중...");
 const editedIndex = ref(-1);
 
 const formTitle = computed(() =>
@@ -159,7 +159,7 @@ const maptitle = ref();
 const map = (item) => {
   console.log(item.division);
   seatrialProps.value = `${item.division}`;
-  maptitle.value = `항차: ${item.name}의 지도`;
+  maptitle.value = `시험: ${item.name}의 지도`;
   dialog.value = true;
 };
 

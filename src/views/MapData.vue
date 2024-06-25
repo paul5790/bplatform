@@ -1,63 +1,319 @@
 <template>
-  <div style="padding: 0px; padding-top: 0px">
-    <div id="map" style="height: 93vh"></div>
+  <div
+    style="padding: 0px; position: relative; height: 93vh; overflow: visible"
+  >
+    <div id="map" style="height: 100%"></div>
+    <v-btn
+      icon="mdi-magnify"
+      color="primary"
+      fab
+      @click="searchCardVisible = true"
+      style="position: absolute; bottom: 16px; right: 16px; z-index: 1000"
+    ></v-btn>
+
+    <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
+    <v-card
+      v-if="searchCardVisible"
+      ref="searchCard"
+      @mousedown="startDrag($event, 'searchCard')"
+      style="
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 1100;
+        width: 350px;
+        overflow: visible;
+      "
+    >
+      <v-card-title>
+        <span>검색</span>
+        <p
+          @click="searchCardVisible = false"
+          style="position: absolute; top: 3px; right: 8px"
+        >
+          <v-icon>mdi-close</v-icon>
+        </p>
+      </v-card-title>
+      <v-card-text>
+        <!-- 여기에 검색 창 컨텐츠를 추가하세요 -->
+        <div style="position: relative; z-index: 1200">
+          <v-select
+            v-model="selectedtrialrun"
+            :items="trialrun"
+            label="항차 선택"
+            variant="outlined"
+            class="custom-select"
+          ></v-select>
+          <VueDatePicker
+            :class="themeMode === 'dark' ? 'dp__theme_dark' : 'dp__theme_light'"
+            style="--dp-input-padding: 15px"
+            v-model="dateRange"
+            range
+            :dark="themeMode === 'dark'"
+            :readonly="date_readonly"
+          />
+          <p style="font-size: 12px; font-weight: bold">
+            &nbsp;&nbsp;* 날짜 검색은 한국 표준시를 기준으로 작성하며,
+          </p>
+          <p style="font-size: 12px; font-weight: bold">
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로 보여짐
+          </p>
+          <v-btn style="margin-top: 20px" @click="testCardVisible = true"
+            >검색하기</v-btn
+          >
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <!-- --------------------------항적, 웨이포인트 리스트 표출------------------------------- -->
+    <v-card
+      v-if="testCardVisible"
+      ref="testCard"
+      @mousedown="startDrag($event, 'testCard')"
+      style="
+        position: absolute;
+        top: 316px;
+        right: 16px;
+        z-index: 1100;
+        width: 350px;
+        overflow: visible;
+      "
+    >
+      <v-card-title>
+        <span>시험 선택</span>
+        <p
+          @click="testCardVisible = false"
+          style="position: absolute; top: 3px; right: 8px"
+        >
+          <v-icon>mdi-close</v-icon>
+        </p>
+      </v-card-title>
+      <v-card-text>
+        <!-- 여기에 검색 창 컨텐츠를 추가하세요 -->
+        <div style="position: relative; z-index: 1200">
+          <v-checkbox
+            v-model="selectedTest"
+            color="red"
+            label="빨간항차"
+            value="red"
+            hide-details
+          ></v-checkbox>
+          <v-checkbox
+            v-model="selectedTest"
+            color="yellow"
+            label="노란항차"
+            value="yellow"
+            hide-details
+          ></v-checkbox>
+          <v-checkbox
+            v-model="selectedTest"
+            color="blue"
+            label="blue항차"
+            value="blue"
+            hide-details
+          ></v-checkbox>
+          <v-checkbox
+            v-model="selectedTest"
+            color="green"
+            label="green항차"
+            value="green"
+            hide-details
+          ></v-checkbox>
+          <v-checkbox
+            v-model="selectedTest"
+            color="black"
+            label="black항차"
+            value="black"
+            hide-details
+          ></v-checkbox>
+          <v-checkbox
+            v-model="selectedTest"
+            color="brown"
+            label="brown항차"
+            value="brown"
+            hide-details
+          ></v-checkbox>
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <v-dialog v-model="dialogVisible" max-width="300">
+      <v-card>
+        <v-card-title class="headline">알림</v-card-title>
+        <v-card-text>최대 5개까지 선택할 수 있습니다.</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="red darken-1" text @click="dialogVisible = false"
+            >확인</v-btn
+          >
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script setup>
 import L from "leaflet";
-import { ref, toRefs, onMounted, defineProps } from "vue";
+import { ref, toRefs, onMounted, defineProps, watch } from "vue";
+import { readTrialData } from "../api/index.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
+const searchCardVisible = ref(false);
+const testCardVisible = ref(false);
+const searchCard = ref(null);
+const testCard = ref(null);
+
+// ----------------------------select Bar--------------------------------//
+
+// trial
+const trialrun = ref(["직접 선택"]);
+const selectedtrialrun = ref(null);
+const selectedtrialNum = ref();
+const setStartTime = ref([]);
+const setEndTime = ref([]);
+
+
+
+// date Picker
+const date_readonly = ref(true);
+const dateRange = ref([]);
+
+const getTrialDate = async () => {
+  try {
+    const response = await readTrialData(tokenid.value);
+    for (let i = 0; i < response.length; i++) {
+      setStartTime.value.push(`${response[i].startTimeUtc}`);
+      setEndTime.value.push(`${response[i].endTimeUtc}`);
+      selectedtrialNum.value = i + 1;
+      trialrun.value.push(`항차 ${i + 1}번`);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+onMounted(getTrialDate);
+
+watch(selectedtrialrun, (newVal) => {
+  if(newVal == "직접 선택"){
+    date_readonly.value = false;
+  }
+  else{
+    date_readonly.value = true;
+  }
+});
+
+// ---------------------------- Test CardView --------------------------------//
+const selectedTest = ref([]);
+const dialogVisible = ref(false);
+
+const layers = {
+  red: { polyline: null, markers: [] },
+  yellow: { polyline: null, markers: [] },
+  blue: { polyline: null, markers: [] },
+  green: { polyline: null, markers: [] },
+  black: { polyline: null, markers: [] },
+  brown: { polyline: null, markers: [] },
+};
+
+const aisData = {
+  red: [
+    [35.29, 130.1],
+    [35.19, 129.96],
+    [35.29, 129.76],
+    [35.19, 129.66],
+    [35.29, 129.26],
+  ],
+  yellow: [
+    [35.19, 130.1],
+    [35.09, 129.96],
+    [35.19, 129.76],
+    [35.09, 129.66],
+    [35.19, 129.26],
+  ],
+  blue: [
+    [35.39, 130.1],
+    [35.29, 129.96],
+    [35.39, 129.76],
+    [35.29, 129.66],
+    [35.39, 129.26],
+  ],
+  green: [
+    [35.49, 130.1],
+    [35.39, 129.96],
+    [35.49, 129.76],
+    [35.39, 129.66],
+    [35.49, 129.26],
+  ],
+  black: [
+    [35.59, 130.1],
+    [35.49, 129.96],
+    [35.59, 129.76],
+    [35.49, 129.66],
+    [35.59, 129.26],
+  ],
+  brown: [
+    [35.69, 130.1],
+    [35.59, 129.96],
+    [35.69, 129.76],
+    [35.59, 129.66],
+    [35.69, 129.26],
+  ],
+};
 
 let map = null;
-const ais1 = ref([
-  [35.29, 130.10],
-  [35.19, 129.96],
-  [35.29, 129.76],
-  [35.19, 129.66],
-  [35.29, 129.26],
-]);
 
-const ais2 = ref([
-  [35.19, 130.10],
-  [35.09, 129.96],
-  [35.19, 129.76],
-  [35.09, 129.66],
-  [35.19, 129.26],
-]);
+watch(selectedTest, (newVal) => {
+  if (newVal.length > 5) {
+    selectedTest.value.pop(); // 가장 마지막에 추가된 항목 제거
+    alert("최대 5개까지 선택할 수 있습니다.");
+  }
 
-const ais3 = ref([
-  [35.39, 130.10],
-  [35.29, 129.96],
-  [35.39, 129.76],
-  [35.29, 129.66],
-  [35.39, 129.26],
-]);
+  if (map) {
+    Object.keys(layers).forEach((color) => {
+      const layer = layers[color];
+      if (newVal.includes(color)) {
+        if (!layer.polyline) {
+          layer.polyline = L.polyline(aisData[color], {
+            color: color,
+            weight: 2,
+            dashArray: color === "blue" || color === "green" ? "5, 5" : "1",
+          }).addTo(map);
+        }
+        if (layer.markers.length === 0) {
+          const iconUrl = `/image/marker-icon-${color}.png`;
+          const icon = new L.Icon({
+            iconUrl: iconUrl,
+            iconSize: [17, 28],
+            iconAnchor: [9, 28],
+            popupAnchor: [1, -34],
+          });
+          aisData[color].forEach((coords) => {
+            const marker = L.marker(coords, { icon: icon }).bindPopup(
+              `waypoint: ${coords}`
+            );
+            marker.addTo(map);
+            layer.markers.push(marker);
+          });
+        }
+      } else {
+        if (layer.polyline) {
+          map.removeLayer(layer.polyline);
+          layer.polyline = null;
+        }
+        layer.markers.forEach((marker) => {
+          map.removeLayer(marker);
+        });
+        layer.markers = [];
+      }
+    });
+  }
 
-const ais4 = ref([
-  [35.49, 130.10],
-  [35.39, 129.96],
-  [35.49, 129.76],
-  [35.39, 129.66],
-  [35.49, 129.26],
-]);
 
-const ais5 = ref([
-  [35.59, 130.10],
-  [35.49, 129.96],
-  [35.59, 129.76],
-  [35.49, 129.66],
-  [35.59, 129.26],
-]);
+});
 
-const ais6 = ref([
-  [35.69, 130.10],
-  [35.59, 129.96],
-  [35.69, 129.76],
-  [35.59, 129.66],
-  [35.69, 129.26],
-]);
+// ---------------------------- Map View --------------------------------//
+
 
 onMounted(() => {
   // 지도 초기화
@@ -73,116 +329,37 @@ onMounted(() => {
     popupAnchor: [0, -18],
   });
 
-  L.polyline(ais1.value, { color: "red", weight: 2, dashArray: "1" }).addTo(
-    map
-  );
-  L.polyline(ais2.value, { color: "yellow", weight: 2, dashArray: "1" }).addTo(
-    map
-  );
-  L.polyline(ais3.value, { color: "blue", weight: 2, dashArray: "5, 5" }).addTo(
-    map
-  );
-  L.polyline(ais4.value, {
-    color: "green",
-    weight: 2,
-    dashArray: "5, 5",
-  }).addTo(map);
-  L.polyline(ais5.value, {
-    color: "black",
-    weight: 2,
-    dashArray: "25, 5, 2, 5",
-  }).addTo(map);
-  L.polyline(ais6.value, {
-    color: "brown",
-    weight: 2,
-    dashArray: "25, 5, 2, 5",
-  }).addTo(map);
-
-  const redIcon = new L.Icon({
-    iconUrl: "/image/marker-icon-red.png",
-    iconSize: [17, 28],
-    iconAnchor: [9, 28],
-    popupAnchor: [1, -34],
-  });
-
-  const greenIcon = new L.Icon({
-    iconUrl: "/image/marker-icon-green.png",
-    iconSize: [17, 28],
-    iconAnchor: [9, 28],
-    popupAnchor: [1, -34],
-  });
-
-  const blueIcon = new L.Icon({
-    iconUrl: "/image/marker-icon-blue.png",
-    iconSize: [17, 28],
-    iconAnchor: [9, 28],
-    popupAnchor: [1, -34],
-  });
-
-  const yellowIcon = new L.Icon({
-    iconUrl: "/image/marker-icon-gold.png",
-    iconSize: [17, 28],
-    iconAnchor: [9, 28],
-    popupAnchor: [1, -34],
-  });
-
-  const blackIcon = new L.Icon({
-    iconUrl: "/image/marker-icon-black.png",
-    iconSize: [17, 28],
-    iconAnchor: [9, 28],
-    popupAnchor: [1, -34],
-  });
-
-  const orangeIcon = new L.Icon({
-    iconUrl: "/image/marker-icon-orange.png",
-    iconSize: [17, 28],
-    iconAnchor: [9, 28],
-    popupAnchor: [1, -34],
-  });
-
-  for (let i = 0; i < ais1.value.length; i++) {
-    L.marker(ais1.value[i], { icon: redIcon })
-      .addTo(map)
-      .bindPopup(`waypoint: ${ais1.value[i]}`);
-  }
-
-  for (let i = 0; i < ais2.value.length; i++) {
-    L.marker(ais2.value[i], { icon: yellowIcon })
-      .addTo(map)
-      .bindPopup(`waypoint: ${ais2.value[i]}`);
-  }
-
-  for (let i = 0; i < ais3.value.length; i++) {
-    L.marker(ais3.value[i], { icon: blueIcon })
-      .addTo(map)
-      .bindPopup(`waypoint: ${ais3.value[i]}`);
-  }
-
-  for (let i = 0; i < ais4.value.length; i++) {
-    L.marker(ais4.value[i], { icon: greenIcon })
-      .addTo(map)
-      .bindPopup(`waypoint: ${ais4.value[i]}`);
-  }
-
-  for (let i = 0; i < ais5.value.length; i++) {
-    L.marker(ais5.value[i], { icon: blackIcon })
-      .addTo(map)
-      .bindPopup(`waypoint: ${ais5.value[i]}`);
-  }
-
-  for (let i = 0; i < ais6.value.length; i++) {
-    L.marker(ais6.value[i], { icon: orangeIcon })
-      .addTo(map)
-      .bindPopup(`waypoint: ${ais6.value[i]}`);
-  }
-
-  
-    L.marker([35.27678, 129.315888], { icon: shipIcon })
+  L.marker([35.27678, 129.315888], { icon: shipIcon })
     .addTo(map)
     .bindPopup("Realtime Location.")
     .openPopup();
-
 });
+
+const startDrag = (event, cardName) => {
+  let card;
+  if (cardName === "searchCard") card = searchCard;
+  else if (cardName === "testCard") card = testCard;
+
+  const cardElement = card.value.$el;
+  const initialX = event.clientX;
+  const initialY = event.clientY;
+  const rect = cardElement.getBoundingClientRect();
+  const offsetX = initialX - rect.left + 60;
+  const offsetY = initialY - rect.top + 65;
+
+  const onMouseMove = (moveEvent) => {
+    cardElement.style.left = `${moveEvent.clientX - offsetX}px`;
+    cardElement.style.top = `${moveEvent.clientY - offsetY}px`;
+  };
+
+  const onMouseUp = () => {
+    document.removeEventListener("mousemove", onMouseMove);
+    document.removeEventListener("mouseup", onMouseUp);
+  };
+
+  document.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mouseup", onMouseUp);
+};
 </script>
 
 <style scoped>
@@ -197,5 +374,13 @@ onMounted(() => {
   width: 100%;
   height: 100%;
   border-radius: 50%;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  height: 100%;
 }
 </style>

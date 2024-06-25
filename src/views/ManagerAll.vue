@@ -80,43 +80,14 @@ import VoyageManage from "../components/Manage/VoyageManage";
 import UserSetting from "../components/Manage/UserSetting";
 import LogViewing from "../components/Manage/LogViewing";
 import UserPermission from "../components/Manage/UserPermission";
-import {
-  darkbackcolor,
-  whitebackcolor,
-  darkbtn,
-  lightbtn,
-  darkselectedTabText,
-  darkNoNselectedTabTextAdmin,
-  lightselectedTabText,
-  lightNoNselectedTabTextAdmin
-} from "../color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
 
 onMounted(() => {
   sessionStorage.setItem("page", "관리자 설정");
 });
 
 // 다크모드
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
-
-const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
-});
-
-const themeColor = ref(
-  themeMode.value === "light" ? whitebackcolor : darkbackcolor
-);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
-
-
-const themeSelectedTabTextColor = ref(
-  themeMode.value === "light" ? lightselectedTabText : darkselectedTabText
-);
-const themeNoNSelectedTabTextColor = ref(
-  themeMode.value === "light" ? lightNoNselectedTabTextAdmin : darkNoNselectedTabTextAdmin
-);
+const { btnColor, textColor, themeColor, tableStyle } = themeConfig;
 
 const overlay = ref(false);
 const tab = ref(Number(sessionStorage.getItem("admintab")) || null);

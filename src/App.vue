@@ -277,27 +277,11 @@ import { ref, watch } from "vue";
 import axios from "axios";
 import Dashboard from "../src/views/MainDashBoard.vue";
 import { checkLogin, createMineData, readMineData } from "./api/index.js";
-import {
-  darkbackcolor,
-  whitebackcolor,
-  darkbtn,
-  lightbtn,
-} from "./color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
+import { userStateStore } from './stores/modules/userState.js';
 
-sessionStorage.setItem("downloading", false);
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
-
-const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
-});
-
-const themeColor = ref(
-  themeMode.value === "light" ? whitebackcolor : darkbackcolor
-);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
+const state = userStateStore();
+const { btnColor, themeColor } = themeConfig;
 
 const visible = ref(false);
 const decodedTokenData = ref(null);
@@ -376,14 +360,15 @@ watch(checkboxA, (newValue, oldValue) => {
 
 // 회원 가입 관리
 const showSignup = ref(
-  sessionStorage.getItem("showSignup") === "true" || false
+  false
 );
 
 const movesignup = () => {
   userid.value = "";
   password.value = "";
   showSignup.value = true;
-  sessionStorage.setItem("showSignup", showSignup.value.toString());
+  // sessionStorage.setItem("showSignup", showSignup.value.toString());
+
 };
 
 const ruleCheck = () => {
@@ -455,7 +440,7 @@ const signupBtn = async () => {
         checkbox5.value = false;
         checkbox6.value = false;
         checkbox7.value = false;
-        sessionStorage.setItem("showSignup", showSignup.value.toString());
+        // sessionStorage.setItem("showSignup", showSignup.value.toString());
 
         newid.value = "";
         newpassword.value = "";
@@ -482,7 +467,7 @@ const signfinish = () => {
   newaffiliation.value = "";
   newphone.value = "";
   showSignup.value = false;
-  sessionStorage.setItem("showSignup", showSignup.value.toString());
+  // sessionStorage.setItem("showSignup", showSignup.value.toString());
 };
 
 // Rules
@@ -571,7 +556,10 @@ const login = async () => {
 
   try {
     // 로그인 요청
-    const response = await checkLogin(data);
+    // const response = await checkLogin(data);
+
+    const response = await state.login(data);
+    console.log(response);
 
     sessionStorage.setItem("token", response);
 
@@ -595,6 +583,9 @@ const login = async () => {
     // ...
     const userName = userDataResponse.userName;
     const userGroup = userDataResponse.userGroup;
+
+    state.setUserInfo(id, userName, userGroup, true);
+    console.log("확인" + state.token, state.id, state.userid, state.isAdmin, state.showDashboard);
     sessionStorage.setItem("id", id);
     sessionStorage.setItem("userid", userName);
     sessionStorage.setItem("isAdmin", userGroup);
@@ -656,6 +647,7 @@ const logout = () => {
   sessionStorage.setItem("showDashboard", showDashboard.value.toString());
   sessionStorage.setItem("userid", userid.value);
   sessionStorage.setItem("isAdmin", userid.value);
+  state.setUserInfo("", "", "GUEST", "false")
 };
 </script>
 

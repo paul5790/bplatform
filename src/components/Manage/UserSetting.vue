@@ -235,27 +235,11 @@ import {
   updateUserData,
   resetPassword
 } from "../../api/index.js";
-import {
-  darkbackcolor,
-  whitebackcolor,
-  darkbtn,
-  lightbtn,
-} from "../../color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
 
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
+const { btnColor, themeColor } = themeConfig;
 const userId = ref(sessionStorage.getItem("id") || "");
 
-const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
-});
-
-const themeColor = ref(
-  themeMode.value === "light" ? whitebackcolor : darkbackcolor
-);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
 const dialog = ref(false);
 const dialog2 = ref(false);
 const page = ref(1);

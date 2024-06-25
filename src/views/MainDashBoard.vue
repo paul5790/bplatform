@@ -180,12 +180,14 @@ import {
   onBeforeUnmount,
 } from "vue";
 import { useRoute } from "vue-router";
+
 const drawer = ref(true);
 const iconshow = ref(true);
 const emits = defineEmits(["logout"]);
 const logoutDialog = ref(false);
 const privacyDialog = ref(false);
 const selected_item = ref(sessionStorage.getItem("page") || "대시보드");
+
 
 const getSelectedMenuItemFromURL = () => {
   return useRoute().name;

@@ -13,7 +13,9 @@ import {
 } from "echarts/components";
 import VChart, { THEME_KEY } from "vue-echarts";
 import { ref, provide, onMounted, defineProps, watch } from "vue";
-import { darkText, lightText } from "../../color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
+
+const { textColor } = themeConfig;
 
 const props = defineProps({
   starport: String,
@@ -30,12 +32,7 @@ use([
 
 provide(THEME_KEY);
 
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
 
-const textColor = ref(themeMode.value === "light" ? lightText : darkText);
-watch(themeMode, (newValue) => {
-  textColor.value = newValue === "light" ? lightText : darkText;
-});
 
 const option = ref({
   title: {

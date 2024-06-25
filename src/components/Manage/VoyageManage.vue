@@ -728,29 +728,11 @@ import {
   deleteTrialData,
   readTrialData,
 } from "../../api/index.js";
-import {
-  darkbackcolor,
-  whitebackcolor,
-  darkbtn,
-  lightbtn,
-} from "../../color/color.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
 
+const { btnColor, themeColor } = themeConfig;
 // loaddialog
 const loadDialog = ref(false);
-
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
-
-const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
-});
-
-const themeColor = ref(
-  themeMode.value === "light" ? whitebackcolor : darkbackcolor
-);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
 
 // 데이트 피커 제한
 const currentDate = new Date();

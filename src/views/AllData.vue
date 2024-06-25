@@ -301,7 +301,7 @@
 
         <v-btn
           :loading="downloadBtnLoading"
-          :color="textColor"
+          :color="btnTextColor"
           :style="{
             'background-color': btnColor,
             'margin-top': '0px',
@@ -359,62 +359,21 @@ import {
   cancelDownload,
 } from "../api/index.js";
 import JSZip from "jszip";
-import {
-  darkbackcolor,
-  whitebackcolor,
-  darkselectedTab,
-  darkNonSelectedTab,
-  darkselectedTabText,
-  darkNoNselectedTabText,
-  lightselectedTab,
-  lightNonSelectedTab,
-  lightselectedTabText,
-  lightNoNselectedTabText,
-  darkbtn,
-  lightbtn,
-  darkbtnText,
-  lightbtnText,
-} from "../color/color.js";
 
-// 다크모드
-const themeMode = ref(localStorage.getItem("themeMode") || "light");
+import { themeMode, themeConfig } from "@/utils/theme.js";
+import "@/styles/datepicker-theme.css";
 
-const btnColor = ref(themeMode.value === "light" ? lightbtn : darkbtn);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? lightbtn : darkbtn;
-});
-
-const textColor = ref(themeMode.value === "light" ? lightbtnText : darkbtnText);
-const themeColor = ref(
-  themeMode.value === "light" ? whitebackcolor : darkbackcolor
-);
-const themeSelectedTabColor = ref(
-  themeMode.value === "light" ? lightselectedTab : darkselectedTab
-);
-const themeNoNSelectedTabColor = ref(
-  themeMode.value === "light" ? lightNonSelectedTab : darkNonSelectedTab
-);
-const themeSelectedTabTextColor = ref(
-  themeMode.value === "light" ? lightselectedTabText : darkselectedTabText
-);
-const themeNoNSelectedTabTextColor = ref(
-  themeMode.value === "light" ? lightNoNselectedTabText : darkNoNselectedTabText
-);
-watch(themeMode, (newValue) => {
-  themeColor.value = newValue === "light" ? whitebackcolor : darkbackcolor;
-});
-
-const tableStyle = computed(() => {
-  const imageUrl = themeMode.value === "light" ? '/image/kriso_kren_n.png' : '/image/kriso_kren_d.png';
-  return {
-    paddingTop: '5px',
-    paddingBottom: '10px',
-    backgroundImage: `url(${imageUrl})`,
-    backgroundSize: 'auto 60%',
-    backgroundPosition: 'center 30%',
-    backgroundRepeat: 'no-repeat'
-  };
-});
+const {
+  btnColor,
+  textColor,
+  themeColor,
+  btnTextColor,
+  themeSelectedTabColor,
+  themeNoNSelectedTabColor,
+  themeSelectedTabTextColor,
+  themeNoNSelectedTabTextColor,
+  tableStyle
+} = themeConfig;
 
 const tab = ref(0);
 
@@ -693,7 +652,6 @@ const dataDownloadServer = async () => {
     canceling.value = false;
     // downloadDialog.value = true;
     downloadBtnLoading.value = true;
-    sessionStorage.setItem("downloading", true);
     //searchStart
     console.log(searchStart.value);
     console.log(startTime.value);
@@ -718,7 +676,6 @@ const dataDownloadServer = async () => {
     console.log("setData = " + setData.signals);
     const loadData = await downloadDataFile(tokenid.value, setData);
 
-    sessionStorage.setItem("downloading", false);
     downloadBtnLoading.value = false;
     // 다운로드할 파일 이름 추출
     const contentDispositionHeader = loadData.headers["content-disposition"];
@@ -3153,64 +3110,6 @@ select {
 select:hover,
 select:focus {
   border-color: #007bff;
-}
-
-.dp__theme_dark {
-  --dp-background-color: #424242;
-  --dp-text-color: #fff;
-  --dp-hover-color: #484848;
-  --dp-hover-text-color: #fff;
-  --dp-hover-icon-color: #959595;
-  --dp-primary-color: #005cb2;
-  --dp-primary-disabled-color: #61a8ea;
-  --dp-primary-text-color: #fff;
-  --dp-secondary-color: #a9a9a9;
-  --dp-border-color: #999;
-  --dp-menu-border-color: #2d2d2d;
-  --dp-border-color-hover: #aaaeb7;
-  --dp-disabled-color: #737373;
-  --dp-disabled-color-text: #d0d0d0;
-  --dp-scroll-bar-background: #212121;
-  --dp-scroll-bar-color: #484848;
-  --dp-success-color: #00701a;
-  --dp-success-color-disabled: #428f59;
-  --dp-icon-color: #959595;
-  --dp-danger-color: #e53935;
-  --dp-marker-color: #e53935;
-  --dp-tooltip-color: #3e3e3e;
-  --dp-highlight-color: rgb(0 92 178 / 20%);
-  --dp-range-between-dates-background-color: var(--dp-hover-color, #484848);
-  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #fff);
-  --dp-range-between-border-color: var(--dp-hover-color, #fff);
-}
-
-.dp__theme_light {
-  --dp-background-color: #fff;
-  --dp-text-color: #212121;
-  --dp-hover-color: #f3f3f3;
-  --dp-hover-text-color: #212121;
-  --dp-hover-icon-color: #959595;
-  --dp-primary-color: #1976d2;
-  --dp-primary-disabled-color: #6bacea;
-  --dp-primary-text-color: #f8f5f5;
-  --dp-secondary-color: #c0c4cc;
-  --dp-border-color: #ddd;
-  --dp-menu-border-color: #ddd;
-  --dp-border-color-hover: #aaaeb7;
-  --dp-disabled-color: #f6f6f6;
-  --dp-scroll-bar-background: #f3f3f3;
-  --dp-scroll-bar-color: #959595;
-  --dp-success-color: #76d275;
-  --dp-success-color-disabled: #a3d9b1;
-  --dp-icon-color: #959595;
-  --dp-danger-color: #ff6f60;
-  --dp-marker-color: #ff6f60;
-  --dp-tooltip-color: #fafafa;
-  --dp-disabled-color-text: #8e8e8e;
-  --dp-highlight-color: rgb(25 118 210 / 10%);
-  --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
-  --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
-  --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
 }
 
 .auto-width {
