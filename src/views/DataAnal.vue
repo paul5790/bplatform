@@ -1,0 +1,1167 @@
+<template>
+  <v-card
+    height="93vh"
+    :style="{ backgroundColor: themeColor }"
+    class="pa-1 d-flex justify-center align-center"
+  >
+    <v-row>
+      <v-col cols="9">
+        <v-row>
+          <v-col cols="12" no-gutters style="padding: 3px">
+            <v-sheet
+              v-if="nodata"
+              :elevation="elevation"
+              :style="{
+                height: '75vh',
+                padding: '30px',
+                paddingBottom: '0px',
+                paddingRight: '0',
+                display: 'flex',
+                backgroundColor: themeColor,
+              }"
+            >
+              <v-card style="flex: 1">
+                <v-card-title>
+                  <span class="text-h6">{{ selectedcontentsItem }}</span>
+                </v-card-title>
+                <v-card-item>
+                  <v-sheet v-if="!loading">
+                    <v-sheet v-if="first"> </v-sheet>
+                    <v-sheet
+                      v-if="!first"
+                      :elevation="elevation"
+                      :style="{
+                        height: '67vh',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }"
+                    >
+                      <p
+                        style="
+                          margin-top: 10px;
+                          font-weight: 400;
+                          font-size: 18px;
+                        "
+                      >
+                        no-data
+                      </p>
+                    </v-sheet>
+                  </v-sheet>
+                  <v-sheet
+                    v-if="loading"
+                    :elevation="elevation"
+                    :style="{
+                      height: '67vh',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }"
+                  >
+                    <v-progress-circular
+                      :size="50"
+                      color="primary"
+                      indeterminate
+                    ></v-progress-circular>
+                    <p
+                      style="
+                        margin-top: 10px;
+                        font-weight: 400;
+                        font-size: 18px;
+                      "
+                    >
+                      loading
+                    </p>
+                  </v-sheet>
+                </v-card-item>
+              </v-card>
+            </v-sheet>
+            <v-sheet
+              v-if="!nodata"
+              :style="{
+                height: '75vh',
+                padding: '30px',
+                paddingBottom: '0',
+                paddingRight: '0',
+                display: 'flex',
+                backgroundColor: themeColor,
+              }"
+            >
+              <v-card style="flex: 1">
+                <v-card-item id="graph" :style="tableStyle">
+                  <v-card-title>
+                    <span class="text-h6"
+                      >{{ selectedcontentsItem }} contents</span
+                    >
+                  </v-card-title>
+                  <v-chart
+                    ref="chart"
+                    class="chart"
+                    :option="option"
+                    autoresize
+                  />
+                </v-card-item>
+              </v-card>
+            </v-sheet>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12" no-gutters style="padding: 3px">
+            <v-sheet
+              :style="{
+                height: '20vh',
+                padding: '30px',
+                paddingTop: '10px',
+                paddingRight: '0',
+                display: 'flex',
+                backgroundColor: themeColor,
+              }"
+            >
+              <v-card style="flex: 1">
+                <v-card-item>
+                  <v-data-table-virtual
+                    style=""
+                    :headers="headers"
+                    :items="analysis"
+                  >
+                  </v-data-table-virtual>
+                </v-card-item>
+              </v-card>
+            </v-sheet>
+          </v-col>
+        </v-row>
+      </v-col>
+
+      <v-col cols="3">
+        <v-row>
+          <v-col cols="12" no-gutters style="padding: 3px">
+            <v-sheet
+              :style="{
+                height: '93vh',
+                padding: '30px',
+                paddingBottom: '5px',
+                paddingLeft: '10px',
+                display: 'flex',
+                backgroundColor: themeColor,
+                position: 'relative',
+              }"
+            >
+              <v-card style="flex: 1">
+                <v-card-item>
+                  <div>
+                    <v-select
+                      v-model="selectedsubComponent"
+                      :items="subComponents"
+                      label="SubComponents"
+                      variant="outlined"
+                      class="custom-select"
+                      style="margin-top: 3vh"
+                      multiple
+                    ></v-select>
+
+                    <v-select
+                      v-model="selectedItem"
+                      :items="items"
+                      label="Items"
+                      variant="outlined"
+                      class="custom-select"
+                      multiple
+                    ></v-select>
+
+                    <v-select
+                      v-model="selectedtrialrun"
+                      :items="trialrun"
+                      label="Period / Test Number"
+                      variant="outlined"
+                      class="custom-select"
+                    ></v-select>
+
+                    <VueDatePicker
+                      :class="
+                        themeMode === 'dark'
+                          ? 'dp__theme_dark'
+                          : 'dp__theme_light'
+                      "
+                      style="--dp-input-padding: 15px"
+                      v-model="dateRange"
+                      range
+                      :dark="themeMode === 'dark'"
+                      :readonly="date_readonly"
+                    />
+                    <p style="font-size: 12px; font-weight: bold">
+                      &nbsp;&nbsp;* 날짜 검색은 한국 표준시를 기준으로 작성하며,
+                      &nbsp;&nbsp;
+                    </p>
+                    <p style="font-size: 12px; font-weight: bold">
+                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로 보여짐
+                    </p>
+                    <v-btn
+                      style="margin-top: 10px"
+                      width="500px"
+                      :color="btnColor"
+                      @click="searchData()"
+                    >
+                      조회하기
+                    </v-btn>
+                    <v-btn
+                      style="
+                        position: absolute;
+                        bottom: 10px;
+                        left: 10px;
+                        width: calc(100% - 20px);
+                      "
+                      height="40px"
+                      width="500px"
+                      :color="btnColor"
+                      @click="captureImage()"
+                    >
+                      그래프 캡쳐하기
+                    </v-btn>
+                  </div>
+                  <p style="margin-top: 38vh"></p>
+                </v-card-item>
+              </v-card>
+            </v-sheet>
+          </v-col>
+        </v-row>
+      </v-col>
+    </v-row>
+  </v-card>
+</template>
+
+<script setup>
+import { ref, provide, onMounted, watch, watchEffect } from "vue";
+import { use } from "echarts/core";
+import { CanvasRenderer } from "echarts/renderers";
+import { LineChart } from "echarts/charts";
+import { UniversalTransition } from "echarts/features";
+import { themeMode, themeConfig } from "@/utils/theme.js";
+import { readTrialData } from "../api/index.js";
+import "@/styles/datepicker-theme.css";
+import {
+  DatasetComponent,
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  TransformComponent,
+  ToolboxComponent,
+  LegendComponent,
+  DataZoomComponent,
+  MarkLineComponent,
+  MarkPointComponent,
+} from "echarts/components";
+import VChart, { THEME_KEY } from "vue-echarts";
+use([
+  DatasetComponent,
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  TransformComponent,
+  MarkLineComponent,
+  MarkPointComponent,
+  ToolboxComponent,
+  LegendComponent,
+  LineChart,
+  CanvasRenderer,
+  UniversalTransition,
+  DataZoomComponent,
+]);
+provide(THEME_KEY);
+
+// =================================================== 셋업 ===================================================
+// 다크모드
+const { btnColor, textColor, themeColor, tableStyle } = themeConfig;
+const tokenid = ref(sessionStorage.getItem("token") || "");
+
+onMounted(() => {
+  sessionStorage.setItem("page", "데이터 분석");
+});
+// 검색관련 변수
+const searchType = ref("N/A");
+
+// // 화면 로딩 변수
+// const nodata = ref(true);
+// const loading = ref(false);
+// const first = ref(true);
+
+// =================================================== 신호 선택 ===================================================
+const subComponents = ref([
+  "DGPS",
+  "GYRO",
+  "ANEMOMETER",
+  "SPEEDLOG",
+  "AUTOPILOT",
+  "NO.1ENGINEPANEL",
+  "NO.2ENGINEPANEL",
+]);
+const items = ref([]);
+const selectedsubComponent = ref([]); // 선택된 구성 요소
+const selectedItem = ref([]); // 선택된 구성 요소
+const chartInstance = ref(null);
+
+watchEffect(() => {
+  items.value = []; // 기존 items 초기화
+  selectedItem.value = null;
+  if (selectedsubComponent.value) {
+    // null 체크 추가
+    if (selectedsubComponent.value.includes("DGPS")) {
+      items.value.push(
+        "latitude",
+        "longitude",
+        "altitude",
+        "speedovergroundknots",
+        "courseovergrounddegreestrue"
+      );
+    }
+    if (selectedsubComponent.value.includes("GYRO")) {
+      items.value.push("heading", "rateofturn");
+    }
+    if (selectedsubComponent.value.includes("ANEMOMETER")) {
+      items.value.push("anemometerangle", "anemometerspeed");
+    }
+    if (selectedsubComponent.value.includes("SPEEDLOG")) {
+      items.value.push("speedn");
+    }
+    if (selectedsubComponent.value.includes("AUTOPILOT")) {
+      items.value.push("starboardruddersensor", "portruddersensor");
+    }
+    if (selectedsubComponent.value.includes("NO.1ENGINEPANEL")) {
+      items.value.push(
+        "1_Engine Speed",
+        "1_Engine Oil Temperature",
+        "1_Engine Oil Pressure",
+        "1_Engine Coolant Level",
+        "1_Transmission Oil Pressure",
+        "1_Charging System Potential",
+        "1_Battery Potential",
+        "1_Engine total hours",
+        "1_Engine Intake Manifold Pressure",
+        "1_Engine Intake Manifold Temp",
+        "1_Engine Exhaust Gas Temperature",
+        "1_fuel_LEVEL"
+      );
+    }
+    if (selectedsubComponent.value.includes("NO.2ENGINEPANEL")) {
+      items.value.push(
+        "2_Engine Speed",
+        "2_Engine Oil Temperature",
+        "2_Engine Oil Pressure",
+        "2_Engine Coolant Level",
+        "2_Transmission Oil Pressure",
+        "2_Charging System Potential",
+        "2_Battery Potential",
+        "2_Engine total hours",
+        "2_Engine Intake Manifold Pressure",
+        "2_Engine Intake Manifold Temp",
+        "2_Engine Exhaust Gas Temperature",
+        "2_fuel_LEVEL"
+      );
+    }
+  }
+});
+
+watch(selectedItem, (newVal) => {
+  if (newVal.length > 5) {
+    selectedItem.value.pop(); // 가장 마지막에 추가된 항목 제거
+    alert("최대 5개까지 선택할 수 있습니다.");
+  }
+});
+
+// =============================== 항차 및 날짜 선택 ===========================================
+// trial
+const trialrun = ref(["직접 선택"]);
+const selectedtrialrun = ref(null);
+const selectedtrialNum = ref();
+
+// 항차의 시작, 끝 기간을 미리 정의하여 저장
+const setStartTime = ref([]);
+const setEndTime = ref([]);
+
+// axios에 쓰일 지정 기간
+const startDate = ref(); // 반응적인(ref) 변수로 선언
+const endDate = ref(); // 반응적인(ref) 변수로 선언
+
+// date Picker
+const date_readonly = ref(true);
+const dateRange = ref([]);
+
+const getTrialDate = async () => {
+  try {
+    const response = await readTrialData(tokenid.value);
+    for (let i = 0; i < response.length; i++) {
+      setStartTime.value.push(`${response[i].startTimeUtc}`);
+      setEndTime.value.push(`${response[i].endTimeUtc}`);
+      selectedtrialNum.value = i + 1;
+      trialrun.value.push(`항차 ${i + 1}번`);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+onMounted(getTrialDate);
+
+watch(selectedtrialrun, (newVal) => {
+  if (newVal == "직접 선택") {
+    date_readonly.value = false;
+    searchType.value = "period";
+    updateDate();
+  } else {
+    const index = trialrun.value.indexOf(selectedtrialrun.value);
+    date_readonly.value = true;
+    searchType.value = "seatrial";
+
+    startDate.value = setStartTime.value[index - 1];
+    endDate.value = setEndTime.value[index - 1];
+
+    let start = new Date(startDate.value);
+    let end = new Date(endDate.value);
+
+    // 시간 범위 설정
+    dateRange.value = [start, end];
+  }
+  console.log(`period : start =  ${startDate.value}, end = ${endDate.value}`);
+});
+
+const updateDate = () => {
+  let start = new Date(dateRange.value[0]);
+  let end = new Date(dateRange.value[1]);
+
+  if (!isNaN(start) && !isNaN(end)) {
+    // 유효한 날짜인 경우에만 ISO 문자열로 변환
+    startDate.value = start.toISOString();
+    endDate.value = end.toISOString();
+  } else {
+    console.error("Invalid date values in dateRange.value");
+  }
+};
+
+// =============================== 통계 테이블 신호 ===========================================
+// 데이터 테이블 헤더
+const headers = ref([
+  {
+    title: "신호",
+    align: "start",
+    key: "name",
+    sortable: false,
+  },
+  { title: "단위", align: "center", key: "unit", sortable: false },
+  { title: "최솟값", align: "center", key: "min", sortable: false },
+  { title: "최댓값", align: "center", key: "max", sortable: false },
+  { title: "평균값", align: "center", key: "average", sortable: false },
+  { title: "중앙값", align: "center", key: "median", sortable: false },
+  { title: "분산", align: "center", key: "variance", sortable: false },
+  { title: "표준편차", align: "center", key: "rmse", sortable: false },
+  { title: "표준오차", align: "center", key: "error", sortable: false },
+  { title: "RMS", align: "center", key: "rms", sortable: false },
+]);
+
+const analysis = ref([
+  {
+    name: "signal",
+    unit: "unit",
+    min: "-",
+    max: "-",
+    average: "-",
+    rmse: "-",
+    rms: "-",
+    variance: "-",
+    error: "-",
+    median: "-",
+  },
+]);
+const unit = ref();
+
+// =============================== 차트 변수 ===========================================
+
+const chart = ref(null);
+
+// 랜덤 데이터 생성 함수
+const generateRandomData = (min, max, length) => {
+  const data = [];
+  for (let i = 0; i < length; i++) {
+    data.push(Math.floor(Math.random() * (max - min + 1)) + min);
+  }
+  return data;
+};
+
+const analysisData = ref([]);
+const analysisTime = ref([]);
+
+// 데이터 전체 담기
+const itemsData = {
+  gga: [],
+  vtg: [],
+  hdt: [],
+  rot: [],
+  mwv: [],
+  vhw: [],
+  rsa: [],
+  engine_SPEED: [],
+  engine_OIL_TEMPERATURE1: [],
+  engine_OIL_PRESSURE: [],
+  transmission_OIL_PRESSURE: [],
+  charging_SYSTEM_POTENTIAL: [],
+  engine_TOTAL_HOURS: [],
+  engine_INTAKE_MANIFOLD_NO1_PRESSURE: [],
+  fuel_LEVEL_1: [],
+  engine_SPEED2: [],
+  engine_OIL_TEMPERATURE2: [],
+  engine_OIL_PRESSURE2: [],
+  transmission_OIL_PRESSURE2: [],
+  charging_SYSTEM_POTENTIAL2: [],
+  engine_TOTAL_HOURS2: [],
+  engine_INTAKE_MANIFOLD_NO1_PRESSURE2: [],
+  fuel_LEVEL_2: [],
+};
+
+// 데이터 생성 및 객체에 담기
+const gData = {
+  latitude: generateRandomData(0, 200, 200),
+  longitude: generateRandomData(-10, 50, 200),
+  altitude: generateRandomData(1000, 1100, 200),
+  speedovergroundknots: generateRandomData(0, 40, 200),
+  courseovergrounddegreestrue: generateRandomData(0, 360, 200),
+  heading: generateRandomData(0, 360, 200),
+  rateofturn: generateRandomData(-30, 30, 200),
+  anemometerangle: generateRandomData(0, 360, 200),
+  anemometerspeed: generateRandomData(0, 100, 200),
+  speedn: generateRandomData(0, 40, 200),
+  starboardruddersensor: generateRandomData(-45, 45, 200),
+  portruddersensor: generateRandomData(-45, 45, 200),
+  "1_Engine Speed": generateRandomData(0, 5000, 200),
+  "1_Engine Oil Temperature": generateRandomData(60, 120, 200),
+  "1_Engine Oil Pressure": generateRandomData(10, 100, 200),
+  "1_Engine Coolant Level": generateRandomData(0, 100, 200),
+  "1_Transmission Oil Pressure": generateRandomData(10, 100, 200),
+  "1_Charging System Potential": generateRandomData(12, 14, 200),
+  "1_Battery Potential": generateRandomData(12, 14, 200),
+  "1_Engine total hours": generateRandomData(0, 10000, 200),
+  "1_Engine Intake Manifold Pressure": generateRandomData(0, 30, 200),
+  "1_Engine Intake Manifold Temp": generateRandomData(0, 50, 200),
+  "1_Engine Exhaust Gas Temperature": generateRandomData(0, 700, 200),
+  "1_fuel_LEVEL": generateRandomData(0, 100, 200),
+  "2_Engine Speed": generateRandomData(0, 5000, 200),
+  "2_Engine Oil Temperature": generateRandomData(60, 120, 200),
+  "2_Engine Oil Pressure": generateRandomData(10, 100, 200),
+  "2_Engine Coolant Level": generateRandomData(0, 100, 200),
+  "2_Transmission Oil Pressure": generateRandomData(10, 100, 200),
+  "2_Charging System Potential": generateRandomData(12, 14, 200),
+  "2_Battery Potential": generateRandomData(12, 14, 200),
+  "2_Engine total hours": generateRandomData(0, 10000, 200),
+  "2_Engine Intake Manifold Pressure": generateRandomData(0, 30, 200),
+  "2_Engine Intake Manifold Temp": generateRandomData(0, 50, 200),
+  "2_Engine Exhaust Gas Temperature": generateRandomData(0, 700, 200),
+  "2_fuel_LEVEL": generateRandomData(0, 100, 200),
+};
+
+const option = ref({
+  dataset: [
+    {
+      id: "dataset_raw",
+    },
+  ],
+  // tooltip: {
+  //   formatter: "{a} <br/>{b} : {c} mb",
+  // },
+  tooltip: {
+    trigger: "axis",
+  },
+  legend: {
+    data: selectedsubComponent.value,
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {},
+    },
+  },
+  grid: {
+    top: "13%", // top margin을 15%로 설정
+  },
+  dataZoom: [
+    {
+      type: "slider",
+      xAxisIndex: 0,
+      filterMode: "none",
+      height: "6%", // 높이를 20%로 설정
+      bottom: "2%", // 위치를 아래로 조정
+    },
+    {
+      type: "slider",
+      yAxisIndex: 0,
+      filterMode: "none",
+      width: "2%",
+    },
+    {
+      type: "inside",
+      xAxisIndex: 0,
+      filterMode: "none",
+    },
+    {
+      type: "inside",
+      yAxisIndex: 0,
+      filterMode: "none",
+    },
+    // {
+    //   show: true,
+    //   realtime: true,
+    //   start: 0,
+    //   end: 100,
+    //   xAxisIndex: [0, 1],
+    //   height: "2%",
+    // },
+  ],
+  xAxis: {
+    type: "category",
+    nameLocation: "middle",
+    data: Array.from({ length: 200 }, (_, i) => `Day ${i + 1}`), // x축 데이터를 1~3000일로 설정
+    axisLabel: {
+      color: textColor.value, // 텍스트 색상을 흰색으로 설정
+    },
+  },
+  yAxis: {},
+  series: [],
+});
+
+// =============================== 데이터 검색 및 업데이트 ===========================================
+
+const updateSeries = () => {
+  const series = [];
+
+  // dataMap을 자동으로 생성
+  const dataMap = Object.keys(gData).reduce((map, key) => {
+    map[key] = gData[key];
+    return map;
+  }, {});
+
+  selectedItem.value.forEach((component) => {
+    if (component in dataMap) {
+      series.push({
+        name: component,
+        type: "line",
+        data: dataMap[component],
+        markPoint: {
+          data: [
+            { type: "max", name: "Max" },
+            { type: "min", name: "Min" },
+          ],
+        },
+      });
+    }
+  });
+
+  console.log(series);
+  option.value.series = series;
+
+  option.value.legend = {
+    data: selectedItem.value,
+  };
+};
+
+// 데이터 업데이트
+const axiosData = async () => {};
+
+// 데이터 API 요청
+// const fetchData = async (component, type, trialNum, startDate, endDate) => {
+//   try {
+//     let dataFomat;
+//     if (voyagesearch.value) {
+//       dataFomat = {
+//         "subComponent":component,
+//         "content":type,
+//         "seatrialNumber":trialNum,
+//         "period":["N/A","N/A"]
+//       }
+//       return await readDataTrial(tokenid.value, dataFomat, postType.value);
+//     } else {
+//       console.log(startDate);
+//       console.log(endDate);
+//       dataFomat = {
+//         "subComponent":component,
+//         "content":type,
+//         "seatrialNumber":"N/A",
+//         "period":[startDate,endDate]
+//       }
+//       return await readDataTrial(tokenid.value, dataFomat, postType.value);
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     throw error; // 에러를 호출자에게 전파
+//   }
+// };
+
+//데이터 검색
+const searchData = async () => {
+  // if (
+  //   selectedsubComponent.value !== null &&
+  //   selectedItem.value !== null &&
+  //   selectedtrialrun.value !== null
+  // ) {
+  //   nodata.value = true;
+  //   loading.value = true;
+  //   first.value = false;
+
+  // } else {
+  //   alert("선택항목을 선택해주세요.");
+  // }
+
+  // try {
+  //   analysisData.value = [];
+  //   analysisTime.value = [];
+
+  //   if (selectedItem.value === "위도" || selectedItem.value === "경도") {
+  //     itemsData.gga = await fetchData("DGPS", "GGA", selectedItem.value === "위도" || selectedItem.value === "경도" ? "latitude,longitude" : "altitude", selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+  //   else if (selectedItem.value === "SOG" || selectedItem.value === "COG") {
+  //     itemsData.vtg = await fetchData("DGPS", "VTG", selectedItem.value === "SOG" || selectedItem.value === "COG" ? "speedovergroundknots,courseovergrounddegreestrue" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "Heading") {
+  //     itemsData.hdt = await fetchData("GYRO", "HDT", selectedItem.value === "Heading" ? "heading" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "회전 속도") {
+  //     itemsData.rot = await fetchData("GYRO", "ROT", selectedItem.value === "회전 속도" ? "rateofturn" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "풍향" || selectedItem.value === "풍속") {
+  //     itemsData.mwv = await fetchData("ANEMOMETER", "MWV", selectedItem.value === "풍향" || selectedItem.value === "풍속" ? "anemometerangle,anemometerspeed" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "선박 속도") {
+  //     itemsData.vhw = await fetchData("SPEEDLOG", "VHW", selectedItem.value === "선박 속도" ? "speedn" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "스타보트 센서" || selectedItem.value === "포트 센서") {
+  //     itemsData.rsa = await fetchData("AUTOPILOT", "RSA", selectedItem.value === "스타보트 센서" || selectedItem.value === "포트 센서" ? "starboardruddersensor,portruddersensor" : null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 속도") {
+  //     itemsData.engine_SPEED = await fetchEngineData("no1enginepanel/no1engine_panel_61444", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 오일 온도") {
+  //     itemsData.engine_OIL_TEMPERATURE1 = await fetchEngineData("no1enginepanel/no1engine_panel_65262", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 오일 압력" || selectedItem.value === "엔진1 냉각수 량") {
+  //     itemsData.engine_OIL_PRESSURE = await fetchEngineData("no1enginepanel/no1engine_panel_65263", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 변속기 오일 압력") {
+  //     itemsData.transmission_OIL_PRESSURE = await fetchEngineData("no1enginepanel/no1engine_panel_65272", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 충전 시스템 전압" || selectedItem.value === "엔진1 배터리 전압") {
+  //     itemsData.charging_SYSTEM_POTENTIAL = await fetchEngineData("no1enginepanel/no1engine_panel_65271", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 누적 가동시간") {
+  //     itemsData.engine_TOTAL_HOURS = await fetchEngineData("no1enginepanel/no1engine_panel_65253", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 배기가스 온도" || selectedItem.value === "엔진1 흡입 매니폴드 온도" || selectedItem.value === "엔진1 흡입 매니폴드 압력") {
+  //     itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE = await fetchEngineData("no1enginepanel/no1engine_panel_65270", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진1 연료 량") {
+  //     itemsData.fuel_LEVEL_1 = await fetchEngineData("no1enginepanel/no1engine_panel_65276", "NO1ENGINEPANEL", "NO1ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 속도") {
+  //     itemsData.engine_SPEED2 = await fetchEngineData("no2enginepanel/no2engine_panel_61444", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_61444", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 오일 온도") {
+  //     itemsData.engine_OIL_TEMPERATURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65262", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65262", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 오일 압력" || selectedItem.value === "엔진2 냉각수 량") {
+  //     itemsData.engine_OIL_PRESSURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65263", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65263", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 변속기 오일 압력") {
+  //     itemsData.transmission_OIL_PRESSURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65272", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65272", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 충전 시스템 전압" || selectedItem.value === "엔진2 배터리 전압") {
+  //     itemsData.charging_SYSTEM_POTENTIAL2 = await fetchEngineData("no2enginepanel/no2engine_panel_65271", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65271", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 누적 가동시간") {
+  //     itemsData.engine_TOTAL_HOURS2 = await fetchEngineData("no2enginepanel/no2engine_panel_65253", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65253", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 배기가스 온도" || selectedItem.value === "엔진2 흡입 매니폴드 온도" || selectedItem.value === "엔진2 흡입 매니폴드 압력") {
+  //     itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2 = await fetchEngineData("no2enginepanel/no2engine_panel_65270", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65270", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   else if (selectedItem.value === "엔진2 연료 량") {
+  //     itemsData.fuel_LEVEL_2 = await fetchEngineData("no2enginepanel/no2engine_panel_65276", "NO2ENGINEPANEL", "NO2ENGINE_PANEL_65276", null, selectedtrialNum.value, startDate2.value, endDate2.value)
+  //   }
+
+  //   switch (selectedItem.value) {
+  //     case "위도":
+  //       processData(gga, "timestamp_EQUIPMENT", "latitude", "degree(°)", "gga/latitude", "latitude");
+  //       break;
+  //     case "경도":
+  //       processData(gga, "timestamp_EQUIPMENT", "longitude", "degree(°)", "gga/longitude", "longitude");
+  //       break;
+  //     case "고도":
+  //       processData(gga, "timestamp_EQUIPMENT", "altitude", "M", "gga/altitude", "altitude");
+  //       break;
+  //     case "SOG":
+  //       processData(vtg, "timestamp_EQUIPMENT", "speedovergroundknots", "N", "vtg/speedovergroundknots", "speedovergroundknots");
+  //       break;
+  //     case "COG":
+  //       processData(vtg, "timestamp_EQUIPMENT", "courseovergrounddegreestrue", "degree(°)", "vtg/courseovergrounddegreestrue", "courseovergrounddegreestrue");
+  //       break;
+  //     case "Heading":
+  //       processData(hdt, "timestamp_EQUIPMENT", "heading", "degree(°)", "hdt/heading", "heading");
+  //       break;
+  //     case "회전 속도":
+  //       processData(rot, "timestamp_EQUIPMENT", "rateofturn", "degree/minute", "rot/rateofturn", "rateofturn");
+  //       break;
+  //     case "풍향":
+  //       processData(mwv, "timestamp_EQUIPMENT", "anemometerangle", "degree(°)", "mwv/anemometerangle", "anemometerangle");
+  //       break;
+  //     case "풍속":
+  //       processData(mwv, "timestamp_EQUIPMENT", "anemometerspeed", "m/s", "mwv/anemometerspeed", "anemometerspeed");
+  //       break;
+  //     case "선박 속도":
+  //       processData(vhw, "timestamp_EQUIPMENT", "speedn", "N", "vhw/speedn", "speedn");
+  //       break;
+  //     case "스타보트 센서":
+  //       processData(rsa, "timestamp_EQUIPMENT", "starboardruddersensor", "degree(°)", "rsa/starboardruddersensor", "starboardruddersensor");
+  //       break;
+  //     case "포트 센서":
+  //       processData(rsa, "timestamp_EQUIPMENT", "portruddersensor", "degree(°)", "rsa/portruddersensor", "portruddersensor");
+  //       break;
+
+  //     case "엔진1 속도":
+  //       processData(engine_SPEED, "timestamp_EQUIPMENT", "engine_SPEED", "RPM", "no1engine_panel_61444/Engine Speed", "Engine Speed");
+  //       break;
+  //     case "엔진1 오일 온도":
+  //       processData(engine_OIL_TEMPERATURE1, "timestamp_EQUIPMENT", "engine_OIL_TEMPERATURE1", "°C", "no1engine_panel_65262/Engine Oil Temperature", "Engine Oil Temperature");
+  //       break;
+  //     case "엔진1 오일 압력":
+  //       processData(engine_OIL_PRESSURE, "timestamp_EQUIPMENT", "engine_OIL_PRESSURE", "kPa", "no1engine_panel_65263/Engine Oil Pressure", "Engine Oil Pressure");
+  //       break;
+  //     case "엔진1 냉각수 량":
+  //       processData(engine_OIL_PRESSURE, "timestamp_EQUIPMENT", "engine_COOLANT_LEVEL", "%", "no1engine_panel_65263/Engine Coolant Level", "Engine Coolant Level");
+  //       break;
+  //     case "엔진1 변속기 오일 압력":
+  //       processData(transmission_OIL_PRESSURE, "timestamp_EQUIPMENT", "transmission_OIL_PRESSURE", "kPa", "no1engine_panel_65272/Transmission Oil Pressure", "Transmission Oil Pressure");
+  //       break;
+  //     case "엔진1 충전 시스템 전압":
+  //       processData(charging_SYSTEM_POTENTIAL, "timestamp_EQUIPMENT", "charging_SYSTEM_POTENTIAL", "V", "no1engine_panel_65271/Charging System Potential", "Charging System Potential");
+  //       break;
+  //     case "엔진1 배터리 전압":
+  //       processData(charging_SYSTEM_POTENTIAL, "timestamp_EQUIPMENT", "battery_POTENTIAL", "V", "no1engine_panel_65271/Battery Potential", "Battery Potential");
+  //       break;
+  //     case "엔진1 누적 가동시간":
+  //       processData(engine_TOTAL_HOURS, "timestamp_EQUIPMENT", "engine_TOTAL_HOURS", "hr", "no1engine_panel_65253/Engine total hours", "Engine total hours");
+  //       break;
+  //     case "엔진1 흡입 매니폴드 압력":
+  //       processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_PRESSURE", "kPa", "no1engine_panel_65270/Engine Intake Manifold Pressure", "Engine Intake Manifold Pressure");
+  //       break;
+  //     case "엔진1 흡입 매니폴드 온도":
+  //       processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_TEMP", "°C", "no1engine_panel_65270/Engine Intake Manifold Temp", "Engine Intake Manifold Temp");
+  //       break;
+  //     case "엔진1 배기가스 온도":
+  //       processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_EXHAUST_GAS_TEMPERATURE", "°C", "no1engine_panel_65270/Engine Exhaust Gas Temperature", "Engine Exhaust Gas Temperature");
+  //       break;
+  //     case "엔진1 연료 량":
+  //       processData(fuel_LEVEL_1, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no1engine_panel_65276/Fuel Level", "fuel_LEVEL");
+  //       break;
+
+  //     case "엔진2 속도":
+  //       processData(engine_SPEED2, "timestamp_EQUIPMENT", "engine_SPEED", "RPM", "no2engine_panel_61444/Engine Speed", "Engine Speed");
+  //       break;
+  //     case "엔진2 오일 온도":
+  //       processData(engine_OIL_TEMPERATURE2, "timestamp_EQUIPMENT", "engine_OIL_TEMPERATURE1", "°C", "no2engine_panel_65262/Engine Oil Temperature", "Engine Oil Temperature");
+  //       break;
+  //     case "엔진2 오일 압력":
+  //       processData(engine_OIL_PRESSURE2, "timestamp_EQUIPMENT", "engine_OIL_PRESSURE", "kPa", "no2engine_panel_65263/Engine Oil Pressure", "Engine Oil Pressure");
+  //       break;
+  //     case "엔진2 냉각수 량":
+  //       processData(engine_OIL_PRESSURE2, "timestamp_EQUIPMENT", "engine_COOLANT_LEVEL", "%", "no2engine_panel_65263/Engine Coolant Level", "Engine Coolant Level");
+  //       break;
+  //     case "엔진2 변속기 오일 압력":
+  //       processData(transmission_OIL_PRESSURE2, "timestamp_EQUIPMENT", "transmission_OIL_PRESSURE", "kPa", "no2engine_panel_65272/Transmission Oil Pressure", "Transmission Oil Pressure");
+  //       break;
+  //     case "엔진2 충전 시스템 전압":
+  //       processData(charging_SYSTEM_POTENTIAL2, "timestamp_EQUIPMENT", "charging_SYSTEM_POTENTIAL", "V", "no2engine_panel_65271/Charging System Potential", "Charging System Potential");
+  //       break;
+  //     case "엔진2 배터리 전압":
+  //       processData(charging_SYSTEM_POTENTIAL2, "timestamp_EQUIPMENT", "battery_POTENTIAL", "V", "no2engine_panel_65271/Battery Potential", "Battery Potential");
+  //       break;
+  //     case "엔진2 누적 가동시간":
+  //       processData(engine_TOTAL_HOURS2, "timestamp_EQUIPMENT", "engine_TOTAL_HOURS", "hr", "no2engine_panel_65253/Engine total hours", "Engine total hours");
+  //       break;
+  //     case "엔진2 흡입 매니폴드 압력":
+  //       processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_PRESSURE", "kPa", "no2engine_panel_65270/Engine Intake Manifold Pressure", "Engine Intake Manifold Pressure");
+  //       break;
+  //     case "엔진2 흡입 매니폴드 온도":
+  //       processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_TEMP", "°C", "no2engine_panel_65270/Engine Intake Manifold Temp", "Engine Intake Manifold Temp");
+  //       break;
+  //     case "엔진2 배기가스 온도":
+  //       processData(engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_EXHAUST_GAS_TEMPERATURE", "°C", "no2engine_panel_65270/Engine Exhaust Gas Temperature", "Engine Exhaust Gas Temperature");
+  //       break;
+  //     case "엔진2 연료 량":
+  //       processData(fuel_LEVEL_2, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no2engine_panel_65276/Fuel Level", "fuel_LEVEL");
+  //       break;
+  //   }
+
+  //   ""
+
+  //   const datasetRaw2 = ref([["time", "value"]]);
+  //     datasetRaw2.value = [];
+  //     for (let i = 0; i <= analysisTime.value.length; i++) {
+  //       datasetRaw2.value.push([
+  //         analysisTime.value[i + 1],
+  //         analysisData.value[i],
+  //       ]);
+  //     }
+  //     if (analysisTime.value.length <= 0) {
+  //       console.log("yolololololol~~");
+
+  //       analysis.value[0].min = "-"; // 최댓값
+  //       analysis.value[0].max = "-"; // 평균값
+  //       analysis.value[0].average = "-"; // 표준편차
+  //       analysis.value[0].rmse = "-"; // 제곱평균제곱근
+  //       analysis.value[0].rms = "-"; // 중앙값
+  //       analysis.value[0].median = "-"; // 표준 오차
+  //       analysis.value[0].error = "-"; // 분산
+  //       analysis.value[0].variance = "-";
+
+  //       nodata.value = true;
+  //       loading.value = false;
+  //     } else {
+  //       nodata.value = false;
+  //     }
+
+  //     analysisTime.value.sort((a, b) => {
+  //       // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+  //       const timeA = new Date(a);
+  //       const timeB = new Date(b);
+  //       return timeA - timeB;
+  //     });
+
+  //     datasetRaw2.value.sort((a, b) => {
+  //       // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+  //       const timeA = new Date(a[0]);
+  //       const timeB = new Date(b[0]);
+  //       return timeA - timeB;
+  //     });
+
+  //     option.value = {
+  //       dataset: [
+  //         {
+  //           id: "dataset_raw",
+  //           source: datasetRaw2.value,
+  //         },
+  //       ],
+  //       tooltip: {
+  //         trigger: "axis",
+  //         formatter: function (params) {
+  //           params = params[0];
+  //           return `Time: ${params.value[0]}, Value: ${params.value[1]}`;
+  //         },
+  //         axisPointer: {
+  //           animation: false,
+  //         },
+  //       },
+  //       dataZoom: [
+  //         {
+  //           type: 'slider',
+  //           xAxisIndex: 0,
+  //           filterMode: 'none',
+  //           height: "6%", // 높이를 20%로 설정
+  //           bottom: "2%", // 위치를 아래로 조정
+  //         },
+  //         {
+  //           type: 'slider',
+  //           yAxisIndex: 0,
+  //           filterMode: 'none',
+  //           width: "2%",
+  //         },
+  //         {
+  //           type: 'inside',
+  //           xAxisIndex: 0,
+  //           filterMode: 'none'
+  //         },
+  //         {
+  //           type: 'inside',
+  //           yAxisIndex: 0,
+  //           filterMode: 'none'
+  //         }
+  //         // {
+  //         //   show: true,
+  //         //   realtime: true,
+  //         //   start: 0,
+  //         //   end: 100,
+  //         //   xAxisIndex: [0, 1],
+  //         //   height: "2%",
+  //         // },
+  //       ],
+  //       xAxis: {
+  //         type: "category",
+  //         nameLocation: "middle",
+  //         data: analysisTime.value, // x축 데이터를 times 배열로 설정
+  //         axisLabel: {
+  //           color: textColor.value, // 텍스트 색상을 흰색으로 설정
+  //         },
+  //       },
+  //       yAxis: {},
+  //       series: [
+  //         {
+  //           type: "line",
+  //           datasetId: "dataset_raw",
+  //           showSymbol: false,
+  //           markPoint: {
+  //             data: [
+  //               { type: "max", name: "Max" },
+  //               { type: "min", name: "Min" },
+  //             ],
+  //           },
+  //           encode: {
+  //             x: "time",
+  //             y: "value",
+  //             itemName: "time",
+  //             tooltip: ["value"],
+  //           },
+  //         },
+  //       ],
+  //     };
+
+  //     const minValue = ref(); // 최솟값
+  //     const maxValue = ref(); // 최댓값
+  //     const averageValue = ref(); // 평균값
+  //     const standardDeviation = ref(); // 표준편차
+  //     const rms = ref(); // 제곱평균제곱근
+  //     const median = ref(); // 중앙값
+  //     const standardError = ref(); // 표준오차
+  //     const variance = ref();
+  //     const numericValues = analysisData.value
+  //       .map((value) => Number(value))
+  //       .filter((value) => !isNaN(value));
+
+  //     // console.log( "통계:", analysisData.value); // if(analysisData)
+
+  //     if (numericValues.length > 1) {
+  //       // 최솟값 구하기
+  //       minValue.value = Math.min(...analysisData.value);
+
+  //       // 최댓값 구하기
+  //       maxValue.value = Math.max(...analysisData.value);
+  //       // 평균 계산sortedValues
+  //       const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
+  //       averageValue.value = sum.value / numericValues.length;
+
+  //       // 표준편차 계산
+  //       const squaredDifferences = ref(
+  //         numericValues.map((value) => Math.pow(value - averageValue.value, 2))
+  //       );
+  //       const sumOfSquaredDifferences = squaredDifferences.value.reduce(
+  //         (acc, value) => acc + value,
+  //         0
+  //       );
+  //       variance.value = sumOfSquaredDifferences / numericValues.length;
+  //       standardDeviation.value = Math.sqrt(variance.value);
+
+  //       // 제곱평균제곱근(RMS) 계산
+  //       const sumOfSquares = ref(
+  //         numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
+  //       );
+  //       rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
+
+  //       // 중앙값 계산
+  //       const sortedValues = numericValues.sort((a, b) => a - b);
+  //       const mid = ref(Math.floor(sortedValues.length / 2));
+
+  //       if (sortedValues.length % 2 === 0) {
+  //         // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
+  //         median.value =
+  //           (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
+  //         console.log("짝수");
+  //       } else {
+  //         // 홀수일 경우 중간 값이 중앙값
+  //         median.value = sortedValues[mid.value];
+  //         console.log("홀수");
+  //       }
+  //       // 표준 오차 계산
+  //       standardError.value =
+  //         standardDeviation.value / Math.sqrt(numericValues.length);
+  //     } else {
+  //       alert("데이터가 존재하지 않습니다.")
+  //       averageValue.value = 0;
+  //       standardDeviation.value = 0;
+  //       rms.value = 0;
+  //       median.value = 0;
+  //       standardError.value = 0;
+  //     }
+  //     analysis.value[0].unit = unit.value;
+  //     // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
+  //     analysis.value[0].min = minValue.value.toFixed(4);
+  //     // console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
+  //     analysis.value[0].max = maxValue.value.toFixed(4);
+  //     // console.log(`Average Value: ${averageValue.value}`); // 평균값
+  //     analysis.value[0].average = averageValue.value.toFixed(4);
+  //     // console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
+  //     analysis.value[0].rmse = standardDeviation.value.toFixed(4);
+  //     // console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
+  //     analysis.value[0].rms = rms.value.toFixed(4);
+  //     // console.log(`Median: ${median.value}`); // 중앙값
+  //     analysis.value[0].median = median.value.toFixed(4);
+  //     // console.log(`Standard Error: ${standardError.value}`); // 표준 오차
+  //     analysis.value[0].error = standardError.value.toFixed(4);
+  //     // console.log(`Variance: ${variance.value}`); // 분산
+  //     analysis.value[0].variance = variance.value.toFixed(4);
+
+  //     // console.log(`NaN Check: ${analysisData.value.some(isNaN)}`); //f
+  //     // console.log(`Empty Value Check: ${analysisData.value.includes("")}`); //t
+  //     // console.log(
+  //     //   `Undefined Value Check: ${analysisData.value.includes(undefined)}` //f
+  //     // );
+  //     // console.log(
+  //     //   `Non-numeric Value Check: ${analysisData.value.some(
+  //     //     (value) => typeof value !== "number" || isNaN(value) //t
+  //     //   )}`
+  //     // );
+  // } catch (error) {
+  //   console.error(error);
+  // } finally {
+  //   loading.value = false;
+  // }
+
+  updateDate();
+
+  console.log(`period : start =  ${startDate.value}, end = ${endDate.value}`);
+  console.log(
+    "ㅋㅋㅋㅋㅋㅋㅋㅋ" + setStartTime.value + ", 과" + setEndTime.value
+  );
+  clearChart();
+  option.value.series = [];
+  updateSeries();
+  chart.value.setOption(updateSeries);
+};
+
+const clearChart = () => {
+  option.value.series = [];
+  chart.value.setOption(option.value, true); // true를 통해 기존 옵션을 덮어쓰고 초기화
+};
+</script>
+
+<style scoped>
+.custom-select {
+  --v-select-menu-font-size: 10px;
+}
+.chart {
+  height: 65vh;
+}
+body {
+  margin: 0;
+}
+</style>

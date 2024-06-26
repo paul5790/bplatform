@@ -56,11 +56,11 @@
           <v-list-item
             v-if="permission === 'ADMIN' || permission === 'USER'"
             :key="3"
-            :to="`/datagraph`"
+            :to="`/test`"
             :exact="true"
             :title="`데이터 분석`"
             :prepend-icon="`mdi-chart-line`"
-            :value="`/datagraph`"
+            :value="`/test`"
             @click="handleListItemClick(`데이터 분석`)"
           ></v-list-item>
           <v-list-item

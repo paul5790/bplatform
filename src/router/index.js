@@ -13,11 +13,6 @@ const routes = [
     component: () => import("../views/RealtimeView.vue"),
   },
   {
-    path: "/test",
-    name: "test",
-    component: () => import("../components/ObRudder.vue"),
-  },
-  {
     path: "/map",
     name: "map",
     component: () => import("../views/MapData.vue"),
@@ -41,6 +36,11 @@ const routes = [
     path: "/datagraph",
     name: "datagraph",
     component: () => import("../views/DataGraph.vue"),
+  },
+  {
+    path: "/test",
+    name: "test",
+    component: () => import("../views/DataAnal.vue"),
   },
   {
     path: "/manager",
