@@ -173,8 +173,6 @@ const selectedtrialNum = ref();
 const setStartTime = ref([]);
 const setEndTime = ref([]);
 
-
-
 // date Picker
 const date_readonly = ref(true);
 const dateRange = ref([]);
@@ -195,10 +193,9 @@ const getTrialDate = async () => {
 onMounted(getTrialDate);
 
 watch(selectedtrialrun, (newVal) => {
-  if(newVal == "직접 선택"){
+  if (newVal == "직접 선택") {
     date_readonly.value = false;
-  }
-  else{
+  } else {
     date_readonly.value = true;
   }
 });
@@ -261,6 +258,124 @@ const aisData = {
   ],
 };
 
+// 데이터를 가져오는 함수
+const fetchData = async () => {
+  try {
+    const jsonData = [
+      {
+        latitude: "35.290000",
+        longitude: "129.760000",
+        test: "1",
+      },
+      {
+        latitude: "35.291000",
+        longitude: "129.761000",
+        test: "1",
+      },
+      {
+        latitude: "35.292000",
+        longitude: "129.763000",
+        test: "1",
+      },
+      {
+        latitude: "35.293000",
+        longitude: "129.765000",
+        test: "1",
+      },
+      {
+        latitude: "35.294000",
+        longitude: "129.757000",
+        test: "1",
+      },
+      {
+        latitude: "35.295000",
+        longitude: "129.769000",
+        test: "1",
+      },
+      {
+        latitude: "35.296000",
+        longitude: "129.750000",
+        test: "1",
+      },
+      {
+        latitude: "35.291000",
+        longitude: "129.771000",
+        test: "2",
+      },
+      {
+        latitude: "35.292000",
+        longitude: "129.773000",
+        test: "2",
+      },
+      {
+        latitude: "35.293000",
+        longitude: "129.775000",
+        test: "2",
+      },
+      {
+        latitude: "35.294000",
+        longitude: "129.777000",
+        test: "2",
+      },
+      {
+        latitude: "35.295000",
+        longitude: "129.779000",
+        test: "2",
+      },
+      {
+        latitude: "35.296000",
+        longitude: "129.770000",
+        test: "2",
+      },
+      {
+        latitude: "35.296000",
+        longitude: "129.770000",
+        test: "3",
+      },
+    ];
+
+        // test 값에 따른 데이터를 저장할 임시 객체
+    const tempData = {};
+
+    // jsonData를 순회하며 test 값에 따른 데이터 분류
+    jsonData.forEach(item => {
+      const testValue = item.test;
+      const latitude = parseFloat(item.latitude);
+      const longitude = parseFloat(item.longitude);
+
+      // test 값에 해당하는 배열이 없으면 새로 생성
+      if (!tempData[testValue]) {
+        tempData[testValue] = [];
+      }
+
+      // test 값에 해당하는 배열에 위도와 경도를 추가
+      tempData[testValue].push([latitude, longitude]);
+    });
+
+    // 기존 데이터를 초기화
+    Object.keys(aisData).forEach(key => {
+      aisData[key] = [];
+    });
+
+    // 임시 데이터를 순서대로 aisData에 할당
+    const colors = ['red', 'yellow', 'blue', 'green', 'black', 'brown'];
+    let colorIndex = 0;
+
+    Object.values(tempData).forEach((dataArray, index) => {
+      if (colorIndex < colors.length) {
+        aisData[colors[colorIndex]] = dataArray;
+        colorIndex++;
+      }
+    });
+
+    console.log(aisData);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+  }
+};
+
+fetchData();
+
 let map = null;
 
 watch(selectedTest, (newVal) => {
@@ -268,6 +383,7 @@ watch(selectedTest, (newVal) => {
     selectedTest.value.pop(); // 가장 마지막에 추가된 항목 제거
     alert("최대 5개까지 선택할 수 있습니다.");
   }
+  console.log(aisData);
 
   if (map) {
     Object.keys(layers).forEach((color) => {
@@ -308,12 +424,9 @@ watch(selectedTest, (newVal) => {
       }
     });
   }
-
-
 });
 
 // ---------------------------- Map View --------------------------------//
-
 
 onMounted(() => {
   // 지도 초기화

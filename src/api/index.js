@@ -503,7 +503,6 @@ export const readDataTrial = async (tokenid, data, type) => {
         },
       }
     );
-    console.log("EEE");
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);

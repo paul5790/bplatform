@@ -1,0 +1,59 @@
+[
+  {
+    "latitude": "35.293000",
+    "longitude": "129.775000",
+    "test": "1",
+    "waypoint_ID": "1",
+    "route_name": "장생포-일산항"
+  },
+  {
+    "latitude": "35.294000",
+    "longitude": "129.777000",
+    "test": "1",
+    "waypoint_ID": "2",
+    "route_name": "장생포-일산항"
+  },
+  {
+    "latitude": "35.295000",
+    "longitude": "129.777000",
+    "test": "1",
+    "waypoint_ID": "3",
+    "route_name": "장생포-일산항"
+  },
+  {
+    "latitude": "35.296000",
+    "longitude": "129.777000",
+    "test": "1",
+    "waypoint_ID": "4",
+    "route_name": "장생포-일산항"
+  },
+  {
+    "latitude": "35.291000",
+    "longitude": "129.771000",
+    "test": "2",
+    "waypoint_ID": "1",
+    "route_name": "장생포-일산항"
+  },
+  {
+    "latitude": "35.292000",
+    "longitude": "129.773000",
+    "test": "2",
+    "waypoint_ID": "2",
+    "route_name": "장생포-일산항"
+  },
+  {
+    "latitude": "35.293000",
+    "longitude": "129.775000",
+    "test": "3",
+    "waypoint_ID": "1",
+    "route_name": "장생포-일산항"
+  },
+
+  {
+    "latitude": "35.296000",
+    "longitude": "129.770000",
+    "test": "3",
+    "waypoint_ID": "2",
+    "route_name": "장생포-일산항"
+  }
+]

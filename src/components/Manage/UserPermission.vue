@@ -70,31 +70,58 @@
         >
           <v-card-item style="padding-top: 10px">
             <v-window class="scrollable-card">
-              <v-data-table-virtual
-                :items="consoles"
-                :headers="checkheaders"
-                class="limited-height"
-              >
-                <template v-slot:item="{ item }">
+              <table>
+                <thead>
                   <tr>
-                    <td>{{ item.name }}</td>
+                    <th>신호명</th>
+                    <th>view</th>
+                    <th>capture</th>
+                    <th>download</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ALL</td>
                     <td>
-                      <v-checkbox
-                        style="padding-top: 0px"
-                        v-model="item.view"
-                      ></v-checkbox>
+                      <input
+                        type="checkbox"
+                        v-model="allView"
+                        @change="toggleAll('view')"
+                      />
                     </td>
                     <td>
-                      <v-checkbox v-model="item.capture"></v-checkbox>
+                      <input
+                        type="checkbox"
+                        v-model="allCapture"
+                        @change="toggleAll('capture')"
+                      />
                     </td>
                     <td>
-                      <v-checkbox v-model="item.download"></v-checkbox>
+                      <input
+                        type="checkbox"
+                        v-model="allDownload"
+                        @change="toggleAll('download')"
+                      />
                     </td>
                   </tr>
-                </template>
-              </v-data-table-virtual>
+                  <tr v-for="(item, index) in permission" :key="index">
+                    <td>{{ item.name }}</td>
+                    <td>
+                      <input type="checkbox" v-model="item.view" />
+                    </td>
+                    <td>
+                      <input type="checkbox" v-model="item.capture" />
+                    </td>
+                    <td>
+                      <input type="checkbox" v-model="item.download" />
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
             </v-window>
           </v-card-item>
+          
+        <v-btn>저장하기</v-btn>
         </v-card>
       </v-sheet>
     </v-col>
@@ -131,7 +158,14 @@ const search = ref();
 const selectionLog = ref(["Web Dashboard Log", "Window App Log"]);
 const selectedLog = ref(selectionLog.value[0]);
 
-const consoles = ref([
+// --------------------- 전체 데이터 관리 -------------------------------
+const allView = ref(false);
+const allCapture = ref(false);
+const allDownload = ref(false);
+
+// --------------------- 데이터 셋 -------------------------------
+
+const permission = ref([
   {
     name: "DGPS",
     view: true,
@@ -168,13 +202,54 @@ const consoles = ref([
     capture: false,
     download: false,
   },
+  { name: "AUTOPILOT", view: false, capture: false, download: false },
+  { name: "SPEEDLOG", view: false, capture: false, download: false },
+  { name: "CANTHROTTLE", view: false, capture: false, download: false },
+  { name: "AUTOPILOTCONTACT", view: false, capture: false, download: false },
+  { name: "NO.1ENGINEPANEL", view: false, capture: false, download: false },
+  { name: "NO.2ENGINEPANEL", view: false, capture: false, download: false },
+  { name: "MTIE1.ISA", view: false, capture: false, download: false },
+  { name: "MTIE5.VDGS", view: false, capture: false, download: false },
+  { name: "MTIE5.DBS", view: false, capture: false, download: false },
+  { name: "MOF1.ANS", view: false, capture: false, download: false },
+  { name: "MOF2.SYNC", view: false, capture: false, download: false },
+  { name: "MOF1.GNW", view: false, capture: false, download: false },
+  { name: "MTIE5.SAS", view: false, capture: false, download: false },
   {
-    name: "ECDIS",
-    view: true,
+    name: "MTIE4.XINNOS_VDGS_EMUL",
+    view: false,
     capture: false,
     download: false,
   },
+  {
+    name: "MTIE4.XINNOS_STAS_EMUL",
+    view: false,
+    capture: false,
+    download: false,
+  },
+  { name: "MTIE4.XINNOS_STAS", view: false, capture: false, download: false },
+  { name: "MTIE4.XINNOS_VDGS", view: false, capture: false, download: false },
+  { name: "MANAGEMENT", view: false, capture: false, download: false },
+  { name: "RUDDER", view: false, capture: false, download: false },
+  { name: "ENGINE", view: false, capture: false, download: false },
+  { name: "MODE", view: false, capture: false, download: false },
 ]);
+
+
+const toggleAll = (type) => {
+  const isChecked = type === 'view' ? allView.value : type === 'capture' ? allCapture.value : allDownload.value;
+  permission.value.forEach(item => {
+    item[type] = isChecked;
+  });
+};
+
+// watch를 사용하여 모든 체크박스가 동일한지 확인
+watch(permission, (newVal) => {
+  allView.value = newVal.every(item => item.view);
+  allCapture.value = newVal.every(item => item.capture);
+  allDownload.value = newVal.every(item => item.download);
+}, { deep: true });
+
 
 watchEffect(() => {
   console.log("selectedLog changed:", selectedLog.value);
@@ -271,5 +346,21 @@ onMounted(() => {
 
 .limited-height tr {
   max-height: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f4f4f4;
 }
 </style>
