@@ -129,8 +129,8 @@ const fetchData = async () => {
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       const storageSizeFloat = parseFloat(response[i].storageSize).toFixed(2);
       newItems.push({
-        division: response[i].seatrialId,
-        name: response[i].name,
+        division: response[i].testNumber,
+        name: response[i].shipName,
         shipid: response[i].shipId,
         startdate: response[i].startTimeUtc,
         purpose: response[i].testPurpose,
@@ -157,7 +157,7 @@ onMounted(() => {
 const seatrialProps = ref();
 const maptitle = ref();
 const map = (item) => {
-  console.log(item.division);
+  console.log("item : " + item.division);
   seatrialProps.value = `${item.division}`;
   maptitle.value = `시험: ${item.name}의 지도`;
   dialog.value = true;

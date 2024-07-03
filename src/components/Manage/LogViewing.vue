@@ -179,7 +179,7 @@ const appData = async () => {
         .add(9, "hours")
         .format("YYYY-MM-DD HH:mm:ss");
       items.value.push({
-        id: response[i].id || "",
+        // id: response[i].id || "",
         utc: koreanTime || "",
         type: response[i].type || "",
         log: response[i].log || "",

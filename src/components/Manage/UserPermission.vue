@@ -80,7 +80,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
+                  <tr style="background-color: #f6f2f2">
                     <td>ALL</td>
                     <td>
                       <input
@@ -120,8 +120,11 @@
               </table>
             </v-window>
           </v-card-item>
-          
-        <v-btn>저장하기</v-btn>
+          <div style="display: flex; justify-content: right; padding: 10px">
+            <v-btn variant="tonal" style="width: 220px; font-weight: bold">
+              저장
+            </v-btn>
+          </div>
         </v-card>
       </v-sheet>
     </v-col>
@@ -166,42 +169,12 @@ const allDownload = ref(false);
 // --------------------- 데이터 셋 -------------------------------
 
 const permission = ref([
-  {
-    name: "DGPS",
-    view: true,
-    capture: false,
-    download: false,
-  },
-  {
-    name: "GYRO",
-    view: false,
-    capture: true,
-    download: false,
-  },
-  {
-    name: "ANEMOMETER",
-    view: false,
-    capture: true,
-    download: false,
-  },
-  {
-    name: "RADAR",
-    view: false,
-    capture: false,
-    download: false,
-  },
-  {
-    name: "AIS",
-    view: false,
-    capture: false,
-    download: true,
-  },
-  {
-    name: "ECDIS",
-    view: true,
-    capture: false,
-    download: false,
-  },
+  { name: "DGPS", view: true, capture: false, download: false },
+  { name: "GYRO", view: false, capture: true, download: false },
+  { name: "ANEMOMETER", view: false, capture: true, download: false },
+  { name: "RADAR", view: false, capture: false, download: false },
+  { name: "AIS", view: false, capture: false, download: true },
+  { name: "ECDIS", view: true, capture: false, download: false },
   { name: "AUTOPILOT", view: false, capture: false, download: false },
   { name: "SPEEDLOG", view: false, capture: false, download: false },
   { name: "CANTHROTTLE", view: false, capture: false, download: false },
@@ -235,21 +208,28 @@ const permission = ref([
   { name: "MODE", view: false, capture: false, download: false },
 ]);
 
-
 const toggleAll = (type) => {
-  const isChecked = type === 'view' ? allView.value : type === 'capture' ? allCapture.value : allDownload.value;
-  permission.value.forEach(item => {
+  const isChecked =
+    type === "view"
+      ? allView.value
+      : type === "capture"
+      ? allCapture.value
+      : allDownload.value;
+  permission.value.forEach((item) => {
     item[type] = isChecked;
   });
 };
 
 // watch를 사용하여 모든 체크박스가 동일한지 확인
-watch(permission, (newVal) => {
-  allView.value = newVal.every(item => item.view);
-  allCapture.value = newVal.every(item => item.capture);
-  allDownload.value = newVal.every(item => item.download);
-}, { deep: true });
-
+watch(
+  permission,
+  (newVal) => {
+    allView.value = newVal.every((item) => item.view);
+    allCapture.value = newVal.every((item) => item.capture);
+    allDownload.value = newVal.every((item) => item.download);
+  },
+  { deep: true }
+);
 
 watchEffect(() => {
   console.log("selectedLog changed:", selectedLog.value);

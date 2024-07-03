@@ -300,35 +300,6 @@
         </v-card>
       </v-dialog>
 
-      <!-- 소실주기 설정 모달 -->
-      <v-dialog v-model="losstimeDialog" max-width="400">
-        <v-card>
-          <v-card-title>데이터 소실주기 설정</v-card-title>
-          <v-card-text>
-            <v-col cols="12"><p style="font-size: 13px">소실 주기</p></v-col>
-            <v-col cols="12">
-              <v-text-field
-                label="settime (초)"
-                variant="solo"
-                v-model="losstime"
-                required
-              ></v-text-field>
-            </v-col>
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="blue-darken-1"
-              variant="text"
-              @click="losstimeDialog = false"
-              >취소</v-btn
-            >
-            <v-btn color="blue-darken-1" variant="text" @click="axiostime()"
-              >설정</v-btn
-            >
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
 
       <!-- 소실주기 설정 모달 -->
       <v-dialog v-model="ALLlosstimeDialog" max-width="920">
@@ -1842,6 +1813,7 @@ const updateTimeRefs = async () => {
   await updateLossTimeData(tokenid.value, data);
   setTimeRefs();
   alert("설정이 완료되었습니다.")
+  ALLlosstimeDialog.value = false;
 };
 
 const updateTenRefs = () => {
@@ -1966,25 +1938,6 @@ const resetPasswordcancle = () => {
   resetPasswordDialog.value = false;
 }
 
-const axiostime = async () => {
-  const data = {
-    lossTime: losstime.value,
-    lampTime: realtime.value,
-  };
-  try {
-    // 서버에 POST 요청을 보내고 응답을 받음
-    const lossTime = await updateSetTime(tokenid.value, data);
-    console.log(lossTime);
-    alert("수정이 완료되었습니다.");
-    realtimeDialog.value = false;
-    losstimeDialog.value = false;
-    getInfo();
-    // 이후 작업 수행 (예: 토큰을 저장하거나 처리)
-  } catch (error) {
-    console.error(error);
-  }
-};
-
 const axiosrealtime = async () => {
   const data = {
     lampTime: realtime.value,
@@ -2014,7 +1967,6 @@ const getInfo = async () => {
     userDescription.value = userDataResponse.description;
     userEmail.value = userDataResponse.email;
     userNumber.value = userDataResponse.phoneNumber;
-    losstime.value = userDataResponse.lossTime;
     realtime.value = userDataResponse.lampTime;
   } catch (error) {
     // 에러 처리

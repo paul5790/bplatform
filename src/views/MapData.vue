@@ -13,6 +13,44 @@
 
     <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
     <v-card
+      v-if="sliderCardVisible"
+      style="
+        position: absolute;
+        bottom: 16px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1100;
+        width: 700px;
+        overflow: visible;
+      "
+    >
+      <v-card-title>
+        <span>Time Slider</span>
+      </v-card-title>
+      <v-card-text style="padding-top: 0; padding-bottom: 0">
+        <!-- 여기에 검색 창 컨텐츠를 추가하세요 -->
+        <div style="position: relative; z-index: 1200">
+          <v-slider
+            v-model="sliderValue"
+            thumb-label="always"
+            step="1"
+            :max="10"
+            :ticks="scenario"
+            show-ticks="always"
+            class="custom-slider"
+          >
+            <template v-slot:thumb-label="{ modelValue }">
+              <span class="thumb-label">{{
+                timeData[Math.min(Math.floor(modelValue / 1), 9)]
+              }}</span>
+            </template>
+          </v-slider>
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
+    <v-card
       v-if="searchCardVisible"
       ref="searchCard"
       @mousedown="startDrag($event, 'searchCard')"
@@ -40,7 +78,7 @@
           <v-select
             v-model="selectedtrialrun"
             :items="trialrun"
-            label="항차 선택"
+            label="시험 선택"
             variant="outlined"
             class="custom-select"
           ></v-select>
@@ -161,8 +199,46 @@ import { themeMode, themeConfig } from "@/utils/theme.js";
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const searchCardVisible = ref(false);
 const testCardVisible = ref(false);
+const sliderCardVisible = ref(true);
 const searchCard = ref(null);
 const testCard = ref(null);
+
+let map = null;
+
+// ----------------------------Slider Bar--------------------------------//
+const sliderValue = ref(0);
+const timeData = ref([
+  "2020-08-12T08:44:64.151235Z",
+  "2020-08-12T08:44:65.151235Z",
+  "2020-08-12T08:44:66.151235Z",
+  "2020-08-12T08:44:67.151235Z",
+  "2020-08-12T08:44:68.151235Z",
+  "2020-08-12T08:44:69.151235Z",
+  "2020-08-12T08:44:70.151235Z",
+  "2020-08-12T08:44:71.151235Z",
+  "2020-08-12T08:44:72.151235Z",
+  "2020-08-12T08:44:73.151235Z",
+]);
+
+const scenario = ref({
+  0: "1",
+  1: "2",
+  2: "3",
+  3: "4",
+  4: "5",
+  5: "6",
+  6: "7",
+  7: "8",
+  8: "9",
+  9: "10",
+  10: "11",
+});
+
+let currentPolyline;
+
+watch(sliderValue, (newVal) => {
+  aisMapping(newVal);
+});
 
 // ----------------------------select Bar--------------------------------//
 
@@ -204,179 +280,350 @@ watch(selectedtrialrun, (newVal) => {
 const selectedTest = ref([]);
 const dialogVisible = ref(false);
 
-const layers = {
-  red: { polyline: null, markers: [] },
-  yellow: { polyline: null, markers: [] },
-  blue: { polyline: null, markers: [] },
-  green: { polyline: null, markers: [] },
-  black: { polyline: null, markers: [] },
-  brown: { polyline: null, markers: [] },
-};
-
-const aisData = {
-  red: [
-    [35.29, 130.1],
-    [35.19, 129.96],
-    [35.29, 129.76],
-    [35.19, 129.66],
-    [35.29, 129.26],
-  ],
-  yellow: [
-    [35.19, 130.1],
-    [35.09, 129.96],
-    [35.19, 129.76],
-    [35.09, 129.66],
-    [35.19, 129.26],
-  ],
-  blue: [
-    [35.39, 130.1],
-    [35.29, 129.96],
-    [35.39, 129.76],
-    [35.29, 129.66],
-    [35.39, 129.26],
-  ],
-  green: [
-    [35.49, 130.1],
-    [35.39, 129.96],
-    [35.49, 129.76],
-    [35.39, 129.66],
-    [35.49, 129.26],
-  ],
-  black: [
-    [35.59, 130.1],
-    [35.49, 129.96],
-    [35.59, 129.76],
-    [35.49, 129.66],
-    [35.59, 129.26],
-  ],
-  brown: [
-    [35.69, 130.1],
-    [35.59, 129.96],
-    [35.69, 129.76],
-    [35.59, 129.66],
-    [35.69, 129.26],
-  ],
-};
+const aisData = {};
 
 // 데이터를 가져오는 함수
 const fetchData = async () => {
   try {
-    const jsonData = [
+    const AisData = [
       {
-        latitude: "35.290000",
-        longitude: "129.760000",
+        latitude: "35.25678",
+        longitude: "129.260888",
         test: "1",
+        scenario: "1",
+        type: "Menual",
       },
       {
-        latitude: "35.291000",
-        longitude: "129.761000",
+        latitude: "35.245678",
+        longitude: "129.300888",
         test: "1",
+        scenario: "1",
+        type: "Menual",
       },
       {
-        latitude: "35.292000",
-        longitude: "129.763000",
+        latitude: "35.24878",
+        longitude: "129.330888",
         test: "1",
+        scenario: "1",
+        type: "Menual",
       },
       {
-        latitude: "35.293000",
-        longitude: "129.765000",
+        latitude: "35.25978",
+        longitude: "129.350888",
         test: "1",
+        scenario: "1",
+        type: "Menual",
       },
       {
-        latitude: "35.294000",
-        longitude: "129.757000",
+        latitude: "35.25978",
+        longitude: "129.350888",
         test: "1",
+        scenario: "2",
+        type: "Auto",
       },
       {
-        latitude: "35.295000",
-        longitude: "129.769000",
+        latitude: "35.33978",
+        longitude: "129.360888",
         test: "1",
+        scenario: "2",
+        type: "Auto",
       },
       {
         latitude: "35.296000",
-        longitude: "129.750000",
+        longitude: "129.450000",
         test: "1",
-      },
-      {
-        latitude: "35.291000",
-        longitude: "129.771000",
-        test: "2",
-      },
-      {
-        latitude: "35.292000",
-        longitude: "129.773000",
-        test: "2",
-      },
-      {
-        latitude: "35.293000",
-        longitude: "129.775000",
-        test: "2",
-      },
-      {
-        latitude: "35.294000",
-        longitude: "129.777000",
-        test: "2",
-      },
-      {
-        latitude: "35.295000",
-        longitude: "129.779000",
-        test: "2",
+        scenario: "2",
+        type: "Auto",
       },
       {
         latitude: "35.296000",
-        longitude: "129.770000",
-        test: "2",
+        longitude: "129.450000",
+        test: "1",
+        scenario: "3",
+        type: "Remote",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.440000",
+        test: "1",
+        scenario: "3",
+        type: "Remote",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.440000",
+        test: "1",
+        scenario: "4",
+        type: "Menual",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.470000",
+        test: "1",
+        scenario: "4",
+        type: "Menual",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.470000",
+        test: "1",
+        scenario: "5",
+        type: "Remote",
+      },
+      {
+        latitude: "35.316000",
+        longitude: "129.420000",
+        test: "1",
+        scenario: "5",
+        type: "Remote",
+      },
+      {
+        latitude: "35.316000",
+        longitude: "129.420000",
+        test: "1",
+        scenario: "6",
+        type: "Auto",
       },
       {
         latitude: "35.296000",
-        longitude: "129.770000",
-        test: "3",
+        longitude: "129.370000",
+        test: "1",
+        scenario: "6",
+        type: "Auto",
+      },
+      {
+        latitude: "35.266000",
+        longitude: "129.40000",
+        test: "1",
+        scenario: "6",
+        type: "Auto",
+      },
+      {
+        latitude: "35.25678",
+        longitude: "129.260888",
+        test: "1",
+        scenario: "6",
+        type: "Auto",
+      },
+      {
+        latitude: "35.25678",
+        longitude: "129.260888",
+        test: "1",
+        scenario: "7",
+        type: "Menual",
+      },
+      {
+        latitude: "35.245678",
+        longitude: "129.300888",
+        test: "1",
+        scenario: "7",
+        type: "Menual",
+      },
+      {
+        latitude: "35.24878",
+        longitude: "129.330888",
+        test: "1",
+        scenario: "7",
+        type: "Menual",
+      },
+      {
+        latitude: "35.25978",
+        longitude: "129.350888",
+        test: "1",
+        scenario: "8",
+        type: "Menual",
+      },
+      {
+        latitude: "35.33978",
+        longitude: "129.360888",
+        test: "1",
+        scenario: "8",
+        type: "Auto",
+      },
+      {
+        latitude: "35.33978",
+        longitude: "129.360888",
+        test: "1",
+        scenario: "9",
+        type: "Auto",
+      },
+      {
+        latitude: "35.296000",
+        longitude: "129.450000",
+        test: "1",
+        scenario: "9",
+        type: "Auto",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.440000",
+        test: "1",
+        scenario: "9",
+        type: "Remote",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.440000",
+        test: "1",
+        scenario: "10",
+        type: "Remote",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.470000",
+        test: "1",
+        scenario: "10",
+        type: "Menual",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.470000",
+        test: "1",
+        scenario: "10",
+        type: "Menual",
+      },
+      {
+        latitude: "35.276000",
+        longitude: "129.476000",
+        test: "1",
+        scenario: "10",
+        type: "Remote",
+      },
+      {
+        latitude: "35.316000",
+        longitude: "129.420000",
+        test: "1",
+        scenario: "10",
+        type: "Remote",
+      },
+      {
+        latitude: "35.316000",
+        longitude: "129.420000",
+        test: "1",
+        scenario: "11",
+        type: "Auto",
+      },
+      {
+        latitude: "35.296000",
+        longitude: "129.370000",
+        test: "1",
+        scenario: "11",
+        type: "Auto",
+      },
+      {
+        latitude: "35.266000",
+        longitude: "129.40000",
+        test: "1",
+        scenario: "11",
+        type: "Auto",
+      },
+      {
+        latitude: "35.25678",
+        longitude: "129.260888",
+        test: "1",
+        scenario: "11",
+        type: "Auto",
       },
     ];
 
-        // test 값에 따른 데이터를 저장할 임시 객체
-    const tempData = {};
-
-    // jsonData를 순회하며 test 값에 따른 데이터 분류
-    jsonData.forEach(item => {
-      const testValue = item.test;
-      const latitude = parseFloat(item.latitude);
-      const longitude = parseFloat(item.longitude);
-
-      // test 값에 해당하는 배열이 없으면 새로 생성
-      if (!tempData[testValue]) {
-        tempData[testValue] = [];
+    AisData.forEach(({ latitude, longitude, type, scenario }) => {
+      if (!aisData[scenario]) {
+        aisData[scenario] = [];
       }
-
-      // test 값에 해당하는 배열에 위도와 경도를 추가
-      tempData[testValue].push([latitude, longitude]);
+      aisData[scenario].push([
+        parseFloat(latitude),
+        parseFloat(longitude),
+        type,
+      ]);
     });
 
-    // 기존 데이터를 초기화
-    Object.keys(aisData).forEach(key => {
-      aisData[key] = [];
-    });
-
-    // 임시 데이터를 순서대로 aisData에 할당
-    const colors = ['red', 'yellow', 'blue', 'green', 'black', 'brown'];
-    let colorIndex = 0;
-
-    Object.values(tempData).forEach((dataArray, index) => {
-      if (colorIndex < colors.length) {
-        aisData[colors[colorIndex]] = dataArray;
-        colorIndex++;
-      }
-    });
+    const Waypoint = [
+      {
+        latitude: "35.25978",
+        longitude: "129.350888",
+        test: "1",
+        scenario: "1",
+        type: "Menual",
+      },
+      {
+        latitude: "35.296000",
+        longitude: "129.450000",
+        test: "1",
+        scenario: "2",
+        type: "Auto",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.440000",
+        test: "1",
+        scenario: "3",
+        type: "Remote",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.470000",
+        test: "1",
+        scenario: "4",
+        type: "Menual",
+      },
+      {
+        latitude: "35.316000",
+        longitude: "129.420000",
+        test: "1",
+        scenario: "5",
+        type: "Remote",
+      },
+      {
+        latitude: "35.25678",
+        longitude: "129.260888",
+        test: "1",
+        scenario: "6",
+        type: "Auto",
+      },
+      {
+        latitude: "35.24878",
+        longitude: "129.330888",
+        test: "1",
+        scenario: "7",
+        type: "Menual",
+      },
+      {
+        latitude: "35.33978",
+        longitude: "129.360888",
+        test: "1",
+        scenario: "8",
+        type: "Auto",
+      },
+      {
+        latitude: "35.286000",
+        longitude: "129.440000",
+        test: "1",
+        scenario: "9",
+        type: "Remote",
+      },
+      {
+        latitude: "35.316000",
+        longitude: "129.420000",
+        test: "1",
+        scenario: "10",
+        type: "Remote",
+      },
+      {
+        latitude: "35.25678",
+        longitude: "129.260888",
+        test: "1",
+        scenario: "11",
+        type: "Auto",
+      },
+    ];
 
     console.log(aisData);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error("Error fetching data:", error);
   }
 };
 
 fetchData();
-
-let map = null;
 
 watch(selectedTest, (newVal) => {
   if (newVal.length > 5) {
@@ -384,46 +631,6 @@ watch(selectedTest, (newVal) => {
     alert("최대 5개까지 선택할 수 있습니다.");
   }
   console.log(aisData);
-
-  if (map) {
-    Object.keys(layers).forEach((color) => {
-      const layer = layers[color];
-      if (newVal.includes(color)) {
-        if (!layer.polyline) {
-          layer.polyline = L.polyline(aisData[color], {
-            color: color,
-            weight: 2,
-            dashArray: color === "blue" || color === "green" ? "5, 5" : "1",
-          }).addTo(map);
-        }
-        if (layer.markers.length === 0) {
-          const iconUrl = `/image/marker-icon-${color}.png`;
-          const icon = new L.Icon({
-            iconUrl: iconUrl,
-            iconSize: [17, 28],
-            iconAnchor: [9, 28],
-            popupAnchor: [1, -34],
-          });
-          aisData[color].forEach((coords) => {
-            const marker = L.marker(coords, { icon: icon }).bindPopup(
-              `waypoint: ${coords}`
-            );
-            marker.addTo(map);
-            layer.markers.push(marker);
-          });
-        }
-      } else {
-        if (layer.polyline) {
-          map.removeLayer(layer.polyline);
-          layer.polyline = null;
-        }
-        layer.markers.forEach((marker) => {
-          map.removeLayer(marker);
-        });
-        layer.markers = [];
-      }
-    });
-  }
 });
 
 // ---------------------------- Map View --------------------------------//
@@ -446,7 +653,44 @@ onMounted(() => {
     .addTo(map)
     .bindPopup("Realtime Location.")
     .openPopup();
+
+  aisMapping(sliderValue.value);
 });
+
+const aisMapping = (newVal) => {
+  if (map) {
+    if (currentPolyline) {
+      map.removeLayer(currentPolyline);
+    }
+
+    // newVal 값에 해당하는 aisData를 가져옵니다.
+    const data = aisData[newVal + 1];
+    // 폴리라인을 그립니다.
+    if (data) {
+      let dashtype;
+
+      // 색상에 따른 dashArray 값을 설정합니다.
+      if (data[0][2] === "Menual") {
+        // blue와 green을 나타내는 예시
+        dashtype = "1";
+      } else if (data[0][2] === "Auto") {
+        // brown과 black을 나타내는 예시
+        dashtype = "5, 5";
+      } else if (data[0][2] === "Remote") {
+        // brown과 black을 나타내는 예시
+        dashtype = "10, 5, 1, 5";
+      } else {
+        dashtype = "1";
+      }
+
+      currentPolyline = L.polyline(data, {
+        color: "blue",
+        weight: 2,
+        dashArray: dashtype,
+      }).addTo(map);
+    }
+  }
+};
 
 const startDrag = (event, cardName) => {
   let card;
@@ -477,6 +721,15 @@ const startDrag = (event, cardName) => {
 
 <style scoped>
 /* 추가: 마커의 스타일을 지정하는 CSS */
+.custom-slider .thumb-label {
+  font-size: 14px; /* Adjust the font size as needed */
+  padding: 8px;
+  max-width: 150px; /* Adjust the max width as needed */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .custom-marker {
   width: 20px;
   height: 20px;

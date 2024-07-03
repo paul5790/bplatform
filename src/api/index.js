@@ -8,11 +8,11 @@ export const cctvUrl = `http://${apiLocation}/stream/index.m3u8`;
 // 취소 토큰 생성
 let cancelTokenSource = axios.CancelToken.source();
 
-// 로그인
+// 로그인 v1
 export const checkLogin = async (data) => {
   try {
     const response = await axios.post(
-      `http://${apiLocation}/auth/login`,
+      `http://${apiLocation}/api/v1/login`,
       data,
       {
         headers: {
@@ -28,14 +28,18 @@ export const checkLogin = async (data) => {
   }
 };
 
-// 회원가입
+// 회원가입 v1
 export const createMineData = async (data) => {
   try {
-    const response = await axios.post(`http://${apiLocation}/auth/join`, data, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const response = await axios.post(
+      `http://${apiLocation}/api/v1/join`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     return response.data;
   } catch (error) {
@@ -44,11 +48,11 @@ export const createMineData = async (data) => {
   }
 };
 
-// 비밀번호 확인
+// 비밀번호 확인 v1
 export const readPwData = async (tokenid, pw) => {
   try {
     const response = await axios.post(
-      `http://${apiLocation}/admin/check`,
+      `http://${apiLocation}/api/v1/auth/admin/admin_check`,
       pw,
       {
         headers: {
@@ -65,11 +69,11 @@ export const readPwData = async (tokenid, pw) => {
   }
 };
 
-// 초기 비밀번호 수정
+// 초기 비밀번호 수정 v1
 export const resetPwData = async (tokenid, pw) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/set/initialpassword`,
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/auth/admin/initial_password`,
       pw,
       {
         headers: {
@@ -86,20 +90,16 @@ export const resetPwData = async (tokenid, pw) => {
   }
 };
 
-// 개인정보 가져오기
+// 개인정보 가져오기 v1
 export const readMineData = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/auth/userinfo/mine`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
-
+    const response = await axios.get(`http://${apiLocation}/api/v1/auth/user`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+    });
+    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -107,11 +107,11 @@ export const readMineData = async (tokenid) => {
   }
 };
 
-// 개인정보 변경
+// 개인정보 변경 v1
 export const updateMineData = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/auth/userinfo/update/mine`,
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/auth/user`,
       data,
       {
         headers: {
@@ -128,11 +128,11 @@ export const updateMineData = async (tokenid, data) => {
   }
 };
 
-// 비밀번호 업데이트
+// 비밀번호 업데이트 v1
 export const updatePassword = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/auth/userinfo/update/password`,
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/auth/user/password`,
       data,
       {
         headers: {
@@ -149,11 +149,11 @@ export const updatePassword = async (tokenid, data) => {
   }
 };
 
-// 비밀번호 초기화
+// 비밀번호 초기화 v1
 export const resetPassword = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/auth/userinfo/initialize/password`,
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/auth/admin/user/password`,
       data,
       {
         headers: {
@@ -170,12 +170,11 @@ export const resetPassword = async (tokenid, data) => {
   }
 };
 
-// 사용자 데이터 받아오기
+// 사용자 데이터 받아오기 v1
 export const readUserData = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/auth/userinfo/all`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/auth/admin/user`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -191,11 +190,11 @@ export const readUserData = async (tokenid) => {
   }
 };
 
-// 사용자 데이터 수정하기
+// 사용자 데이터 수정하기 v1
 export const updateUserData = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/auth/userinfo/update`,
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/auth/admin/user`,
       data,
       {
         headers: {
@@ -212,17 +211,17 @@ export const updateUserData = async (tokenid, data) => {
   }
 };
 
-// 사용자 데이터 삭제하기
+// 사용자 데이터 삭제하기 v1
 export const deleteUserData = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/auth/userinfo/delete`,
-      data,
+    const response = await axios.delete(
+      `http://${apiLocation}/api/v1/auth/admin/user`,
       {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${tokenid}`,
         },
+        data: data, // data를 옵션 객체 내에 포함시킵니다.
       }
     );
 
@@ -236,9 +235,8 @@ export const deleteUserData = async (tokenid, data) => {
 // 웹 로그 가져오기
 export const readWebLogData = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/get/log/webapp`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/log/webapp`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -257,9 +255,8 @@ export const readWebLogData = async (tokenid) => {
 // 앱 로그 가져오기
 export const readAppLogData = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/get/log/winapp`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/log/winapp`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -275,33 +272,11 @@ export const readAppLogData = async (tokenid) => {
   }
 };
 
-// 실시간 데이터 주기
-export const updateSetTime = async (tokenid, data) => {
-  try {
-    const response = await axios.post(
-      `http://${apiLocation}/auth/userinfo/update/lamptime`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
-
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching data:", error);
-    throw error;
-  }
-};
-
-// 데이터 별 소실주기 읽기
+// 데이터 별 소실주기 읽기 v1
 export const readLossTimeData = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/auth/userinfo/get/losstime`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/lossfreq`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -320,8 +295,8 @@ export const readLossTimeData = async (tokenid) => {
 // 데이터 별 소실주기 수정
 export const updateLossTimeData = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/auth/userinfo/update/losstime`,
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/lossfreq`,
       data,
       {
         headers: {
@@ -338,59 +313,55 @@ export const updateLossTimeData = async (tokenid, data) => {
   }
 };
 
-// 데이터 주기 읽기
-// export const readTimeData = async (tokenid) => {
-//   try {
-//     const response = await axios.post(
-//       `http://${apiLocation}/info/get/settime`,
-//       {},
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${tokenid}`,
-//         },
-//       }
-//     );
+// 실시간 모니터링의 데이터 주기 읽기 v1
+export const readLampTimeData = async (tokenid) => {
+  try {
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/lamptime`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
 
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     throw error;
-//   }
-// };
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
 
-// 데이터 주기 읽기
-// export const readLampTimeData = async (tokenid) => {
-//   try {
-//     const response = await axios.post(
-//       `http://${apiLocation}/auth/userinfo/get/lamptime`,
-//       {},
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${tokenid}`,
-//         },
-//       }
-//     );
+// 실시간 모니터링의 데이터 주기 수정 v1
+export const updateSetTime = async (tokenid, data) => {
+  try {
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/lamptime`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
 
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     throw error;
-//   }
-// };
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
 
-// 데이터 소실 빈도 확인
+
+// 데이터 소실 빈도 확인 v1
 export const readlossData = async (
-  tokenid,
-  endpoint,
-  trialnum,
-  settingtime
+  tokenid, dataFormat
 ) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/lossdata/${endpoint}/${trialnum}/${settingtime}`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/lossfreq/${dataFormat}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -406,12 +377,11 @@ export const readlossData = async (
   }
 };
 
-// 항차 데이터 가져오기
+// 항차 데이터 가져오기 v1
 export const readTrialData = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/seatrial`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/test`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -427,11 +397,11 @@ export const readTrialData = async (tokenid) => {
   }
 };
 
-// 항차 데이터 추가하기
+// 항차 데이터 추가하기 v1
 export const createTrialData = async (tokenid, data) => {
   try {
     const response = await axios.post(
-      `http://${apiLocation}/admin/set/info/seatrial`,
+      `http://${apiLocation}/api/v1/test`,
       data,
       {
         headers: {
@@ -448,11 +418,11 @@ export const createTrialData = async (tokenid, data) => {
   }
 };
 
-// 항차 데이터 수정하기
+// 항차 데이터 수정하기 v1
 export const updateTrialData = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/update/info/seatrial`,
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/test`,
       data,
       {
         headers: {
@@ -469,19 +439,16 @@ export const updateTrialData = async (tokenid, data) => {
   }
 };
 
-// 항차 데이터 삭제하기
+// 항차 데이터 삭제하기 v1
 export const deleteTrialData = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/admin/delete/info/seatrial`,
-      data,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+    const response = await axios.delete(`http://${apiLocation}/api/v1/test`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+      data: data, // data를 옵션 객체 내에 포함시킵니다.
+    });
 
     return response.data;
   } catch (error) {
@@ -490,12 +457,11 @@ export const deleteTrialData = async (tokenid, data) => {
   }
 };
 
-// 데이터 조회하기
-export const readDataTrial = async (tokenid, data, type) => {
+// 데이터 조회하기 v1
+export const readDataTrial = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/data/${type}`,
-      data,
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/information/${data}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -510,47 +476,11 @@ export const readDataTrial = async (tokenid, data, type) => {
   }
 };
 
-// // 데이터 조회하기 (날짜)
-// export const readDataDate = async (
-//   tokenid,
-//   subComponunt,
-//   content,
-//   searchStart,
-//   searchEnd
-// ) => {
-//   try {
-//     const response = await axios.post(
-//       `http://${apiLocation}/data/period`,
-//       {},
-//       {
-//         headers: {
-//           "Content-Type": "application/json",
-//           Authorization: `Bearer ${tokenid}`,
-//           subcomp: `${subComponunt}`,
-//           content: `${content}`,
-//           start: `${searchStart}`,
-//           end: `${searchEnd}`,
-//         },
-//       }
-//     );
-
-//     console.log("ee");
-
-//     return response.data;
-//   } catch (error) {
-//     console.error("Error fetching data:", error);
-//     throw error;
-//   }
-// };
-
-
-
-//// 데이터 다운로드
+// 데이터 다운로드 v1
 export const downloadDataFile = async (tokenid, data) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/data/download`,
-      data,
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/information/${data}`,
       {
         responseType: "blob",
         headers: {
@@ -569,12 +499,11 @@ export const downloadDataFile = async (tokenid, data) => {
   }
 };
 
-// (Echart 도넛) 전체 데이터 저장 용량 비교
+// (Echart 도넛) 전체 데이터 저장 용량 비교 v1
 export const readDataStorage = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/storage/table`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/db/status/tables`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -590,12 +519,11 @@ export const readDataStorage = async (tokenid) => {
   }
 };
 
-// (Echart 도넛) 항차별 데이터 저장 용량 비교
+// (Echart 도넛) 항차별 데이터 저장 용량 비교 v1
 export const readDataTrialStorage = async (tokenid, trialnum) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/storage/subcomp/${trialnum}`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/db/status/tables/test?test_number=${trialnum}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -611,19 +539,15 @@ export const readDataTrialStorage = async (tokenid, trialnum) => {
   }
 };
 
-// (Echart 반도넛) 서버 저장 공간 현황
+// (Echart 반도넛) 서버 저장 공간 현황 v1
 export const serverStorage = async (tokenid) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/storage/db`,
-      {},
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+    const response = await axios.get(`http://${apiLocation}/api/v1/db/status`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -632,12 +556,11 @@ export const serverStorage = async (tokenid) => {
   }
 };
 
-// 웨이포인트 가져오기
+// 웨이포인트 가져오기 v1
 export const readWaypoint = async (tokenid, trial) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/waypoints/${trial}`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/waypoint?test_number=${trial}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -653,12 +576,11 @@ export const readWaypoint = async (tokenid, trial) => {
   }
 };
 
-// 항적 가져오기
+// 항적 가져오기 v1
 export const readAis = async (tokenid, trial) => {
   try {
-    const response = await axios.post(
-      `http://${apiLocation}/info/ais/${trial}`,
-      {},
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/trajectory?test_number=${trial}`,
       {
         headers: {
           "Content-Type": "application/json",

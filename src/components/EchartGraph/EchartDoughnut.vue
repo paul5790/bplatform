@@ -253,7 +253,7 @@ const getTrialDate = async () => {
     const response = await readTrialData(tokenid.value);
     trialrun.value.push("전체");
     for (let i = 0; i < response.length; i++) {
-      trialrun.value.push(`항차 ${i + 1}번`);
+      trialrun.value.push(`시험 ${i + 1}번`);
       selectedtrialNum.value = trialrun.value[0];
     }
   } catch (error) {

@@ -12,6 +12,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 
+
 // heading과 courseOverGround 값을 ref로 정의합니다.
 const heading = ref(0);
 
@@ -39,4 +40,6 @@ onUnmounted(() => {
 </script>
 
 <style>
+
+
 </style>

@@ -121,12 +121,14 @@
             >
               <v-card style="flex: 1">
                 <v-card-item>
-                  <v-data-table-virtual
-                    style=""
+                  <v-data-table
                     :headers="headers"
                     :items="analysis"
+                    fixed-header
+                    height="120px"
+                    hide-default-footer
                   >
-                  </v-data-table-virtual>
+                  </v-data-table>
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -158,6 +160,7 @@
                       variant="outlined"
                       class="custom-select"
                       style="margin-top: 3vh"
+                      chips
                       multiple
                     ></v-select>
 
@@ -167,6 +170,7 @@
                       label="Items"
                       variant="outlined"
                       class="custom-select"
+                      chips
                       multiple
                     ></v-select>
 
@@ -392,7 +396,7 @@ const getTrialDate = async () => {
       setStartTime.value.push(`${response[i].startTimeUtc}`);
       setEndTime.value.push(`${response[i].endTimeUtc}`);
       selectedtrialNum.value = i + 1;
-      trialrun.value.push(`항차 ${i + 1}번`);
+      trialrun.value.push(`시험 ${i + 1}번`);
     }
   } catch (error) {
     console.error(error);
@@ -417,7 +421,6 @@ watch(selectedtrialrun, (newVal) => {
     // 시간 범위 설정
     dateRange.value = [start, end];
   }
-  console.log(`period : start =  ${startDate.value}, end = ${endDate.value}`);
 });
 
 const updateDate = () => {
@@ -514,42 +517,42 @@ const itemsData = {
 
 // 데이터 생성 및 객체에 담기
 const gData = {
-  latitude: generateRandomData(0, 200, 200),
-  longitude: generateRandomData(-10, 50, 200),
-  altitude: generateRandomData(1000, 1100, 200),
-  speedovergroundknots: generateRandomData(0, 40, 200),
-  courseovergrounddegreestrue: generateRandomData(0, 360, 200),
-  heading: generateRandomData(0, 360, 200),
-  rateofturn: generateRandomData(-30, 30, 200),
-  anemometerangle: generateRandomData(0, 360, 200),
-  anemometerspeed: generateRandomData(0, 100, 200),
-  speedn: generateRandomData(0, 40, 200),
-  starboardruddersensor: generateRandomData(-45, 45, 200),
-  portruddersensor: generateRandomData(-45, 45, 200),
-  "1_Engine Speed": generateRandomData(0, 5000, 200),
-  "1_Engine Oil Temperature": generateRandomData(60, 120, 200),
-  "1_Engine Oil Pressure": generateRandomData(10, 100, 200),
-  "1_Engine Coolant Level": generateRandomData(0, 100, 200),
-  "1_Transmission Oil Pressure": generateRandomData(10, 100, 200),
-  "1_Charging System Potential": generateRandomData(12, 14, 200),
-  "1_Battery Potential": generateRandomData(12, 14, 200),
-  "1_Engine total hours": generateRandomData(0, 10000, 200),
-  "1_Engine Intake Manifold Pressure": generateRandomData(0, 30, 200),
-  "1_Engine Intake Manifold Temp": generateRandomData(0, 50, 200),
-  "1_Engine Exhaust Gas Temperature": generateRandomData(0, 700, 200),
-  "1_fuel_LEVEL": generateRandomData(0, 100, 200),
-  "2_Engine Speed": generateRandomData(0, 5000, 200),
-  "2_Engine Oil Temperature": generateRandomData(60, 120, 200),
-  "2_Engine Oil Pressure": generateRandomData(10, 100, 200),
-  "2_Engine Coolant Level": generateRandomData(0, 100, 200),
-  "2_Transmission Oil Pressure": generateRandomData(10, 100, 200),
-  "2_Charging System Potential": generateRandomData(12, 14, 200),
-  "2_Battery Potential": generateRandomData(12, 14, 200),
-  "2_Engine total hours": generateRandomData(0, 10000, 200),
-  "2_Engine Intake Manifold Pressure": generateRandomData(0, 30, 200),
-  "2_Engine Intake Manifold Temp": generateRandomData(0, 50, 200),
-  "2_Engine Exhaust Gas Temperature": generateRandomData(0, 700, 200),
-  "2_fuel_LEVEL": generateRandomData(0, 100, 200),
+  latitude: [],
+  longitude: [],
+  altitude: [],
+  speedovergroundknots: [],
+  courseovergrounddegreestrue: [],
+  heading: [],
+  rateofturn: [],
+  anemometerangle: [],
+  anemometerspeed: [],
+  speedn: [],
+  starboardruddersensor: [],
+  portruddersensor: [],
+  "1_Engine Speed": [],
+  "1_Engine Oil Temperature": [],
+  "1_Engine Oil Pressure": [],
+  "1_Engine Coolant Level": [],
+  "1_Transmission Oil Pressure": [],
+  "1_Charging System Potential": [],
+  "1_Battery Potential": [],
+  "1_Engine total hours": [],
+  "1_Engine Intake Manifold Pressure": [],
+  "1_Engine Intake Manifold Temp": [],
+  "1_Engine Exhaust Gas Temperature": [],
+  "1_fuel_LEVEL": [],
+  "2_Engine Speed": [],
+  "2_Engine Oil Temperature": [],
+  "2_Engine Oil Pressure": [],
+  "2_Engine Coolant Level": [],
+  "2_Transmission Oil Pressure": [],
+  "2_Charging System Potential": [],
+  "2_Battery Potential": [],
+  "2_Engine total hours": [],
+  "2_Engine Intake Manifold Pressure": [],
+  "2_Engine Intake Manifold Temp": [],
+  "2_Engine Exhaust Gas Temperature": [],
+  "2_fuel_LEVEL": [],
 };
 
 const option = ref({
@@ -580,8 +583,8 @@ const option = ref({
       type: "slider",
       xAxisIndex: 0,
       filterMode: "none",
-      height: "6%", // 높이를 20%로 설정
-      bottom: "2%", // 위치를 아래로 조정
+      height: "4%", // 높이를 20%로 설정
+      bottom: "1%", // 위치를 아래로 조정
     },
     {
       type: "slider",
@@ -611,7 +614,7 @@ const option = ref({
   xAxis: {
     type: "category",
     nameLocation: "middle",
-    data: Array.from({ length: 200 }, (_, i) => `Day ${i + 1}`), // x축 데이터를 1~3000일로 설정
+    data: analysisTime.value, // x축 데이터를 times 배열로 설정
     axisLabel: {
       color: textColor.value, // 텍스트 색상을 흰색으로 설정
     },
@@ -625,18 +628,42 @@ const option = ref({
 const updateSeries = () => {
   const series = [];
 
+  // 모든 타임스탬프 수집
+  const allTimestamps = new Set();
+  selectedItem.value.forEach((component) => {
+    if (component in gData) {
+      gData[component].forEach((item) => {
+        const timestamp = Object.keys(item)[0];
+        allTimestamps.add(timestamp);
+      });
+    }
+  });
+
+  // 타임스탬프를 정렬
+  const sortedTimestamps = Array.from(allTimestamps).sort(
+    (a, b) => new Date(a) - new Date(b)
+  );
+
   // dataMap을 자동으로 생성
   const dataMap = Object.keys(gData).reduce((map, key) => {
-    map[key] = gData[key];
+    // 타임스탬프를 키로 사용한 맵 생성
+    map[key] = gData[key].reduce((subMap, item) => {
+      const timestamp = Object.keys(item)[0];
+      subMap[timestamp] = item[timestamp];
+      return subMap;
+    }, {});
     return map;
   }, {});
 
   selectedItem.value.forEach((component) => {
     if (component in dataMap) {
+      const seriesData = sortedTimestamps.map((timestamp) => dataMap[component][timestamp] || null);
+
       series.push({
         name: component,
         type: "line",
-        data: dataMap[component],
+        data: seriesData,
+        connectNulls: true, // null 값을 선으로 연결
         markPoint: {
           data: [
             { type: "max", name: "Max" },
@@ -647,12 +674,37 @@ const updateSeries = () => {
     }
   });
 
-  console.log(series);
   option.value.series = series;
 
   option.value.legend = {
     data: selectedItem.value,
   };
+
+  option.value.xAxis = {
+    type: "category",
+    nameLocation: "middle",
+    data: sortedTimestamps, // x축 데이터를 타임스탬프로 설정
+    axisLabel: {
+      color: textColor.value, // 텍스트 색상을 흰색으로 설정
+      formatter: (value) => {
+        const date = new Date(value);
+        const formattedDate = `
+        ${date.getDate().toString().padStart(2, "0")} ${date
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date
+          .getSeconds()
+          .toString()
+          .padStart(2, "0")}`;
+        return formattedDate;
+      },
+    },
+  };
+
+  if (chartInstance.value) {
+    chartInstance.value.clear(); // 이전 데이터 제거
+    chartInstance.value.setOption(option.value);
+  }
 };
 
 // 데이터 업데이트
@@ -661,26 +713,48 @@ const axiosData = async () => {};
 // 데이터 API 요청
 const fetchData = async (subComponent, contents) => {
   try {
-    let dataFomat = {
-      subComponent: subComponent,
-      content: contents,
-      seatrialNumber: "N/A",
-      period: [startDate.value, endDate.value],
-    };
-    return await readDataTrial(tokenid.value, dataFomat, "period");
+    let dataFomat = `period?start_utctime=${startDate.value}&end_utctime=${endDate.value}&signal_name=${subComponent}_${contents}`;
+    return await readDataTrial(tokenid.value, dataFomat);
   } catch (error) {
     console.error(error);
     throw error; // 에러를 호출자에게 전파
   }
 };
 
-const processData = (data, timestampKey, dataKey, unitValue, contentsItemValue, analysisName) => {
-  console.log(data);
-  analysisData.value = data.map(item => item[dataKey]);
-  analysisTime.value = data.map(item => item[timestampKey].slice(0, 19));
+let n = 0;
+
+const processData = (
+  data,
+  timestampKey,
+  dataKey,
+  unitValue,
+  contentsItemValue,
+  analysisName
+) => {
+  analysisData.value[n] = data.map((item) => item[dataKey]);
+
+  // 중복된 타임스탬프를 제거하면서 analysisTime에 값을 추가
+  const newTimestamps = data.map((item) => item[timestampKey]);
+  const allTimestamps = new Set([...analysisTime.value, ...newTimestamps]);
+  analysisTime.value = Array.from(allTimestamps).sort(
+    (a, b) => new Date(a) - new Date(b)
+  );
+
+  // analysisTime.value = data.map((item) => item[timestampKey]);
+  // gData[analysisName] = data.map((item) => item[dataKey]);
+  gData[analysisName] = data.map((item) => {
+    let obj = {};
+    obj[item[timestampKey]] = item[dataKey];
+    return obj;
+  });
+
+  console.log(gData[analysisName]);
+
   unit.value = unitValue;
   // selectedcontentsItem.value = contentsItemValue;
-  analysis.value[0].name = analysisName;
+  analysis.value[n].name = analysisName;
+  analysis.value[n].unit = unitValue;
+  n++;
 };
 
 //데이터 검색
@@ -697,11 +771,30 @@ const searchData = async () => {
   // } else {
   //   alert("선택항목을 선택해주세요.");
   // }
+  updateDate();
+  clearChart();
 
   try {
     analysisData.value = [];
     analysisTime.value = [];
 
+    const newLength = selectedItem.value.length;
+    // 기본 객체 템플릿
+    const template = {
+      name: "signal",
+      unit: "unit",
+      min: "-",
+      max: "-",
+      average: "-",
+      rmse: "-",
+      rms: "-",
+      variance: "-",
+      error: "-",
+      median: "-",
+    };
+    analysis.value = Array.from({ length: newLength }, () => ({ ...template }));
+
+    console.log("구간 1");
     if (
       selectedItem.value.includes("latitude") ||
       selectedItem.value.includes("longitude") ||
@@ -791,7 +884,7 @@ const searchData = async () => {
     if (selectedItem.value.includes("1_fuel_LEVEL")) {
       itemsData.fuel_LEVEL_1 = await fetchData(
         "NO1ENGINEPANEL",
-        "NO2ENGINE_PANEL_65276"
+        "NO1ENGINE_PANEL_65276"
       );
     }
     if (selectedItem.value.includes("2_Engine Speed")) {
@@ -808,7 +901,7 @@ const searchData = async () => {
     }
     if (
       selectedItem.value.includes("2_Engine Oil Pressure") ||
-      selectedItem.value.includes("1_Engine Coolant Level")
+      selectedItem.value.includes("2_Engine Coolant Level")
     ) {
       itemsData.engine_OIL_PRESSURE2 = await fetchData(
         "NO2ENGINEPANEL",
@@ -823,7 +916,7 @@ const searchData = async () => {
     }
     if (
       selectedItem.value.includes("2_Charging System Potential") ||
-      selectedItem.value.includes("1_Battery Potential")
+      selectedItem.value.includes("2_Battery Potential")
     ) {
       itemsData.charging_SYSTEM_POTENTIAL2 = await fetchData(
         "NO2ENGINEPANEL",
@@ -838,8 +931,8 @@ const searchData = async () => {
     }
     if (
       selectedItem.value.includes("2_Engine Intake Manifold Pressure") ||
-      selectedItem.value.includes("1_Engine Intake Manifold Temp") ||
-      selectedItem.value.includes("1_Engine Exhaust Gas Temperature")
+      selectedItem.value.includes("2_Engine Intake Manifold Temp") ||
+      selectedItem.value.includes("2_Engine Exhaust Gas Temperature")
     ) {
       itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2 = await fetchData(
         "NO2ENGINEPANEL",
@@ -852,340 +945,506 @@ const searchData = async () => {
         "NO2ENGINE_PANEL_65276"
       );
     }
+    console.log("구간 2");
+    selectedItem.value.forEach((item) => {
+      switch (item) {
+        case "latitude":
+          processData(
+            itemsData.gga,
+            "timestamp_EQUIPMENT",
+            "latitude",
+            "degree(°)",
+            "gga/latitude",
+            "latitude"
+          );
+          break;
+        case "longitude":
+          processData(
+            itemsData.gga,
+            "timestamp_EQUIPMENT",
+            "longitude",
+            "degree(°)",
+            "gga/longitude",
+            "longitude"
+          );
+          break;
+        case "altitude":
+          processData(
+            itemsData.gga,
+            "timestamp_EQUIPMENT",
+            "altitude",
+            "M",
+            "gga/altitude",
+            "altitude"
+          );
+          break;
+        case "speedovergroundknots":
+          processData(
+            itemsData.vtg,
+            "timestamp_EQUIPMENT",
+            "speedovergroundknots",
+            "N",
+            "vtg/speedovergroundknots",
+            "speedovergroundknots"
+          );
+          break;
+        case "courseovergrounddegreestrue":
+          processData(
+            itemsData.vtg,
+            "timestamp_EQUIPMENT",
+            "courseovergrounddegreestrue",
+            "degree(°)",
+            "vtg/courseovergrounddegreestrue",
+            "courseovergrounddegreestrue"
+          );
+          break;
+        case "heading":
+          processData(
+            itemsData.hdt,
+            "timestamp_EQUIPMENT",
+            "heading",
+            "degree(°)",
+            "hdt/heading",
+            "heading"
+          );
+          break;
+        case "rateofturn":
+          processData(
+            itemsData.rot,
+            "timestamp_EQUIPMENT",
+            "rateofturn",
+            "degree/minute",
+            "rot/rateofturn",
+            "rateofturn"
+          );
+          break;
+        case "anemometerangle":
+          processData(
+            itemsData.mwv,
+            "timestamp_EQUIPMENT",
+            "anemometerangle",
+            "degree(°)",
+            "mwv/anemometerangle",
+            "anemometerangle"
+          );
+          break;
+        case "anemometerspeed":
+          processData(
+            itemsData.mwv,
+            "timestamp_EQUIPMENT",
+            "anemometerspeed",
+            "m/s",
+            "mwv/anemometerspeed",
+            "anemometerspeed"
+          );
+          break;
+        case "speedn":
+          processData(
+            itemsData.vhw,
+            "timestamp_EQUIPMENT",
+            "speedn",
+            "N",
+            "vhw/speedn",
+            "speedn"
+          );
+          break;
+        case "starboardruddersensor":
+          processData(
+            itemsData.rsa,
+            "timestamp_EQUIPMENT",
+            "starboardruddersensor",
+            "degree(°)",
+            "rsa/starboardruddersensor",
+            "starboardruddersensor"
+          );
+          break;
+        case "portruddersensor":
+          processData(
+            itemsData.rsa,
+            "timestamp_EQUIPMENT",
+            "portruddersensor",
+            "degree(°)",
+            "rsa/portruddersensor",
+            "portruddersensor"
+          );
+          break;
 
-    console.log(`selectedItem : ${selectedItem.value}, gga : ${itemsData.gga}, vtg : ${itemsData.vtg}, engine270 : ${itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2}`);
+        case "1_Engine Speed":
+          processData(
+            itemsData.engine_SPEED,
+            "timestamp_EQUIPMENT",
+            "engine_SPEED",
+            "RPM",
+            "no1engine_panel_61444/Engine Speed",
+            "1_Engine Speed"
+          );
+          break;
+        case "1_Engine Oil Temperature":
+          processData(
+            itemsData.engine_OIL_TEMPERATURE1,
+            "timestamp_EQUIPMENT",
+            "engine_OIL_TEMPERATURE1",
+            "°C",
+            "no1engine_panel_65262/Engine Oil Temperature",
+            "1_Engine Oil Temperature"
+          );
+          break;
+        case "1_Engine Oil Pressure":
+          processData(
+            itemsData.engine_OIL_PRESSURE,
+            "timestamp_EQUIPMENT",
+            "engine_OIL_PRESSURE",
+            "kPa",
+            "no1engine_panel_65263/Engine Oil Pressure",
+            "1_Engine Oil Pressure"
+          );
+          break;
+        case "1_Engine Coolant Level":
+          processData(
+            itemsData.engine_OIL_PRESSURE,
+            "timestamp_EQUIPMENT",
+            "engine_COOLANT_LEVEL",
+            "%",
+            "no1engine_panel_65263/Engine Coolant Level",
+            "1_Engine Coolant Level"
+          );
+          break;
+        case "1_Transmission Oil Pressure":
+          processData(
+            itemsData.transmission_OIL_PRESSURE,
+            "timestamp_EQUIPMENT",
+            "transmission_OIL_PRESSURE",
+            "kPa",
+            "no1engine_panel_65272/Transmission Oil Pressure",
+            "1_Transmission Oil Pressure"
+          );
+          break;
+        case "1_Charging System Potential":
+          processData(
+            itemsData.charging_SYSTEM_POTENTIAL,
+            "timestamp_EQUIPMENT",
+            "charging_SYSTEM_POTENTIAL",
+            "V",
+            "no1engine_panel_65271/Charging System Potential",
+            "1_Charging System Potential"
+          );
+          break;
+        case "1_Battery Potential":
+          processData(
+            itemsData.charging_SYSTEM_POTENTIAL,
+            "timestamp_EQUIPMENT",
+            "battery_POTENTIAL",
+            "V",
+            "no1engine_panel_65271/Battery Potential",
+            "1_Battery Potential"
+          );
+          break;
+        case "1_Engine total hours":
+          processData(
+            itemsData.engine_TOTAL_HOURS,
+            "timestamp_EQUIPMENT",
+            "engine_TOTAL_HOURS",
+            "hr",
+            "no1engine_panel_65253/Engine total hours",
+            "1_Engine total hours"
+          );
+          break;
+        case "1_Engine Intake Manifold Pressure":
+          processData(
+            itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE,
+            "timestamp_EQUIPMENT",
+            "engine_INTAKE_MANIFOLD_NO1_PRESSURE",
+            "kPa",
+            "no1engine_panel_65270/Engine Intake Manifold Pressure",
+            "1_Engine Intake Manifold Pressure"
+          );
+          break;
+        case "1_Engine Intake Manifold Temp":
+          processData(
+            itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE,
+            "timestamp_EQUIPMENT",
+            "engine_INTAKE_MANIFOLD_NO1_TEMP",
+            "°C",
+            "no1engine_panel_65270/Engine Intake Manifold Temp",
+            "1_Engine Intake Manifold Temp"
+          );
+          break;
+        case "1_Engine Exhaust Gas Temperature":
+          processData(
+            itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE,
+            "timestamp_EQUIPMENT",
+            "engine_EXHAUST_GAS_TEMPERATURE",
+            "°C",
+            "no1engine_panel_65270/Engine Exhaust Gas Temperature",
+            "1_Engine Exhaust Gas Temperature"
+          );
+          break;
+        case "1_fuel_LEVEL":
+          processData(
+            itemsData.fuel_LEVEL_1,
+            "timestamp_EQUIPMENT",
+            "fuel_LEVEL_1",
+            "%",
+            "no1engine_panel_65276/Fuel Level",
+            "1_fuel_LEVEL"
+          );
+          break;
 
-    switch (selectedItem.value) {
-        case "위도":
-          processData(itemsData.gga, "timestamp_EQUIPMENT", "latitude", "degree(°)", "gga/latitude", "latitude");
+        case "2_Engine Speed":
+          processData(
+            itemsData.engine_SPEED2,
+            "timestamp_EQUIPMENT",
+            "engine_SPEED",
+            "RPM",
+            "no2engine_panel_61444/Engine Speed",
+            "2_Engine Speed"
+          );
           break;
-        case "경도":
-          processData(itemsData.gga, "timestamp_EQUIPMENT", "longitude", "degree(°)", "gga/longitude", "longitude");
+        case "2_Engine Oil Temperature":
+          processData(
+            itemsData.engine_OIL_TEMPERATURE2,
+            "timestamp_EQUIPMENT",
+            "engine_OIL_TEMPERATURE1",
+            "°C",
+            "no2engine_panel_65262/Engine Oil Temperature",
+            "2_Engine Oil Temperature"
+          );
           break;
-        case "고도":
-          processData(itemsData.gga, "timestamp_EQUIPMENT", "altitude", "M", "gga/altitude", "altitude");
+        case "2_Engine Oil Pressure":
+          processData(
+            itemsData.engine_OIL_PRESSURE2,
+            "timestamp_EQUIPMENT",
+            "engine_OIL_PRESSURE",
+            "kPa",
+            "no2engine_panel_65263/Engine Oil Pressure",
+            "2_Engine Oil Pressure"
+          );
           break;
-        case "SOG":
-          processData(itemsData.vtg, "timestamp_EQUIPMENT", "speedovergroundknots", "N", "vtg/speedovergroundknots", "speedovergroundknots");
+        case "2_Engine Coolant Level":
+          processData(
+            itemsData.engine_OIL_PRESSURE2,
+            "timestamp_EQUIPMENT",
+            "engine_COOLANT_LEVEL",
+            "%",
+            "no2engine_panel_65263/Engine Coolant Level",
+            "2_Engine Coolant Level"
+          );
           break;
-        case "COG":
-          processData(itemsData.vtg, "timestamp_EQUIPMENT", "courseovergrounddegreestrue", "degree(°)", "vtg/courseovergrounddegreestrue", "courseovergrounddegreestrue");
+        case "2_Transmission Oil Pressure":
+          processData(
+            itemsData.transmission_OIL_PRESSURE2,
+            "timestamp_EQUIPMENT",
+            "transmission_OIL_PRESSURE",
+            "kPa",
+            "no2engine_panel_65272/Transmission Oil Pressure",
+            "2_Transmission Oil Pressure"
+          );
           break;
-        case "Heading":
-          processData(itemsData.hdt, "timestamp_EQUIPMENT", "heading", "degree(°)", "hdt/heading", "heading");
+        case "2_Charging System Potential":
+          processData(
+            itemsData.charging_SYSTEM_POTENTIAL2,
+            "timestamp_EQUIPMENT",
+            "charging_SYSTEM_POTENTIAL",
+            "V",
+            "no2engine_panel_65271/Charging System Potential",
+            "2_Charging System Potential"
+          );
           break;
-        case "회전 속도":
-          processData(itemsData.rot, "timestamp_EQUIPMENT", "rateofturn", "degree/minute", "rot/rateofturn", "rateofturn");
+        case "2_Battery Potential":
+          processData(
+            itemsData.charging_SYSTEM_POTENTIAL2,
+            "timestamp_EQUIPMENT",
+            "battery_POTENTIAL",
+            "V",
+            "no2engine_panel_65271/Battery Potential",
+            "2_Battery Potential"
+          );
           break;
-        case "풍향":
-          processData(itemsData.mwv, "timestamp_EQUIPMENT", "anemometerangle", "degree(°)", "mwv/anemometerangle", "anemometerangle");
+        case "2_Engine total hours":
+          processData(
+            itemsData.engine_TOTAL_HOURS2,
+            "timestamp_EQUIPMENT",
+            "engine_TOTAL_HOURS",
+            "hr",
+            "no2engine_panel_65253/Engine total hours",
+            "2_Engine total hours"
+          );
           break;
-        case "풍속":
-          processData(itemsData.mwv, "timestamp_EQUIPMENT", "anemometerspeed", "m/s", "mwv/anemometerspeed", "anemometerspeed");
+        case "2_Engine Intake Manifold Pressure":
+          processData(
+            itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2,
+            "timestamp_EQUIPMENT",
+            "engine_INTAKE_MANIFOLD_NO1_PRESSURE",
+            "kPa",
+            "no2engine_panel_65270/Engine Intake Manifold Pressure",
+            "2_Engine Intake Manifold Pressure"
+          );
           break;
-        case "선박 속도":
-          processData(itemsData.vhw, "timestamp_EQUIPMENT", "speedn", "N", "vhw/speedn", "speedn");
+        case "2_Engine Intake Manifold Temp":
+          processData(
+            itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2,
+            "timestamp_EQUIPMENT",
+            "engine_INTAKE_MANIFOLD_NO1_TEMP",
+            "°C",
+            "no2engine_panel_65270/Engine Intake Manifold Temp",
+            "2_Engine Intake Manifold Temp"
+          );
           break;
-        case "스타보트 센서":
-          processData(itemsData.rsa, "timestamp_EQUIPMENT", "starboardruddersensor", "degree(°)", "rsa/starboardruddersensor", "starboardruddersensor");
+        case "2_Engine Exhaust Gas Temperature":
+          processData(
+            itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2,
+            "timestamp_EQUIPMENT",
+            "engine_EXHAUST_GAS_TEMPERATURE",
+            "°C",
+            "no2engine_panel_65270/Engine Exhaust Gas Temperature",
+            "2_Engine Exhaust Gas Temperature"
+          );
           break;
-        case "포트 센서":
-          processData(itemsData.rsa, "timestamp_EQUIPMENT", "portruddersensor", "degree(°)", "rsa/portruddersensor", "portruddersensor");
-          break;
-
-        case "엔진1 속도":
-          processData(itemsData.engine_SPEED, "timestamp_EQUIPMENT", "engine_SPEED", "RPM", "no1engine_panel_61444/Engine Speed", "Engine Speed");
-          break;
-        case "엔진1 오일 온도":
-          processData(itemsData.engine_OIL_TEMPERATURE1, "timestamp_EQUIPMENT", "engine_OIL_TEMPERATURE1", "°C", "no1engine_panel_65262/Engine Oil Temperature", "Engine Oil Temperature");
-          break;
-        case "엔진1 오일 압력":
-          processData(itemsData.engine_OIL_PRESSURE, "timestamp_EQUIPMENT", "engine_OIL_PRESSURE", "kPa", "no1engine_panel_65263/Engine Oil Pressure", "Engine Oil Pressure");
-          break;
-        case "엔진1 냉각수 량":
-          processData(itemsData.engine_OIL_PRESSURE, "timestamp_EQUIPMENT", "engine_COOLANT_LEVEL", "%", "no1engine_panel_65263/Engine Coolant Level", "Engine Coolant Level");
-          break;
-        case "엔진1 변속기 오일 압력":
-          processData(itemsData.transmission_OIL_PRESSURE, "timestamp_EQUIPMENT", "transmission_OIL_PRESSURE", "kPa", "no1engine_panel_65272/Transmission Oil Pressure", "Transmission Oil Pressure");
-          break;
-        case "엔진1 충전 시스템 전압":
-          processData(itemsData.charging_SYSTEM_POTENTIAL, "timestamp_EQUIPMENT", "charging_SYSTEM_POTENTIAL", "V", "no1engine_panel_65271/Charging System Potential", "Charging System Potential");
-          break;
-        case "엔진1 배터리 전압":
-          processData(itemsData.charging_SYSTEM_POTENTIAL, "timestamp_EQUIPMENT", "battery_POTENTIAL", "V", "no1engine_panel_65271/Battery Potential", "Battery Potential");
-          break;
-        case "엔진1 누적 가동시간":
-          processData(itemsData.engine_TOTAL_HOURS, "timestamp_EQUIPMENT", "engine_TOTAL_HOURS", "hr", "no1engine_panel_65253/Engine total hours", "Engine total hours");
-          break;
-        case "엔진1 흡입 매니폴드 압력":
-          processData(itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_PRESSURE", "kPa", "no1engine_panel_65270/Engine Intake Manifold Pressure", "Engine Intake Manifold Pressure");
-          break;
-        case "엔진1 흡입 매니폴드 온도":
-          processData(itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_TEMP", "°C", "no1engine_panel_65270/Engine Intake Manifold Temp", "Engine Intake Manifold Temp");
-          break;
-        case "엔진1 배기가스 온도":
-          processData(itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE, "timestamp_EQUIPMENT", "engine_EXHAUST_GAS_TEMPERATURE", "°C", "no1engine_panel_65270/Engine Exhaust Gas Temperature", "Engine Exhaust Gas Temperature");
-          break;
-        case "엔진1 연료 량":
-          processData(itemsData.fuel_LEVEL_1, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no1engine_panel_65276/Fuel Level", "fuel_LEVEL");
-          break;
-
-
-
-        case "엔진2 속도":
-          processData(itemsData.engine_SPEED2, "timestamp_EQUIPMENT", "engine_SPEED", "RPM", "no2engine_panel_61444/Engine Speed", "Engine Speed");
-          break;
-        case "엔진2 오일 온도":
-          processData(itemsData.engine_OIL_TEMPERATURE2, "timestamp_EQUIPMENT", "engine_OIL_TEMPERATURE1", "°C", "no2engine_panel_65262/Engine Oil Temperature", "Engine Oil Temperature");
-          break;
-        case "엔진2 오일 압력":
-          processData(itemsData.engine_OIL_PRESSURE2, "timestamp_EQUIPMENT", "engine_OIL_PRESSURE", "kPa", "no2engine_panel_65263/Engine Oil Pressure", "Engine Oil Pressure");
-          break;
-        case "엔진2 냉각수 량":
-          processData(itemsData.engine_OIL_PRESSURE2, "timestamp_EQUIPMENT", "engine_COOLANT_LEVEL", "%", "no2engine_panel_65263/Engine Coolant Level", "Engine Coolant Level");
-          break;
-        case "엔진2 변속기 오일 압력":
-          processData(itemsData.transmission_OIL_PRESSURE2, "timestamp_EQUIPMENT", "transmission_OIL_PRESSURE", "kPa", "no2engine_panel_65272/Transmission Oil Pressure", "Transmission Oil Pressure");
-          break;
-        case "엔진2 충전 시스템 전압":
-          processData(itemsData.charging_SYSTEM_POTENTIAL2, "timestamp_EQUIPMENT", "charging_SYSTEM_POTENTIAL", "V", "no2engine_panel_65271/Charging System Potential", "Charging System Potential");
-          break;
-        case "엔진2 배터리 전압":
-          processData(itemsData.charging_SYSTEM_POTENTIAL2, "timestamp_EQUIPMENT", "battery_POTENTIAL", "V", "no2engine_panel_65271/Battery Potential", "Battery Potential");
-          break;
-        case "엔진2 누적 가동시간":
-          processData(itemsData.engine_TOTAL_HOURS2, "timestamp_EQUIPMENT", "engine_TOTAL_HOURS", "hr", "no2engine_panel_65253/Engine total hours", "Engine total hours");
-          break;
-        case "엔진2 흡입 매니폴드 압력":
-          processData(itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_PRESSURE", "kPa", "no2engine_panel_65270/Engine Intake Manifold Pressure", "Engine Intake Manifold Pressure");
-          break;
-        case "엔진2 흡입 매니폴드 온도":
-          processData(itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_INTAKE_MANIFOLD_NO1_TEMP", "°C", "no2engine_panel_65270/Engine Intake Manifold Temp", "Engine Intake Manifold Temp");
-          break;
-        case "엔진2 배기가스 온도":
-          processData(itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2, "timestamp_EQUIPMENT", "engine_EXHAUST_GAS_TEMPERATURE", "°C", "no2engine_panel_65270/Engine Exhaust Gas Temperature", "Engine Exhaust Gas Temperature");
-          break;
-        case "엔진2 연료 량":
-          processData(itemsData.fuel_LEVEL_2, "timestamp_EQUIPMENT", "fuel_LEVEL_1", "%", "no2engine_panel_65276/Fuel Level", "fuel_LEVEL");
+        case "2_fuel_LEVEL":
+          processData(
+            itemsData.fuel_LEVEL_2,
+            "timestamp_EQUIPMENT",
+            "fuel_LEVEL_1",
+            "%",
+            "no2engine_panel_65276/Fuel Level",
+            "2_fuel_LEVEL"
+          );
           break;
       }
+    });
+    console.log("구간 3");
 
-  //   ("");
+    const datasetRaw2 = ref([["time", "value"]]);
+    datasetRaw2.value = [];
 
-  //   const datasetRaw2 = ref([["time", "value"]]);
-  //   datasetRaw2.value = [];
-  //   for (let i = 0; i <= analysisTime.value.length; i++) {
-  //     datasetRaw2.value.push([
-  //       analysisTime.value[i + 1],
-  //       analysisData.value[i],
-  //     ]);
-  //   }
-  //   if (analysisTime.value.length <= 0) {
-  //     console.log("yolololololol~~");
+    analysisTime.value.sort((a, b) => {
+      // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+      const timeA = new Date(a);
+      const timeB = new Date(b);
+      return timeA - timeB;
+    });
 
-  //     analysis.value[0].min = "-"; // 최댓값
-  //     analysis.value[0].max = "-"; // 평균값
-  //     analysis.value[0].average = "-"; // 표준편차
-  //     analysis.value[0].rmse = "-"; // 제곱평균제곱근
-  //     analysis.value[0].rms = "-"; // 중앙값
-  //     analysis.value[0].median = "-"; // 표준 오차
-  //     analysis.value[0].error = "-"; // 분산
-  //     analysis.value[0].variance = "-";
+    datasetRaw2.value.sort((a, b) => {
+      // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+      const timeA = new Date(a[0]);
+      const timeB = new Date(b[0]);
+      return timeA - timeB;
+    });
 
-  //     nodata.value = true;
-  //     loading.value = false;
-  //   } else {
-  //     nodata.value = false;
-  //   }
+    console.log("구간 그래프");
+    //updateSeries();
 
-  //   analysisTime.value.sort((a, b) => {
-  //     // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
-  //     const timeA = new Date(a);
-  //     const timeB = new Date(b);
-  //     return timeA - timeB;
-  //   });
+    for (let n = 0; n < selectedItem.value.length; n++) {
+      console.log(`구간 ${4 + n}`);
+      for (let i = 0; i <= analysisTime.value.length; i++) {
+        datasetRaw2.value.push([
+          analysisTime.value[i + 1],
+          analysisData.value[n][i],
+        ]);
+      }
 
-  //   datasetRaw2.value.sort((a, b) => {
-  //     // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
-  //     const timeA = new Date(a[0]);
-  //     const timeB = new Date(b[0]);
-  //     return timeA - timeB;
-  //   });
+      if (analysisTime.value.length <= 0) {
+        console.log("yolololololol~~");
+        analysis.value[n].min = "-"; // 최댓값
+        analysis.value[n].max = "-"; // 평균값
+        analysis.value[n].average = "-"; // 표준편차
+        analysis.value[n].rmse = "-"; // 제곱평균제곱근
+        analysis.value[n].rms = "-"; // 중앙값
+        analysis.value[n].median = "-"; // 표준 오차
+        analysis.value[n].error = "-"; // 분산
+        analysis.value[n].variance = "-";
 
-  //   option.value = {
-  //     dataset: [
-  //       {
-  //         id: "dataset_raw",
-  //         source: datasetRaw2.value,
-  //       },
-  //     ],
-  //     tooltip: {
-  //       trigger: "axis",
-  //       formatter: function (params) {
-  //         params = params[0];
-  //         return `Time: ${params.value[0]}, Value: ${params.value[1]}`;
-  //       },
-  //       axisPointer: {
-  //         animation: false,
-  //       },
-  //     },
-  //     dataZoom: [
-  //       {
-  //         type: "slider",
-  //         xAxisIndex: 0,
-  //         filterMode: "none",
-  //         height: "6%", // 높이를 20%로 설정
-  //         bottom: "2%", // 위치를 아래로 조정
-  //       },
-  //       {
-  //         type: "slider",
-  //         yAxisIndex: 0,
-  //         filterMode: "none",
-  //         width: "2%",
-  //       },
-  //       {
-  //         type: "inside",
-  //         xAxisIndex: 0,
-  //         filterMode: "none",
-  //       },
-  //       {
-  //         type: "inside",
-  //         yAxisIndex: 0,
-  //         filterMode: "none",
-  //       },
-  //       // {
-  //       //   show: true,
-  //       //   realtime: true,
-  //       //   start: 0,
-  //       //   end: 100,
-  //       //   xAxisIndex: [0, 1],
-  //       //   height: "2%",
-  //       // },
-  //     ],
-  //     xAxis: {
-  //       type: "category",
-  //       nameLocation: "middle",
-  //       data: analysisTime.value, // x축 데이터를 times 배열로 설정
-  //       axisLabel: {
-  //         color: textColor.value, // 텍스트 색상을 흰색으로 설정
-  //       },
-  //     },
-  //     yAxis: {},
-  //     series: [
-  //       {
-  //         type: "line",
-  //         datasetId: "dataset_raw",
-  //         showSymbol: false,
-  //         markPoint: {
-  //           data: [
-  //             { type: "max", name: "Max" },
-  //             { type: "min", name: "Min" },
-  //           ],
-  //         },
-  //         encode: {
-  //           x: "time",
-  //           y: "value",
-  //           itemName: "time",
-  //           tooltip: ["value"],
-  //         },
-  //       },
-  //     ],
-  //   };
+        // nodata.value = true;
+        // loading.value = false;
+      } else {
+        // nodata.value = false;
+      }
 
-  //   const minValue = ref(); // 최솟값
-  //   const maxValue = ref(); // 최댓값
-  //   const averageValue = ref(); // 평균값
-  //   const standardDeviation = ref(); // 표준편차
-  //   const rms = ref(); // 제곱평균제곱근
-  //   const median = ref(); // 중앙값
-  //   const standardError = ref(); // 표준오차
-  //   const variance = ref();
-  //   const numericValues = analysisData.value
-  //     .map((value) => Number(value))
-  //     .filter((value) => !isNaN(value));
+      const minValue = ref(); // 최솟값
+      const maxValue = ref(); // 최댓값
+      const averageValue = ref(); // 평균값
+      const standardDeviation = ref(); // 표준편차
+      const rms = ref(); // 제곱평균제곱근
+      const median = ref(); // 중앙값
+      const standardError = ref(); // 표준오차
+      const variance = ref();
+      const numericValues = analysisData.value[n]
+        .map((value) => Number(value))
+        .filter((value) => !isNaN(value));
 
-  //   // console.log( "통계:", analysisData.value); // if(analysisData)
+      // console.log( "통계:", analysisData.value); // if(analysisData)
 
-  //   if (numericValues.length > 1) {
-  //     // 최솟값 구하기
-  //     minValue.value = Math.min(...analysisData.value);
+      if (numericValues.length > 1) {
+        // 최솟값 구하기
+        minValue.value = Math.min(...analysisData.value[n]);
 
-  //     // 최댓값 구하기
-  //     maxValue.value = Math.max(...analysisData.value);
-  //     // 평균 계산sortedValues
-  //     const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
-  //     averageValue.value = sum.value / numericValues.length;
+        // 최댓값 구하기
+        maxValue.value = Math.max(...analysisData.value[n]);
+        // 평균 계산sortedValues
+        const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
+        averageValue.value = sum.value / numericValues.length;
 
-  //     // 표준편차 계산
-  //     const squaredDifferences = ref(
-  //       numericValues.map((value) => Math.pow(value - averageValue.value, 2))
-  //     );
-  //     const sumOfSquaredDifferences = squaredDifferences.value.reduce(
-  //       (acc, value) => acc + value,
-  //       0
-  //     );
-  //     variance.value = sumOfSquaredDifferences / numericValues.length;
-  //     standardDeviation.value = Math.sqrt(variance.value);
+        // 표준편차 계산
+        const squaredDifferences = ref(
+          numericValues.map((value) => Math.pow(value - averageValue.value, 2))
+        );
+        const sumOfSquaredDifferences = squaredDifferences.value.reduce(
+          (acc, value) => acc + value,
+          0
+        );
+        variance.value = sumOfSquaredDifferences / numericValues.length;
+        standardDeviation.value = Math.sqrt(variance.value);
 
-  //     // 제곱평균제곱근(RMS) 계산
-  //     const sumOfSquares = ref(
-  //       numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
-  //     );
-  //     rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
+        // 제곱평균제곱근(RMS) 계산
+        const sumOfSquares = ref(
+          numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
+        );
+        rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
 
-  //     // 중앙값 계산
-  //     const sortedValues = numericValues.sort((a, b) => a - b);
-  //     const mid = ref(Math.floor(sortedValues.length / 2));
+        // 중앙값 계산
+        const sortedValues = numericValues.sort((a, b) => a - b);
+        const mid = ref(Math.floor(sortedValues.length / 2));
 
-  //     if (sortedValues.length % 2 === 0) {
-  //       // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
-  //       median.value =
-  //         (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
-  //       console.log("짝수");
-  //     } else {
-  //       // 홀수일 경우 중간 값이 중앙값
-  //       median.value = sortedValues[mid.value];
-  //       console.log("홀수");
-  //     }
-  //     // 표준 오차 계산
-  //     standardError.value =
-  //       standardDeviation.value / Math.sqrt(numericValues.length);
-  //   } else {
-  //     alert("데이터가 존재하지 않습니다.");
-  //     averageValue.value = 0;
-  //     standardDeviation.value = 0;
-  //     rms.value = 0;
-  //     median.value = 0;
-  //     standardError.value = 0;
-  //   }
-  //   analysis.value[0].unit = unit.value;
-  //   // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
-  //   analysis.value[0].min = minValue.value.toFixed(4);
-  //   // console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
-  //   analysis.value[0].max = maxValue.value.toFixed(4);
-  //   // console.log(`Average Value: ${averageValue.value}`); // 평균값
-  //   analysis.value[0].average = averageValue.value.toFixed(4);
-  //   // console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
-  //   analysis.value[0].rmse = standardDeviation.value.toFixed(4);
-  //   // console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
-  //   analysis.value[0].rms = rms.value.toFixed(4);
-  //   // console.log(`Median: ${median.value}`); // 중앙값
-  //   analysis.value[0].median = median.value.toFixed(4);
-  //   // console.log(`Standard Error: ${standardError.value}`); // 표준 오차
-  //   analysis.value[0].error = standardError.value.toFixed(4);
-  //   // console.log(`Variance: ${variance.value}`); // 분산
-  //   analysis.value[0].variance = variance.value.toFixed(4);
-
-  //   // console.log(`NaN Check: ${analysisData.value.some(isNaN)}`); //f
-  //   // console.log(`Empty Value Check: ${analysisData.value.includes("")}`); //t
-  //   // console.log(
-  //   //   `Undefined Value Check: ${analysisData.value.includes(undefined)}` //f
-  //   // );
-  //   // console.log(
-  //   //   `Non-numeric Value Check: ${analysisData.value.some(
-  //   //     (value) => typeof value !== "number" || isNaN(value) //t
-  //   //   )}`
-  //   // );
+        if (sortedValues.length % 2 === 0) {
+          // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
+          median.value =
+            (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
+          console.log("짝수");
+        } else {
+          // 홀수일 경우 중간 값이 중앙값
+          median.value = sortedValues[mid.value];
+          console.log("홀수");
+        }
+        // 표준 오차 계산
+        standardError.value =
+          standardDeviation.value / Math.sqrt(numericValues.length);
+      } else {
+        alert("데이터가 존재하지 않습니다.");
+        averageValue.value = 0;
+        standardDeviation.value = 0;
+        rms.value = 0;
+        median.value = 0;
+        standardError.value = 0;
+      }
+      // analysis.value[n].unit = unit.value;
+      // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
+      analysis.value[n].min = minValue.value.toFixed(4);
+      // console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
+      analysis.value[n].max = maxValue.value.toFixed(4);
+      // console.log(`Average Value: ${averageValue.value}`); // 평균값
+      analysis.value[n].average = averageValue.value.toFixed(4);
+      // console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
+      analysis.value[n].rmse = standardDeviation.value.toFixed(4);
+      // console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
+      analysis.value[n].rms = rms.value.toFixed(4);
+      // console.log(`Median: ${median.value}`); // 중앙값
+      analysis.value[n].median = median.value.toFixed(4);
+      // console.log(`Standard Error: ${standardError.value}`); // 표준 오차
+      analysis.value[n].error = standardError.value.toFixed(4);
+      // console.log(`Variance: ${variance.value}`); // 분산
+      analysis.value[n].variance = variance.value.toFixed(4);
+     }
+     console.log("구간 n");
   } catch (error) {
     console.error(error);
   } finally {
@@ -1193,11 +1452,16 @@ const searchData = async () => {
   }
 
   updateDate();
-
   clearChart();
   option.value.series = [];
+  console.log("구간 n1");
   updateSeries();
+  console.log("구간 n2");
   chart.value.setOption(updateSeries);
+  n = 0;
+  analysis.value.forEach((item, index) => {
+    console.log(`Item ${index}:`, item);
+  });
 };
 
 const clearChart = () => {
@@ -1215,5 +1479,8 @@ const clearChart = () => {
 }
 body {
   margin: 0;
+}
+.v-data-table-footer {
+  display: none !important;
 }
 </style>

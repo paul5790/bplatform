@@ -85,7 +85,7 @@ const getTrialDate = async () => {
   try {
     const response = await readTrialData(tokenid.value);
     for (let i = 0; i < response.length; i++) {
-      trialrun.value.push(`항차 ${i + 1}번`);
+      trialrun.value.push(`시험 ${i + 1}번`);
       selectedtrialNum.value = trialrun.value[0];
     }
   } catch (error) {
@@ -428,11 +428,13 @@ const fetchData = async () => {
     const timeDataRefs = responseKeys.map((key) => response[key]);
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
+        console.log("test : "+ endpoint + timeDataRefs[i] );
+        const [Sc, Co] = endpoint.split("/");
+        const dataFormat = `signal?signal_name=${Sc}_${Co}&test_number=${trialNum.value}&settime=${timeDataRefs[i]}`;
+
         const response = await readlossData(
           tokenid.value,
-          endpoint,
-          trialNum.value,
-          timeDataRefs[i]
+          dataFormat
         );
 
         dataRefs[i].value = 0;
@@ -477,7 +479,7 @@ const chart = ref(null);
 
 const option = ref({
   title: {
-    text: "항차 별 데이터 소실 빈도",
+    text: "시험 별 데이터 소실 빈도",
     left: "center",
     textStyle: {
       fontSize: 19, // 폰트 크기 설정

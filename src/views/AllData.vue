@@ -4,22 +4,25 @@
     <div style="padding: 30px; padding-bottom: 0px">
       <!-- 데이터 선택창 -->
       <v-row>
-        <v-col cols="3">
+        <v-col cols="2">
+          <!-- <p style="font-size: 10px">main components</p> -->
           <v-select
             v-model="mainSelectedItems"
             :items="mainSelect"
-            label="Main Components"
+            density="compact"
+            label="Main Component"
             variant="outlined"
           >
           </v-select>
         </v-col>
         <!-- 첫번째 선택박스 -->
-        <v-col cols="3">
+        <v-col cols="2">
           <v-select
             v-model="firstSelectedItems"
             :items="firstSelect"
             label="Sub Components"
             variant="outlined"
+            density="compact"
             multiple
           >
             <template v-slot:selection="{ item, index }">
@@ -58,12 +61,13 @@
         </v-col>
 
         <!-- 두번째 선택박스 -->
-        <v-col cols="3">
+        <v-col cols="2">
           <v-select
             v-model="contentsSelectedItems"
             :items="secondSelect"
             label="Contents"
             variant="outlined"
+            density="compact"
             multiple
           >
             <template v-slot:selection="{ item, index }">
@@ -103,12 +107,22 @@
       </v-row>
       <v-sheet style="display: flex; height: 8vh">
         <v-row>
-          <v-col cols="6"></v-col>
+          <v-col cols="2">
+            <v-select
+              v-model="selectedDataType"
+              :items="dataType"
+              label="voyage"
+              density="compact"
+              variant="outlined"
+            >
+            </v-select>
+          </v-col>
           <v-col cols="2">
             <v-select
               v-model="selectedvoyage"
               :items="voyage"
               label="voyage"
+              density="compact"
               variant="outlined"
             >
             </v-select>
@@ -120,8 +134,9 @@
               :class="
                 themeMode === 'dark' ? 'dp__theme_dark' : 'dp__theme_light'
               "
-              style="--dp-input-padding: 15px"
+              style="--dp-input-padding: 8px"
               v-model="dateRange"
+              density="compact"
               range
               :dark="themeMode === 'dark'"
               :readonly="date_readonly"
@@ -188,6 +203,7 @@
         class="scrollable-card"
         v-model="tab"
         style="
+        overflow-y: auto;
           box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
           border-radius: 8px;
           height: 64vh;
@@ -227,6 +243,7 @@
                 :density="'dense'"
                 :headers="headerName"
                 :items="dataSet"
+                class="custom-data-table"
                 return-object
                 :style="tableStyle"
                 @update:options="handleSortUpdate"
@@ -264,7 +281,11 @@
                     <v-text-field
                       label="Page"
                       variant="outlined"
-                      style="max-width: 70px; margin-left: 10px; text-align: center;"
+                      style="
+                        max-width: 70px;
+                        margin-left: 10px;
+                        text-align: center;
+                      "
                       @keyup.enter="keyPage"
                       v-model="page"
                     ></v-text-field>
@@ -372,7 +393,7 @@ const {
   themeNoNSelectedTabColor,
   themeSelectedTabTextColor,
   themeNoNSelectedTabTextColor,
-  tableStyle
+  tableStyle,
 } = themeConfig;
 
 const tab = ref(0);
@@ -446,6 +467,8 @@ const secondSelect = ref([]);
 const mainSelectedItems = ref([]);
 const firstSelectedItems = ref([]);
 const contentsSelectedItems = ref([]);
+const selectedDataType = ref();
+const dataType = ref(["정형 데이터", "데이터 원문"]);
 
 //전체 선택
 const likesAllData = computed(
@@ -500,7 +523,7 @@ const getTrialDate = async () => {
     for (let i = 0; i < response.length; i++) {
       setStartTime.value.push(`${response[i].startTimeUtc}`);
       setEndTime.value.push(`${response[i].endTimeUtc}`);
-      voyage.value.push(`항차 ${i + 1}번`);
+      voyage.value.push(`시험 ${i + 1}번`);
     }
   } catch (error) {
     console.error(error);
@@ -572,27 +595,17 @@ const fetchData = async (data) => {
 
         let dataFomat;
         if (postType.value == "period") {
-          dataFomat = {
-            subComponent: Sc,
-            content: Co,
-            seatrialNumber: "N/A",
-            period: [searchStart.value, searchEnd.value],
-          };
+          dataFomat = `period?start_utctime=${searchStart.value}&end_utctime=${searchEnd.value}&signal_name=${Sc}_${Co}`;
+          console.log(dataFomat);
         } else if (postType.value == "seatrial") {
-          dataFomat = {
-            subComponent: Sc,
-            content: Co,
-            seatrialNumber: selectedtrialNum.value,
-            period: ["N/A", "N/A"],
-          };
+          dataFomat = `test?signal_name=${Sc}_${Co}&test_number=${selectedtrialNum.value}`;
+          console.log(dataFomat);
         }
-        console.log("dataSet : " + JSON.stringify(dataFomat));
+        // console.log("dataSet : " + JSON.stringify(dataFomat));
         const response = await readDataTrial(
           tokenid.value,
           dataFomat,
-          postType.value
         );
-
         // dataSet.value = response;
 
         const dataheader = ref();
@@ -614,8 +627,8 @@ const fetchData = async (data) => {
             align: "start",
             key,
             width:
-              key === "timestamp_PUBLISH" || key === "timestamp_EQUIPMENT"
-                ? 280
+              key === "timestamp_PUBLISH"
+                ? 1400
                 : undefined,
           };
         });
@@ -653,28 +666,20 @@ const dataDownloadServer = async () => {
     // downloadDialog.value = true;
     downloadBtnLoading.value = true;
     //searchStart
-    console.log(searchStart.value);
-    console.log(startTime.value);
-    console.log(startISOTime.value);
-    let period = ["N/A", "N/A"];
-    let seatrial = "N/A";
-    if (searchType.value == "period") {
-      period = [searchStart.value, searchEnd.value];
-      seatrial = "N/A";
-    } else {
-      period = [startISOTime.value, endISOTime.value];
-      seatrial = selectedtrialNum.value;
+    let sData;
+    let keepStr; 
+    const downloadData = ref("");
+    for (let i = 0; i < variableName.length; i++) {
+      const [Sc, Co] = variableName[i].split("/");
+      downloadData.value = `${downloadData.value}&signals=${Sc}_${Co}`;
     }
-
-    let setData = {
-      type: selectDownlodFormat.value,
-      findBy: searchType.value,
-      period: period,
-      seatrial: seatrial,
-      signals: variableName,
-    };
-    console.log("setData = " + setData.signals);
-    const loadData = await downloadDataFile(tokenid.value, setData);
+    if (searchType.value == "period") {
+      sData = `download?file_type=${selectDownlodFormat.value}&find_method=${searchType.value}&start_utctime=${searchStart.value}&end_utctime=${searchEnd.value}${downloadData.value}`;
+    } else {
+      sData = `download?file_type=${selectDownlodFormat.value}&find_method=${searchType.value}&test_number=${selectedtrialNum.value}${downloadData.value}`;
+    }
+    console.log(sData);
+    const loadData = await downloadDataFile(tokenid.value, sData);
 
     downloadBtnLoading.value = false;
     // 다운로드할 파일 이름 추출
@@ -3031,7 +3036,7 @@ watch(selectedvoyage, (newValue, oldValue) => {
 
     const index = voyage.value.indexOf(selectedvoyage.value);
     date_readonly.value = true;
-    searchType.value = "seatrial";
+    searchType.value = "test";
 
     const date1 = ref(setStartTime.value[index - 1]);
     const date2 = ref(setEndTime.value[index - 1]);
@@ -3086,7 +3091,6 @@ const sortData = (data, sortByKey, sortOrder) => {
 </script>
 
 <style scoped>
-
 .all-app {
   padding: 30px;
   padding-left: 50px;
@@ -3094,6 +3098,9 @@ const sortData = (data, sortByKey, sortOrder) => {
 }
 .d-flex {
   display: flex;
+}
+.custom-data-table .v-data-table__wrapper {
+  white-space: nowrap;
 }
 select {
   text-align: center;
@@ -3115,12 +3122,19 @@ select:focus {
 .auto-width {
   width: auto;
 }
+.custom-select .v-field__input {
+  font-size: 16px; /* 원하는 크기로 조절 */
+}
+.custom-select .v-select__selections {
+  font-size: 16px; /* 드롭다운 항목 텍스트 크기 조절 */
+}
+.custom-select .v-label {
+  font-size: 14px; /* 레이블 텍스트 크기 조절 */
+}
 </style>
 
 <style>
 .pagination-center {
   margin: -50 auto;
 }
-
-
 </style>

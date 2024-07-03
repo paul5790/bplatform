@@ -165,7 +165,7 @@
                     <v-select
                       v-model="selectedtrialrun"
                       :items="trialrun"
-                      label="항차 선택"
+                      label="시험 선택"
                       variant="outlined"
                       class="custom-select"
                     ></v-select>
@@ -291,7 +291,7 @@ const getTrialDate = async () => {
       setStartTime.value.push(`${response[i].startTimeUtc}`);
       setEndTime.value.push(`${response[i].endTimeUtc}`);
       selectedtrialNum.value = i + 1;
-      trialrun.value.push(`항차 ${i + 1}번`);
+      trialrun.value.push(`시험 ${i + 1}번`);
     }
   } catch (error) {
     console.error(error);
@@ -312,7 +312,7 @@ const first = ref(true);
 watchEffect(() => {
   const index = trialrun.value.indexOf(selectedtrialrun.value);
   selectedtrialNum.value = index;
-  daterange.value = `${selectedtrialNum.value}항차 데이터`;
+  daterange.value = `${selectedtrialNum.value}시험 데이터`;
 
   if (selectedtrialrun.value === "직접 선택") {
     date_readonly.value = false;

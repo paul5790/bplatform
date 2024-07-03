@@ -25,7 +25,7 @@
             <v-dialog v-model="dialog1_1" persistent width="800">
               <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
-                  <span class="text-h5">항차 측정 종료</span>
+                  <span class="text-h5">시험 측정 종료</span>
                 </v-card-title>
                 <v-card-text>
                   <v-sheet style="display: flex">
@@ -94,7 +94,7 @@
             <v-dialog v-model="dialog1" persistent width="800">
               <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
-                  <span class="text-h5">항차 측정 시작</span>
+                  <span class="text-h5">시험 측정 시작</span>
                 </v-card-title>
                 <v-card-text>
                   <v-sheet style="display: flex">
@@ -105,7 +105,7 @@
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 번호 입력
+                                  시험 번호 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -124,7 +124,7 @@
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 시작 시간
+                                  시험 시작 시간
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -151,7 +151,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 이름 입력
+                                  시험 이름 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -171,7 +171,7 @@
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 목적 입력
+                                  시험 목적 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -258,7 +258,7 @@
             <v-dialog v-model="dialog2" persistent width="800">
               <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
-                  <span class="text-h5">항차 추가</span>
+                  <span class="text-h5">시험 추가</span>
                 </v-card-title>
                 <v-card-text>
                   <v-sheet style="display: flex">
@@ -269,7 +269,7 @@
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 번호 입력
+                                  시험 번호 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -288,7 +288,7 @@
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 시작 시간
+                                  시험 시작 시간
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -315,7 +315,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 종료 시간
+                                  시험 종료 시간
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -344,7 +344,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 이름 입력
+                                  시험 이름 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -364,7 +364,7 @@
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 목적 입력
+                                  시험 목적 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -453,7 +453,7 @@
             <v-dialog v-model="dialog3" persistent width="800">
               <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
-                  <span class="text-h5">항차 수정</span>
+                  <span class="text-h5">시험 수정</span>
                 </v-card-title>
                 <v-card-text>
                   <v-sheet style="display: flex">
@@ -464,7 +464,7 @@
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 시작 시간
+                                  시험 시작 시간
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -490,7 +490,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 종료 시간
+                                  시험 종료 시간
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -517,7 +517,7 @@
                             <v-col cols="4" style="margin-top: 28px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 이름 입력
+                                  시험 이름 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -537,7 +537,7 @@
                             <v-col cols="4" style="margin-top: 8px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
-                                  항차 목적 입력
+                                  시험 목적 입력
                                 </p></v-list-subheader
                               >
                             </v-col>
@@ -625,10 +625,10 @@
             <v-dialog v-model="dialog4" persistent width="350">
               <v-card :style="{ backgroundColor: themeColor }">
                 <v-card-title>
-                  <span class="text-h5">항차 정보 삭제</span>
+                  <span class="text-h5">시험 정보 삭제</span>
                 </v-card-title>
                 <v-card-text
-                  >{{ selecteddivision }}항차의 정보를
+                  >{{ selecteddivision }}시험의 정보를
                   삭제하시겠습니까?</v-card-text
                 >
                 <v-card-actions>
@@ -751,7 +751,7 @@ const dialog1_1 = ref(false);
 const dialog2 = ref(false);
 const dialog3 = ref(false);
 const dialog4 = ref(false);
-const message = ref("항차 테이블 정보 로딩중...");
+const message = ref("시험 테이블 정보 로딩중...");
 
 const overlay = ref(false);
 
@@ -808,7 +808,7 @@ const rules1 = ref({
       for (let i = 0; i < division.value - 1; i++) {
         if (items.value[i].division === value) {
           divisiontrue.value = false;
-          return "겹치는 항차가 존재합니다.";
+          return "겹치는 시험이 존재합니다.";
         }
       }
       if (/^\d+$/.test(value)) {
@@ -907,8 +907,8 @@ const openDialog3 = () => {
     dialog3.value = true;
     console.log(selectedData.value[0].index);
   } else {
-    alert("항차를 선택해주세요.");
-    console.log("항차를 선택해주세요.");
+    alert("시험을 선택해주세요.");
+    console.log("시험을 선택해주세요.");
   }
 };
 
@@ -917,8 +917,8 @@ const openDialog4 = () => {
     selecteddivision.value = selectedData.value[0].division;
     dialog4.value = true;
   } else {
-    alert("항차를 선택해주세요.");
-    console.log("항차를 선택해주세요.");
+    alert("시험을 선택해주세요.");
+    console.log("시험을 선택해주세요.");
   }
 };
 
@@ -984,12 +984,12 @@ const waitStart = () => {
       sessionStorage.setItem("startstate", "true");
       startstate.value = true;
       nullDialog1();
-      alert("항차 측정이 시작됩니다.");
+      alert("시험 측정이 시작됩니다.");
       location.reload();
     } catch (error) {
       // 특정 에러인 경우에 따라 다르게 처리합니다.
       if (error instanceof TypeError && error.message.includes("toString")) {
-        alert("항차 정보를 전부 입력해 주세요.");
+        alert("시험 정보를 전부 입력해 주세요.");
         console.error("toString error occurred in waitStart:", error.message);
       } else {
         console.error("An error occurred in waitStart:", error);
@@ -1015,10 +1015,9 @@ const startData = async () => {
   const description = sessionStorage.getItem("description") || null;
 
   const data = {
-    seatrialId: division,
-    name: name,
+    testNumber: division,
+    shipName: name,
     shipId: "440714900",
-    groupId: "1",
     testPurpose: testPurpose,
     navigationArea: navigationArea,
     startTimeUtc: startTimeUtc,
@@ -1041,7 +1040,7 @@ const startData = async () => {
 
     // console.log(response.data);
     overlay.value = false;
-    alert("항차 측정이 종료됩니다.");
+    alert("시험 측정이 종료됩니다.");
     location.reload();
   } catch (error) {
     console.error(error);
@@ -1063,7 +1062,7 @@ const cancelData = async () => {
   sessionStorage.removeItem("description");
   sessionStorage.setItem("startstate", "false");
   startstate.value = false;
-  alert("항차 측정이 종료됩니다.");
+  alert("시험 측정이 종료됩니다.");
   location.reload();
   nullDialog1_1();
 };
@@ -1083,7 +1082,7 @@ const editData = async () => {
     editenddate.value === null ||
     editenddate.value === ""
   ) {
-    alert("항차 정보를 전부 올바르게 입력해 주세요.");
+    alert("시험 정보를 전부 올바르게 입력해 주세요.");
   } else if (editstartdate.value > editenddate.value) {
     alert("종료시간이 시작시간보다 더 빠릅니다.");
   } else if (editstartdate.value.getTime() === editenddate.value.getTime()) {
@@ -1099,7 +1098,7 @@ const editData = async () => {
     let check = checkIfRangeExists(range);
     console.log(check);
     if (check) {
-      alert("선택된 날짜에 항차가 이미 존재합니다.");
+      alert("선택된 날짜에 시험이 이미 존재합니다.");
     } else {
       try {
         //overlay.value = true;
@@ -1107,8 +1106,8 @@ const editData = async () => {
         dialog2.value = false;
         const division = sessionStorage.getItem("division") || null;
         const data = {
-          seatrialId: division,
-          name: editname.value,
+          testNumber: division,
+          shipName: editname.value,
           shipId: "440714900",
           groupId: "1",
           testPurpose: editpurpose.value,
@@ -1123,7 +1122,7 @@ const editData = async () => {
           await createTrialData(tokenid.value, data);
           overlay.value = false;
           
-          alert("항차 추가가 완료되었습니다.");
+          alert("시험 추가가 완료되었습니다.");
           nullDialog2();
           // console.log("API 응답 데이터:", response.data);
           location.reload();
@@ -1133,7 +1132,7 @@ const editData = async () => {
             error instanceof TypeError &&
             error.message.includes("toString")
           ) {
-            alert("항차 정보를 전부 입력해 주세요.");
+            alert("시험 정보를 전부 입력해 주세요.");
             console.error(
               "toString error occurred in waitStart:",
               error.message
@@ -1190,7 +1189,7 @@ const changeData = async () => {
       selectedenddate.value === null ||
       selectedenddate.value === ""
     ) {
-      alert("항차 정보를 전부 올바르게 입력해 주세요.");
+      alert("시험 정보를 전부 올바르게 입력해 주세요.");
     } else if (startDate > endDate) {
       alert("종료시간이 시작시간보다 더 빠릅니다.");
     } else if (startDate.getTime() === endDate.getTime()) {
@@ -1199,8 +1198,8 @@ const changeData = async () => {
       console.log(selectedData.value[0].division);
       try {
         const data = {
-          seatrialId: selecteddivision.value,
-          name: selectedname.value,
+          testNumber: selecteddivision.value,
+          shipName: selectedname.value,
           shipId: "440714900",
           groupId: "1",
           testPurpose: selectedpurpose.value,
@@ -1214,7 +1213,7 @@ const changeData = async () => {
         try {
           await updateTrialData(tokenid.value, data);
           nullDialog3();
-          alert("선택된 항차의 수정이 완료되었습니다.");
+          alert("선택된 시험의 수정이 완료되었습니다.");
           location.reload();
         } catch (error) {
           console.log(1127);
@@ -1222,7 +1221,7 @@ const changeData = async () => {
             error instanceof TypeError &&
             error.message.includes("toString")
           ) {
-            alert("항차 정보를 올바르게 입력해 주세요.");
+            alert("시험 정보를 올바르게 입력해 주세요.");
             console.error(
               "toString error occurred in waitStart:",
               error.message
@@ -1233,12 +1232,12 @@ const changeData = async () => {
         }
       } catch (error) {
         console.error(error);
-        alert("선택된 항차 목록이 존재하지 않습니다.");
+        alert("선택된 시험 목록이 존재하지 않습니다.");
 
       }
     }
   } else {
-    alert("선택된 날짜에 항차가 이미 존재합니다.");
+    alert("선택된 날짜에 시험이 이미 존재합니다.");
   }
 };
 
@@ -1249,12 +1248,12 @@ const deleteData = async () => {
   overlayemit(true);
   dialog4.value = false;
   const data = {
-    seatrialId: selecteddivision.value,
+    testNumber: selecteddivision.value,
   };
   try {
     await deleteTrialData(tokenid.value, data);
     
-    alert("선택한 항차의 삭제가 완료되었습니다.");
+    alert("선택한 시험의 삭제가 완료되었습니다.");
     overlayemit(false);
     overlay.value = false;
     location.reload();
@@ -1273,12 +1272,12 @@ const overlayemit = (data) => {
 
 // 데이터 테이블 헤더
 const headers = ref([
-  { title: "항차", align: "start", sortable: true, key: "division" },
+  { title: "시험", align: "start", sortable: true, key: "division" },
   { title: "시작시간", align: "start", key: "startdate", sortable: true },
   { title: "끝시간", align: "start", key: "enddate" },
   { title: "진행 시간", align: "start", key: "time" },
   { title: "Ship ID", align: "start", key: "shipid" },
-  { title: "이름", align: "start", key: "name" },
+  { title: "선박 이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
   { title: "해역 위치", align: "start", key: "location" },
   { title: "저장 용량", align: "start", key: "storage" },
@@ -1330,8 +1329,8 @@ const fetchData = async () => {
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       items.value.push({
         index: i,
-        division: response[i].seatrialId,
-        name: response[i].name,
+        division: response[i].testNumber,
+        name: response[i].shipName,
         shipid: response[i].shipId,
         startdate: startUtc + "Z",
         purpose: response[i].testPurpose,
@@ -1342,7 +1341,7 @@ const fetchData = async () => {
         time: formattedTime,
       });
       if (i === response.length - 1) {
-        sessionStorage.setItem("division", Number(response[i].seatrialId) + 1);
+        sessionStorage.setItem("division", Number(response[i].testNumber) + 1);
       }
     }
     items.value.sort((a, b) => {

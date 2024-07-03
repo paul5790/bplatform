@@ -19,7 +19,7 @@
       :color="btnColor"
       align-tabs="start"
     >
-      <v-tab :value="1">항차 설정</v-tab>
+      <v-tab :value="1">시험 설정</v-tab>
       <v-tab :value="2">사용자 설정</v-tab>
       <v-tab :value="3">로그 관리</v-tab>
       <v-tab :value="4">사용자 별 권한 관리</v-tab>

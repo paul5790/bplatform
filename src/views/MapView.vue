@@ -90,8 +90,10 @@ const initializeMap = (waypoints, wid, ais, startlocation, endlocation) => {
 
 onMounted(async () => {
   try {
+    console.log(`props.trial : ${props.trial}`);
     const waypointData = await readWaypoint(tokenid.value, props.trial);
     const aisData = await readAis(tokenid.value, props.trial);
+    
     const uniqueWaypoints = new Set();
     // waypointData의 중복을 제거하고 A에 저장
     for (let i = 0; i < waypointData.length; i++) {
