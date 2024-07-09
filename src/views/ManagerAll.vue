@@ -33,8 +33,8 @@
       "
     >
       <v-window-item v-for="n in 4" :key="n" :value="n">
-        <v-card class="no-shadow" style="flex: 1">
-          <v-card-item :style="tab === 4 ? 'padding: 0px' : ''">
+        <v-card class="no-shadow" style="flex: 1;">
+          <v-card-item style="padding: 0px;">
             <div v-if="tab === 1">
               <!-- Move v-if here -->
               <div class="component-container">
@@ -106,8 +106,6 @@ const overlayEmit = (dataFromChild) => {
 
 <style>
 .manager-sheet {
-  height: 75vh;
-  display: flex;
 }
 
 .no-shadow {

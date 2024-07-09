@@ -1,230 +1,225 @@
 <template>
-  <v-sheet class="manager-sheet">
-    <v-card
-      class="scrollable-card"
-      style="
-        flex: 1;
-        height: 75vh;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-      "
-    >
-      <v-card-item>
-        <v-row class="dialog-row">
-          <div class="dialog-div">
-            <!-- <v-btn color="blue" @click="update()">수정하기</v-btn> -->
+  <v-card
+    class="scrollable-card"
+    style="
+      flex: 1;
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    "
+  >
+    <v-card-item>
+      <v-row class="dialog-row">
+        <div class="dialog-div">
+          <!-- <v-btn color="blue" @click="update()">수정하기</v-btn> -->
 
-            <div style="display: flex">
-              <v-btn :color = btnColor @click="check()"> 수정하기 </v-btn>
+          <div style="display: flex">
+            <v-btn :color="btnColor" @click="check()"> 수정하기 </v-btn>
 
-              <v-dialog v-model="dialog" persistent width="1024">
-                <v-card>
-                  <v-card-title>
-                    <span class="text-h5">유저 정보</span>
-                  </v-card-title>
-                  <v-card-text>
-                    <v-container>
-                      <v-row>
-                        <v-col cols="12"
-                          ><p style="font-size: 13px">기본 정보</p></v-col
-                        >
-                        <v-col cols="12" sm="6">
-                          <v-text-field
-                            :readonly="true"
-                            label="사용자 ID"
-                            required
-                            v-model="selectedId"
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6">
-                          <v-text-field
-                            :readonly="true"
-                            label="이름"
-                            hint="example of persistent helper text"
-                            persistent-hint
-                            v-model="selecteduserName"
-                            required
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6">
-                          <v-text-field
-                            :readonly="true"
-                            v-model="selectedemail"
-                            label="이메일"
-                            required
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6">
-                          <v-text-field
-                            :readonly="true"
-                            v-model="selectedphoneNumber"
-                            label="전화번호"
-                            required
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12"
-                          ><p style="font-size: 13px">유저 설정</p></v-col
-                        >
-                        <v-col cols="12" sm="6">
-                          <v-text-field
-                            label="소속"
-                            type="text"
-                            :rules="rules.department"
-                            v-model="selecteddepartment"
-                            required
-                          ></v-text-field>
-                        </v-col>
-                        <v-col cols="12" sm="6">
-                          <v-select
-                            :items="['ADMIN', 'USER', 'GUEST']"
-                            label="권한*"
-                            v-model="selecteduserGroup"
-                            required
-                          ></v-select>
-                        </v-col>
-                        <v-col cols="12">
-                          <v-textarea
-                            counter="25"
-                            label="설명"
-                            type="text"
-                            :rules="rules.description"
-                            maxlength="25"
-                            v-model="selecteddescription"
-                            multi-line
-                          ></v-textarea>
-                        </v-col>
-                      </v-row>
-                    </v-container>
-                  </v-card-text>
-                  <v-card-actions>
-                    <v-btn
-                      color="deep-orange-darken-1"
-                      variant="text"
-                      @click="resetPW()"
-                    >
-                      비밀번호 초기화
-                    </v-btn>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      color="blue-darken-1"
-                      variant="text"
-                      @click="nullDialog"
-                    >
-                      뒤로가기
-                    </v-btn>
-                    <v-btn
-                      color="blue-darken-1"
-                      variant="text"
-                      @click="changeData()"
-                    >
-                      저장하기
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </div>
-            <div style="display: flex; margin-left: 15px">
-              <v-btn :color = btnColor @click="check2()"> 삭제하기 </v-btn>
-
-              <v-dialog v-model="dialog2" persistent width="400">
-                <v-card>
-                  <v-card-title>
-                    <span class="text-h5">유저 정보 삭제</span>
-                  </v-card-title>
-                  <v-card-text
-                    >{{ selectedId }}의 정보를 삭제하시겠습니까?</v-card-text
+            <v-dialog v-model="dialog" persistent width="1024">
+              <v-card>
+                <v-card-title>
+                  <span class="text-h5">유저 정보</span>
+                </v-card-title>
+                <v-card-text>
+                  <v-container>
+                    <v-row>
+                      <v-col cols="12"
+                        ><p style="font-size: 13px">기본 정보</p></v-col
+                      >
+                      <v-col cols="12" sm="6">
+                        <v-text-field
+                          :readonly="true"
+                          label="사용자 ID"
+                          required
+                          v-model="selectedId"
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6">
+                        <v-text-field
+                          :readonly="true"
+                          label="이름"
+                          hint="example of persistent helper text"
+                          persistent-hint
+                          v-model="selecteduserName"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6">
+                        <v-text-field
+                          :readonly="true"
+                          v-model="selectedemail"
+                          label="이메일"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6">
+                        <v-text-field
+                          :readonly="true"
+                          v-model="selectedphoneNumber"
+                          label="전화번호"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12"
+                        ><p style="font-size: 13px">유저 설정</p></v-col
+                      >
+                      <v-col cols="12" sm="6">
+                        <v-text-field
+                          label="소속"
+                          type="text"
+                          :rules="rules.department"
+                          v-model="selecteddepartment"
+                          required
+                        ></v-text-field>
+                      </v-col>
+                      <v-col cols="12" sm="6">
+                        <v-select
+                          :items="['ADMIN', 'USER', 'GUEST']"
+                          label="권한*"
+                          v-model="selecteduserGroup"
+                          required
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="12">
+                        <v-textarea
+                          counter="25"
+                          label="설명"
+                          type="text"
+                          :rules="rules.description"
+                          maxlength="25"
+                          v-model="selecteddescription"
+                          multi-line
+                        ></v-textarea>
+                      </v-col>
+                    </v-row>
+                  </v-container>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn
+                    color="deep-orange-darken-1"
+                    variant="text"
+                    @click="resetPW()"
                   >
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn
-                      color="blue-darken-1"
-                      variant="text"
-                      @click="deleteData()"
-                      >예</v-btn
-                    >
-                    <v-btn
-                      color="blue-darken-1"
-                      variant="text"
-                      @click="cancel()"
-                      >아니오</v-btn
-                    >
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </div>
+                    비밀번호 초기화
+                  </v-btn>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="text"
+                    @click="nullDialog"
+                  >
+                    뒤로가기
+                  </v-btn>
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="text"
+                    @click="changeData()"
+                  >
+                    저장하기
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </div>
-        </v-row>
-        <v-data-table
-          style="margin-top: 20px"
-          v-model="selectedItems"
-          v-model:page="page"
-          class="elevation-1"
-          :headers="headers"
-          :items="items"
-          :items-per-page="itemsPerPage"
-          density="compact"
-          hide-default-footer
-          item-key="userName"
-          select-strategy="single"
-          return-object
-          show-select
-        >
-          <template v-slot:no-data>
-            <v-sheet
-              height="55vh"
-              class="pa-1 d-flex justify-center align-center"
-            >
-              <div style="text-align: center">
-                <p style="font-weight: 500; font-size: 20px">
-                  {{ message }}
-                </p>
-              </div>
-            </v-sheet>
-          </template>
-          <template v-slot:bottom>
-            <div class="text-center pt-2">
-              <v-pagination
-                v-model="page"
-                :length="pageCount"
-                :total-visible="6"
-                rounded="circle"
-              ></v-pagination>
-            </div>
-          </template>
-        </v-data-table>
-      </v-card-item>
-    </v-card>
-    <!-- 데이터 저장중 모달 persistent -->
-    <v-dialog v-model="loadDialog" max-width="400">
-      <v-card>
-        <v-card-text>
-          <v-row align-content="center" class="fill-height" justify="center">
-            <v-col class="text-subtitle-1 text-center" cols="12">
-              loading...
-            </v-col>
-            <v-col cols="6">
-              <v-progress-linear
-                color="deep-purple-accent-4"
-                height="6"
-                indeterminate
-                rounded
-              ></v-progress-linear>
-            </v-col>
-          </v-row>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="blue-darken-1"
-            variant="text"
-            @click="(loadDialog = false), cancleLoading()"
-            >취소</v-btn
+          <div style="display: flex; margin-left: 15px">
+            <v-btn :color="btnColor" @click="check2()"> 삭제하기 </v-btn>
+
+            <v-dialog v-model="dialog2" persistent width="400">
+              <v-card>
+                <v-card-title>
+                  <span class="text-h5">유저 정보 삭제</span>
+                </v-card-title>
+                <v-card-text
+                  >{{ selectedId }}의 정보를 삭제하시겠습니까?</v-card-text
+                >
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    color="blue-darken-1"
+                    variant="text"
+                    @click="deleteData()"
+                    >예</v-btn
+                  >
+                  <v-btn color="blue-darken-1" variant="text" @click="cancel()"
+                    >아니오</v-btn
+                  >
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
+          </div>
+        </div>
+      </v-row>
+      <v-data-table
+        style="margin-top: 20px"
+        v-model="selectedItems"
+        v-model:page="page"
+        class="elevation-1"
+        :headers="headers"
+        :items="items"
+        :items-per-page="itemsPerPage"
+        density="compact"
+        hide-default-footer
+        item-key="userName"
+        select-strategy="single"
+        return-object
+        show-select
+      >
+        <template v-slot:no-data>
+          <v-sheet
+            height="55vh"
+            class="pa-1 d-flex justify-center align-center"
           >
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
-  </v-sheet>
+            <div style="text-align: center">
+              <p style="font-weight: 500; font-size: 20px">
+                {{ message }}
+              </p>
+            </div>
+          </v-sheet>
+        </template>
+        <template v-slot:bottom>
+          <div class="text-center pt-2">
+            <v-pagination
+              v-model="page"
+              :length="pageCount"
+              :total-visible="6"
+              rounded="circle"
+            ></v-pagination>
+          </div>
+        </template>
+      </v-data-table>
+    </v-card-item>
+  </v-card>
+  <!-- 데이터 저장중 모달 persistent -->
+  <v-dialog v-model="loadDialog" max-width="400">
+    <v-card>
+      <v-card-text>
+        <v-row align-content="center" class="fill-height" justify="center">
+          <v-col class="text-subtitle-1 text-center" cols="12">
+            loading...
+          </v-col>
+          <v-col cols="6">
+            <v-progress-linear
+              color="deep-purple-accent-4"
+              height="6"
+              indeterminate
+              rounded
+            ></v-progress-linear>
+          </v-col>
+        </v-row>
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn
+          color="blue-darken-1"
+          variant="text"
+          @click="(loadDialog = false), cancleLoading()"
+          >취소</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -233,7 +228,7 @@ import {
   readUserData,
   deleteUserData,
   updateUserData,
-  resetPassword
+  resetPassword,
 } from "../../api/index.js";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 
@@ -335,21 +330,20 @@ const check2 = () => {
 };
 
 // 비밀번호 초기화
-const resetPW= () => {
+const resetPW = () => {
   let data = {
-    "id":selectedId.value
+    id: selectedId.value,
   };
   console.log(data);
-  try{
+  try {
     resetPassword(tokenid.value, data);
-    
-    alert("비밀번호가 초기화 되었습니다.")
-  }
-  catch(error) {
+
+    alert("비밀번호가 초기화 되었습니다.");
+  } catch (error) {
     console.error(error);
     message.value = `api 오류(${error})`;
   }
-}
+};
 
 const deleteData = async () => {
   const data = {

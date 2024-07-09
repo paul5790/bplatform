@@ -1,72 +1,68 @@
 <template>
-  <v-sheet class="manager-sheet">
-    <!-- <v-btn color="blue" @click="errorMethod">오류발생 버튼</v-btn> -->
-    <v-card
-      style="
-        flex: 1;
-        height: 75vh;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-      "
-    >
-      <v-card-item style="padding-top: 0px">
-        <v-row justify="space-between">
-          <v-col cols="auto">
-            <v-select
-              v-model="selectedLog"
-              :items="selectionLog"
-              variant="solo"
-              style="
-                width: 210px;
-                height: 5vh;
-                margin-top: 10px;
-                margin-left: 10px;
-              "
-              density="compact"
-            ></v-select>
-          </v-col>
-          <v-col cols="3">
-            <v-text-field
-              v-model="search"
-              label="Search"
-              prepend-inner-icon="mdi-magnify"
-              variant="underlined"
-              hide-details
-              single-line
-            ></v-text-field>
-          </v-col>
-        </v-row>
-        <v-window
-          class="scrollable-card"
+  <!-- <v-btn color="blue" @click="errorMethod">오류발생 버튼</v-btn> -->
+  <v-card
+    style="
+      flex: 1;
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    "
+  >
+    <v-card-item style="padding-top: 0px">
+      <v-row justify="space-between">
+        <v-col cols="auto">
+          <v-select
+            v-model="selectedLog"
+            :items="selectionLog"
+            variant="solo"
+            style="
+              width: 210px;
+              height: 5vh;
+              margin-top: 10px;
+              margin-left: 10px;
+            "
+            density="compact"
+          ></v-select>
+        </v-col>
+        <v-col cols="3">
+          <v-text-field
+            v-model="search"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            variant="underlined"
+            hide-details
+            single-line
+          ></v-text-field>
+        </v-col>
+      </v-row>
+      <v-window class="scrollable-card">
+        <v-data-table
+          style="margin-top: 20px"
+          v-model:page="page"
+          class="elevation-1"
+          :headers="headers"
+          :search="search"
+          :items="filteredItems"
+          :items-per-page="itemsPerPage"
+          hide-default-footer
+          :density="'dense'"
+          return-object
         >
-          <v-data-table
-            style="margin-top: 20px"
-            v-model:page="page"
-            class="elevation-1"
-            :headers="headers"
-            :search="search"
-            :items="filteredItems"
-            :items-per-page="itemsPerPage"
-            hide-default-footer
-            :density="'dense'"
-            return-object
-          >
-            <template v-slot:bottom>
-              <div class="text-center pt-2">
-                <v-pagination
-                  v-model="page"
-                  :length="pageCount"
-                  :total-visible="9"
-                  rounded="circle"
-                ></v-pagination>
-              </div>
-            </template>
-          </v-data-table>
-        </v-window>
-      </v-card-item>
-    </v-card>
-  </v-sheet>
+          <template v-slot:bottom>
+            <div class="text-center pt-2">
+              <v-pagination
+                v-model="page"
+                :length="pageCount"
+                :total-visible="9"
+                rounded="circle"
+              ></v-pagination>
+            </div>
+          </template>
+        </v-data-table>
+      </v-window>
+    </v-card-item>
+  </v-card>
 </template>
 
 <script setup>
@@ -110,15 +106,14 @@ const filteredItems = computed(() => {
   if (!search.value) {
     return items.value;
   }
-  return items.value.filter(item => {
-    return Object.values(item).some(value =>
+  return items.value.filter((item) => {
+    return Object.values(item).some((value) =>
       String(value).toLowerCase().includes(search.value.toLowerCase())
     );
   });
 });
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
-
 
 const webheaders = ref([
   { title: "유저", key: "id" },
@@ -201,7 +196,6 @@ onMounted(() => {
   // 컴포넌트가 마운트될 때 실행되는 코드
   webData();
 });
-
 </script>
 
 <style scoped>

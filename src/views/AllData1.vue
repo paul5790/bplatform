@@ -5,9 +5,7 @@
       <!-- 데이터 선택창 -->
 
       <v-card-actions>
-        <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
-        <v-card
-          ref="searchCard"
+        <v-card ref="searchCard"
           style="
             position: absolute;
             top: 100px;
@@ -15,73 +13,156 @@
             transform: translateX(-50%);
             z-index: 1100;
             width: 70%;
-            height: 150px;
+            height: 75px;
             overflow: visible;
-          "
-        >
-          <v-card-text>
-            <!-- 여기에 검색 창 컨텐츠를 추가하세요 -->
-            <v-tabs v-model="tabs">
-              <v-tab :value="1">선내 데이터</v-tab>
-              <v-tab :value="2">관제 데이터 </v-tab>
-            </v-tabs>
-            <v-tabs-window v-model="tabs">
-              <v-tabs-window-item :value="1">
-                <v-card>
-                  <v-card-text style="padding-bottom: 0px">
-                    <div style="display: flex; gap: 16px">
-                      <v-text-field
-                        style="padding-bottom: 0px"
-                        v-model="MainComponent"
-                        body-1
-                        density="compact"
-                        append-inner-icon="mdi-roman-numeral-1"
-                        label="Main Component"
-                        variant="outlined"
-                        readonly
-                        class="custom-text-field"
-                      ></v-text-field>
-                      <v-text-field
-                        v-model="SubComponent"
-                        density="compact"
-                        append-inner-icon="mdi-roman-numeral-2"
-                        label="Sub Component"
-                        variant="outlined"
-                        class="custom-text-field"
-                      ></v-text-field>
-                      <v-text-field
-                        v-model="Contents"
-                        density="compact"
-                        append-inner-icon="mdi-roman-numeral-3"
-                        label="Contents"
-                        variant="outlined"
-                        class="custom-text-field"
-                      ></v-text-field>
-                      <v-text-field
-                        v-model="DataScope"
-                        density="compact"
-                        append-inner-icon="mdi-calendar-range"
-                        label="Data Scope"
-                        variant="outlined"
-                        class="custom-text-field"
-                      ></v-text-field>
-                    </div>
-                  </v-card-text>
-                </v-card>
-              </v-tabs-window-item>
-              <v-tabs-window-item :value="2">
-                <v-card> </v-card>
-              </v-tabs-window-item>
-            </v-tabs-window>
+          ">
+          <v-card-text style="padding-bottom: 0px">
+            <div style="display: flex; gap: 16px">
+              <v-text-field
+                v-model="ShipData"
+                density="compact"
+                append-inner-icon="mdi-roman-numeral-3"
+                label="ShipData"
+                variant="outlined"
+                readonly
+                @click="
+                  (SelectedDataCardVisible = true),
+                    (SelectedContentsCardVisible = false),
+                    (DataTypeCardVisible = false),
+                    (periodSettingCardVisible = false)
+                "
+                class="custom-text-field"
+              ></v-text-field>
+              <v-text-field
+                v-model="SelectedContents"
+                body-1
+                density="compact"
+                append-inner-icon="mdi-roman-numeral-1"
+                label="Main Component"
+                variant="outlined"
+                readonly
+                @click="
+                  (SelectedDataCardVisible = false),
+                    (SelectedContentsCardVisible = true),
+                    (DataTypeCardVisible = false),
+                    (periodSettingCardVisible = false)
+                "
+                class="custom-text-field"
+              ></v-text-field>
+              <v-text-field
+                v-model="SubComponent"
+                density="compact"
+                append-inner-icon="mdi-roman-numeral-2"
+                label="Sub Component"
+                variant="outlined"
+                readonly
+                @click="
+                  (SelectedDataCardVisible = false),
+                    (SelectedContentsCardVisible = false),
+                    (DataTypeCardVisible = true),
+                    (periodSettingCardVisible = false)
+                "
+                class="custom-text-field"
+              ></v-text-field>
+              <v-text-field
+                v-model="DataScope"
+                density="compact"
+                append-inner-icon="mdi-calendar-range"
+                label="Data Scope"
+                variant="outlined"
+                @click="
+                  (SelectedDataCardVisible = false),
+                    (SelectedContentsCardVisible = false),
+                    (DataTypeCardVisible = false),
+                    (periodSettingCardVisible = true)
+                "
+                class="custom-text-field"
+              ></v-text-field>
+            </div>
           </v-card-text>
         </v-card>
-
+        <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
+        
+        <!-- 0번째 데이터 타입 선택 카드 -->
         <v-card
-          v-if="MainComponentCardVisible"
+          v-if="SelectedDataCardVisible"
           style="
             position: absolute;
             top: 260px;
             left: 15%;
+            z-index: 1100;
+            width: 27%;
+            overflow: visible;
+          "
+        >
+          <v-card-title>
+            <span>Data</span>
+          </v-card-title>
+          <v-card-text>
+            <div
+              class="destination-container"
+              style="
+                margin-bottom: 15px;
+                display: flex;
+                justify-content: center;
+              "
+            >
+              <v-btn
+                :class="{ 'selected-button': selectDataType === '정형 데이터' }"
+                width="43%"
+                style="flex: 1; margin: 0 10px"
+                variant="outlined"
+                class="secondBtn"
+                @click="toggleSelectDataType('정형 데이터')"
+              >
+                <v-icon v-if="selectDataType === '정형 데이터'" left color="red"
+                  >mdi-check</v-icon
+                >
+                선내 데이터 (SHIP)</v-btn
+              >
+              <v-btn
+                :class="{
+                  'selected-button': selectDataType === '비정형 데이터',
+                }"
+                width="43%"
+                style="flex: 1; margin: 0 10px"
+                variant="outlined"
+                class="secondBtn"
+                @click="toggleSelectDataType('비정형 데이터')"
+              >
+                <v-icon
+                  v-if="selectDataType === '비정형 데이터'"
+                  left
+                  color="red"
+                  >mdi-check</v-icon
+                >
+                관제 데이터 (VTS)</v-btn
+              >
+            </div>
+            <v-divider></v-divider>
+            <div class="chip-container">
+              <div class="recent-search">
+                <p style="height: 20px"></p>
+              </div>
+              <v-btn
+                color="#5865f2"
+                width="100px"
+                variant="flat"
+                @click="completeData0()"
+                style="position: absolute; right: 16px; bottom: 8px"
+                >선택</v-btn
+              >
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- 1번째 데이터 선택 카드 -->
+        <v-card
+          v-if="SelectedContentsCardVisible"
+          style="
+            position: absolute;
+            top: 260px;
+            left: 33%;
             z-index: 1100;
             width: 50%;
             overflow: visible;
@@ -155,8 +236,158 @@
               </div>
               <v-btn
                 color="#5865f2"
+                width="100px"
                 variant="flat"
                 @click="completeData()"
+                style="position: absolute; right: 16px; bottom: 8px"
+                >선택</v-btn
+              >
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- 2번째 데이터 타입 선택 카드 -->
+        <v-card
+          v-if="DataTypeCardVisible"
+          style="
+            position: absolute;
+            top: 260px;
+            left: 50%;
+            z-index: 1100;
+            width: 27%;
+            overflow: visible;
+          "
+        >
+          <v-card-title>
+            <span>Data Format</span>
+          </v-card-title>
+          <v-card-text>
+            <div
+              class="destination-container"
+              style="
+                margin-bottom: 15px;
+                display: flex;
+                justify-content: center;
+              "
+            >
+              <v-btn
+                :class="{ 'selected-button': selectDataType === '정형 데이터' }"
+                width="43%"
+                variant="outlined"
+                style="flex: 1; margin: 0 10px"
+                class="secondBtn"
+                @click="toggleSelectDataType('정형 데이터')"
+              >
+                <v-icon v-if="selectDataType === '정형 데이터'" left color="red"
+                  >mdi-check</v-icon
+                >
+                정형 데이터 (TABLE)</v-btn
+              >
+              <v-btn
+                :class="{
+                  'selected-button': selectDataType === '비정형 데이터',
+                }"
+                width="43%"
+                variant="outlined"
+                style="flex: 1; margin: 0 10px"
+                class="secondBtn"
+                @click="toggleSelectDataType('비정형 데이터')"
+              >
+                <v-icon
+                  v-if="selectDataType === '비정형 데이터'"
+                  left
+                  color="red"
+                  >mdi-check</v-icon
+                >
+                비정형 데이터 (JSON)</v-btn
+              >
+            </div>
+            <v-divider></v-divider>
+            <div class="chip-container">
+              <div class="recent-search">
+                <p style="height: 20px"></p>
+              </div>
+              <v-btn
+                color="#5865f2"
+                width="100px"
+                variant="flat"
+                @click="completeData2()"
+                style="position: absolute; right: 16px; bottom: 8px"
+                >선택</v-btn
+              >
+            </div>
+          </v-card-text>
+        </v-card>
+
+        <!-- 3번째 항차, 기간 선택 카드 -->
+        <v-card
+          v-if="periodSettingCardVisible"
+          style="
+            position: absolute;
+            top: 260px;
+            left: 50%;
+            z-index: 1100;
+            width: 35%;
+            overflow: visible;
+          "
+        >
+          <v-card-title>
+            <span>Data Period</span>
+          </v-card-title>
+          <v-card-text>
+            <div class="destination-container" style="margin-bottom: 15px">
+              <v-list style="width: 30%; border-right: 1px solid #e0e0e0">
+                <v-list-item-group v-model="selectedTest">
+                  <v-list-item
+                    v-for="(category, index) in testList"
+                    :key="index"
+                    @click="toggleCategory(index)"
+                    :class="{ 'selected-item': selectedTest === index }"
+                  >
+                    <v-list-item-title>{{ category }}</v-list-item-title>
+                  </v-list-item>
+                </v-list-item-group>
+              </v-list>
+
+              <div
+                v-if="selectedTest === 0"
+                style="
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  width: 0%;
+                "
+              >
+                <VueDatePicker
+                  v-model="dateRange"
+                  :inline="true"
+                  select-text="apply"
+                  density="compact"
+                  range
+                  style="--dp-input-padding: 8px; width: auto"
+                />
+                <v-textarea
+                  style="width: 260px; margin-top: 10px; font-size: 12px"
+                  placeholder="apply 버튼을 클릭하세요."
+                  readonly
+                  rows="2"
+                  no-resize
+                  v-model="dateRange"
+                  density="compact"
+                  variant="outlined"
+                ></v-textarea>
+              </div>
+            </div>
+            <v-divider></v-divider>
+            <div class="chip-container">
+              <div class="recent-search">
+                <p style="height: 20px"></p>
+              </div>
+              <v-btn
+                color="#5865f2"
+                width="100px"
+                variant="flat"
+                @click="completeData3()"
                 style="position: absolute; right: 16px; bottom: 8px"
                 >선택</v-btn
               >
@@ -505,17 +736,25 @@ import { ref, computed, watch } from "vue";
 
 const tabs = ref();
 
-const MainComponent = ref();
+const SelectedContents = ref();
 const SubComponent = ref();
 const Contents = ref();
 const DataScope = ref();
 
 // Main Component Card View
-const MainComponentCardVisible = ref(true);
+const SelectedDataCardVisible = ref(false);
+const SelectedContentsCardVisible = ref(false);
+const DataTypeCardVisible = ref(false);
+const periodSettingCardVisible = ref(false);
+
 const selectedCategory = ref(null);
 const selectedDestination = ref(null);
 const selectedItems = ref([]);
 const subItems = ref([]);
+const searchTarget = ref([]);
+
+const selectedHour = ref(6);
+const selectedMinute = ref(19);
 
 const categories = ref([
   "Ship Information",
@@ -742,23 +981,28 @@ const toggleDestination = (destination) => {
   }
 };
 
+const removeItemFromArray = (array, item) => {
+  const index = array.indexOf(item);
+  if (index > -1) {
+    array.splice(index, 1);
+  }
+};
+
 const toggleSubItem = (subItem) => {
+  const itemName = `${selectedDestination.value.name}_${subItem}`;
   if (selectedItems.value.includes(subItem)) {
     selectedItems.value = selectedItems.value.filter(
       (item) => item !== subItem
     );
-    const index = recentSearches.value.indexOf(
-      `${selectedDestination.value.name}_${subItem}`
-    );
-    if (index > -1) {
-      recentSearches.value.splice(index, 1);
-    }
+    removeItemFromArray(recentSearches.value, itemName);
+    removeItemFromArray(searchTarget.value, itemName);
   } else {
     selectedItems.value.push(subItem);
     if (subItem === "ALL") {
       recentSearches.value.push(`${selectedDestination.value.name}`);
     } else {
       recentSearches.value.push(`${selectedDestination.value.name}_${subItem}`);
+      searchTarget.value.push(`${selectedDestination.value.name}_${subItem}`);
     }
   }
 };
@@ -775,9 +1019,47 @@ const handleChipClick = (search) => {
   }
 };
 
+// ------------------- 2번째 데이터 타입 Method ------------------------ //
+const selectDataType = ref(null);
+const toggleSelectDataType = (type) => {
+  if (selectDataType.value === type) {
+    selectDataType.value = null;
+  } else {
+    selectDataType.value = type;
+  }
+  console.log(selectDataType.value);
+};
+
+// ------------------- 3번째 데이터 기간 Method ------------------------ //
+// 초기 날짜 설정
+const dateRange = ref(); // 초기 날짜를 설정합니
+const testList = ref(["직접 선택", "시험 1", "시험 2", "시험 3", "시험 4"]);
+const selectedTest = ref();
+
 // ------------------- Complete Method ------------------------ //
+const completeData0 = () => {
+  SelectedDataCardVisible.value = false;
+  SelectedContentsCardVisible.value = true;
+};
 
+const completeData = () => {
+  console.log(selectedItems.value);
+  console.log(searchTarget.value);
+  SelectedContents.value = searchTarget.value[0];
+  SelectedContentsCardVisible.value = false;
+  DataTypeCardVisible.value = true;
+};
 
+const completeData2 = () => {
+  SubComponent.value = selectDataType.value;
+  DataTypeCardVisible.value = false;
+  periodSettingCardVisible.value = true;
+};
+
+const completeData3 = () => {
+  periodSettingCardVisible.value = false;
+  console.log(dateRange.value);
+};
 
 ////////////////////// watch //////////////////////
 watch(selectedCategory, (newVal) => {
@@ -817,6 +1099,11 @@ watch(recentSearches.value, (newVal) => {
   border-right: 1px solid #e0e0e0;
 }
 
+.category-list40 {
+  width: 40%;
+  border-right: 1px solid #e0e0e0;
+}
+
 .destination-list {
   width: 35%;
   height: 250px;
@@ -842,6 +1129,24 @@ watch(recentSearches.value, (newVal) => {
   margin-top: 5px;
   margin-right: 5px;
   cursor: pointer;
+}
+.secondBtn {
+  margin-right: 20px;
+  height: 40px;
+}
+
+.selected-button {
+  border: 1px solid red;
+  color: red;
+}
+
+/* Select 버튼을 숨기는 스타일 */
+.vue3-date-picker__actions {
+  display: none !important;
+}
+
+.vue3-date-picker__select-button {
+  display: none !important;
 }
 </style>
 

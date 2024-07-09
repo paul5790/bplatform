@@ -32,16 +32,15 @@
         <div style="position: relative; z-index: 1200">
           <v-slider
             v-model="sliderValue"
-            thumb-label="always"
             step="1"
-            :max="10"
-            :ticks="scenario"
-            show-ticks="always"
+            :max="AisData.length - 1"
+            thumb-label="always"
             class="custom-slider"
+            @change="onSliderChange"
           >
             <template v-slot:thumb-label="{ modelValue }">
               <span class="thumb-label">{{
-                timeData[Math.min(Math.floor(modelValue / 1), 9)]
+                timeData[Math.min(Math.floor(modelValue), timeData.length - 1)]
               }}</span>
             </template>
           </v-slider>
@@ -207,18 +206,7 @@ let map = null;
 
 // ----------------------------Slider Bar--------------------------------//
 const sliderValue = ref(0);
-const timeData = ref([
-  "2020-08-12T08:44:64.151235Z",
-  "2020-08-12T08:44:65.151235Z",
-  "2020-08-12T08:44:66.151235Z",
-  "2020-08-12T08:44:67.151235Z",
-  "2020-08-12T08:44:68.151235Z",
-  "2020-08-12T08:44:69.151235Z",
-  "2020-08-12T08:44:70.151235Z",
-  "2020-08-12T08:44:71.151235Z",
-  "2020-08-12T08:44:72.151235Z",
-  "2020-08-12T08:44:73.151235Z",
-]);
+const timeData = ref([]);
 
 const scenario = ref({
   0: "1",
@@ -277,255 +265,375 @@ watch(selectedtrialrun, (newVal) => {
 });
 
 // ---------------------------- Test CardView --------------------------------//
+
+const AisData = [
+  {
+    latitude: "35.290000",
+    longitude: "129.260000",
+    test: "1",
+    scenario: "1",
+    type: "Menual",
+    time: "2020-08-12T08:44:62.151235Z",
+  },
+  {
+    latitude: "35.245678",
+    longitude: "129.300888",
+    test: "1",
+    scenario: "1",
+    type: "Menual",
+    time: "2020-08-12T08:44:63.151235Z",
+  },
+  {
+    latitude: "35.24878",
+    longitude: "129.330888",
+    test: "1",
+    scenario: "1",
+    type: "Menual",
+    time: "2020-08-12T08:44:64.151235Z",
+  },
+  {
+    latitude: "35.25978",
+    longitude: "129.350888",
+    test: "1",
+    scenario: "1",
+    type: "Menual",
+    time: "2020-08-12T08:44:65.151235Z",
+  },
+  {
+    latitude: "35.25978",
+    longitude: "129.350888",
+    test: "1",
+    scenario: "2",
+    type: "Auto",
+    time: "2020-08-12T08:44:66.151235Z",
+  },
+  {
+    latitude: "35.26978",
+    longitude: "129.360888",
+    test: "1",
+    scenario: "2",
+    type: "Auto",
+    time: "2020-08-12T08:44:67.151235Z",
+  },
+  {
+    latitude: "35.296000",
+    longitude: "129.450000",
+    test: "1",
+    scenario: "2",
+    type: "Auto",
+    time: "2020-08-12T08:44:68.151235Z",
+  },
+  {
+    latitude: "35.296000",
+    longitude: "129.450000",
+    test: "1",
+    scenario: "3",
+    type: "Remote",
+    time: "2020-08-12T08:44:69.151235Z",
+  },
+  {
+    latitude: "35.286000",
+    longitude: "129.440000",
+    test: "1",
+    scenario: "3",
+    type: "Remote",
+    time: "2020-08-12T08:44:70.151235Z",
+  },
+  {
+    latitude: "35.286000",
+    longitude: "129.440000",
+    test: "1",
+    scenario: "4",
+    type: "Menual",
+    time: "2020-08-12T08:44:71.151235Z",
+  },
+  {
+    latitude: "35.286000",
+    longitude: "129.470000",
+    test: "1",
+    scenario: "4",
+    type: "Menual",
+    time: "2020-08-12T08:44:72.151235Z",
+  },
+  {
+    latitude: "35.286000",
+    longitude: "129.470000",
+    test: "1",
+    scenario: "5",
+    type: "Remote",
+    time: "2020-08-12T08:44:73.151235Z",
+  },
+  {
+    latitude: "35.285000",
+    longitude: "129.484000",
+    test: "1",
+    scenario: "5",
+    type: "Remote",
+    time: "2020-08-12T08:44:74.151235Z",
+  },
+  {
+    latitude: "35.285000",
+    longitude: "129.484000",
+    test: "1",
+    scenario: "6",
+    type: "Auto",
+    time: "2020-08-12T08:44:75.151235Z",
+  },
+  {
+    latitude: "35.281000",
+    longitude: "129.498000",
+    test: "1",
+    scenario: "6",
+    type: "Auto",
+    time: "2020-08-12T08:44:76.151235Z",
+  },
+  {
+    latitude: "35.270000",
+    longitude: "129.474000",
+    test: "1",
+    scenario: "6",
+    type: "Auto",
+    time: "2020-08-12T08:44:77.151235Z",
+  },
+  {
+    latitude: "35.257000",
+    longitude: "129.492000",
+    test: "1",
+    scenario: "6",
+    type: "Auto",
+    time: "2020-08-12T08:44:78.151235Z",
+  },
+  {
+    latitude: "35.257000",
+    longitude: "129.492000",
+    test: "1",
+    scenario: "7",
+    type: "Menual",
+    time: "2020-08-12T08:44:79.151235Z",
+  },
+  {
+    latitude: "35.252000",
+    longitude: "129.477000",
+    test: "1",
+    scenario: "7",
+    type: "Menual",
+    time: "2020-08-12T08:44:80.151235Z",
+  },
+  {
+    latitude: "35.243000",
+    longitude: "129.471000",
+    test: "1",
+    scenario: "7",
+    type: "Menual",
+    time: "2020-08-12T08:44:81.151235Z",
+  },
+  {
+    latitude: "35.243000",
+    longitude: "129.471000",
+    test: "1",
+    scenario: "8",
+    type: "Menual",
+    time: "2020-08-12T08:44:82.151235Z",
+  },
+  {
+    latitude: "35.240000",
+    longitude: "129.441000",
+    test: "1",
+    scenario: "8",
+    type: "Auto",
+    time: "2020-08-12T08:44:83.151235Z",
+  },
+  {
+    latitude: "35.240000",
+    longitude: "129.441000",
+    test: "1",
+    scenario: "9",
+    type: "Auto",
+    time: "2020-08-12T08:44:84.151235Z",
+  },
+  {
+    latitude: "35.237000",
+    longitude: "129.351000",
+    test: "1",
+    scenario: "9",
+    type: "Auto",
+    time: "2020-08-12T08:44:85.151235Z",
+  },
+  {
+    latitude: "35.222000",
+    longitude: "129.342000",
+    test: "1",
+    scenario: "9",
+    type: "Remote",
+    time: "2020-08-12T08:44:86.151235Z",
+  },
+  {
+    latitude: "35.222000",
+    longitude: "129.342000",
+    test: "1",
+    scenario: "10",
+    type: "Remote",
+    time: "2020-08-12T08:44:87.151235Z",
+  },
+  {
+    latitude: "35.232000",
+    longitude: "129.332000",
+    test: "1",
+    scenario: "10",
+    type: "Menual",
+    time: "2020-08-12T08:44:88.151235Z",
+  },
+  {
+    latitude: "35.212000",
+    longitude: "129.322000",
+    test: "1",
+    scenario: "10",
+    type: "Menual",
+    time: "2020-08-12T08:44:89.151235Z",
+  },
+  {
+    latitude: "35.227000",
+    longitude: "129.312000",
+    test: "1",
+    scenario: "10",
+    type: "Remote",
+    time: "2020-08-12T08:44:90.151235Z",
+  },
+  {
+    latitude: "35.217000",
+    longitude: "129.292000",
+    test: "1",
+    scenario: "10",
+    type: "Remote",
+    time: "2020-08-12T08:44:91.151235Z",
+  },
+  {
+    latitude: "35.217000",
+    longitude: "129.292000",
+    test: "1",
+    scenario: "11",
+    type: "Auto",
+    time: "2020-08-12T08:44:92.151235Z",
+  },
+  {
+    latitude: "35.224000",
+    longitude: "129.291500",
+    test: "1",
+    scenario: "11",
+    type: "Auto",
+    time: "2020-08-12T08:44:93.151235Z",
+  },
+  {
+    latitude: "35.256400",
+    longitude: "129.257000",
+    test: "1",
+    scenario: "11",
+    type: "Auto",
+    time: "2020-08-12T08:44:94.151235Z",
+  },
+  {
+    latitude: "35.256777",
+    longitude: "129.260888",
+    test: "1",
+    scenario: "11",
+    type: "Menual",
+    time: "2020-08-12T08:44:95.151235Z",
+  },
+];
+
+const Waypoint = [
+  {
+    latitude: "35.25978",
+    longitude: "129.350888",
+    test: "1",
+    scenario: "1",
+    type: "Menual",
+  },
+  {
+    latitude: "35.296000",
+    longitude: "129.450000",
+    test: "1",
+    scenario: "2",
+    type: "Auto",
+  },
+  {
+    latitude: "35.286000",
+    longitude: "129.440000",
+    test: "1",
+    scenario: "3",
+    type: "Remote",
+  },
+  {
+    latitude: "35.286000",
+    longitude: "129.470000",
+    test: "1",
+    scenario: "4",
+    type: "Menual",
+  },
+  {
+    latitude: "35.285000",
+    longitude: "129.484000",
+    test: "1",
+    scenario: "5",
+    type: "Remote",
+  },
+  {
+    latitude: "35.257000",
+    longitude: "129.492000",
+    test: "1",
+    scenario: "6",
+    type: "Auto",
+  },
+  {
+    latitude: "35.243000",
+    longitude: "129.471000",
+    test: "1",
+    scenario: "7",
+    type: "Menual",
+  },
+  {
+    latitude: "35.240000",
+    longitude: "129.441000",
+    test: "1",
+    scenario: "8",
+    type: "Auto",
+  },
+  {
+    latitude: "35.222000",
+    longitude: "129.342000",
+    test: "1",
+    scenario: "9",
+    type: "Remote",
+  },
+  {
+    latitude: "35.217000",
+    longitude: "129.292000",
+    test: "1",
+    scenario: "10",
+    type: "Remote",
+  },
+  {
+    latitude: "35.256777",
+    longitude: "129.260888",
+    test: "1",
+    scenario: "11",
+    type: "Auto",
+  },
+];
+
+AisData.forEach((data) => timeData.value.push(data.time));
+
 const selectedTest = ref([]);
 const dialogVisible = ref(false);
-
+let currentPolylines = [];
+let currentScenario = null;
 const aisData = {};
+let waypointMarkers = [];
+let waypointLine = null;
 
 // 데이터를 가져오는 함수
 const fetchData = async () => {
   try {
-    const AisData = [
-      {
-        latitude: "35.25678",
-        longitude: "129.260888",
-        test: "1",
-        scenario: "1",
-        type: "Menual",
-      },
-      {
-        latitude: "35.245678",
-        longitude: "129.300888",
-        test: "1",
-        scenario: "1",
-        type: "Menual",
-      },
-      {
-        latitude: "35.24878",
-        longitude: "129.330888",
-        test: "1",
-        scenario: "1",
-        type: "Menual",
-      },
-      {
-        latitude: "35.25978",
-        longitude: "129.350888",
-        test: "1",
-        scenario: "1",
-        type: "Menual",
-      },
-      {
-        latitude: "35.25978",
-        longitude: "129.350888",
-        test: "1",
-        scenario: "2",
-        type: "Auto",
-      },
-      {
-        latitude: "35.33978",
-        longitude: "129.360888",
-        test: "1",
-        scenario: "2",
-        type: "Auto",
-      },
-      {
-        latitude: "35.296000",
-        longitude: "129.450000",
-        test: "1",
-        scenario: "2",
-        type: "Auto",
-      },
-      {
-        latitude: "35.296000",
-        longitude: "129.450000",
-        test: "1",
-        scenario: "3",
-        type: "Remote",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.440000",
-        test: "1",
-        scenario: "3",
-        type: "Remote",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.440000",
-        test: "1",
-        scenario: "4",
-        type: "Menual",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.470000",
-        test: "1",
-        scenario: "4",
-        type: "Menual",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.470000",
-        test: "1",
-        scenario: "5",
-        type: "Remote",
-      },
-      {
-        latitude: "35.316000",
-        longitude: "129.420000",
-        test: "1",
-        scenario: "5",
-        type: "Remote",
-      },
-      {
-        latitude: "35.316000",
-        longitude: "129.420000",
-        test: "1",
-        scenario: "6",
-        type: "Auto",
-      },
-      {
-        latitude: "35.296000",
-        longitude: "129.370000",
-        test: "1",
-        scenario: "6",
-        type: "Auto",
-      },
-      {
-        latitude: "35.266000",
-        longitude: "129.40000",
-        test: "1",
-        scenario: "6",
-        type: "Auto",
-      },
-      {
-        latitude: "35.25678",
-        longitude: "129.260888",
-        test: "1",
-        scenario: "6",
-        type: "Auto",
-      },
-      {
-        latitude: "35.25678",
-        longitude: "129.260888",
-        test: "1",
-        scenario: "7",
-        type: "Menual",
-      },
-      {
-        latitude: "35.245678",
-        longitude: "129.300888",
-        test: "1",
-        scenario: "7",
-        type: "Menual",
-      },
-      {
-        latitude: "35.24878",
-        longitude: "129.330888",
-        test: "1",
-        scenario: "7",
-        type: "Menual",
-      },
-      {
-        latitude: "35.25978",
-        longitude: "129.350888",
-        test: "1",
-        scenario: "8",
-        type: "Menual",
-      },
-      {
-        latitude: "35.33978",
-        longitude: "129.360888",
-        test: "1",
-        scenario: "8",
-        type: "Auto",
-      },
-      {
-        latitude: "35.33978",
-        longitude: "129.360888",
-        test: "1",
-        scenario: "9",
-        type: "Auto",
-      },
-      {
-        latitude: "35.296000",
-        longitude: "129.450000",
-        test: "1",
-        scenario: "9",
-        type: "Auto",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.440000",
-        test: "1",
-        scenario: "9",
-        type: "Remote",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.440000",
-        test: "1",
-        scenario: "10",
-        type: "Remote",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.470000",
-        test: "1",
-        scenario: "10",
-        type: "Menual",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.470000",
-        test: "1",
-        scenario: "10",
-        type: "Menual",
-      },
-      {
-        latitude: "35.276000",
-        longitude: "129.476000",
-        test: "1",
-        scenario: "10",
-        type: "Remote",
-      },
-      {
-        latitude: "35.316000",
-        longitude: "129.420000",
-        test: "1",
-        scenario: "10",
-        type: "Remote",
-      },
-      {
-        latitude: "35.316000",
-        longitude: "129.420000",
-        test: "1",
-        scenario: "11",
-        type: "Auto",
-      },
-      {
-        latitude: "35.296000",
-        longitude: "129.370000",
-        test: "1",
-        scenario: "11",
-        type: "Auto",
-      },
-      {
-        latitude: "35.266000",
-        longitude: "129.40000",
-        test: "1",
-        scenario: "11",
-        type: "Auto",
-      },
-      {
-        latitude: "35.25678",
-        longitude: "129.260888",
-        test: "1",
-        scenario: "11",
-        type: "Auto",
-      },
-    ];
-
     AisData.forEach(({ latitude, longitude, type, scenario }) => {
       if (!aisData[scenario]) {
         aisData[scenario] = [];
@@ -536,87 +644,6 @@ const fetchData = async () => {
         type,
       ]);
     });
-
-    const Waypoint = [
-      {
-        latitude: "35.25978",
-        longitude: "129.350888",
-        test: "1",
-        scenario: "1",
-        type: "Menual",
-      },
-      {
-        latitude: "35.296000",
-        longitude: "129.450000",
-        test: "1",
-        scenario: "2",
-        type: "Auto",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.440000",
-        test: "1",
-        scenario: "3",
-        type: "Remote",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.470000",
-        test: "1",
-        scenario: "4",
-        type: "Menual",
-      },
-      {
-        latitude: "35.316000",
-        longitude: "129.420000",
-        test: "1",
-        scenario: "5",
-        type: "Remote",
-      },
-      {
-        latitude: "35.25678",
-        longitude: "129.260888",
-        test: "1",
-        scenario: "6",
-        type: "Auto",
-      },
-      {
-        latitude: "35.24878",
-        longitude: "129.330888",
-        test: "1",
-        scenario: "7",
-        type: "Menual",
-      },
-      {
-        latitude: "35.33978",
-        longitude: "129.360888",
-        test: "1",
-        scenario: "8",
-        type: "Auto",
-      },
-      {
-        latitude: "35.286000",
-        longitude: "129.440000",
-        test: "1",
-        scenario: "9",
-        type: "Remote",
-      },
-      {
-        latitude: "35.316000",
-        longitude: "129.420000",
-        test: "1",
-        scenario: "10",
-        type: "Remote",
-      },
-      {
-        latitude: "35.25678",
-        longitude: "129.260888",
-        test: "1",
-        scenario: "11",
-        type: "Auto",
-      },
-    ];
-
     console.log(aisData);
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -632,6 +659,90 @@ watch(selectedTest, (newVal) => {
   }
   console.log(aisData);
 });
+
+// 슬라이더 값이 변경될 때 호출되는 함수
+const onSliderChange = (newVal) => {
+  const index = Math.floor(newVal);
+  if (index < 0 || index >= AisData.length) {
+    return;
+  }
+  aisMapping(index);
+};
+
+const aisMapping = (index) => {
+  if (map && index >= 0 && index < AisData.length) {
+    const scenario = AisData[index]?.scenario;
+
+    // 시나리오가 변경되면 기존 폴리라인 제거
+    if (currentScenario !== scenario) {
+      currentPolylines.forEach((polyline) => map.removeLayer(polyline));
+      currentPolylines = [];
+      currentScenario = scenario;
+    }
+
+    // 현재 시나리오의 데이터를 순차적으로 추가
+    const dataToShow = AisData.slice(0, index + 1).filter(
+      (data) => data.scenario === scenario
+    );
+
+    // 기존 폴리라인 제거
+    currentPolylines.forEach((polyline) => map.removeLayer(polyline));
+    currentPolylines = [];
+
+    if (dataToShow.length > 0) {
+      let latlngs = dataToShow.map((data) => [
+        parseFloat(data.latitude),
+        parseFloat(data.longitude),
+      ]);
+      let dashtype;
+
+      if (dataToShow[0].type === "Menual") {
+        dashtype = "1";
+      } else if (dataToShow[0].type === "Auto") {
+        dashtype = "5, 5";
+      } else if (dataToShow[0].type === "Remote") {
+        dashtype = "10, 5, 1, 5";
+      } else {
+        dashtype = "1";
+      }
+
+      const polyline = L.polyline(latlngs, {
+        color: "blue",
+        weight: 2,
+        dashArray: dashtype,
+      }).addTo(map);
+
+      currentPolylines.push(polyline);
+    }
+  }
+};
+
+const addWaypoints = () => {
+  Waypoint.forEach((point) => {
+    const latlng = [parseFloat(point.latitude), parseFloat(point.longitude)];
+    const redIcon = new L.Icon({
+      iconUrl: "/image/marker-icon-2x-black.png",
+      shadowUrl: "/image/marker-shadow.png",
+      iconSize: [12, 20],
+      iconAnchor: [7, 20],
+      popupAnchor: [1, -34],
+      shadowSize: [20, 20],
+    });
+    const marker = L.marker(latlng, { icon: redIcon })
+      .addTo(map)
+      .bindPopup(`Scenario: ${point.scenario}`);
+    waypointMarkers.push(marker);
+  });
+
+  const waypointLatLngs = Waypoint.map((point) => [
+    parseFloat(point.latitude),
+    parseFloat(point.longitude),
+  ]);
+  waypointLine = L.polyline(waypointLatLngs, {
+    color: "black",
+    weight: 0.2,
+  }).addTo(map);
+};
 
 // ---------------------------- Map View --------------------------------//
 
@@ -654,43 +765,44 @@ onMounted(() => {
     .bindPopup("Realtime Location.")
     .openPopup();
 
+  addWaypoints();
   aisMapping(sliderValue.value);
 });
 
-const aisMapping = (newVal) => {
-  if (map) {
-    if (currentPolyline) {
-      map.removeLayer(currentPolyline);
-    }
+// const aisMapping = (newVal) => {
+//   if (map) {
+//     if (currentPolyline) {
+//       map.removeLayer(currentPolyline);
+//     }
 
-    // newVal 값에 해당하는 aisData를 가져옵니다.
-    const data = aisData[newVal + 1];
-    // 폴리라인을 그립니다.
-    if (data) {
-      let dashtype;
+//     // newVal 값에 해당하는 aisData를 가져옵니다.
+//     const data = aisData[newVal + 1];
+//     // 폴리라인을 그립니다.
+//     if (data) {
+//       let dashtype;
 
-      // 색상에 따른 dashArray 값을 설정합니다.
-      if (data[0][2] === "Menual") {
-        // blue와 green을 나타내는 예시
-        dashtype = "1";
-      } else if (data[0][2] === "Auto") {
-        // brown과 black을 나타내는 예시
-        dashtype = "5, 5";
-      } else if (data[0][2] === "Remote") {
-        // brown과 black을 나타내는 예시
-        dashtype = "10, 5, 1, 5";
-      } else {
-        dashtype = "1";
-      }
+//       // 색상에 따른 dashArray 값을 설정합니다.
+//       if (data[0][2] === "Menual") {
+//         // blue와 green을 나타내는 예시
+//         dashtype = "1";
+//       } else if (data[0][2] === "Auto") {
+//         // brown과 black을 나타내는 예시
+//         dashtype = "5, 5";
+//       } else if (data[0][2] === "Remote") {
+//         // brown과 black을 나타내는 예시
+//         dashtype = "10, 5, 1, 5";
+//       } else {
+//         dashtype = "1";
+//       }
 
-      currentPolyline = L.polyline(data, {
-        color: "blue",
-        weight: 2,
-        dashArray: dashtype,
-      }).addTo(map);
-    }
-  }
-};
+//       currentPolyline = L.polyline(data, {
+//         color: "blue",
+//         weight: 2,
+//         dashArray: dashtype,
+//       }).addTo(map);
+//     }
+//   }
+// };
 
 const startDrag = (event, cardName) => {
   let card;

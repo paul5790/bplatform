@@ -20,11 +20,15 @@
           </v-list-item-subtitle>
         </v-list-item>
 
-        <v-list-item v-if="permission === 'ADMIN'" @click="passwordcheckingDialog = true">
+        <v-list-item
+          v-if="permission === 'ADMIN'"
+          @click="passwordcheckingDialog = true"
+        >
           <v-list-item-title>초기 비밀번호 재설정</v-list-item-title>
 
           <v-list-item-subtitle>
-            초기 비밀번호를 변경함 &nbsp;&nbsp;&nbsp;&nbsp;   <span style="font-size: 10px; color: #ff3333;">*ADMIN만 가능</span>
+            초기 비밀번호를 변경함 &nbsp;&nbsp;&nbsp;&nbsp;
+            <span style="font-size: 10px; color: #ff3333">*ADMIN만 가능</span>
           </v-list-item-subtitle>
         </v-list-item>
       </v-list>
@@ -36,7 +40,7 @@
         lines="three"
         select-strategy="classic"
       >
-        <v-list-subheader>주기 설정</v-list-subheader>
+        <v-list-subheader>데이터 설정</v-list-subheader>
 
         <v-list-item @click="(ALLlosstimeDialog = true), setTimeRefs()">
           <v-list-item-title>데이터 소실 주기 설정</v-list-item-title>
@@ -46,11 +50,19 @@
           </v-list-item-subtitle>
         </v-list-item>
 
-        <v-list-item @click="realtimeDialog = true">
+        <v-list-item @click="realtimeCycleDialog = true">
           <v-list-item-title>실시간 주기 설정</v-list-item-title>
 
           <v-list-item-subtitle>
             실시간 모니터링에서 들어오는 시간 주기를 설정함
+          </v-list-item-subtitle>
+        </v-list-item>
+
+        <v-list-item @click="realtimeStandardDialog = true">
+          <v-list-item-title>실시간 데이터 기준 설정</v-list-item-title>
+
+          <v-list-item-subtitle>
+            실시간 모니터링의 게이지에 기준을 설정함
           </v-list-item-subtitle>
         </v-list-item>
 
@@ -228,9 +240,7 @@
           <v-card-text>
             <v-container>
               <v-row>
-                <v-col cols="12"
-                  ><p style="font-size: 13px">비밀번호</p></v-col
-                >
+                <v-col cols="12"><p style="font-size: 13px">비밀번호</p></v-col>
                 <v-col cols="12">
                   <v-text-field
                     :append-inner-icon="visible ? 'mdi-eye' : 'mdi-eye-off'"
@@ -255,7 +265,10 @@
               @click="passwordCheckingcancle()"
               >취소</v-btn
             >
-            <v-btn color="blue-darken-1" variant="text" @click="passwordChecking()"
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click="passwordChecking()"
               >입력</v-btn
             >
           </v-card-actions>
@@ -299,7 +312,6 @@
           </v-card-actions>
         </v-card>
       </v-dialog>
-
 
       <!-- 소실주기 설정 모달 -->
       <v-dialog v-model="ALLlosstimeDialog" max-width="920">
@@ -1468,7 +1480,11 @@
                           <v-col cols="1"> </v-col>
                           <v-col cols="4">
                             <v-list-subheader>
-                              <v-btn @click="updateTenRefs()" color="blue-grey-lighten-4" style="height: 55px; font-size: 12px">
+                              <v-btn
+                                @click="updateTenRefs()"
+                                color="blue-grey-lighten-4"
+                                style="height: 55px; font-size: 12px"
+                              >
                                 Change All Data
                               </v-btn>
                             </v-list-subheader>
@@ -1501,11 +1517,10 @@
       </v-dialog>
 
       <!-- 실시간 주기 설정 모달 -->
-      <v-dialog v-model="realtimeDialog" max-width="400">
+      <v-dialog v-model="realtimeCycleDialog" max-width="400">
         <v-card>
           <v-card-title>실시간 모니터링 주기 설정</v-card-title>
-          <v-card-text>
-            <v-col cols="12"><p style="font-size: 13px">실시간 주기</p></v-col>
+          <v-card-text style="padding-bottom: 0px">
             <v-col cols="12">
               <v-text-field
                 label="settime (초)"
@@ -1520,13 +1535,126 @@
             <v-btn
               color="blue-darken-1"
               variant="text"
-              @click="realtimeDialog = false"
+              @click="realtimeCycleDialog = false"
               >취소</v-btn
             >
             <v-btn color="blue-darken-1" variant="text" @click="axiosrealtime()"
               >설정</v-btn
             >
           </v-card-actions>
+        </v-card>
+      </v-dialog>
+
+      <!-- 실시간 주기 설정 모달 -->
+      <v-dialog
+        v-model="realtimeStandardDialog"
+        max-width="500"
+        max-height="600"
+      >
+        <v-card class="scrollable-card-1">
+          <v-card-title>실시간 데이터 기준 설정</v-card-title>
+          <v-card-text style="padding-bottom: 0px">
+            <v-btn-toggle
+              v-model="shipType"
+              variant="outlined"
+              divided
+              style="width: 100%"
+            >
+              <v-btn style="flex: 1" value="시험선">시험선</v-btn>
+              <v-btn style="flex: 1" value="실증선">실증선</v-btn>
+              <v-btn style="flex: 1" value="일반선">일반선</v-btn>
+            </v-btn-toggle>
+          </v-card-text>
+          <v-card-actions>
+            <v-btn
+              :icon="rsShow ? 'mdi-chevron-up' : 'mdi-chevron-down'"
+              @click="rsShow = !rsShow"
+            ></v-btn>
+            <p style="color: grey">자세히</p>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click="realtimeStandardDialog = false"
+              v-show="!rsShow"
+              >취소</v-btn
+            >
+            <v-btn
+              color="blue-darken-1"
+              variant="text"
+              @click="axiosrealtime()"
+              v-show="!rsShow"
+              >설정</v-btn
+            >
+          </v-card-actions>
+          <v-expand-transition>
+            <div v-show="rsShow">
+              <v-divider></v-divider>
+
+              <v-card-text style="padding-bottom: 0px; padding-top: 40px">
+                <v-form
+                  ref="form"
+                  v-model="valid"
+                  style="padding-left: 20px; padding-right: 20px"
+                >
+                  <v-row
+                    v-for="(item, index) in standardItems"
+                    :key="index"
+                    class="compact-row"
+                  >
+                    <v-col cols="4">
+                      <v-list-subheader class="compact-label"
+                        >{{ item.label }} :
+                      </v-list-subheader>
+                    </v-col>
+                    <v-col cols="3">
+                      <v-text-field
+                        v-model="item.min"
+                        label="min"
+                        :rules="[standardRules.required]"
+                        variant="underlined"
+                        density="compact"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="1.5" class="compact-label-left">
+                      <v-list-subheader class="compact-label">
+                        ~
+                      </v-list-subheader></v-col
+                    >
+                    <v-col cols="3">
+                      <v-text-field
+                        v-model="item.max"
+                        label="max"
+                        :rules="[standardRules.required]"
+                        variant="underlined"
+                        density="compact"
+                        required
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-form>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="realtimeStandardDialog = false"
+                  v-show="rsShow"
+                  >취소</v-btn
+                >
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="axiosrealtime()"
+                  v-show="rsShow"
+                  >설정</v-btn
+                >
+              </v-card-actions>
+            </div>
+          </v-expand-transition>
         </v-card>
       </v-dialog>
     </v-card>
@@ -1562,7 +1690,6 @@ const darkMode = () => {
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const permission = ref(sessionStorage.getItem("isAdmin"));
 
-
 // 개인정보 변경
 const userName = ref();
 const userDepartment = ref();
@@ -1588,13 +1715,14 @@ const passwordcheckingDialog = ref(false);
 const resetPasswordDialog = ref(false);
 const losstimeDialog = ref(false);
 const ALLlosstimeDialog = ref(false); // 소실주기 전체
-const realtimeDialog = ref(false);
+const realtimeCycleDialog = ref(false);
+const realtimeStandardDialog = ref(true);
 
 // 데이터 소실주기 설정
 const losstime = ref();
 const realtime = ref();
 
-// 데이터 소실주기 시간
+//////////////////// 데이터 소실주기 시간 ///////////////////////
 const selectRadio = ref("DGPS");
 const timeRefs = {
   ALL: ref(10),
@@ -1755,8 +1883,10 @@ const updateTimeRefs = async () => {
     NO1ENGINEPANEL_NO1ENGINE_PANEL_65270: timeRefs.NO1ENGINE_PANEL_65270.value,
     NO1ENGINEPANEL_NO1ENGINE_PANEL_65276: timeRefs.NO1ENGINE_PANEL_65276.value,
     NO1ENGINEPANEL_NO1ENGINE_PANEL_65360: timeRefs.NO1ENGINE_PANEL_65360.value,
-    NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_LAMP: timeRefs.NO1ENGINE_PANEL_65361_LAMP.value,
-    NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_STATUS: timeRefs.NO1ENGINE_PANEL_65361_STATUS.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_LAMP:
+      timeRefs.NO1ENGINE_PANEL_65361_LAMP.value,
+    NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_STATUS:
+      timeRefs.NO1ENGINE_PANEL_65361_STATUS.value,
     NO1ENGINEPANEL_NO1ENGINE_PANEL_65378: timeRefs.NO1ENGINE_PANEL_65378.value,
     NO1ENGINEPANEL_NO1ENGINE_PANEL_65376: timeRefs.NO1ENGINE_PANEL_65376.value,
     NO1ENGINEPANEL_NO1ENGINE_PANEL_65379: timeRefs.NO1ENGINE_PANEL_65379.value,
@@ -1769,8 +1899,10 @@ const updateTimeRefs = async () => {
     NO2ENGINEPANEL_NO2ENGINE_PANEL_65270: timeRefs.NO2ENGINE_PANEL_65270.value,
     NO2ENGINEPANEL_NO2ENGINE_PANEL_65276: timeRefs.NO2ENGINE_PANEL_65276.value,
     NO2ENGINEPANEL_NO2ENGINE_PANEL_65360: timeRefs.NO2ENGINE_PANEL_65360.value,
-    NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_LAMP: timeRefs.NO2ENGINE_PANEL_65361_LAMP.value,
-    NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_STATUS: timeRefs.NO2ENGINE_PANEL_65361_STATUS.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_LAMP:
+      timeRefs.NO2ENGINE_PANEL_65361_LAMP.value,
+    NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_STATUS:
+      timeRefs.NO2ENGINE_PANEL_65361_STATUS.value,
     NO2ENGINEPANEL_NO2ENGINE_PANEL_65378: timeRefs.NO2ENGINE_PANEL_65378.value,
     NO2ENGINEPANEL_NO2ENGINE_PANEL_65376: timeRefs.NO2ENGINE_PANEL_65376.value,
     NO2ENGINEPANEL_NO2ENGINE_PANEL_65379: timeRefs.NO2ENGINE_PANEL_65379.value,
@@ -1812,12 +1944,12 @@ const updateTimeRefs = async () => {
   };
   await updateLossTimeData(tokenid.value, data);
   setTimeRefs();
-  alert("설정이 완료되었습니다.")
+  alert("설정이 완료되었습니다.");
   ALLlosstimeDialog.value = false;
 };
 
 const updateTenRefs = () => {
-  Object.values(timeRefs).forEach(refObj => {
+  Object.values(timeRefs).forEach((refObj) => {
     refObj.value = timeRefs.ALL.value; // 10의 상수값을 넣으려면 이 부분을 수정
   });
 };
@@ -1883,7 +2015,7 @@ const passwordOK = async () => {
 
 const passwordChecking = async () => {
   let passwordCheck = {
-    "password": Cpw.value
+    password: Cpw.value,
   };
   try {
     let A = await readPwData(tokenid.value, passwordCheck);
@@ -1899,11 +2031,11 @@ const passwordChecking = async () => {
     alert("오류가 발생했습니다.");
     console.error("Error in passwordChecking:", error);
   }
-}
+};
 
 const resetPassword = async () => {
   let passwordCheck = {
-    "password": Rpw.value
+    password: Rpw.value,
   };
   try {
     let A = await resetPwData(tokenid.value, passwordCheck);
@@ -1915,10 +2047,7 @@ const resetPassword = async () => {
     alert("오류가 발생했습니다.");
     console.error("Error in passwordChecking:", error);
   }
-}
-
-
-
+};
 
 // 비밀번호 변경 취소
 const passwordcancle = () => {
@@ -1931,12 +2060,12 @@ const passwordcancle = () => {
 const passwordCheckingcancle = () => {
   pwCheck.value = null;
   passwordcheckingDialog.value = false;
-}
+};
 
 const resetPasswordcancle = () => {
   pwCheck.value = null;
   resetPasswordDialog.value = false;
-}
+};
 
 const axiosrealtime = async () => {
   const data = {
@@ -1947,7 +2076,7 @@ const axiosrealtime = async () => {
     const realtime = await updateSetTime(tokenid.value, data);
     console.log(realtime);
     alert("수정이 완료되었습니다.");
-    realtimeDialog.value = false;
+    realtimeCycleDialog.value = false;
     getInfo();
     // 이후 작업 수행 (예: 토큰을 저장하거나 처리)
   } catch (error) {
@@ -2065,6 +2194,43 @@ const rules = ref({
     },
   ],
 });
+
+// ------------------------ realtime standard --------------------------
+
+const shipType = ref("시험선");
+const rsShow = ref(true);
+
+const standardRules = {
+  required: (value) => !!value || "필수 입력 항목입니다.",
+};
+
+const standardItems = ref([
+  { label: "Rudder Value", min: "-50", max: "50" },
+  { label: "Ship Speed", min: "0", max: "15" },
+  { label: "Wind Speed", min: "0", max: "40" },
+  { label: "Engine Speed", min: "0", max: "1000" },
+  { label: "Oil Pressure", min: "0", max: "10" },
+  { label: "Oil Temp", min: "0", max: "200" },
+  { label: "Trans Pressure", min: "0", max: "40" },
+  { label: "Gas Temp", min: "0", max: "900" },
+]);
 </script>
 
-<style scoped></style>
+<style scoped>
+.compact-row {
+  margin-bottom: 8px;
+}
+
+.compact-label {
+  margin-top: 0 !important;
+}
+.compact-label-left {
+  margin-top: 0 !important;
+  margin-left: 15px;
+}
+
+.v-text-field {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+</style>

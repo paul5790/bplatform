@@ -75,7 +75,7 @@ import { readTrialData } from "../api/index.js";
 
 const emits = defineEmits(["trial"]);
 const page = ref(1);
-const itemsPerPage = ref(10);
+const itemsPerPage = ref(15);
 
 const headers = ref([
   { title: "구분", align: "start", key: "division" },
@@ -85,7 +85,7 @@ const headers = ref([
   { title: "종료시간", align: "start", key: "enddate" },
   { title: "시험 이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
-  { title: "map", key: "actions", sortable: false },
+  // { title: "map", key: "actions", sortable: false },
   { title: "해역 위치", align: "start", key: "location" },
   { title: "저장 용량", align: "start", key: "storage" },
   

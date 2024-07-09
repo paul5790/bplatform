@@ -1,5 +1,4 @@
 <template>
-  <v-sheet class="manager-sheet">
     <v-card
       class="scrollable-card"
       style="
@@ -10,7 +9,7 @@
         overflow-y: auto;
       "
     >
-      <v-card-item style="padding-top: 0px">
+      <v-card-item style="padding-top: 0px;">
         <v-row class="dialog-row">
           <!-- 종료 후 저장 -->
           <div class="dialog-div" style="display: flex; margin-right: 0">
@@ -717,7 +716,6 @@
         indeterminate
       ></v-progress-circular>
     </v-overlay>
-  </v-sheet>
 </template>
 
 <script setup>
