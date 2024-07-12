@@ -1,106 +1,106 @@
 <template>
-    <v-card
-      class="scrollable-card"
-      style="
-        flex: 1;
-        height: 75vh;
-        display: flex;
-        flex-direction: column;
-        overflow-y: auto;
-      "
-    >
-      <v-card-item style="padding-top: 0px;">
-        <v-row class="dialog-row">
-          <!-- 종료 후 저장 -->
-          <div class="dialog-div" style="display: flex; margin-right: 0">
-            <v-btn
-              v-if="startstate"
-              :color="btnColor"
-              v-bind="props"
-              @click="openDialog1_1()"
-            >
-              시운전 진행중..(종료하기)
-            </v-btn>
-            <v-dialog v-model="dialog1_1" persistent width="800">
-              <v-card :style="{ backgroundColor: themeColor }">
-                <v-card-title>
-                  <span class="text-h5">시험 측정 종료</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-sheet style="display: flex">
-                    <v-card style="flex: 1">
-                      <v-card-item>
-                        <v-container fluid>
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  측정 종료 시간 :
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+  <v-card
+    class="scrollable-card"
+    style="
+      flex: 1;
+      height: 75vh;
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+    "
+  >
+    <v-card-item style="padding-top: 0px">
+      <v-row class="dialog-row">
+        <!-- 종료 후 저장 -->
+        <div class="dialog-div" style="display: flex; margin-right: 0">
+          <v-btn
+            v-if="startstate"
+            :color="btnColor"
+            v-bind="props"
+            @click="openDialog1_1()"
+          >
+            시운전 진행중..(종료하기)
+          </v-btn>
+          <v-dialog v-model="dialog1_1" persistent width="800">
+            <v-card :style="{ backgroundColor: themeColor }">
+              <v-card-title>
+                <span class="text-h5">시험 측정 종료</span>
+              </v-card-title>
+              <v-card-text>
+                <v-sheet style="display: flex">
+                  <v-card style="flex: 1">
+                    <v-card-item>
+                      <v-container fluid>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 5px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                측정 종료 시간 :
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  {{ endTimeUtc }}
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-                          </v-row>
-                        </v-container>
-                      </v-card-item>
-                    </v-card>
-                  </v-sheet>
-                </v-card-text>
-                <v-card-actions style="margin-top: 0px">
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="grey-darken-1"
-                    variant="text"
-                    @click="nullDialog1_1()"
-                  >
-                    뒤로가기
-                  </v-btn>
-                  <v-btn
-                    color="deep-orange-lighten-2"
-                    variant="text"
-                    @click="cancelData()"
-                  >
-                    측정취소
-                  </v-btn>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="startData()"
-                  >
-                    측정종료
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
-          <!-- 시작하기 -->
-          <div class="dialog-div">
-            <v-btn
-              v-if="!startstate"
-              :color="btnColor"
-              v-bind="props"
-              @click="openDialog1()"
-            >
-              시작하기
-            </v-btn>
-            <v-dialog v-model="dialog1" persistent width="800">
-              <v-card :style="{ backgroundColor: themeColor }">
-                <v-card-title>
-                  <span class="text-h5">시험 측정 시작</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-sheet style="display: flex">
-                    <v-card style="flex: 1">
-                      <v-card-item>
-                        <v-container fluid>
-                          <!-- <v-row>
+                          <v-col cols="8" style="margin-top: 5px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                {{ endTimeUtc }}
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-item>
+                  </v-card>
+                </v-sheet>
+              </v-card-text>
+              <v-card-actions style="margin-top: 0px">
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="grey-darken-1"
+                  variant="text"
+                  @click="nullDialog1_1()"
+                >
+                  뒤로가기
+                </v-btn>
+                <v-btn
+                  color="deep-orange-lighten-2"
+                  variant="text"
+                  @click="cancelData()"
+                >
+                  측정취소
+                </v-btn>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="startData()"
+                >
+                  측정종료
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+        <!-- 시작하기 -->
+        <div class="dialog-div">
+          <v-btn
+            v-if="!startstate"
+            :color="btnColor"
+            v-bind="props"
+            @click="openDialog1()"
+          >
+            시작하기
+          </v-btn>
+          <v-dialog v-model="dialog1" persistent width="800">
+            <v-card :style="{ backgroundColor: themeColor }">
+              <v-card-title>
+                <span class="text-h5">시험 측정 시작</span>
+              </v-card-title>
+              <v-card-text>
+                <v-sheet style="display: flex">
+                  <v-card style="flex: 1">
+                    <v-card-item>
+                      <v-container fluid>
+                        <!-- <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
@@ -119,152 +119,152 @@
                             </v-col>
                           </v-row> -->
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 시작 시간
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 시작 시간
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <!-- 날짜 설정 -->
+                          <v-col cols="8">
+                            <!-- 날짜 설정 -->
 
-                              <VueDatePicker
-                                :class="
-                                  themeMode === 'dark'
-                                    ? 'dp__theme_dark'
-                                    : 'dp__theme_light'
-                                "
-                                style="--dp-input-padding: 15px"
-                                v-model="startTimeUtc"
-                                text-input
-                                :dark="themeMode === 'dark'"
-                                :readonly="true"
-                              />
-                            </v-col>
-                          </v-row>
+                            <VueDatePicker
+                              :class="
+                                themeMode === 'dark'
+                                  ? 'dp__theme_dark'
+                                  : 'dp__theme_light'
+                              "
+                              style="--dp-input-padding: 15px"
+                              v-model="startTimeUtc"
+                              text-input
+                              :dark="themeMode === 'dark'"
+                              :readonly="true"
+                            />
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 28px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 이름 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 28px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 이름 입력
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                style="margin-top: 20px"
-                                variant="outlined"
-                                v-model="startname"
-                                type="text"
-                                :rules="rules1.name"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
+                          <v-col cols="8">
+                            <v-text-field
+                              style="margin-top: 20px"
+                              variant="outlined"
+                              v-model="startname"
+                              type="text"
+                              :rules="rules1.name"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 목적 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 목적 입력
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="startpurpose"
-                                type="text"
-                                :rules="rules1.purpose"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="startpurpose"
+                              type="text"
+                              :rules="rules1.purpose"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  항해 해역 위치
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                항해 해역 위치
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="startlocation"
-                                type="text"
-                                :rules="rules1.location"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="startlocation"
+                              type="text"
+                              :rules="rules1.location"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 10px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  설명
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 10px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                설명
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="startdescription"
-                                type="text"
-                                :rules="rules1.description"
-                                maxlength="25"
-                                @keyup.enter="waitStart()"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-                        </v-container>
-                      </v-card-item>
-                    </v-card>
-                  </v-sheet>
-                </v-card-text>
-                <v-card-actions style="margin-top: 10px">
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="nullDialog1()"
-                  >
-                    뒤로가기
-                  </v-btn>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="waitStart()"
-                  >
-                    측정시작
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
-          <!-- 추가하기 -->
-          <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn :color="btnColor" v-bind="props" @click="openDialog2()">
-              추가하기
-            </v-btn>
-            <v-dialog v-model="dialog2" persistent width="800">
-              <v-card :style="{ backgroundColor: themeColor }">
-                <v-card-title>
-                  <span class="text-h5">시험 추가</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-sheet style="display: flex">
-                    <v-card style="flex: 1">
-                      <v-card-item>
-                        <v-container fluid>
-                          <!-- <v-row>
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="startdescription"
+                              type="text"
+                              :rules="rules1.description"
+                              maxlength="25"
+                              @keyup.enter="waitStart()"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-item>
+                  </v-card>
+                </v-sheet>
+              </v-card-text>
+              <v-card-actions style="margin-top: 10px">
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="nullDialog1()"
+                >
+                  뒤로가기
+                </v-btn>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="waitStart()"
+                >
+                  측정시작
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+        <!-- 추가하기 -->
+        <div style="display: flex; margin: 15px; margin-left: 0">
+          <v-btn :color="btnColor" v-bind="props" @click="openDialog2()">
+            추가하기
+          </v-btn>
+          <v-dialog v-model="dialog2" persistent width="800">
+            <v-card :style="{ backgroundColor: themeColor }">
+              <v-card-title>
+                <span class="text-h5">시험 추가</span>
+              </v-card-title>
+              <v-card-text>
+                <v-sheet style="display: flex">
+                  <v-card style="flex: 1">
+                    <v-card-item>
+                      <v-container fluid>
+                        <!-- <v-row>
                             <v-col cols="4" style="margin-top: 5px">
                               <v-list-subheader
                                 ><p style="font-size: 17px">
@@ -283,439 +283,434 @@
                             </v-col>
                           </v-row> -->
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 시작 시간
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 시작 시간
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <!-- 날짜 설정 -->
+                          <v-col cols="8">
+                            <!-- 날짜 설정 -->
 
-                              <VueDatePicker
-                                :class="
-                                  themeMode === 'dark'
-                                    ? 'dp__theme_dark'
-                                    : 'dp__theme_light'
-                                "
-                                :dark="themeMode === 'dark'"
-                                style="--dp-input-padding: 15px"
-                                v-model="editstartdate"
-                                text-input
-                                :max-date="currentDate"
-                              />
-                            </v-col>
-                          </v-row>
+                            <VueDatePicker
+                              :class="
+                                themeMode === 'dark'
+                                  ? 'dp__theme_dark'
+                                  : 'dp__theme_light'
+                              "
+                              :dark="themeMode === 'dark'"
+                              style="--dp-input-padding: 15px"
+                              v-model="editstartdate"
+                              text-input
+                              :max-date="currentDate"
+                            />
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 28px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 종료 시간
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 28px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 종료 시간
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <VueDatePicker
-                                :class="
-                                  themeMode === 'dark'
-                                    ? 'dp__theme_dark'
-                                    : 'dp__theme_light'
-                                "
-                                :dark="themeMode === 'dark'"
-                                style="
-                                  margin-top: 20px;
-                                  --dp-input-padding: 15px;
-                                "
-                                v-model="editenddate"
-                                text-input
-                                :max-date="currentDate"
-                                :max-time="currentTime"
-                              />
-                            </v-col>
-                          </v-row>
+                          <v-col cols="8">
+                            <VueDatePicker
+                              :class="
+                                themeMode === 'dark'
+                                  ? 'dp__theme_dark'
+                                  : 'dp__theme_light'
+                              "
+                              :dark="themeMode === 'dark'"
+                              style="margin-top: 20px; --dp-input-padding: 15px"
+                              v-model="editenddate"
+                              text-input
+                              :max-date="currentDate"
+                              :max-time="currentTime"
+                            />
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 28px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 이름 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 28px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 이름 입력
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                style="margin-top: 20px"
-                                variant="outlined"
-                                v-model="editname"
-                                type="text"
-                                :rules="rules1.name"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
+                          <v-col cols="8">
+                            <v-text-field
+                              style="margin-top: 20px"
+                              variant="outlined"
+                              v-model="editname"
+                              type="text"
+                              :rules="rules1.name"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 목적 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 목적 입력
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="editpurpose"
-                                type="text"
-                                :rules="rules1.purpose"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="editpurpose"
+                              type="text"
+                              :rules="rules1.purpose"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  항해 해역 위치
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                항해 해역 위치
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                style="margin-top: 0px"
-                                variant="outlined"
-                                v-model="editlocation"
-                                type="text"
-                                :rules="rules1.location"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
+                          <v-col cols="8">
+                            <v-text-field
+                              style="margin-top: 0px"
+                              variant="outlined"
+                              v-model="editlocation"
+                              type="text"
+                              :rules="rules1.location"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
 
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 10px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  설명
-                                </p></v-list-subheader
-                              >
-                            </v-col>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 10px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                설명
+                              </p></v-list-subheader
+                            >
+                          </v-col>
 
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="editdescription"
-                                type="text"
-                                style="margin-bottom: 5px"
-                                :rules="rules1.description"
-                                maxlength="25"
-                                @keyup.enter="editData()"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-                        </v-container>
-                      </v-card-item>
-                    </v-card>
-                  </v-sheet>
-                </v-card-text>
-                <v-card-actions style="margin-top: 10px">
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="nullDialog2()"
-                  >
-                    뒤로가기
-                  </v-btn>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="editData()"
-                  >
-                    저장하기
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
-          <!-- 수정하기 -->
-          <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn :color="btnColor" v-bind="props" @click="openDialog3()">
-              수정하기
-            </v-btn>
-            <v-dialog v-model="dialog3" persistent width="800">
-              <v-card :style="{ backgroundColor: themeColor }">
-                <v-card-title>
-                  <span class="text-h5">시험 수정</span>
-                </v-card-title>
-                <v-card-text>
-                  <v-sheet style="display: flex">
-                    <v-card style="flex: 1">
-                      <v-card-item>
-                        <v-container fluid>
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 시작 시간
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <!-- 날짜 설정 -->
-
-                              <VueDatePicker
-                                :class="
-                                  themeMode === 'dark'
-                                    ? 'dp__theme_dark'
-                                    : 'dp__theme_light'
-                                "
-                                :dark="themeMode === 'dark'"
-                                style="--dp-input-padding: 15px"
-                                v-model="selectedstartdate"
-                                text-input
-                              />
-                            </v-col>
-                          </v-row>
-
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 28px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 종료 시간
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <VueDatePicker
-                                :class="
-                                  themeMode === 'dark'
-                                    ? 'dp__theme_dark'
-                                    : 'dp__theme_light'
-                                "
-                                :dark="themeMode === 'dark'"
-                                style="
-                                  margin-top: 20px;
-                                  --dp-input-padding: 15px;
-                                "
-                                v-model="selectedenddate"
-                                text-input
-                              />
-                            </v-col>
-                          </v-row>
-
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 28px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 이름 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                style="margin-top: 20px"
-                                variant="outlined"
-                                v-model="selectedname"
-                                type="text"
-                                :rules="rules1.name"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 목적 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="selectedpurpose"
-                                type="text"
-                                :rules="rules1.purpose"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 8px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  항해 해역 위치
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                style="margin-top: 0px"
-                                variant="outlined"
-                                v-model="selectedlocation"
-                                type="text"
-                                :rules="rules1.location"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-
-                          <v-row>
-                            <v-col cols="4" style="margin-top: 10px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  설명
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="selecteddescription"
-                                type="text"
-                                style="margin-bottom: 35px"
-                                :rules="rules1.description"
-                                maxlength="25"
-                                @keyup.enter="changeData()"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row>
-                        </v-container>
-                      </v-card-item>
-                    </v-card>
-                  </v-sheet>
-                </v-card-text>
-                <v-card-actions style="margin-top: 10px">
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="nullDialog3()"
-                  >
-                    뒤로가기
-                  </v-btn>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="changeData()"
-                  >
-                    저장하기
-                  </v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
-          <!-- 삭제하기 -->
-          <div style="display: flex; margin: 15px; margin-left: 0">
-            <v-btn :color="btnColor" @click="openDialog4()"> 삭제하기 </v-btn>
-
-            <v-dialog v-model="dialog4" persistent width="350">
-              <v-card :style="{ backgroundColor: themeColor }">
-                <v-card-title>
-                  <span class="text-h5">시험 정보 삭제</span>
-                </v-card-title>
-                <v-card-text
-                  >{{ selecteddivision }}시험의 정보를
-                  삭제하시겠습니까?</v-card-text
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="editdescription"
+                              type="text"
+                              style="margin-bottom: 5px"
+                              :rules="rules1.description"
+                              maxlength="25"
+                              @keyup.enter="editData()"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-item>
+                  </v-card>
+                </v-sheet>
+              </v-card-text>
+              <v-card-actions style="margin-top: 10px">
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="nullDialog2()"
                 >
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn
-                    color="blue-darken-1"
-                    variant="text"
-                    @click="deleteData()"
-                    >예</v-btn
-                  >
-                  <v-btn color="blue-darken-1" variant="text" @click="cancel()"
-                    >아니오</v-btn
-                  >
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
-          </div>
-        </v-row>
-        <v-data-table
-          style="margin-top: 20px"
-          v-model="selectedData"
-          v-model:page="page"
-          class="elevation-1"
-          :headers="headers"
-          :items="items"
-          :items-per-page="itemsPerPage"
-          density="compact"
-          hide-default-footer
-          select-strategy="single"
-          return-object
-          show-select
-        >
-          <template v-slot:no-data>
-            <v-sheet
-              height="55vh"
-              class="pa-1 d-flex justify-center align-center"
-            >
-              <div style="text-align: center">
-                <p style="font-weight: 500; font-size: 20px">
-                  {{ message }}
-                </p>
-              </div>
-            </v-sheet>
-          </template>
-          <template v-slot:bottom>
-            <div class="text-center pt-2">
-              <v-pagination
-                v-model="page"
-                :length="pageCount"
-                :total-visible="6"
-                rounded="circle"
-              ></v-pagination>
+                  뒤로가기
+                </v-btn>
+                <v-btn color="blue-darken-1" variant="text" @click="editData()">
+                  저장하기
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+        <!-- 수정하기 -->
+        <div style="display: flex; margin: 15px; margin-left: 0">
+          <v-btn :color="btnColor" v-bind="props" @click="openDialog3()">
+            수정하기
+          </v-btn>
+          <v-dialog v-model="dialog3" persistent width="800">
+            <v-card :style="{ backgroundColor: themeColor }">
+              <v-card-title>
+                <span class="text-h5">시험 수정</span>
+              </v-card-title>
+              <v-card-text>
+                <v-sheet style="display: flex">
+                  <v-card style="flex: 1">
+                    <v-card-item>
+                      <v-container fluid>
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 시작 시간
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <!-- 날짜 설정 -->
+
+                            <VueDatePicker
+                              :class="
+                                themeMode === 'dark'
+                                  ? 'dp__theme_dark'
+                                  : 'dp__theme_light'
+                              "
+                              :dark="themeMode === 'dark'"
+                              style="--dp-input-padding: 15px"
+                              v-model="selectedstartdate"
+                              text-input
+                            />
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 28px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 종료 시간
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <VueDatePicker
+                              :class="
+                                themeMode === 'dark'
+                                  ? 'dp__theme_dark'
+                                  : 'dp__theme_light'
+                              "
+                              :dark="themeMode === 'dark'"
+                              style="margin-top: 20px; --dp-input-padding: 15px"
+                              v-model="selectedenddate"
+                              text-input
+                            />
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 28px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 이름 입력
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <v-text-field
+                              style="margin-top: 20px"
+                              variant="outlined"
+                              v-model="selectedname"
+                              type="text"
+                              :rules="rules1.name"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험 목적 입력
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="selectedpurpose"
+                              type="text"
+                              :rules="rules1.purpose"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                항해 해역 위치
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <v-text-field
+                              style="margin-top: 0px"
+                              variant="outlined"
+                              v-model="selectedlocation"
+                              type="text"
+                              :rules="rules1.location"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 10px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                설명
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="selecteddescription"
+                              type="text"
+                              style="margin-bottom: 35px"
+                              :rules="rules1.description"
+                              maxlength="25"
+                              @keyup.enter="changeData()"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </v-container>
+                    </v-card-item>
+                  </v-card>
+                </v-sheet>
+              </v-card-text>
+              <v-card-actions style="margin-top: 10px">
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="nullDialog3()"
+                >
+                  뒤로가기
+                </v-btn>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="changeData()"
+                >
+                  저장하기
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+        <!-- 삭제하기 -->
+        <div style="display: flex; margin: 15px; margin-left: 0">
+          <v-btn :color="btnColor" @click="openDialog4()"> 삭제하기 </v-btn>
+
+          <v-dialog v-model="dialog4" persistent width="350">
+            <v-card :style="{ backgroundColor: themeColor }">
+              <v-card-title>
+                <span class="text-h5">시험 정보 삭제</span>
+              </v-card-title>
+              <v-card-text
+                >{{ selecteddivision }}시험의 정보를
+                삭제하시겠습니까?</v-card-text
+              >
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  @click="deleteData()"
+                  >예</v-btn
+                >
+                <v-btn color="blue-darken-1" variant="text" @click="cancel()"
+                  >아니오</v-btn
+                >
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </div>
+      </v-row>
+      <div>
+        <input type="file" @change="handleFileUpload" />
+        <button @click="uploadFile">Upload</button>
+      </div>
+
+      <v-data-table
+        style="margin-top: 20px"
+        v-model="selectedData"
+        v-model:page="page"
+        class="elevation-1"
+        :headers="headers"
+        :items="items"
+        :items-per-page="itemsPerPage"
+        density="compact"
+        hide-default-footer
+        select-strategy="single"
+        return-object
+        show-select
+      >
+        <template v-slot:no-data>
+          <v-sheet
+            height="55vh"
+            class="pa-1 d-flex justify-center align-center"
+          >
+            <div style="text-align: center">
+              <p style="font-weight: 500; font-size: 20px">
+                {{ message }}
+              </p>
             </div>
-          </template>
-        </v-data-table>
-      </v-card-item>
+          </v-sheet>
+        </template>
+        <template v-slot:bottom>
+          <div class="text-center pt-2">
+            <v-pagination
+              v-model="page"
+              :length="pageCount"
+              :total-visible="6"
+              rounded="circle"
+            ></v-pagination>
+          </div>
+        </template>
+      </v-data-table>
+    </v-card-item>
+  </v-card>
+  <!-- 데이터 저장중 모달 persistent -->
+  <v-dialog v-model="loadDialog" max-width="300" height="100" persistent>
+    <v-card>
+      <v-card-text>
+        <v-row align-content="center" class="fill-height" justify="center">
+          <v-col class="text-subtitle-1 text-center mt-3" cols="12">
+            Processing
+          </v-col>
+          <v-col cols="6">
+            <v-progress-linear
+              color="blue"
+              height="6"
+              indeterminate
+              rounded
+            ></v-progress-linear>
+          </v-col>
+        </v-row>
+      </v-card-text>
     </v-card>
-    <!-- 데이터 저장중 모달 persistent -->
-    <v-dialog v-model="loadDialog" max-width="300" height="100" persistent>
-      <v-card>
-        <v-card-text>
-          <v-row align-content="center" class="fill-height" justify="center">
-            <v-col class="text-subtitle-1 text-center mt-3" cols="12">
-              Processing
-            </v-col>
-            <v-col cols="6">
-              <v-progress-linear
-                color="blue"
-                height="6"
-                indeterminate
-                rounded
-              ></v-progress-linear>
-            </v-col>
-          </v-row>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
-    <v-overlay
-      v-model="overlay"
-      contained
-      class="align-center justify-center overlay"
-    >
-      <v-progress-circular
-        :size="50"
-        color="primary"
-        indeterminate
-      ></v-progress-circular>
-    </v-overlay>
+  </v-dialog>
+  <v-overlay
+    v-model="overlay"
+    contained
+    class="align-center justify-center overlay"
+  >
+    <v-progress-circular
+      :size="50"
+      color="primary"
+      indeterminate
+    ></v-progress-circular>
+  </v-overlay>
 </template>
 
 <script setup>
@@ -1034,8 +1029,6 @@ const startData = async () => {
     sessionStorage.removeItem("endTimeUtc");
     sessionStorage.removeItem("description");
 
-    
-
     // console.log(response.data);
     overlay.value = false;
     alert("시험 측정이 종료됩니다.");
@@ -1044,7 +1037,7 @@ const startData = async () => {
     console.error(error);
     alert(error.response?.data || "An error occurred during signup.");
     overlay.value = false;
-    alert("")
+    alert("");
   }
 
   nullDialog1_1();
@@ -1119,7 +1112,7 @@ const editData = async () => {
         try {
           await createTrialData(tokenid.value, data);
           overlay.value = false;
-          
+
           alert("시험 추가가 완료되었습니다.");
           nullDialog2();
           // console.log("API 응답 데이터:", response.data);
@@ -1141,7 +1134,6 @@ const editData = async () => {
         }
       } catch (error) {
         console.error("An error occurred in waitStart:", error);
-        
       }
     }
   }
@@ -1231,7 +1223,6 @@ const changeData = async () => {
       } catch (error) {
         console.error(error);
         alert("선택된 시험 목록이 존재하지 않습니다.");
-
       }
     }
   } else {
@@ -1250,7 +1241,7 @@ const deleteData = async () => {
   };
   try {
     await deleteTrialData(tokenid.value, data);
-    
+
     alert("선택한 시험의 삭제가 완료되었습니다.");
     overlayemit(false);
     overlay.value = false;
@@ -1320,8 +1311,8 @@ const fetchData = async () => {
         ].endTimeUtc.slice(0, 19)}`
       );
       const size = parseFloat(response[i].storageSize).toFixed(1);
-      const startUtc = (response[i].startTimeUtc).substring(0, 22);
-      const endUtc = (response[i].endTimeUtc).substring(0, 22);
+      const startUtc = response[i].startTimeUtc.substring(0, 22);
+      const endUtc = response[i].endTimeUtc.substring(0, 22);
       const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;

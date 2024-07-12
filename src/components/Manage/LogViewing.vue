@@ -40,7 +40,7 @@
         <v-data-table
           style="margin-top: 20px"
           v-model:page="page"
-          class="elevation-1"
+          class="elevation-1 "
           :headers="headers"
           :search="search"
           :items="filteredItems"
@@ -199,6 +199,33 @@ onMounted(() => {
 </script>
 
 <style scoped>
+
+.log-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.log-table .v-data-table__wrapper {
+  overflow-x: auto;
+}
+
+.log-table .v-data-table__wrapper table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.log-table .v-data-table__wrapper th,
+.log-table .v-data-table__wrapper td {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  max-width: 150px; /* Adjust this value as needed */
+}
+
+.log-table .v-data-table__wrapper th:nth-child(6),
+.log-table .v-data-table__wrapper td:nth-child(6) {
+  max-width: 400px; /* Adjust this value for the log column */
+}
 .centered-content {
   display: flex;
   justify-content: center; /* 수평 가운데 정렬 */

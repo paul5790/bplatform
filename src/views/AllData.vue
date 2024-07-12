@@ -595,10 +595,10 @@ const fetchData = async (data) => {
 
         let dataFomat;
         if (postType.value == "period") {
-          dataFomat = `period?start_utctime=${searchStart.value}&end_utctime=${searchEnd.value}&signal_name=${Sc}_${Co}`;
+          dataFomat = `table_data/information/period?start_utctime=${searchStart.value}&end_utctime=${searchEnd.value}&signal_name=${Sc}_${Co}`;
           console.log(dataFomat);
         } else if (postType.value == "seatrial") {
-          dataFomat = `test?signal_name=${Sc}_${Co}&test_number=${selectedtrialNum.value}`;
+          dataFomat = `table_data/information/test?signal_name=${Sc}_${Co}&test_number=${selectedtrialNum.value}`;
           console.log(dataFomat);
         }
         // console.log("dataSet : " + JSON.stringify(dataFomat));

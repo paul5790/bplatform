@@ -5,7 +5,8 @@
       <!-- 데이터 선택창 -->
 
       <v-card-actions>
-        <v-card ref="searchCard"
+        <v-card
+          ref="searchCard"
           style="
             position: absolute;
             top: 100px;
@@ -15,11 +16,12 @@
             width: 70%;
             height: 75px;
             overflow: visible;
-          ">
+          "
+        >
           <v-card-text style="padding-bottom: 0px">
             <div style="display: flex; gap: 16px">
               <v-text-field
-                v-model="ShipData"
+                v-model="textboxs.tb1"
                 density="compact"
                 append-inner-icon="mdi-roman-numeral-3"
                 label="ShipData"
@@ -34,7 +36,7 @@
                 class="custom-text-field"
               ></v-text-field>
               <v-text-field
-                v-model="SelectedContents"
+                v-model="textboxs.tb2"
                 body-1
                 density="compact"
                 append-inner-icon="mdi-roman-numeral-1"
@@ -50,7 +52,7 @@
                 class="custom-text-field"
               ></v-text-field>
               <v-text-field
-                v-model="SubComponent"
+                v-model="textboxs.tb3"
                 density="compact"
                 append-inner-icon="mdi-roman-numeral-2"
                 label="Sub Component"
@@ -65,11 +67,12 @@
                 class="custom-text-field"
               ></v-text-field>
               <v-text-field
-                v-model="DataScope"
+                v-model="textboxs.tb4"
                 density="compact"
                 append-inner-icon="mdi-calendar-range"
                 label="Data Scope"
                 variant="outlined"
+                readonly
                 @click="
                   (SelectedDataCardVisible = false),
                     (SelectedContentsCardVisible = false),
@@ -78,17 +81,28 @@
                 "
                 class="custom-text-field"
               ></v-text-field>
+              <v-btn color="#5865f2" variant="flat" width="10%" height="40px"
+                >검색</v-btn
+              >
+              <v-btn
+                @click="test()"
+                color="#5865f2"
+                variant="flat"
+                width="1%"
+                height="40px"
+                >test</v-btn
+              >
             </div>
           </v-card-text>
         </v-card>
         <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
-        
+
         <!-- 0번째 데이터 타입 선택 카드 -->
         <v-card
           v-if="SelectedDataCardVisible"
           style="
             position: absolute;
-            top: 260px;
+            top: 180px;
             left: 15%;
             z-index: 1100;
             width: 27%;
@@ -108,32 +122,29 @@
               "
             >
               <v-btn
-                :class="{ 'selected-button': selectDataType === '정형 데이터' }"
+                :class="{ 'selected-button': ShipData === '선내 데이터' }"
                 width="43%"
                 style="flex: 1; margin: 0 10px"
                 variant="outlined"
                 class="secondBtn"
-                @click="toggleSelectDataType('정형 데이터')"
+                @click="toggleSelectShipData('ship')"
               >
-                <v-icon v-if="selectDataType === '정형 데이터'" left color="red"
+                <v-icon v-if="ShipData === '선내 데이터'" left color="red"
                   >mdi-check</v-icon
                 >
                 선내 데이터 (SHIP)</v-btn
               >
               <v-btn
                 :class="{
-                  'selected-button': selectDataType === '비정형 데이터',
+                  'selected-button': ShipData === '관제 데이터',
                 }"
                 width="43%"
                 style="flex: 1; margin: 0 10px"
                 variant="outlined"
                 class="secondBtn"
-                @click="toggleSelectDataType('비정형 데이터')"
+                @click="toggleSelectShipData('vts')"
               >
-                <v-icon
-                  v-if="selectDataType === '비정형 데이터'"
-                  left
-                  color="red"
+                <v-icon v-if="ShipData === '관제 데이터'" left color="red"
                   >mdi-check</v-icon
                 >
                 관제 데이터 (VTS)</v-btn
@@ -161,7 +172,7 @@
           v-if="SelectedContentsCardVisible"
           style="
             position: absolute;
-            top: 260px;
+            top: 180px;
             left: 33%;
             z-index: 1100;
             width: 50%;
@@ -223,7 +234,7 @@
             <v-divider></v-divider>
             <div class="chip-container">
               <div class="recent-search">
-                <h4>최근 검색</h4>
+                <h4>조회 데이터</h4>
                 <v-chip
                   v-for="(search, index) in recentSearches"
                   :key="index"
@@ -238,7 +249,7 @@
                 color="#5865f2"
                 width="100px"
                 variant="flat"
-                @click="completeData()"
+                @click="completeData1()"
                 style="position: absolute; right: 16px; bottom: 8px"
                 >선택</v-btn
               >
@@ -251,7 +262,7 @@
           v-if="DataTypeCardVisible"
           style="
             position: absolute;
-            top: 260px;
+            top: 180px;
             left: 50%;
             z-index: 1100;
             width: 27%;
@@ -322,26 +333,34 @@
         <!-- 3번째 항차, 기간 선택 카드 -->
         <v-card
           v-if="periodSettingCardVisible"
-          style="
-            position: absolute;
-            top: 260px;
-            left: 50%;
-            z-index: 1100;
-            width: 35%;
-            overflow: visible;
-          "
+          :style="{
+            position: 'absolute',
+            top: '180px',
+            left: selectedTest === 0 ? '67.5%' : '76.55%',
+            zIndex: 1100,
+            width: selectedTest === 0 ? '35%' : '17%',
+            overflow: 'visible',
+            transform: 'translateX(-50%)',
+          }"
         >
           <v-card-title>
             <span>Data Period</span>
           </v-card-title>
           <v-card-text>
             <div class="destination-container" style="margin-bottom: 15px">
-              <v-list style="width: 30%; border-right: 1px solid #e0e0e0">
+              <v-list
+                class="scrollable-card-1"
+                :style="{
+                  height: selectedTest === 0 ? '370px' : '250px',
+                  width: selectedTest === 0 ? '30%' : '100%',
+                  borderRight: '1px solid #e0e0e0',
+                }"
+              >
                 <v-list-item-group v-model="selectedTest">
                   <v-list-item
                     v-for="(category, index) in testList"
                     :key="index"
-                    @click="toggleCategory(index)"
+                    @click="selectTest(index, category)"
                     :class="{ 'selected-item': selectedTest === index }"
                   >
                     <v-list-item-title>{{ category }}</v-list-item-title>
@@ -351,12 +370,12 @@
 
               <div
                 v-if="selectedTest === 0"
-                style="
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  width: 0%;
-                "
+                :style="{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  width: '70%',
+                }"
               >
                 <VueDatePicker
                   v-model="dateRange"
@@ -365,23 +384,32 @@
                   density="compact"
                   range
                   style="--dp-input-padding: 8px; width: auto"
+                  @update:model-value="handleDateChange"
                 />
-                <v-textarea
-                  style="width: 260px; margin-top: 10px; font-size: 12px"
-                  placeholder="apply 버튼을 클릭하세요."
-                  readonly
-                  rows="2"
-                  no-resize
-                  v-model="dateRange"
-                  density="compact"
-                  variant="outlined"
-                ></v-textarea>
               </div>
             </div>
             <v-divider></v-divider>
             <div class="chip-container">
+              <v-btn
+                color="#5865f2"
+                width="100px"
+                variant="flat"
+                @click="completeData3()"
+                style="position: absolute; right: 16px; bottom: 8px"
+                >선택</v-btn
+              >
+            </div>
+            <div class="chip-container">
               <div class="recent-search">
-                <p style="height: 20px"></p>
+                <h4>조회 기간</h4>
+                <v-chip
+                  v-if="searchTimeRange"
+                  close
+                  @click="handleChipClick(search)"
+                  class="chip-item"
+                >
+                  {{ searchTimeRange }}
+                </v-chip>
               </div>
               <v-btn
                 color="#5865f2"
@@ -398,137 +426,25 @@
         <v-spacer></v-spacer>
       </v-card-actions>
 
-      <!-- 탭 기능 구현 -->
-      <v-tabs
-        :style="{
-          color: '#f7f7f7',
-          height: '5vh',
-          marginLeft: '15px',
-          marginRight: '15px',
-        }"
-        v-model="tab"
-        align-tabs="start"
-      >
-        <!-- for문 사용해서 탭 늘리기 -->
-        <v-tab
-          :style="{
-            'background-color':
-              tab === index ? themeSelectedTabColor : themeNoNSelectedTabColor,
-            color:
-              tab === index
-                ? themeSelectedTabTextColor
-                : themeNoNSelectedTabTextColor,
-          }"
-          :value="index"
-          v-for="(item, index) in selectedData"
-          :key="index"
-        >
-          {{ item }}
-        </v-tab>
-      </v-tabs>
-      <!-- 데이터 테이블 -->
-      <v-window
-        class="scrollable-card"
-        v-model="tab"
-        style="
-          box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-          border-radius: 8px;
-          height: 64vh;
-        "
-      >
-        <v-window-item
-          v-for="(item, index) in selectedData"
-          :key="index"
-          :value="index"
-        >
-          <v-card>
-            <v-card-item>
-              <v-sheet
-                v-if="loading"
-                :elevation="elevation"
-                style="
-                  height: 68vh;
-                  display: flex;
-                  flex-direction: column;
-                  align-items: center;
-                  justify-content: center;
-                "
-              >
-                <v-progress-circular
-                  :size="50"
-                  color="primary"
-                  indeterminate
-                ></v-progress-circular>
-                <p style="margin-top: 10px; font-weight: 400; font-size: 18px">
-                  loading
-                </p>
-              </v-sheet>
-              <v-data-table
-                v-if="!loading"
-                v-model="selectedData"
-                :items-per-page="itemsPerPage"
-                :density="'dense'"
-                :headers="headerName"
-                :items="dataSet"
-                return-object
-                style="
-                  padding-top: 5px;
-                  padding-bottom: 10px;
-                  background-image: url('/image/kriso_kren.png');
-                  background-size: auto 85%;
-                  background-position: top center;
-                  background-repeat: no-repeat;
-                "
-                @update:options="handleSortUpdate"
-              >
-                <template v-slot:no-data>
-                  <v-sheet
-                    height="49vh"
-                    class="pa-1 d-flex justify-center align-center"
-                  >
-                    <div v-if="lastloading" style="text-align: center">
-                      <v-progress-circular
-                        :size="50"
-                        color="primary"
-                        indeterminate
-                      ></v-progress-circular>
-                      <p style="font-weight: 500; font-size: 20px">loading!</p>
-                    </div>
-                    <div v-if="!lastloading" style="text-align: center">
-                      <p style="font-weight: 500; font-size: 20px">
-                        {{ message }}
-                      </p>
-                    </div>
-                  </v-sheet>
-                </template>
-                <template v-slot:bottom>
-                  <div
-                    class="text-center pt-2 mb-5"
-                    style="display: flex; justify-content: center"
-                  >
-                    <v-pagination
-                      v-model="page"
-                      :length="pageCount"
-                      :total-visible="10"
-                    ></v-pagination>
-                    <v-text-field
-                      label="Page"
-                      variant="solo-inverted"
-                      style="
-                        max-width: 70px;
-                        margin-left: 10px;
-                        text-align: center;
-                      "
-                      @keyup.enter="keyPage"
-                      v-model="page"
-                    ></v-text-field>
-                  </div>
-                </template>
-              </v-data-table>
-            </v-card-item>
-          </v-card>
-        </v-window-item>
-      </v-window>
+      <v-container>
+        <v-tabs v-model="activeTab">
+          <v-tab v-for="(data, index) in dataKeys" :key="index">{{
+            data
+          }}</v-tab>
+        </v-tabs>
+        <v-tabs-items v-model="activeTab">
+          <v-tab-item v-for="(data, index) in dataKeys" :key="index">
+            <template v-if="activeTab === index">
+            <v-data-table
+              :headers="headers[data].text"
+              :items="dataTables[data]"
+              class="elevation-1"
+            ></v-data-table>
+            </template>
+          </v-tab-item>
+        </v-tabs-items>
+      </v-container>
+
       <!-- 데이터 다운로드 -->
     </div>
     <!-- 데이터 저장중 모달 persistent -->
@@ -732,14 +648,44 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
+import {
+  readTrialData,
+  readDataTrial,
+  readDataDate,
+  downloadDataFile,
+  cancelDownload,
+} from "../api/index.js";
+import { themeMode, themeConfig } from "@/utils/theme.js";
+import "@/styles/datepicker-theme.css";
 
-const tabs = ref();
+// 토큰
+const tokenid = ref(sessionStorage.getItem("token") || "");
 
-const SelectedContents = ref();
-const SubComponent = ref();
-const Contents = ref();
-const DataScope = ref();
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 데이터 선택창
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// text field
+const textboxs = ref({
+  tb1: "",
+  tb2: "",
+  tb3: "",
+  tb4: "",
+});
+
+// for API Request variable
+const requests = ref({
+  type: "",
+  data: "",
+  period: "",
+  index: "",
+  signal: "",
+});
 
 // Main Component Card View
 const SelectedDataCardVisible = ref(false);
@@ -755,6 +701,22 @@ const searchTarget = ref([]);
 
 const selectedHour = ref(6);
 const selectedMinute = ref(19);
+
+// ------------------- 0번째 데이터 선정 Method ------------------------ //
+const ShipData = ref();
+
+const toggleSelectShipData = (data) => {
+  if (data === "ship") {
+    ShipData.value = "선내 데이터";
+  } else if (data === "vts") {
+    ShipData.value = "관제 데이터";
+  } else {
+    console.log("있을 수 없는 일 ㅋ");
+  }
+  console.log(selectDataType.value);
+};
+
+// ------------------- 1번째 데이터 선정 Method ------------------------ //
 
 const categories = ref([
   "Ship Information",
@@ -1021,44 +983,173 @@ const handleChipClick = (search) => {
 
 // ------------------- 2번째 데이터 타입 Method ------------------------ //
 const selectDataType = ref(null);
+
 const toggleSelectDataType = (type) => {
-  if (selectDataType.value === type) {
-    selectDataType.value = null;
+  if (type === "정형 데이터") {
+    selectDataType.value = "정형 데이터";
+  } else if (type === "비정형 데이터") {
+    selectDataType.value = "비정형 데이터";
   } else {
-    selectDataType.value = type;
+    console.log("가능한가?");
   }
   console.log(selectDataType.value);
 };
 
 // ------------------- 3번째 데이터 기간 Method ------------------------ //
 // 초기 날짜 설정
-const dateRange = ref(); // 초기 날짜를 설정합니
-const testList = ref(["직접 선택", "시험 1", "시험 2", "시험 3", "시험 4"]);
+const dateRange = ref(); // 초기 날짜를 설정합니다
+const startUtc = ref(); //검색용 직접선택 시작시간
+const endUtc = ref(); //검색용 직접선택 종료시간
+
+const testList = ref(["직접 선택"]);
 const selectedTest = ref();
+const testStartTimeList = ref([]);
+const testEndTimeList = ref([]);
+
+const searchTimeRange = ref(null); //null로 변경
+
+const getTrialDate = async () => {
+  try {
+    const response = await readTrialData(tokenid.value);
+    for (let i = 0; i < response.length; i++) {
+      testStartTimeList.value.push(`${response[i].startTimeUtc}`);
+      testEndTimeList.value.push(`${response[i].endTimeUtc}`);
+      const testNumber = response[i].testNumber;
+      testList.value.push(`항차 ${testNumber}번`);
+    }
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const selectTest = (index, category) => {
+  selectedTest.value = index;
+  if (index == 0) {
+    handleDateChange();
+  } else {
+    searchTimeRange.value = category;
+  }
+};
+
+const handleDateChange = () => {
+  if (dateRange.value) {
+    startUtc.value = dateRange.value[0].toISOString();
+    endUtc.value = dateRange.value[1].toISOString();
+
+    searchTimeRange.value = `${startUtc.value} - ${endUtc.value}`;
+  } else {
+    searchTimeRange.value = "날짜를 선택 후 apply를 클릭하세요.";
+  }
+};
 
 // ------------------- Complete Method ------------------------ //
 const completeData0 = () => {
+  // 데이터 선택 박스 text 할당
+  textboxs.value.tb1 = ShipData.value;
+
+  // 검색 조건 할당
+  requests.value.data =
+    ShipData.value === "선내 데이터" ? "information" : "vts";
+
+  // 다음 선택 시, 다음 조건 CardView로 이동
   SelectedDataCardVisible.value = false;
   SelectedContentsCardVisible.value = true;
 };
 
-const completeData = () => {
-  console.log(selectedItems.value);
-  console.log(searchTarget.value);
-  SelectedContents.value = searchTarget.value[0];
+const completeData1 = () => {
+  // 데이터 선택 박스 text 할당
+  textboxs.value.tb2 = searchTarget.value[0];
+
+  let signalParams = "";
+
+  for (let i = 0; i < recentSearches.value.length; i++) {
+    signalParams += `&signal_name=${recentSearches.value[i]}`;
+  }
+
+  requests.value.signal = signalParams;
+
+  console.log(requests.value.signal);
+
+  // 다음 선택 시, 다음 조건 CardView로 이동
   SelectedContentsCardVisible.value = false;
   DataTypeCardVisible.value = true;
 };
 
 const completeData2 = () => {
-  SubComponent.value = selectDataType.value;
+  // 데이터 선택 박스 text 할당
+  textboxs.value.tb3 = selectDataType.value;
+
+  // 검색 조건 할당
+  requests.value.type =
+    selectDataType.value === "정형 데이터" ? "table_data" : "collection_data";
+
+  // 다음 선택 시, 다음 조건 CardView로 이동
   DataTypeCardVisible.value = false;
   periodSettingCardVisible.value = true;
 };
 
 const completeData3 = () => {
+  // 데이터 선택 박스 text 할당
+  textboxs.value.tb4 = searchTimeRange.value;
+
+  if (selectedTest.value === 0) {
+    // 직접 선택이라면
+    requests.value.period = `period?start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`;
+  } else {
+    // 시험 선택이라면
+    requests.value.period = `test?test_number=${selectedTest.value}`;
+  }
+
+  // 다음 선택 시, 다음 조건 CardView로 이동
   periodSettingCardVisible.value = false;
-  console.log(dateRange.value);
+
+  if (
+    textboxs.value.tb1 &&
+    textboxs.value.tb2 &&
+    textboxs.value.tb3 &&
+    textboxs.value.tb4
+  ) {
+    console.log("모든 텍스트 박스가 빈 값이 아닙니다.");
+    let apiReq = `table_data        /       information    /   test?test_number=2     &signal_name=ais_vdo&signal_name=ais_vdm`;
+    apiReq = `${requests.value.type}/${requests.value.data}/${requests.value.period}${requests.value.signal}`;
+    console.log(apiReq);
+  }
+};
+
+// Test 중
+const activeTab = ref(0);
+const dataTables = ref({});
+const dataKeys = ref([]);
+const headers = ref({});
+
+const test = async () => {
+  let apiReq = `table_data/information/period?start_utctime=2023-08-08T08:34:28.488521Z&end_utctime=2023-08-08T08:45:38.739842Z&signal_name=ais_vdm&signal_name=ais_vdo`;
+  const response = await readDataTrial(tokenid.value, apiReq);
+  console.log(response);
+  processData(response);
+};
+
+const processData = (response) => {
+  dataKeys.value = Object.keys(response);
+  dataKeys.value.forEach((key) => {
+    if (response[key].length > 0) {
+      headers.value[key] = Object.keys(response[key][0]).map((field) => ({
+        text: field,
+        value: field,
+        class: `header-${field.toLowerCase()}` // 클래스 이름 추가
+      }));
+    }
+    dataTables.value[key] = response[key];
+  });
+};
+
+//
+
+const windowClick = () => {
+  SelectedDataCardVisible.value = false;
+  SelectedContentsCardVisible.value = false;
+  DataTypeCardVisible.value = false;
+  periodSettingCardVisible.value = false;
 };
 
 ////////////////////// watch //////////////////////
@@ -1076,6 +1167,21 @@ watch(selectedItems.value, (newVal) => {
 
 watch(recentSearches.value, (newVal) => {
   console.log("z" + selectedItems.value);
+});
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 데이터 검색 및 저장
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//----------------------데이터 검색--------------------------//
+
+onMounted(() => {
+  getTrialDate();
+  sessionStorage.setItem("page", "데이터 조회");
 });
 </script>
 
@@ -1106,7 +1212,7 @@ watch(recentSearches.value, (newVal) => {
 
 .destination-list {
   width: 35%;
-  height: 250px;
+  height: 350px;
 }
 
 .recent-search {
@@ -1115,7 +1221,6 @@ watch(recentSearches.value, (newVal) => {
 
 .custom-text-field {
   width: 300px !important;
-  font-size: 8px !important;
 }
 
 .destination-container > .v-list {
@@ -1148,6 +1253,21 @@ watch(recentSearches.value, (newVal) => {
 .vue3-date-picker__select-button {
   display: none !important;
 }
+
+.v-data-table__wrapper {
+  overflow-x: auto;
+}
+
+.v-tabs .v-tab {
+  text-transform: none;
+}
+
+.header-timestamp_equipment,
+.header-timestamp_publish {
+  min-width: 200px;
+  /* 필요한 경우 더 조정할 수 있습니다 */
+}
+
 </style>
 
 <style>

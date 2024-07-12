@@ -1,15 +1,14 @@
 <template>
-  <div class="scrollable-card-1 item-wrapper">
+  <div class="item-wrapper">
     <v-sheet
       :style="{
         display: 'flex',
         height: `${getheightValue()}vh`,
         flexDirection: 'column',
-        overflowY: 'auto',
-        alignItems: 'center'
+        alignItems: 'center',
       }"
     >
-      <v-list class="scrollable-card-1" :style="{ width: `${getwidth()}px` }">
+      <v-list class="scrollable-card-1" :style="{ width: `${getwidth()}px`, overflow: 'auto' }">
         <!-- DGPS -->
         <v-list-group>
           <template v-slot:activator="{ props }">
@@ -299,7 +298,7 @@
           </template>
           <v-list-item>
             <div style="height: auto; display: flex" class="scrollable-card-1">
-              <v-sheet style="flex: 0 0 50%">
+              <v-sheet style="flex: 0 0 50%;">
                 <v-sheet v-for="item in data.slice(27, 41)" :key="item.key">
                   <v-icon
                     :color="getIconColor(item.key)"
@@ -360,7 +359,7 @@ const getheightValue = () => {
 
 const getwidth = () => {
   console.log((1980*270) / screenWidth.value)
-  return (screenWidth.value*270) / 1980;
+  return (screenWidth.value*290) / 1980;
 };
 
 

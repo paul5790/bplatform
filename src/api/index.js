@@ -3,7 +3,7 @@ import axios from "axios";
 
 const apiLocation = "bdpback.ias.xinnos.com";
 // const apiLocation = "192.168.0.73:9999";
-export const cctvUrl = `http://${apiLocation}/stream/index.m3u8`;
+export const cctvUrl = `http://${apiLocation}/api/v1/stream/index.m3u8`;
 
 // 취소 토큰 생성
 let cancelTokenSource = axios.CancelToken.source();
@@ -457,11 +457,11 @@ export const deleteTrialData = async (tokenid, data) => {
   }
 };
 
-// 데이터 조회하기 v1
+// 데이터 조회하기 v1 (테이블)
 export const readDataTrial = async (tokenid, data) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/information/${data}`,
+      `http://${apiLocation}/api/v1/${data}`,
       {
         headers: {
           "Content-Type": "application/json",

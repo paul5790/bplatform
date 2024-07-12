@@ -1,59 +1,90 @@
 [
   {
-    "latitude": "35.293000",
-    "longitude": "129.775000",
+    "id": "1",
+    "latitude": "35.25978",
+    "longitude": "129.350888",
+    "test": "1",
     "scenario": "1",
-    "waypoint_ID": "1",
-    "route_name": "장생포-일산항"
+    "routename": "루트이름"
   },
   {
-    "latitude": "35.294000",
-    "longitude": "129.777000",
-    "scenario": "1",
-    "waypoint_ID": "2",
-    "route_name": "장생포-일산항"
-  },
-  {
-    "latitude": "35.295000",
-    "longitude": "129.777000",
-    "scenario": "1",
-    "waypoint_ID": "3",
-    "route_name": "장생포-일산항"
-  },
-  {
+    "id": "2",
     "latitude": "35.296000",
-    "longitude": "129.777000",
-    "scenario": "1",
-    "waypoint_ID": "4",
-    "route_name": "장생포-일산항"
-  },
-  {
-    "latitude": "35.291000",
-    "longitude": "129.771000",
+    "longitude": "129.450000",
+    "test": "1",
     "scenario": "2",
-    "waypoint_ID": "1",
-    "route_name": "장생포-일산항"
+    "routename": "루트이름"
   },
   {
-    "latitude": "35.292000",
-    "longitude": "129.773000",
-    "scenario": "2",
-    "waypoint_ID": "2",
-    "route_name": "장생포-일산항"
-  },
-  {
-    "latitude": "35.293000",
-    "longitude": "129.775000",
+    "id": "3",
+    "latitude": "35.286000",
+    "longitude": "129.440000",
+    "test": "1",
     "scenario": "3",
-    "waypoint_ID": "1",
-    "route_name": "장생포-일산항"
+    "routename": "루트이름"
   },
-
   {
-    "latitude": "35.296000",
-    "longitude": "129.770000",
-    "scenario": "3",
-    "waypoint_ID": "2",
-    "route_name": "장생포-일산항"
+    "id": "4",
+    "latitude": "35.286000",
+    "longitude": "129.470000",
+    "test": "1",
+    "scenario": "4",
+    "routename": "루트이름"
+  },
+  {
+    "id": "5",
+    "latitude": "35.285000",
+    "longitude": "129.484000",
+    "test": "1",
+    "scenario": "5",
+    "routename": "루트이름"
+  },
+  {
+    "id": "6",
+    "latitude": "35.257000",
+    "longitude": "129.492000",
+    "test": "1",
+    "scenario": "6",
+    "routename": "루트이름"
+  },
+  {
+    "id": "7",
+    "latitude": "35.243000",
+    "longitude": "129.471000",
+    "test": "1",
+    "scenario": "7",
+    "routename": "루트이름"
+  },
+  {
+    "id": "8",
+    "latitude": "35.240000",
+    "longitude": "129.441000",
+    "test": "1",
+    "scenario": "8",
+    "routename": "루트이름"
+  },
+  {
+    "id": "9",
+    "latitude": "35.222000",
+    "longitude": "129.342000",
+    "test": "1",
+    "scenario": "9",
+    "routename": "루트이름"
+  },
+  {
+    "id": "10",
+    "latitude": "35.217000",
+    "longitude": "129.292000",
+    "test": "1",
+    "scenario": "10",
+    "routename": "루트이름"
+  },
+  {
+    "id": "11",
+    "latitude": "35.256777",
+    "longitude": "129.260888",
+    "test": "1",
+    "scenario": "11",
+    "routename": "루트이름"
   }
 ]

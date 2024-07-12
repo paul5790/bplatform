@@ -1,56 +1,274 @@
 [
   {
-    "latitude": "35.293000",
-    "longitude": "129.775000",
+    "latitude": "35.290000",
+    "longitude": "129.260000",
+    "test": "1",
     "scenario": "1",
-    "operation": "매뉴얼"
+    "type": "Menual",
+    "time": "2020-08-12T08:44:62.151235Z"
   },
   {
-    "latitude": "35.294000",
-    "longitude": "129.777000",
+    "latitude": "35.245678",
+    "longitude": "129.300888",
+    "test": "1",
     "scenario": "1",
-    "operation": "매뉴얼"
+    "type": "Menual",
+    "time": "2020-08-12T08:44:63.151235Z"
   },
   {
-    "latitude": "35.295000",
-    "longitude": "129.779000",
+    "latitude": "35.24878",
+    "longitude": "129.330888",
+    "test": "1",
     "scenario": "1",
-    "operation": "매뉴얼"
+    "type": "Menual",
+    "time": "2020-08-12T08:44:64.151235Z"
+  },
+  {
+    "latitude": "35.25978",
+    "longitude": "129.350888",
+    "test": "1",
+    "scenario": "1",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:65.151235Z"
+  },
+  {
+    "latitude": "35.25978",
+    "longitude": "129.350888",
+    "test": "1",
+    "scenario": "2",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:66.151235Z"
+  },
+  {
+    "latitude": "35.26978",
+    "longitude": "129.360888",
+    "test": "1",
+    "scenario": "2",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:67.151235Z"
   },
   {
     "latitude": "35.296000",
-    "longitude": "129.770000",
-    "scenario": "1",
-    "operation": "매뉴얼"
-  },
-  {
-    "latitude": "35.291000",
-    "longitude": "129.771000",
+    "longitude": "129.450000",
+    "test": "1",
     "scenario": "2",
-    "operation": "자율"
-  },
-  {
-    "latitude": "35.292000",
-    "longitude": "129.773000",
-    "scenario": "2",
-    "operation": "자율"
-  },
-  {
-    "latitude": "35.293000",
-    "longitude": "129.775000",
-    "scenario": "2",
-    "operation": "자율"
+    "type": "Auto",
+    "time": "2020-08-12T08:44:68.151235Z"
   },
   {
     "latitude": "35.296000",
-    "longitude": "129.770000",
+    "longitude": "129.450000",
+    "test": "1",
     "scenario": "3",
-    "operation": "원격"
+    "type": "Remote",
+    "time": "2020-08-12T08:44:69.151235Z"
   },
   {
-    "latitude": "35.295000",
-    "longitude": "129.775000",
+    "latitude": "35.286000",
+    "longitude": "129.440000",
+    "test": "1",
     "scenario": "3",
-    "operation": "원격"
+    "type": "Remote",
+    "time": "2020-08-12T08:44:70.151235Z"
+  },
+  {
+    "latitude": "35.286000",
+    "longitude": "129.440000",
+    "test": "1",
+    "scenario": "4",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:71.151235Z"
+  },
+  {
+    "latitude": "35.286000",
+    "longitude": "129.470000",
+    "test": "1",
+    "scenario": "4",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:72.151235Z"
+  },
+  {
+    "latitude": "35.286000",
+    "longitude": "129.470000",
+    "test": "1",
+    "scenario": "5",
+    "type": "Remote",
+    "time": "2020-08-12T08:44:73.151235Z"
+  },
+  {
+    "latitude": "35.285000",
+    "longitude": "129.484000",
+    "test": "1",
+    "scenario": "5",
+    "type": "Remote",
+    "time": "2020-08-12T08:44:74.151235Z"
+  },
+  {
+    "latitude": "35.285000",
+    "longitude": "129.484000",
+    "test": "1",
+    "scenario": "6",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:75.151235Z"
+  },
+  {
+    "latitude": "35.281000",
+    "longitude": "129.498000",
+    "test": "1",
+    "scenario": "6",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:76.151235Z"
+  },
+  {
+    "latitude": "35.270000",
+    "longitude": "129.474000",
+    "test": "1",
+    "scenario": "6",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:77.151235Z"
+  },
+  {
+    "latitude": "35.257000",
+    "longitude": "129.492000",
+    "test": "1",
+    "scenario": "6",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:78.151235Z"
+  },
+  {
+    "latitude": "35.257000",
+    "longitude": "129.492000",
+    "test": "1",
+    "scenario": "7",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:79.151235Z"
+  },
+  {
+    "latitude": "35.252000",
+    "longitude": "129.477000",
+    "test": "1",
+    "scenario": "7",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:80.151235Z"
+  },
+  {
+    "latitude": "35.243000",
+    "longitude": "129.471000",
+    "test": "1",
+    "scenario": "7",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:81.151235Z"
+  },
+  {
+    "latitude": "35.243000",
+    "longitude": "129.471000",
+    "test": "1",
+    "scenario": "8",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:82.151235Z"
+  },
+  {
+    "latitude": "35.240000",
+    "longitude": "129.441000",
+    "test": "1",
+    "scenario": "8",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:83.151235Z"
+  },
+  {
+    "latitude": "35.240000",
+    "longitude": "129.441000",
+    "test": "1",
+    "scenario": "9",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:84.151235Z"
+  },
+  {
+    "latitude": "35.237000",
+    "longitude": "129.351000",
+    "test": "1",
+    "scenario": "9",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:85.151235Z"
+  },
+  {
+    "latitude": "35.222000",
+    "longitude": "129.342000",
+    "test": "1",
+    "scenario": "9",
+    "type": "Remote",
+    "time": "2020-08-12T08:44:86.151235Z"
+  },
+  {
+    "latitude": "35.222000",
+    "longitude": "129.342000",
+    "test": "1",
+    "scenario": "10",
+    "type": "Remote",
+    "time": "2020-08-12T08:44:87.151235Z"
+  },
+  {
+    "latitude": "35.232000",
+    "longitude": "129.332000",
+    "test": "1",
+    "scenario": "10",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:88.151235Z"
+  },
+  {
+    "latitude": "35.212000",
+    "longitude": "129.322000",
+    "test": "1",
+    "scenario": "10",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:89.151235Z"
+  },
+  {
+    "latitude": "35.227000",
+    "longitude": "129.312000",
+    "test": "1",
+    "scenario": "10",
+    "type": "Remote",
+    "time": "2020-08-12T08:44:90.151235Z"
+  },
+  {
+    "latitude": "35.217000",
+    "longitude": "129.292000",
+    "test": "1",
+    "scenario": "10",
+    "type": "Remote",
+    "time": "2020-08-12T08:44:91.151235Z"
+  },
+  {
+    "latitude": "35.217000",
+    "longitude": "129.292000",
+    "test": "1",
+    "scenario": "11",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:92.151235Z"
+  },
+  {
+    "latitude": "35.224000",
+    "longitude": "129.291500",
+    "test": "1",
+    "scenario": "11",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:93.151235Z"
+  },
+  {
+    "latitude": "35.256400",
+    "longitude": "129.257000",
+    "test": "1",
+    "scenario": "11",
+    "type": "Auto",
+    "time": "2020-08-12T08:44:94.151235Z"
+  },
+  {
+    "latitude": "35.256777",
+    "longitude": "129.260888",
+    "test": "1",
+    "scenario": "11",
+    "type": "Menual",
+    "time": "2020-08-12T08:44:95.151235Z"
   }
 ]

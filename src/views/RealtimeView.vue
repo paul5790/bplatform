@@ -16,11 +16,11 @@
             <v-sheet style="height: 34vh; display: flex">
               <v-card style="flex: 1">
                 <v-card-item>
-                  <OSMap
+                  <!-- <OSMap
                     :lat="parseFloat(latitude)"
                     :lon="parseFloat(longitude)"
                     :state="mapstart"
-                  />
+                  /> -->
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -422,8 +422,8 @@
             display: 'flex',
           }"
         >
-          <v-card style="width: 100%; height: 100%">
-            <v-card-item>
+          <v-card>
+            <v-card-item  style="padding: 0px;">
               <SocketChecking
                 :checkdata="checkdata"
                 :height="getheightValue2()"
@@ -494,6 +494,7 @@ ws.onopen = function (event) {
 };
 
 const headerNameC = ref();
+
 ws.onmessage = function (event) {
   console.log("Message received: " + event.data);
   try {
@@ -822,9 +823,14 @@ const openCCTV = () => {
 const setCCTV = () => {
   const url = cctvUrl;
   nextTick(() => {
+
     hls1 = new Hls();
+    hls1.config.xhrSetup = (xhr) => {
+      xhr.setRequestHeader('Authorization', `Bearer ${tokenid.value}`);
+    };
     hls1.loadSource(url);
     hls1.attachMedia(videoD.value);
+
     hls1.on(Hls.Events.MANIFEST_PARSED, () => {
       videoD.value.play().catch((error) => {
         console.error("비디오 재생 오류:", error);
