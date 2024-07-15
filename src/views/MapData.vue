@@ -33,7 +33,7 @@
           <v-slider
             v-model="sliderValue"
             step="1"
-            :max="AisData.length - 1"
+            :max="maxValue - 1"
             thumb-label="always"
             class="custom-slider"
             @change="onSliderChange"
@@ -84,6 +84,100 @@
             class="custom-select"
           ></v-select>
           <v-btn @click="searchMapdata()">검색하기</v-btn>
+        </div>
+      </v-card-text>
+    </v-card>
+
+    <!-- --------------------------메타 데이터 표시------------------------------- -->
+    <v-card
+      v-if="metadataCardVisible"
+      ref="searchCard"
+      @mousedown="startDrag($event, 'searchCard')"
+      style="
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        z-index: 1100;
+        width: 500px;
+        overflow: visible;
+      "
+    >
+      <v-card-title>
+        <span>현재 데이터</span>
+        <p
+          @click="metadataCardVisible = false"
+          style="position: absolute; top: 3px; right: 8px"
+        >
+          <v-icon>mdi-close</v-icon>
+        </p>
+      </v-card-title>
+      <v-card-text>
+        <!-- 여기에 검색 창 컨텐츠를 추가하세요 -->
+        <div style="position: relative; z-index: 1100">
+        <v-row>
+          <v-col cols="6">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>시험번호</v-list-item-title>
+                <v-list-item-subtitle>{{ metadata.test }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+          <v-col cols="6">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>운항모드</v-list-item-title>
+                <v-list-item-subtitle>{{ metadata.mode }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="6">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>위도</v-list-item-title>
+                <v-list-item-subtitle>{{ metadata.latitude }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+          <v-col cols="6">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>경도</v-list-item-title>
+                <v-list-item-subtitle>{{ metadata.longitude }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="6">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>시나리오 번호</v-list-item-title>
+                <v-list-item-subtitle>{{ metadata.scenario }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+          <v-col cols="6">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>시험 경로 이름</v-list-item-title>
+                <v-list-item-subtitle>{{ metadata.routeName }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+        </v-row>
+        <v-row>
+          <v-col cols="12">
+            <v-list-item>
+              <v-list-item-content>
+                <v-list-item-title>시간</v-list-item-title>
+                <v-list-item-subtitle>{{ metadata.time }}</v-list-item-subtitle>
+              </v-list-item-content>
+            </v-list-item>
+          </v-col>
+        </v-row>
         </div>
       </v-card-text>
     </v-card>
@@ -184,6 +278,7 @@ import { readWaypoint, readAis } from "../api/index.js";
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const searchCardVisible = ref(false);
+const metadataCardVisible = ref(false);
 const testCardVisible = ref(false);
 const sliderCardVisible = ref(false);
 const searchCard = ref(null);
@@ -192,8 +287,10 @@ const testCard = ref(null);
 let map = null;
 
 // ----------------------------Slider Bar--------------------------------//
-const sliderValue = ref(0);
+const maxValue = ref(0);
+const sliderValue = ref(1);
 const timeData = ref([]);
+
 
 let currentPolyline;
 
@@ -222,6 +319,19 @@ const getTrialDate = async () => {
 };
 onMounted(getTrialDate);
 
+// ----------------------------select Bar--------------------------------//
+
+// metadata
+const metadata = ref({
+  test : null,
+  mode : null,
+  latitude : null,
+  longitude : null,
+  time : null,
+  routeName : null,
+  scenario : null,
+})
+
 // ---------------------------- Test CardView --------------------------------//
 
 const selectedTest = ref([]);
@@ -239,7 +349,7 @@ const shipIcon = new L.Icon({
   popupAnchor: [0, -18],
 });
 
-const searchMapdata = async() => {
+const searchMapdata = async () => {
   let req = `http://localhost:9998/api/v1/trajectory?test_number=2`;
   if (selectedtrialrun.value) {
     const selectedNumber = selectedtrialrun.value.match(/\d+/)[0]; // 숫자만 추출
@@ -250,15 +360,15 @@ const searchMapdata = async() => {
     const waypoint = await readWaypoint(tokenid.value, selectedNumber);
     const ais = await readAis(tokenid.value, selectedNumber);
 
-    console.log(`ais : ${JSON.stringify(ais)}, waypoint : ${JSON.stringify(waypoint)}`);
-
+    console.log(ais);
+    maxValue.value = ais.length;
 
     if (selectedNumber === "100") {
-      testAis.value = AisData;
+      testAis.value = ais;
       testWaypoint.value = waypoint;
       fetchData();
     } else {
-      testAis.value = AisData1;
+      testAis.value = ais;
       testWaypoint.value = waypoint;
       fetchData();
     }
@@ -269,6 +379,9 @@ const searchMapdata = async() => {
     }
 
     defalutMap();
+    // aisMapping(sliderValue.value);
+    sliderValue.value = 0;
+    addWaypoints();
     // shipMarker 다시 추가
     if (shipMarker) {
       const latlng = [
@@ -277,6 +390,9 @@ const searchMapdata = async() => {
       ];
       shipMarker = L.marker(latlng, { icon: shipIcon }).addTo(map);
     }
+
+    searchCardVisible.value = false;
+    metadataCardVisible.value = true;
   } else {
     alert("항차를 선택하세요.");
   }
@@ -287,777 +403,13 @@ const testAis = ref([
     latitude: "35.290000",
     longitude: "129.260000",
     test: "",
-    scenario: "",
-    type: "",
+    scenarioNumber: "",
+    modeType: "",
     time: "",
   },
 ]);
 
 const testWaypoint = ref([]);
-
-const AisData = [
-  {
-    latitude: "35.290000",
-    longitude: "129.260000",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:62.151235Z",
-  },
-  {
-    latitude: "35.245678",
-    longitude: "129.300888",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:63.151235Z",
-  },
-  {
-    latitude: "35.24878",
-    longitude: "129.330888",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:64.151235Z",
-  },
-  {
-    latitude: "35.25978",
-    longitude: "129.350888",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:65.151235Z",
-  },
-  {
-    latitude: "35.25978",
-    longitude: "129.350888",
-    test: "1",
-    scenario: "2",
-    type: "Auto",
-    time: "2020-08-12T08:44:66.151235Z",
-  },
-  {
-    latitude: "35.26978",
-    longitude: "129.360888",
-    test: "1",
-    scenario: "2",
-    type: "Auto",
-    time: "2020-08-12T08:44:67.151235Z",
-  },
-  {
-    latitude: "35.296000",
-    longitude: "129.450000",
-    test: "1",
-    scenario: "2",
-    type: "Auto",
-    time: "2020-08-12T08:44:68.151235Z",
-  },
-  {
-    latitude: "35.296000",
-    longitude: "129.450000",
-    test: "1",
-    scenario: "3",
-    type: "Remote",
-    time: "2020-08-12T08:44:69.151235Z",
-  },
-  {
-    latitude: "35.286000",
-    longitude: "129.440000",
-    test: "1",
-    scenario: "3",
-    type: "Remote",
-    time: "2020-08-12T08:44:70.151235Z",
-  },
-  {
-    latitude: "35.286000",
-    longitude: "129.440000",
-    test: "1",
-    scenario: "4",
-    type: "Menual",
-    time: "2020-08-12T08:44:71.151235Z",
-  },
-  {
-    latitude: "35.286000",
-    longitude: "129.470000",
-    test: "1",
-    scenario: "4",
-    type: "Menual",
-    time: "2020-08-12T08:44:72.151235Z",
-  },
-  {
-    latitude: "35.286000",
-    longitude: "129.470000",
-    test: "1",
-    scenario: "5",
-    type: "Remote",
-    time: "2020-08-12T08:44:73.151235Z",
-  },
-  {
-    latitude: "35.285000",
-    longitude: "129.484000",
-    test: "1",
-    scenario: "5",
-    type: "Remote",
-    time: "2020-08-12T08:44:74.151235Z",
-  },
-  {
-    latitude: "35.285000",
-    longitude: "129.484000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:75.151235Z",
-  },
-  {
-    latitude: "35.281000",
-    longitude: "129.498000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:76.151235Z",
-  },
-  {
-    latitude: "35.270000",
-    longitude: "129.474000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:77.151235Z",
-  },
-  {
-    latitude: "35.257000",
-    longitude: "129.492000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:78.151235Z",
-  },
-  {
-    latitude: "35.257000",
-    longitude: "129.492000",
-    test: "1",
-    scenario: "7",
-    type: "Menual",
-    time: "2020-08-12T08:44:79.151235Z",
-  },
-  {
-    latitude: "35.252000",
-    longitude: "129.477000",
-    test: "1",
-    scenario: "7",
-    type: "Menual",
-    time: "2020-08-12T08:44:80.151235Z",
-  },
-  {
-    latitude: "35.243000",
-    longitude: "129.471000",
-    test: "1",
-    scenario: "7",
-    type: "Menual",
-    time: "2020-08-12T08:44:81.151235Z",
-  },
-  {
-    latitude: "35.243000",
-    longitude: "129.471000",
-    test: "1",
-    scenario: "8",
-    type: "Menual",
-    time: "2020-08-12T08:44:82.151235Z",
-  },
-  {
-    latitude: "35.240000",
-    longitude: "129.441000",
-    test: "1",
-    scenario: "8",
-    type: "Auto",
-    time: "2020-08-12T08:44:83.151235Z",
-  },
-  {
-    latitude: "35.240000",
-    longitude: "129.441000",
-    test: "1",
-    scenario: "9",
-    type: "Auto",
-    time: "2020-08-12T08:44:84.151235Z",
-  },
-  {
-    latitude: "35.237000",
-    longitude: "129.351000",
-    test: "1",
-    scenario: "9",
-    type: "Auto",
-    time: "2020-08-12T08:44:85.151235Z",
-  },
-  {
-    latitude: "35.222000",
-    longitude: "129.342000",
-    test: "1",
-    scenario: "9",
-    type: "Remote",
-    time: "2020-08-12T08:44:86.151235Z",
-  },
-  {
-    latitude: "35.222000",
-    longitude: "129.342000",
-    test: "1",
-    scenario: "10",
-    type: "Remote",
-    time: "2020-08-12T08:44:87.151235Z",
-  },
-  {
-    latitude: "35.232000",
-    longitude: "129.332000",
-    test: "1",
-    scenario: "10",
-    type: "Menual",
-    time: "2020-08-12T08:44:88.151235Z",
-  },
-  {
-    latitude: "35.212000",
-    longitude: "129.322000",
-    test: "1",
-    scenario: "10",
-    type: "Menual",
-    time: "2020-08-12T08:44:89.151235Z",
-  },
-  {
-    latitude: "35.227000",
-    longitude: "129.312000",
-    test: "1",
-    scenario: "10",
-    type: "Remote",
-    time: "2020-08-12T08:44:90.151235Z",
-  },
-  {
-    latitude: "35.217000",
-    longitude: "129.292000",
-    test: "1",
-    scenario: "10",
-    type: "Remote",
-    time: "2020-08-12T08:44:91.151235Z",
-  },
-  {
-    latitude: "35.217000",
-    longitude: "129.292000",
-    test: "1",
-    scenario: "11",
-    type: "Auto",
-    time: "2020-08-12T08:44:92.151235Z",
-  },
-  {
-    latitude: "35.224000",
-    longitude: "129.291500",
-    test: "1",
-    scenario: "11",
-    type: "Auto",
-    time: "2020-08-12T08:44:93.151235Z",
-  },
-  {
-    latitude: "35.256400",
-    longitude: "129.257000",
-    test: "1",
-    scenario: "11",
-    type: "Auto",
-    time: "2020-08-12T08:44:94.151235Z",
-  },
-  {
-    latitude: "35.256777",
-    longitude: "129.260888",
-    test: "1",
-    scenario: "11",
-    type: "Menual",
-    time: "2020-08-12T08:44:95.151235Z",
-  },
-];
-
-const Waypoint = [
-  {
-    id: "0",
-    latitude: "35.290000",
-    longitude: "129.260000",
-    test: "1",
-    scenario: "1",
-    routename: "루트이름",
-  },
-  {
-    id: "1",
-    latitude: "35.25978",
-    longitude: "129.350888",
-    test: "1",
-    scenario: "1",
-    routename: "루트이름",
-  },
-  {
-    id: "2",
-    latitude: "35.296000",
-    longitude: "129.450000",
-    test: "1",
-    scenario: "2",
-    routename: "루트이름",
-  },
-  {
-    id: "3",
-    latitude: "35.286000",
-    longitude: "129.440000",
-    test: "1",
-    scenario: "3",
-    routename: "루트이름",
-  },
-  {
-    id: "4",
-    latitude: "35.286000",
-    longitude: "129.470000",
-    test: "1",
-    scenario: "4",
-    routename: "루트이름",
-  },
-  {
-    id: "5",
-    latitude: "35.285000",
-    longitude: "129.484000",
-    test: "1",
-    scenario: "5",
-    routename: "루트이름",
-  },
-  {
-    id: "6",
-    latitude: "35.257000",
-    longitude: "129.492000",
-    test: "1",
-    scenario: "6",
-    routename: "루트이름",
-  },
-  {
-    id: "7",
-    latitude: "35.243000",
-    longitude: "129.471000",
-    test: "1",
-    scenario: "7",
-    routename: "루트이름",
-  },
-  {
-    id: "8",
-    latitude: "35.240000",
-    longitude: "129.441000",
-    test: "1",
-    scenario: "8",
-    routename: "루트이름",
-  },
-  {
-    id: "9",
-    latitude: "35.222000",
-    longitude: "129.342000",
-    test: "1",
-    scenario: "9",
-    routename: "루트이름",
-  },
-  {
-    id: "10",
-    latitude: "35.212000",
-    longitude: "129.322000",
-    test: "1",
-    scenario: "9",
-    routename: "루트이름",
-  },
-  {
-    id: "11",
-    latitude: "35.217000",
-    longitude: "129.292000",
-    test: "1",
-    scenario: "10",
-    routename: "루트이름",
-  },
-  {
-    id: "12",
-    latitude: "35.256777",
-    longitude: "129.260888",
-    test: "1",
-    scenario: "11",
-    routename: "루트이름",
-  },
-];
-
-const AisData1 = [
-  {
-    latitude: "35.291000",
-    longitude: "129.261000",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:62.151235Z",
-  },
-  {
-    latitude: "35.246678",
-    longitude: "129.301888",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:63.151235Z",
-  },
-  {
-    latitude: "35.24978",
-    longitude: "129.331888",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:64.151235Z",
-  },
-  {
-    latitude: "35.32078",
-    longitude: "129.351888",
-    test: "1",
-    scenario: "1",
-    type: "Menual",
-    time: "2020-08-12T08:44:65.151235Z",
-  },
-  {
-    latitude: "35.26078",
-    longitude: "129.351888",
-    test: "1",
-    scenario: "2",
-    type: "Auto",
-    time: "2020-08-12T08:44:66.151235Z",
-  },
-  {
-    latitude: "35.27078",
-    longitude: "129.361888",
-    test: "1",
-    scenario: "2",
-    type: "Auto",
-    time: "2020-08-12T08:44:67.151235Z",
-  },
-  {
-    latitude: "35.297000",
-    longitude: "129.451000",
-    test: "1",
-    scenario: "2",
-    type: "Auto",
-    time: "2020-08-12T08:44:68.151235Z",
-  },
-  {
-    latitude: "35.297000",
-    longitude: "129.451000",
-    test: "1",
-    scenario: "3",
-    type: "Remote",
-    time: "2020-08-12T08:44:69.151235Z",
-  },
-  {
-    latitude: "35.287000",
-    longitude: "129.441000",
-    test: "1",
-    scenario: "3",
-    type: "Remote",
-    time: "2020-08-12T08:44:70.151235Z",
-  },
-  {
-    latitude: "35.287000",
-    longitude: "129.441000",
-    test: "1",
-    scenario: "4",
-    type: "Menual",
-    time: "2020-08-12T08:44:71.151235Z",
-  },
-  {
-    latitude: "35.287000",
-    longitude: "129.471000",
-    test: "1",
-    scenario: "4",
-    type: "Menual",
-    time: "2020-08-12T08:44:72.151235Z",
-  },
-  {
-    latitude: "35.287000",
-    longitude: "129.471000",
-    test: "1",
-    scenario: "5",
-    type: "Remote",
-    time: "2020-08-12T08:44:73.151235Z",
-  },
-  {
-    latitude: "35.286000",
-    longitude: "129.485000",
-    test: "1",
-    scenario: "5",
-    type: "Remote",
-    time: "2020-08-12T08:44:74.151235Z",
-  },
-  {
-    latitude: "35.286000",
-    longitude: "129.485000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:75.151235Z",
-  },
-  {
-    latitude: "35.282000",
-    longitude: "129.999000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:76.151235Z",
-  },
-  {
-    latitude: "35.271000",
-    longitude: "129.475000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:77.151235Z",
-  },
-  {
-    latitude: "35.258000",
-    longitude: "129.493000",
-    test: "1",
-    scenario: "6",
-    type: "Auto",
-    time: "2020-08-12T08:44:78.151235Z",
-  },
-  {
-    latitude: "35.258000",
-    longitude: "129.493000",
-    test: "1",
-    scenario: "7",
-    type: "Menual",
-    time: "2020-08-12T08:44:79.151235Z",
-  },
-  {
-    latitude: "35.253000",
-    longitude: "129.478000",
-    test: "1",
-    scenario: "7",
-    type: "Menual",
-    time: "2020-08-12T08:44:80.151235Z",
-  },
-  {
-    latitude: "35.244000",
-    longitude: "129.472000",
-    test: "1",
-    scenario: "7",
-    type: "Menual",
-    time: "2020-08-12T08:44:81.151235Z",
-  },
-  {
-    latitude: "35.244000",
-    longitude: "129.472000",
-    test: "1",
-    scenario: "8",
-    type: "Menual",
-    time: "2020-08-12T08:44:82.151235Z",
-  },
-  {
-    latitude: "35.241000",
-    longitude: "129.442000",
-    test: "1",
-    scenario: "8",
-    type: "Auto",
-    time: "2020-08-12T08:44:83.151235Z",
-  },
-  {
-    latitude: "35.241000",
-    longitude: "129.442000",
-    test: "1",
-    scenario: "9",
-    type: "Auto",
-    time: "2020-08-12T08:44:84.151235Z",
-  },
-  {
-    latitude: "35.238000",
-    longitude: "129.352000",
-    test: "1",
-    scenario: "9",
-    type: "Auto",
-    time: "2020-08-12T08:44:85.151235Z",
-  },
-  {
-    latitude: "35.223000",
-    longitude: "129.343000",
-    test: "1",
-    scenario: "9",
-    type: "Remote",
-    time: "2020-08-12T08:44:86.151235Z",
-  },
-  {
-    latitude: "35.223000",
-    longitude: "129.343000",
-    test: "1",
-    scenario: "10",
-    type: "Remote",
-    time: "2020-08-12T08:44:87.151235Z",
-  },
-  {
-    latitude: "35.233000",
-    longitude: "129.333000",
-    test: "1",
-    scenario: "10",
-    type: "Menual",
-    time: "2020-08-12T08:44:88.151235Z",
-  },
-  {
-    latitude: "35.213000",
-    longitude: "129.323000",
-    test: "1",
-    scenario: "10",
-    type: "Menual",
-    time: "2020-08-12T08:44:89.151235Z",
-  },
-  {
-    latitude: "35.228000",
-    longitude: "129.313000",
-    test: "1",
-    scenario: "10",
-    type: "Remote",
-    time: "2020-08-12T08:44:90.151235Z",
-  },
-  {
-    latitude: "35.218000",
-    longitude: "129.293000",
-    test: "1",
-    scenario: "10",
-    type: "Remote",
-    time: "2020-08-12T08:44:91.151235Z",
-  },
-  {
-    latitude: "35.218000",
-    longitude: "129.293000",
-    test: "1",
-    scenario: "11",
-    type: "Auto",
-    time: "2020-08-12T08:44:92.151235Z",
-  },
-  {
-    latitude: "35.225000",
-    longitude: "129.292500",
-    test: "1",
-    scenario: "11",
-    type: "Auto",
-    time: "2020-08-12T08:44:93.151235Z",
-  },
-  {
-    latitude: "35.257400",
-    longitude: "129.258000",
-    test: "1",
-    scenario: "11",
-    type: "Auto",
-    time: "2020-08-12T08:44:94.151235Z",
-  },
-  {
-    latitude: "35.257877",
-    longitude: "129.261888",
-    test: "1",
-    scenario: "11",
-    type: "Menual",
-    time: "2020-08-12T08:44:95.151235Z",
-  },
-];
-
-const Waypoint1 = [
-  {
-    id: "0",
-    latitude: "35.291000",
-    longitude: "129.261000",
-    test: "1",
-    scenario: "1",
-    routename: "루트이름1",
-  },
-  {
-    id: "1",
-    latitude: "35.32078",
-    longitude: "129.351888",
-    test: "1",
-    scenario: "1",
-    routename: "루트이름1",
-  },
-  {
-    id: "2",
-    latitude: "35.297000",
-    longitude: "129.451000",
-    test: "1",
-    scenario: "2",
-    routename: "루트이름1",
-  },
-  {
-    id: "3",
-    latitude: "35.287000",
-    longitude: "129.441000",
-    test: "1",
-    scenario: "3",
-    routename: "루트이름1",
-  },
-  {
-    id: "4",
-    latitude: "35.287000",
-    longitude: "129.471000",
-    test: "1",
-    scenario: "4",
-    routename: "루트이름1",
-  },
-  {
-    id: "5",
-    latitude: "35.286000",
-    longitude: "129.485000",
-    test: "1",
-    scenario: "5",
-    routename: "루트이름1",
-  },
-  {
-    id: "6",
-    latitude: "35.258000",
-    longitude: "129.493000",
-    test: "1",
-    scenario: "6",
-    routename: "루트이름1",
-  },
-  {
-    id: "7",
-    latitude: "35.244000",
-    longitude: "129.472000",
-    test: "1",
-    scenario: "7",
-    routename: "루트이름1",
-  },
-  {
-    id: "8",
-    latitude: "35.241000",
-    longitude: "129.442000",
-    test: "1",
-    scenario: "8",
-    routename: "루트이름1",
-  },
-  {
-    id: "9",
-    latitude: "35.223000",
-    longitude: "129.343000",
-    test: "1",
-    scenario: "9",
-    routename: "루트이름1",
-  },
-  {
-    id: "10",
-    latitude: "35.213000",
-    longitude: "129.323000",
-    test: "1",
-    scenario: "9",
-    routename: "루트이름1",
-  },
-  {
-    id: "11",
-    latitude: "35.218000",
-    longitude: "129.293000",
-    test: "1",
-    scenario: "10",
-    routename: "루트이름1",
-  },
-  {
-    id: "12",
-    latitude: "35.257877",
-    longitude: "129.261888",
-    test: "1",
-    scenario: "11",
-    routename: "루트이름1",
-  },
-];
 
 const testArea = [
   {
@@ -1093,18 +445,17 @@ const testArea = [
 // 데이터를 가져오는 함수
 const fetchData = async () => {
   try {
-    testAis.value.forEach((data) => timeData.value.push(data.time));
-    testAis.value.forEach(({ latitude, longitude, type, scenario }) => {
-      if (!aisData.value[scenario]) {
-        aisData.value[scenario] = [];
+    testAis.value.forEach((data) => timeData.value.push(data.routeName));
+    testAis.value.forEach(({ latitude, longitude, modeType, scenarioNumber }) => {
+      if (!aisData.value[scenarioNumber]) {
+        aisData.value[scenarioNumber] = [];
       }
-      aisData.value[scenario].push([
+      aisData.value[scenarioNumber].push([
         parseFloat(latitude),
         parseFloat(longitude),
-        type,
+        modeType,
       ]);
     });
-    console.log(aisData.value);
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -1137,7 +488,7 @@ const aisMapping = (index) => {
   }
 
   if (map && index >= 0 && index < testAis.value.length) {
-    const scenario = testAis.value[index]?.scenario;
+    const scenario = testAis.value[index]?.scenarioNumber;
 
     // 시나리오가 변경되면 기존 폴리라인 제거
     if (currentScenario !== scenario) {
@@ -1149,7 +500,7 @@ const aisMapping = (index) => {
     // 현재 시나리오의 데이터를 순차적으로 추가
     const dataToShow = testAis.value
       .slice(0, index + 1)
-      .filter((data) => data.scenario === scenario);
+      .filter((data) => data.scenarioNumber === scenario);
 
     // 기존 폴리라인 제거
     currentPolylines.forEach((polyline) => map.removeLayer(polyline));
@@ -1162,11 +513,11 @@ const aisMapping = (index) => {
       ]);
       let dashtype;
 
-      if (dataToShow[0].type === "Menual") {
+      if (dataToShow[0].modeType === "1") {
         dashtype = "1";
-      } else if (dataToShow[0].type === "Auto") {
+      } else if (dataToShow[0].modeType === "2") {
         dashtype = "5, 5";
-      } else if (dataToShow[0].type === "Remote") {
+      } else if (dataToShow[0].modeType === "3") {
         dashtype = "10, 5, 1, 5";
       } else {
         dashtype = "1";
@@ -1181,6 +532,15 @@ const aisMapping = (index) => {
       currentPolylines.push(polyline);
     }
   }
+
+  //metadata view
+  metadata.value.test = testAis.value[index].testNumber;
+  metadata.value.mode = testAis.value[index].modeType === "1" ? 'Menual' : testAis.value[index].modeType === "2" ? 'Auto' : testAis.value[index].modeType === "3" ? 'REMOTE' : '';
+  metadata.value.latitude = testAis.value[index].latitude;
+  metadata.value.longitude = testAis.value[index].longitude;
+  metadata.value.time = testAis.value[index].time;
+  metadata.value.routeName = testAis.value[index].routeName;
+  metadata.value.scenario = testAis.value[index].scenarioNumber
 };
 
 const addWaypoints = () => {
@@ -1195,19 +555,15 @@ const addWaypoints = () => {
   if (testWaypoint.value.length > 0) {
     testWaypoint.value.forEach((point) => {
       const latlng = [parseFloat(point.latitude), parseFloat(point.longitude)];
-      console.log(latlng);
-      const redIcon = new L.Icon({
-        iconUrl: "/image/marker-icon-2x-black.png",
-        shadowUrl: "/image/marker-shadow.png",
-        iconSize: [12, 20],
-        iconAnchor: [7, 20],
-        popupAnchor: [1, -34],
-        shadowSize: [20, 20],
-      });
-      const marker = L.marker(latlng, { icon: redIcon })
+      const circleMarker = L.circleMarker(latlng, {
+        color: "#555555", // 테두리 색상
+        fillColor: "grey", // 채우기 색상
+        fillOpacity: 0.5, // 채우기 투명도
+        radius: 1, // 점의 크기
+      })
         .addTo(map)
-        .bindPopup(`Scenario: ${point.scenario}`);
-      waypointMarkers.push(marker);
+        .bindPopup(`Scenario: ${point.scenarioNumber}`);
+      waypointMarkers.push(circleMarker);
     });
 
     const waypointLatLngs = testWaypoint.value.map((point) => [
@@ -1215,8 +571,8 @@ const addWaypoints = () => {
       parseFloat(point.longitude),
     ]);
     waypointLine = L.polyline(waypointLatLngs, {
-      color: "black",
-      weight: 0.2,
+      color: "#555555",
+      weight: 1,
     }).addTo(map);
   }
 };
@@ -1245,8 +601,8 @@ const defalutMap = () => {
     weight: 2,
   }).addTo(map);
 
-  addWaypoints();
-  aisMapping(sliderValue.value);
+  // addWaypoints();
+  // aisMapping(sliderValue.value);
 };
 
 // const aisMapping = (newVal) => {
