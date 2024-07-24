@@ -2,6 +2,7 @@
 import axios from "axios";
 
 const apiLocation = "bdpback.ias.xinnos.com";
+// const apiLocation = "10.16.152.120"; //
 // const apiLocation = "192.168.0.73:9999";
 export const cctvUrl = `http://${apiLocation}/api/v1/stream/index.m3u8`;
 
@@ -560,7 +561,7 @@ export const serverStorage = async (tokenid) => {
 export const readWaypoint = async (tokenid, trial) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/waypoint?test_number=${trial}`,
+      `http://${apiLocation}/api/v1/waypoint?test_name=${trial}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -580,7 +581,7 @@ export const readWaypoint = async (tokenid, trial) => {
 export const readAis = async (tokenid, trial) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/trajectory?test_number=${trial}`,
+      `http://${apiLocation}/api/v1/trajectory?test_name=${trial}`,
       {
         headers: {
           "Content-Type": "application/json",

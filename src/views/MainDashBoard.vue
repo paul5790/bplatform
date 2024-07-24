@@ -4,7 +4,7 @@
       style="height: 100vh; display: flex; overflow-y: auto"
       class="scrollable-card"
     >
-      <v-navigation-drawer v-model="drawer" app expand-on-hover rail>
+      <v-navigation-drawer v-model="drawer" app expand-on-hover rail :style="{zIndex: 1500}">
         <v-list>
           <v-list-item>
             <img

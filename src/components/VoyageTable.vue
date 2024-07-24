@@ -129,7 +129,7 @@ const fetchData = async () => {
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       const storageSizeFloat = parseFloat(response[i].storageSize).toFixed(2);
       newItems.push({
-        division: response[i].testNumber,
+        division: response[i].testName,
         name: response[i].shipName,
         shipid: response[i].shipId,
         startdate: response[i].startTimeUtc,

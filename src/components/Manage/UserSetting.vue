@@ -95,6 +95,73 @@
                       </v-col>
                     </v-row>
                   </v-container>
+
+                  <v-col cols="12"
+                    ><p style="font-size: 13px">권한 설정</p></v-col
+                  >
+                  <v-card
+                    style="
+                      flex: 1;
+                      margin-right: 15px;
+                      margin-left: 15px;
+                      display: flex;
+                      flex-direction: column;
+                    "
+                  >
+                    <v-card-item style="padding-top: 10px">
+                      <v-window>
+                        <table>
+                          <thead>
+                            <tr>
+                              <th>신호명(SubComponents)</th>
+                              <th>download</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr style="background-color: #f6f2f2">
+                              <td>ALL</td>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  v-model="allDownload"
+                                  @change="toggleAll('download')"
+                                />
+                              </td>
+                            </tr>
+                            <tr
+                              v-for="(item, index) in permissionFrame"
+                              :key="index"
+                            >
+                              <td>{{ item.name }}</td>
+                              <td>
+                                <input
+                                  type="checkbox"
+                                  v-model="item.download"
+                                />
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                        <p style="font-size: 13px; margin-top: 10px">
+                          접근제어 가능 기간 설정
+                        </p>
+                        <VueDatePicker
+                          time-picker-inline
+                          :min-date="new Date()"
+                          :class="
+                            themeMode === 'dark'
+                              ? 'dp__theme_dark'
+                              : 'dp__theme_light'
+                          "
+                          style="--dp-input-padding: 8px"
+                          v-model="datePermission"
+                          density="compact"
+                          :dark="themeMode === 'dark'"
+                          :readonly="date_readonly"
+                        />
+                      </v-window>
+                    </v-card-item>
+                  </v-card>
                 </v-card-text>
                 <v-card-actions>
                   <v-btn
@@ -240,6 +307,56 @@ const dialog2 = ref(false);
 const page = ref(1);
 const itemsPerPage = ref(13);
 
+const allDownload = ref(false);
+
+// --------------------------- 권한 ----------------------------- //
+const permissionFrame = ref([
+  { name: "DGPS", download: false },
+  { name: "GYRO", download: false },
+  { name: "ANEMOMETER", download: false },
+  { name: "RADAR", download: false },
+  { name: "AIS", download: false },
+  { name: "ECDIS", download: false },
+  { name: "AUTOPILOT", download: false },
+  { name: "SPEEDLOG", download: false },
+  { name: "CANTHROTTLE", download: false },
+  { name: "AUTOPILOTCONTACT", download: false },
+  { name: "NO.1ENGINEPANEL", download: false },
+  { name: "NO.2ENGINEPANEL", download: false },
+  { name: "MTIE1.ISA", download: false },
+  { name: "MTIE5.VDGS", download: false },
+  { name: "MTIE5.DBS", download: false },
+  { name: "MOF1.ANS", download: false },
+  { name: "MOF2.SYNC", download: false },
+  { name: "MOF1.GNW", download: false },
+  { name: "MTIE5.SAS", download: false },
+  {
+    name: "MTIE4.XINNOS_VDGS_EMUL",
+    download: false,
+  },
+  {
+    name: "MTIE4.XINNOS_STAS_EMUL",
+    download: false,
+  },
+  { name: "MTIE4.XINNOS_STAS", download: false },
+  { name: "MTIE4.XINNOS_VDGS", download: false },
+  { name: "MANAGEMENT", download: false },
+  { name: "RUDDER", download: false },
+  { name: "ENGINE", download: false },
+  { name: "MODE", download: false },
+]);
+
+const toggleAll = (type) => {
+  const isChecked = allDownload.value;
+  permissionFrame.value.forEach((item) => {
+    item[type] = isChecked;
+  });
+};
+
+const datePermission = ref();
+
+// ---------------------------------------------
+
 // load dialog
 const loadDialog = ref(false);
 
@@ -282,6 +399,7 @@ const rules = ref({
 
 const check = () => {
   if (selectedItems.value.length > 0) {
+    console.log(selectedItems.value);
     selectedId.value = selectedItems.value[0].userId;
     selecteduserName.value = selectedItems.value[0].userName;
     selecteddepartment.value = selectedItems.value[0].department;
@@ -289,6 +407,7 @@ const check = () => {
     selecteduserGroup.value = selectedItems.value[0].userGroup;
     selecteddescription.value = selectedItems.value[0].description;
     selectedphoneNumber.value = selectedItems.value[0].phoneNumber;
+    datePermission.value = selectedItems.value[0].permissionTime;
     if (
       selecteduserName.value === null ||
       selecteduserName.value === "" ||
@@ -297,15 +416,22 @@ const check = () => {
       dialog.value = true;
       console.log("No user selected");
     } else {
+      // permission 적용
+      resetPermissions();
+      selectedItems.value[0].permission.forEach((permissionName) => {
+        const perm = permissionFrame.value.find(
+          (p) => p.name === permissionName
+        );
+        if (perm) {
+          perm.download = true;
+        }
+      });
       dialog.value = true;
     }
   } else {
     alert("유저를 선택해주세요.");
     console.log("No user selected");
   }
-  console.log(selectedphoneNumber.value);
-
-  console.log(selectedemail.value);
 };
 const check2 = () => {
   if (selectedItems.value.length > 0) {
@@ -324,9 +450,6 @@ const check2 = () => {
     alert("유저를 선택해주세요.");
     console.log("No user selected");
   }
-  console.log(selectedphoneNumber.value);
-
-  console.log(selectedemail.value);
 };
 
 // 비밀번호 초기화
@@ -334,7 +457,6 @@ const resetPW = () => {
   let data = {
     id: selectedId.value,
   };
-  console.log(data);
   try {
     resetPassword(tokenid.value, data);
 
@@ -379,34 +501,60 @@ const headers = ref([
 const items = ref([]);
 const selectedItems = ref([]);
 const tokenid = ref(sessionStorage.getItem("token") || "");
+
+// Reset permissions before fetching data
+const resetPermissions = () => {
+  permissionFrame.value.forEach((p) => {
+    p.download = false;
+  });
+};
+
 // 데이터 받아오기
 const fetchData = async () => {
   try {
     const response = await readUserData(tokenid.value);
-    console.log(response);
-    for (let i = 0; i < response.length; i++) {
+    // for (let i = 0; i < response.length; i++) {
+    //   items.value.push({
+    //     userId: response[i].id || "",
+    //     userName: response[i].userName || "",
+    //     userGroup: response[i].userGroup || "",
+    //     department: response[i].department || "",
+    //     phoneNumber: response[i].phoneNumber || "",
+    //     description: response[i].description || "",
+    //     email: response[i].email || "",
+    //   });
+    //   // items.value.push(response.data[i]);
+    // }
+
+    response.forEach((user) => {
       items.value.push({
-        userId: response[i].id || "",
-        userName: response[i].userName || "",
-        userGroup: response[i].userGroup || "",
-        department: response[i].department || "",
-        phoneNumber: response[i].phoneNumber || "",
-        description: response[i].description || "",
-        email: response[i].email || "",
+        userId: user.id || "",
+        userName: user.userName || "",
+        userGroup: user.userGroup || "",
+        department: user.department || "",
+        phoneNumber: user.phoneNumber || "",
+        description: user.description || "",
+        email: user.email || "",
+        permission: user.permissions || "",
+        permissionTime: user.permissionsExpiryTime || "",
       });
-      // items.value.push(response.data[i]);
-    }
+
+      // Reset all permissions to false
+      permissionFrame.value.forEach((p) => {
+        p.download = false;
+      });
+    });
   } catch (error) {
     console.error(error);
     message.value = `api 오류(${error})`;
   }
 };
 
+resetPermissions();
 fetchData();
 
 const changeData = async () => {
   if (rulesdepartment.value === true && rulesdescription.value === true) {
-    console.log(selectedItems.value);
     try {
       const data = {
         id: selectedId.value,
@@ -417,7 +565,17 @@ const changeData = async () => {
         eMail: selectedemail.value,
         description: selecteddescription.value,
       };
+
+      const selectedPermission = permissionFrame.value
+        .filter((permission) => permission.download)
+        .map((permission) => permission.name);
+      data.permissions = selectedPermission;
+
+      const formattedDate = getFormattedDate(datePermission.value);
+      data.permissionsExpiryTime = formattedDate;
+
       console.log(data);
+
       try {
         await updateUserData(tokenid.value, data);
 
@@ -430,7 +588,7 @@ const changeData = async () => {
       console.error(error);
     }
     nullDialog();
-    location.reload();
+    // location.reload();
   } else {
     alert("소속을 입력해주세요.");
   }
@@ -450,6 +608,29 @@ const nullDialog = () => {
   selecteddescription.value = "";
   selectedphoneNumber.value = "";
 };
+
+const getFormattedDate = (date) => {
+  const isoFormatRegex = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/;
+
+  if (typeof date === "string" && isoFormatRegex.test(date)) {
+    return date;
+  } else if (date == "" || date == null) {
+    return "";
+  } else {
+    return formatDate(new Date(date));
+  }
+};
+
+const formatDate = (date) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  const hours = String(date.getHours()).padStart(2, "0");
+  const minutes = String(date.getMinutes()).padStart(2, "0");
+  const seconds = String(date.getSeconds()).padStart(2, "0");
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
 </script>
 
 <style scoped>
@@ -458,6 +639,34 @@ const nullDialog = () => {
   justify-content: center; /* 수평 가운데 정렬 */
   align-items: center; /* 수직 가운데 정렬 */
   min-height: 50vh; /* 화면 높이에 맞게 최소 높이 설정 */
+}
+
+.table-row {
+  padding-top: 4px; /* 원하는 패딩 값으로 조정 */
+  padding-bottom: 4px; /* 원하는 패딩 값으로 조정 */
+}
+.table-row td {
+  padding: 5px; /* 간격을 줄이는데 사용되는 패딩 값 */
+}
+
+.limited-height tr {
+  max-height: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background-color: #f4f4f4;
 }
 
 .dp__theme_dark {

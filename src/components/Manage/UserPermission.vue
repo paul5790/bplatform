@@ -74,9 +74,8 @@
                 <thead>
                   <tr>
                     <th>신호명</th>
-                    <th>view</th>
-                    <th>capture</th>
-                    <th>download</th>
+                    <th>다운로드 권한</th>
+                    <th>접근권한 허용 시간</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -85,35 +84,19 @@
                     <td>
                       <input
                         type="checkbox"
-                        v-model="allView"
-                        @change="toggleAll('view')"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        v-model="allCapture"
-                        @change="toggleAll('capture')"
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
                         v-model="allDownload"
                         @change="toggleAll('download')"
                       />
                     </td>
+                    <td></td>
                   </tr>
                   <tr v-for="(item, index) in permission" :key="index">
                     <td>{{ item.name }}</td>
                     <td>
-                      <input type="checkbox" v-model="item.view" />
-                    </td>
-                    <td>
-                      <input type="checkbox" v-model="item.capture" />
-                    </td>
-                    <td>
                       <input type="checkbox" v-model="item.download" />
+                    </td>
+                    <td>
+                      <input v-model="item.date" />
                     </td>
                   </tr>
                 </tbody>
@@ -169,43 +152,33 @@ const allDownload = ref(false);
 // --------------------- 데이터 셋 -------------------------------
 
 const permission = ref([
-  { name: "DGPS", view: true, capture: false, download: false },
-  { name: "GYRO", view: false, capture: true, download: false },
-  { name: "ANEMOMETER", view: false, capture: true, download: false },
-  { name: "RADAR", view: false, capture: false, download: false },
-  { name: "AIS", view: false, capture: false, download: true },
-  { name: "ECDIS", view: true, capture: false, download: false },
-  { name: "AUTOPILOT", view: false, capture: false, download: false },
-  { name: "SPEEDLOG", view: false, capture: false, download: false },
-  { name: "CANTHROTTLE", view: false, capture: false, download: false },
-  { name: "AUTOPILOTCONTACT", view: false, capture: false, download: false },
-  { name: "NO.1ENGINEPANEL", view: false, capture: false, download: false },
-  { name: "NO.2ENGINEPANEL", view: false, capture: false, download: false },
-  { name: "MTIE1.ISA", view: false, capture: false, download: false },
-  { name: "MTIE5.VDGS", view: false, capture: false, download: false },
-  { name: "MTIE5.DBS", view: false, capture: false, download: false },
-  { name: "MOF1.ANS", view: false, capture: false, download: false },
-  { name: "MOF2.SYNC", view: false, capture: false, download: false },
-  { name: "MOF1.GNW", view: false, capture: false, download: false },
-  { name: "MTIE5.SAS", view: false, capture: false, download: false },
-  {
-    name: "MTIE4.XINNOS_VDGS_EMUL",
-    view: false,
-    capture: false,
-    download: false,
-  },
-  {
-    name: "MTIE4.XINNOS_STAS_EMUL",
-    view: false,
-    capture: false,
-    download: false,
-  },
-  { name: "MTIE4.XINNOS_STAS", view: false, capture: false, download: false },
-  { name: "MTIE4.XINNOS_VDGS", view: false, capture: false, download: false },
-  { name: "MANAGEMENT", view: false, capture: false, download: false },
-  { name: "RUDDER", view: false, capture: false, download: false },
-  { name: "ENGINE", view: false, capture: false, download: false },
-  { name: "MODE", view: false, capture: false, download: false },
+  { name: "DGPS", download: false, date: "" },
+  { name: "GYRO", download: false, date: "" },
+  { name: "ANEMOMETER", download: false, date: "" },
+  { name: "RADAR", download: false, date: "" },
+  { name: "AIS", download: true, date: "2024-07-15T14:50:00" },
+  { name: "ECDIS", download: false, date: "" },
+  { name: "AUTOPILOT", download: false, date: "" },
+  { name: "SPEEDLOG", download: false, date: "" },
+  { name: "CANTHROTTLE", download: false, date: "" },
+  { name: "AUTOPILOTCONTACT", download: false, date: "" },
+  { name: "NO.1ENGINEPANEL", download: false, date: "" },
+  { name: "NO.2ENGINEPANEL", download: false, date: "" },
+  { name: "MTIE1.ISA", download: false, date: "" },
+  { name: "MTIE5.VDGS", download: false, date: "" },
+  { name: "MTIE5.DBS", download: false, date: "" },
+  { name: "MOF1.ANS", download: false, date: "" },
+  { name: "MOF2.SYNC", download: false, date: "" },
+  { name: "MOF1.GNW", download: false, date: "" },
+  { name: "MTIE5.SAS", download: false, date: "" },
+  { name: "MTIE4.XINNOS_VDGS_EMUL", download: false, date: "" },
+  { name: "MTIE4.XINNOS_STAS_EMUL", download: false, date: "" },
+  { name: "MTIE4.XINNOS_STAS", download: false, date: "" },
+  { name: "MTIE4.XINNOS_VDGS", download: false, date: "" },
+  { name: "MANAGEMENT", download: false, date: "" },
+  { name: "RUDDER", download: false, date: "" },
+  { name: "ENGINE", download: false, date: "" },
+  { name: "MODE", download: false, date: "" },
 ]);
 
 const toggleAll = (type) => {

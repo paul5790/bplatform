@@ -20,7 +20,7 @@ const routes = [
   {
     path: "/alldata",
     name: "alldata",
-    component: () => import("../views/AllData.vue"),
+    component: () => import("../views/AllData1.vue"),
   },
   {
     path: "/alldata1",

@@ -79,15 +79,15 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 
 const trialrun = ref([]);
 const selectedtrialNum = ref();
-const trialNum = ref(1);
+const trialNum = ref(100);
 
 const getTrialDate = async () => {
   try {
     const response = await readTrialData(tokenid.value);
     for (let i = 0; i < response.length; i++) {
             
-      const testNumber = response[i].testNumber;
-      trialrun.value.push(`항차 ${testNumber}번`);
+      const testName = response[i].testName;
+      trialrun.value.push(`항차 ${testName}번`);
       selectedtrialNum.value = trialrun.value[0];
       
     }
@@ -406,7 +406,6 @@ const axioslist = ref([
 ]);
 
 const createDataObject = (groupId, values, allValues) => {
-  console.log("red");
   const valueSum = values.reduce((acc, val) => acc + val.value, 0);
   const allValueSum = allValues.reduce((acc, val) => acc + val.value, 0);
   const percent = ((valueSum / allValueSum) * 100).toFixed(2);
@@ -431,19 +430,22 @@ const fetchData = async () => {
     const timeDataRefs = responseKeys.map((key) => response[key]);
     const axiosPromises = axioslist.value.map(async (endpoint, i) => {
       try {
-        console.log("test : "+ endpoint + timeDataRefs[i] );
         const [Sc, Co] = endpoint.split("/");
         const dataFormat = `signal?signal_name=${Sc}_${Co}&test_number=${trialNum.value}&settime=${timeDataRefs[i]}`;
+        console.log(dataFormat);
 
         const response = await readlossData(
           tokenid.value,
           dataFormat
         );
 
-        dataRefs[i].value = 0;
-        dataRefs[i].value += Number(response.countDelay);
-        alldataRefs[i].value = 0;
-        alldataRefs[i].value += Number(response.numOfData);
+        if (response) {
+      dataRefs[i].value = Number(response.countDelay) || 0;
+      alldataRefs[i].value = Number(response.numOfData) || 0;
+    } else {
+      dataRefs[i].value = 0;
+      alldataRefs[i].value = 0;
+    }
       } catch (error) {
         //console.error(error);
       }
@@ -452,9 +454,6 @@ const fetchData = async () => {
     // 모든 axios 호출이 완료될 때까지 기다림
     await Promise.all(axiosPromises);
     loading.value = false;
-
-    console.log("2: "+ dataRefs[0].value);
-    console.log("2: "+ alldataRefs[0].value);
 
     // 데이터를 모두 받아온 후에 차트 업데이트
 
@@ -658,12 +657,9 @@ const handleChartClick = async (event) => {
     const subData = drilldownData.find(
       (data) => data.dataGroupId === event.data.groupId
     );
-    console.log(subData);
     if (subData) {
       const xAxisData = subData.data.map((item) => item[0]);
       const seriesData = subData.data.map((item) => item[1]);
-      console.log(xAxisData);
-      console.log(seriesData);
 
       // 클릭된 데이터에 대한 새로운 그래프 옵션 설정
       const updatedOption = {

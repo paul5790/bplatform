@@ -9,7 +9,7 @@
       overflow-y: auto;
     "
   >
-    <v-card-item style="padding-top: 0px">
+    <v-card-item style="padding-top: 10px">
       <v-row class="dialog-row">
         <!-- 종료 후 저장 -->
         <div class="dialog-div" style="display: flex; margin-right: 0">
@@ -162,6 +162,25 @@
                               v-model="startname"
                               type="text"
                               :rules="rules1.name"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험선 이름
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="startshipname"
+                              type="text"
+                              :rules="rules1.purpose"
                             ></v-text-field>
                           </v-col>
                         </v-row>
@@ -360,6 +379,25 @@
                           <v-col cols="4" style="margin-top: 8px">
                             <v-list-subheader
                               ><p style="font-size: 17px">
+                                시험선 이름
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="editshipname"
+                              type="text"
+                              :rules="rules1.purpose"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
                                 시험 목적 입력
                               </p></v-list-subheader
                             >
@@ -513,11 +551,31 @@
 
                           <v-col cols="8">
                             <v-text-field
-                              style="margin-top: 20px"
+                              style="margin-top: 20px;"
                               variant="outlined"
                               v-model="selectedname"
                               type="text"
+                              readonly="true"
                               :rules="rules1.name"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+
+                        <v-row>
+                          <v-col cols="4" style="margin-top: 8px">
+                            <v-list-subheader
+                              ><p style="font-size: 17px">
+                                시험선 이름
+                              </p></v-list-subheader
+                            >
+                          </v-col>
+
+                          <v-col cols="8">
+                            <v-text-field
+                              variant="outlined"
+                              v-model="selectedshipname"
+                              type="text"
+                              :rules="rules1.purpose"
                             ></v-text-field>
                           </v-col>
                         </v-row>
@@ -587,7 +645,7 @@
                   </v-card>
                 </v-sheet>
               </v-card-text>
-              <v-card-actions style="margin-top: 10px">
+              <v-card-actions style="margin-top: 0px">
                 <v-spacer></v-spacer>
                 <v-btn
                   color="blue-darken-1"
@@ -617,7 +675,7 @@
                 <span class="text-h5">시험 정보 삭제</span>
               </v-card-title>
               <v-card-text
-                >{{ selecteddivision }}시험의 정보를
+                >{{ selectedname }}의 정보를
                 삭제하시겠습니까?</v-card-text
               >
               <v-card-actions>
@@ -636,10 +694,6 @@
           </v-dialog>
         </div>
       </v-row>
-      <div>
-        <input type="file" @change="handleFileUpload" />
-        <button @click="uploadFile">Upload</button>
-      </div>
 
       <v-data-table
         style="margin-top: 20px"
@@ -681,7 +735,7 @@
     </v-card-item>
   </v-card>
   <!-- 데이터 저장중 모달 persistent -->
-  <v-dialog v-model="loadDialog" max-width="300" height="100" persistent>
+  <!-- <v-dialog v-model="loadDialog" max-width="300" height="100" persistent>
     <v-card>
       <v-card-text>
         <v-row align-content="center" class="fill-height" justify="center">
@@ -699,7 +753,7 @@
         </v-row>
       </v-card-text>
     </v-card>
-  </v-dialog>
+  </v-dialog> -->
   <v-overlay
     v-model="overlay"
     contained
@@ -765,6 +819,7 @@ const startstate = ref(
 );
 
 const startname = ref();
+const startshipname = ref();
 const startTimeUtc = ref();
 const endTimeUtc = ref();
 const startpurpose = ref();
@@ -773,6 +828,7 @@ const startdescription = ref();
 
 // 2번째
 const editname = ref("");
+const editshipname = ref("");
 const editstartdate = ref("");
 const editenddate = ref("");
 const editdescription = ref("");
@@ -785,6 +841,7 @@ const selectedname = ref();
 const selectedstartdate = ref();
 const selectedenddate = ref();
 const selectedshipId = ref();
+const selectedshipname = ref();
 const selecteddivision = ref();
 const selectedpurpose = ref();
 const selectedlocation = ref();
@@ -890,15 +947,16 @@ const openDialog2 = () => {
 const openDialog3 = () => {
   if (selectedData.value.length > 0) {
     selecteddivision.value = selectedData.value[0].division;
-    selectedname.value = selectedData.value[0].name;
+    selectedname.value = selectedData.value[0].testName;
     selectedstartdate.value = selectedData.value[0].startdate;
     selectedenddate.value = selectedData.value[0].enddate;
     selectedshipId.value = selectedData.value[0].shipid;
+    selectedshipname.value = selectedData.value[0].name;
     selectedpurpose.value = selectedData.value[0].purpose;
     selectedlocation.value = selectedData.value[0].location;
     selecteddescription.value = selectedData.value[0].description;
     dialog3.value = true;
-    console.log(selectedData.value[0].index);
+    console.log(selectedData.value[0]);
   } else {
     alert("시험을 선택해주세요.");
     console.log("시험을 선택해주세요.");
@@ -907,7 +965,7 @@ const openDialog3 = () => {
 
 const openDialog4 = () => {
   if (selectedData.value.length > 0) {
-    selecteddivision.value = selectedData.value[0].division;
+     selectedname.value = selectedData.value[0].testName;
     dialog4.value = true;
   } else {
     alert("시험을 선택해주세요.");
@@ -918,6 +976,7 @@ const openDialog4 = () => {
 const nullDialog1 = () => {
   dialog1.value = false;
   startname.value = null;
+  startshipname.value = null;
   startdate.value = null;
   enddate.value = null;
   startdescription.value = null;
@@ -930,6 +989,7 @@ const nullDialog1_1 = () => {
 const nullDialog2 = () => {
   dialog2.value = false;
   editname.value = null;
+  editshipname.value = null;
   editstartdate.value = null;
   editenddate.value = null;
   editdescription.value = null;
@@ -939,6 +999,7 @@ const nullDialog2 = () => {
 const nullDialog3 = () => {
   dialog3.value = false;
   selectedname.value = "";
+  selectedshipname.value = "";
   selectedstartdate.value = "";
   selectedenddate.value = "";
   selectedpurpose.value = "";
@@ -965,6 +1026,7 @@ const waitStart = () => {
   } else {
     try {
       sessionStorage.setItem("name", startname.value.toString());
+      sessionStorage.setItem("shipname", startshipname.value.toString());
       sessionStorage.setItem("testPurpose", startpurpose.value.toString());
       sessionStorage.setItem("navigationArea", startlocation.value.toString());
       const startTime = new Date();
@@ -998,9 +1060,8 @@ const startData = async () => {
   dialog1_1.value = false;
   sessionStorage.setItem("startstate", "false");
   startstate.value = false;
-
-  const division = sessionStorage.getItem("division") || null;
   const name = sessionStorage.getItem("name") || null;
+  const shipname = sessionStorage.getItem("shipname") || null;
   const testPurpose = sessionStorage.getItem("testPurpose") || null;
   const navigationArea = sessionStorage.getItem("navigationArea") || null;
   const startTimeUtc = sessionStorage.getItem("startTimeUtc") || null;
@@ -1008,8 +1069,8 @@ const startData = async () => {
   const description = sessionStorage.getItem("description") || null;
 
   const data = {
-    testNumber: division,
-    shipName: name,
+    testName: name,
+    shipName: shipname,
     shipId: "440714900",
     testPurpose: testPurpose,
     navigationArea: navigationArea,
@@ -1023,6 +1084,7 @@ const startData = async () => {
     await createTrialData(tokenid.value, data);
 
     sessionStorage.removeItem("name");
+    sessionStorage.removeItem("shipname");
     sessionStorage.removeItem("testPurpose");
     sessionStorage.removeItem("navigationArea");
     sessionStorage.removeItem("startTimeUtc");
@@ -1046,6 +1108,7 @@ const startData = async () => {
 // 종료하기 후 취소
 const cancelData = async () => {
   sessionStorage.removeItem("name");
+  sessionStorage.removeItem("shipname");
   sessionStorage.removeItem("testPurpose");
   sessionStorage.removeItem("navigationArea");
   sessionStorage.removeItem("startTimeUtc");
@@ -1058,11 +1121,9 @@ const cancelData = async () => {
   nullDialog1_1();
 };
 
-//추가하기
+
+// ------------------- 시험 추가하기 ---------------------- //
 const editData = async () => {
-  console.log(items.value.division);
-  console.log(editstartdate.value.getTime(), editenddate.value.getTime());
-  console.log(editstartdate.value.getTime() === editenddate.value.getTime());
   if (
     editname.value === "" ||
     editpurpose.value === "" ||
@@ -1086,55 +1147,40 @@ const editData = async () => {
     console.log(end);
     let range = `${start}~${end}`;
     console.log(range);
-    let check = checkIfRangeExists(range);
-    console.log(check);
-    if (check) {
-      alert("선택된 날짜에 시험이 이미 존재합니다.");
-    } else {
+    try {
+      //overlay.value = true;
+      loadDialog.value = true;
+      dialog2.value = false;
+      const data = {
+        testName: editname.value,
+        shipName: editshipname.value,
+        shipId: "440714900",
+        testPurpose: editpurpose.value,
+        navigationArea: editlocation.value,
+        startTimeUtc: editstartdate.value,
+        endTimeUtc: editenddate.value,
+        description: editdescription.value,
+      };
+      console.log(data);
       try {
-        //overlay.value = true;
-        loadDialog.value = true;
-        dialog2.value = false;
-        const division = sessionStorage.getItem("division") || null;
-        const data = {
-          testNumber: division,
-          shipName: editname.value,
-          shipId: "440714900",
-          groupId: "1",
-          testPurpose: editpurpose.value,
-          navigationArea: editlocation.value,
-          startTimeUtc: editstartdate.value,
-          endTimeUtc: editenddate.value,
-          description: editdescription.value,
-          storageSize: 0,
-        };
-        console.log(data);
-        try {
-          await createTrialData(tokenid.value, data);
-          overlay.value = false;
+        await createTrialData(tokenid.value, data);
+        overlay.value = false;
 
-          alert("시험 추가가 완료되었습니다.");
-          nullDialog2();
-          // console.log("API 응답 데이터:", response.data);
-          location.reload();
-        } catch (error) {
-          // 특정 에러인 경우에 따라 다르게 처리합니다.
-          if (
-            error instanceof TypeError &&
-            error.message.includes("toString")
-          ) {
-            alert("시험 정보를 전부 입력해 주세요.");
-            console.error(
-              "toString error occurred in waitStart:",
-              error.message
-            );
-          } else {
-            console.error("An error occurred in waitStart:", error);
-          }
-        }
+        alert("시험 추가가 완료되었습니다.");
+        nullDialog2();
+        // console.log("API 응답 데이터:", response.data);
+        location.reload();
       } catch (error) {
-        console.error("An error occurred in waitStart:", error);
+        // 특정 에러인 경우에 따라 다르게 처리합니다.
+        if (error instanceof TypeError && error.message.includes("toString")) {
+          alert("시험 정보를 전부 입력해 주세요.");
+          console.error("toString error occurred in waitStart:", error.message);
+        } else {
+          console.error("An error occurred in waitStart:", error);
+        }
       }
+    } catch (error) {
+      console.error("An error occurred in waitStart:", error);
     }
   }
 };
@@ -1146,87 +1192,63 @@ const changeData = async () => {
   dialog3.value = false;
   const startDate = new Date(selectedstartdate.value);
   const endDate = new Date(selectedenddate.value);
-
-  console.log("Start Date:", startDate);
-  console.log("End Date:", endDate);
-
   const saveTimeRange = timeRange.value.slice();
-  console.log(saveTimeRange);
-  console.log(timeRange.value);
-  console.log(selectedData.value[0].startdate);
-  console.log(selectedData.value[0].startdate === selectedstartdate.value);
-  let start = new Date(selectedstartdate.value).toISOString().slice(0, 19);
-  let end = new Date(selectedenddate.value).toISOString().slice(0, 19);
-  let range = `${start}~${end}`;
   timeRange.value.splice(selectedData.value[0].index, 1);
-  console.log(saveTimeRange);
-  console.log(timeRange.value);
-  let check = checkIfRangeExists(range);
   timeRange.value = saveTimeRange;
-  console.log(saveTimeRange);
-  console.log(timeRange.value);
   if (
-    check === false
-    // || selectedData.value[0].startdate === selectedstartdate.value
+    selectedname.value === "" ||
+    selectedpurpose.value === "" ||
+    selectedlocation.value === "" ||
+    selecteddescription.value === "" ||
+    selectedstartdate.value === "" ||
+    selectedstartdate.value === null ||
+    selectedenddate.value === null ||
+    selectedenddate.value === ""
   ) {
-    if (
-      selectedname.value === "" ||
-      selectedpurpose.value === "" ||
-      selectedlocation.value === "" ||
-      selecteddescription.value === "" ||
-      selectedstartdate.value === "" ||
-      selectedstartdate.value === null ||
-      selectedenddate.value === null ||
-      selectedenddate.value === ""
-    ) {
-      alert("시험 정보를 전부 올바르게 입력해 주세요.");
-    } else if (startDate > endDate) {
-      alert("종료시간이 시작시간보다 더 빠릅니다.");
-    } else if (startDate.getTime() === endDate.getTime()) {
-      alert("시작시간과 종료시간이 같습니다.");
-    } else {
-      console.log(selectedData.value[0].division);
-      try {
-        const data = {
-          testNumber: selecteddivision.value,
-          shipName: selectedname.value,
-          shipId: "440714900",
-          groupId: "1",
-          testPurpose: selectedpurpose.value,
-          navigationArea: selectedlocation.value,
-          startTimeUtc: selectedstartdate.value,
-          endTimeUtc: selectedenddate.value,
-          description: selecteddescription.value,
-          storageSize: 0,
-        };
-        console.log(data);
-        try {
-          await updateTrialData(tokenid.value, data);
-          nullDialog3();
-          alert("선택된 시험의 수정이 완료되었습니다.");
-          location.reload();
-        } catch (error) {
-          console.log(1127);
-          if (
-            error instanceof TypeError &&
-            error.message.includes("toString")
-          ) {
-            alert("시험 정보를 올바르게 입력해 주세요.");
-            console.error(
-              "toString error occurred in waitStart:",
-              error.message
-            );
-          } else {
-            console.error("An error occurred in waitStart:", error);
-          }
-        }
-      } catch (error) {
-        console.error(error);
-        alert("선택된 시험 목록이 존재하지 않습니다.");
-      }
-    }
+    alert("시험 정보를 전부 올바르게 입력해 주세요.");
+  } else if (startDate > endDate) {
+    alert("종료시간이 시작시간보다 더 빠릅니다.");
+  } else if (startDate.getTime() === endDate.getTime()) {
+    alert("시작시간과 종료시간이 같습니다.");
   } else {
-    alert("선택된 날짜에 시험이 이미 존재합니다.");
+    console.log(selectedData.value[0].division);
+    try {
+      const data = {
+        testName: selectedname.value,
+        shipName: selectedshipname.value,
+        shipId: "440714900",
+        testPurpose: selectedpurpose.value,
+        navigationArea: selectedlocation.value,
+        startTimeUtc: selectedstartdate.value,
+        endTimeUtc: selectedenddate.value,
+        description: selecteddescription.value,
+      };
+      console.log("testName = " + data.testName);
+      console.log("shipName = " + data.shipName);
+      console.log("shipId = " + data.shipId);
+      console.log("testPurpose = " + data.testPurpose);
+      console.log("navigationArea = " + data.navigationArea);
+      console.log("startTimeUtc = " + data.startTimeUtc);
+      console.log("endTimeUtc = " + data.endTimeUtc);
+      console.log("description = " + data.description);
+      try {
+        await updateTrialData(tokenid.value, data);
+        nullDialog3();
+        alert("선택된 시험의 수정이 완료되었습니다.");
+        location.reload();
+      } catch (error) {
+        console.log(1127);
+        if (error instanceof TypeError && error.message.includes("toString")) {
+          alert("시험 정보를 올바르게 입력해 주세요.");
+          console.error("toString error occurred in waitStart:", error.message);
+        } else {
+          console.error("An error occurred in waitStart:", error);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      alert("선택된 시험 목록이 존재하지 않습니다.");
+    }
   }
 };
 
@@ -1237,7 +1259,7 @@ const deleteData = async () => {
   overlayemit(true);
   dialog4.value = false;
   const data = {
-    testNumber: selecteddivision.value,
+    testName: selectedname.value,
   };
   try {
     await deleteTrialData(tokenid.value, data);
@@ -1261,7 +1283,7 @@ const overlayemit = (data) => {
 
 // 데이터 테이블 헤더
 const headers = ref([
-  { title: "시험", align: "start", sortable: true, key: "division" },
+  { title: "시험", align: "start", sortable: true, key: "testName" },
   { title: "시작시간", align: "start", key: "startdate", sortable: true },
   { title: "끝시간", align: "start", key: "enddate" },
   { title: "진행 시간", align: "start", key: "time" },
@@ -1318,7 +1340,8 @@ const fetchData = async () => {
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       items.value.push({
         index: i,
-        division: response[i].testNumber,
+        division: response[i].testId, // 필요없으면 없애도댐
+        testName: response[i].testName,
         name: response[i].shipName,
         shipid: response[i].shipId,
         startdate: startUtc + "Z",
@@ -1330,7 +1353,7 @@ const fetchData = async () => {
         time: formattedTime,
       });
       if (i === response.length - 1) {
-        sessionStorage.setItem("division", Number(response[i].testNumber) + 1);
+        sessionStorage.setItem("division", Number(response[i].testId) + 1);
       }
     }
     items.value.sort((a, b) => {
@@ -1352,36 +1375,36 @@ onMounted(() => {
   fetchData();
 });
 
-const checkIfRangeExists = (range) => {
-  // 선택한 범위와 시련 기간을 비교하여 겹치는 부분이 있는지 확인하는 함수
-  // 선택한 범위와 시련 기간을 비교하여 겹치는 부분이 있는지 확인하는 함수
-  const isOverlap = (selectedRange, trialRange) => {
-    const [selectedStart, selectedEnd] = selectedRange
-      .split("~")
-      .map((dateString) => new Date(dateString));
-    const [trialStart, trialEnd] = trialRange
-      .split("~")
-      .map((dateString) => new Date(dateString));
+// const checkIfRangeExists = (range) => {
+//   // 선택한 범위와 시련 기간을 비교하여 겹치는 부분이 있는지 확인하는 함수
+//   // 선택한 범위와 시련 기간을 비교하여 겹치는 부분이 있는지 확인하는 함수
+//   const isOverlap = (selectedRange, trialRange) => {
+//     const [selectedStart, selectedEnd] = selectedRange
+//       .split("~")
+//       .map((dateString) => new Date(dateString));
+//     const [trialStart, trialEnd] = trialRange
+//       .split("~")
+//       .map((dateString) => new Date(dateString));
 
-    // 겹치는 부분이 있으면 true를 반환
-    return (
-      (selectedStart >= trialStart && selectedStart <= trialEnd) ||
-      (selectedEnd >= trialStart && selectedEnd <= trialEnd) ||
-      (trialStart >= selectedStart && trialStart <= selectedEnd) ||
-      (trialEnd >= selectedStart && trialEnd <= selectedEnd)
-    );
-  };
+//     // 겹치는 부분이 있으면 true를 반환
+//     return (
+//       (selectedStart >= trialStart && selectedStart <= trialEnd) ||
+//       (selectedEnd >= trialStart && selectedEnd <= trialEnd) ||
+//       (trialStart >= selectedStart && trialStart <= selectedEnd) ||
+//       (trialEnd >= selectedStart && trialEnd <= selectedEnd)
+//     );
+//   };
 
-  // 선택한 범위
-  const selectedRange = range;
+//   // 선택한 범위
+//   const selectedRange = range;
 
-  // 시련 기간을 반복하여 겹치는 부분이 있는지 확인
-  const isExist = timeRange.value.some((trialRange) =>
-    isOverlap(selectedRange, trialRange)
-  );
+//   // 시련 기간을 반복하여 겹치는 부분이 있는지 확인
+//   const isExist = timeRange.value.some((trialRange) =>
+//     isOverlap(selectedRange, trialRange)
+//   );
 
-  return isExist;
-};
+//   return isExist;
+// };
 
 console.log(items);
 </script>

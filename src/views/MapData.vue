@@ -111,73 +111,98 @@
           <v-icon>mdi-close</v-icon>
         </p>
       </v-card-title>
-      <v-card-text>
+      <v-card-text style="padding-bottom: 0px">
         <!-- 여기에 검색 창 컨텐츠를 추가하세요 -->
         <div style="position: relative; z-index: 1100">
-        <v-row>
-          <v-col cols="6">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>시험번호</v-list-item-title>
-                <v-list-item-subtitle>{{ metadata.test }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-          <v-col cols="6">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>운항모드</v-list-item-title>
-                <v-list-item-subtitle>{{ metadata.mode }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="6">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>위도</v-list-item-title>
-                <v-list-item-subtitle>{{ metadata.latitude }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-          <v-col cols="6">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>경도</v-list-item-title>
-                <v-list-item-subtitle>{{ metadata.longitude }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="6">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>시나리오 번호</v-list-item-title>
-                <v-list-item-subtitle>{{ metadata.scenario }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-          <v-col cols="6">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>시험 경로 이름</v-list-item-title>
-                <v-list-item-subtitle>{{ metadata.routeName }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col cols="12">
-            <v-list-item>
-              <v-list-item-content>
-                <v-list-item-title>시간</v-list-item-title>
-                <v-list-item-subtitle>{{ metadata.time }}</v-list-item-subtitle>
-              </v-list-item-content>
-            </v-list-item>
-          </v-col>
-        </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>시험이름</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    metadata.test
+                  }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>운항모드</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    metadata.mode
+                  }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>위도</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    metadata.latitude
+                  }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>경도</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    metadata.longitude
+                  }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="6">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>시나리오 번호</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    metadata.scenario
+                  }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+            <v-col cols="6">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>시험 경로 이름</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    metadata.routeName
+                  }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-title>시간</v-list-item-title>
+                  <v-list-item-subtitle>{{
+                    metadata.time
+                  }}</v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+            </v-col>
+          </v-row>
+          <v-divider></v-divider>
+          <v-list-item style="padding-bottom: 0px">
+            <v-list-item-content>
+              <v-list-item-subtitle
+                ><v-checkbox
+                  v-model="nonScenario"
+                  :label="`경로 이어보기`"
+                ></v-checkbox
+              ></v-list-item-subtitle>
+            </v-list-item-content>
+          </v-list-item>
         </div>
       </v-card-text>
     </v-card>
@@ -291,7 +316,6 @@ const maxValue = ref(0);
 const sliderValue = ref(1);
 const timeData = ref([]);
 
-
 let currentPolyline;
 
 watch(sliderValue, (newVal) => {
@@ -309,9 +333,9 @@ const getTrialDate = async () => {
   try {
     const response = await readTrialData(tokenid.value);
     for (let i = 0; i < response.length; i++) {
-      const testNumber = response[i].testNumber;
-      selectedtrialNum.value = testNumber;
-      trialrun.value.push(`항차 ${testNumber}번`);
+      const testName = response[i].testName;
+      selectedtrialNum.value = testName;
+      trialrun.value.push(`${testName}`);
     }
   } catch (error) {
     console.error(error);
@@ -323,14 +347,21 @@ onMounted(getTrialDate);
 
 // metadata
 const metadata = ref({
-  test : null,
-  mode : null,
-  latitude : null,
-  longitude : null,
-  time : null,
-  routeName : null,
-  scenario : null,
-})
+  test: null,
+  mode: null,
+  latitude: null,
+  longitude: null,
+  time: null,
+  routeName: null,
+  scenario: null,
+});
+
+// 항적 쌓기 체크박스
+const nonScenario = ref(false);
+
+watch(nonScenario, (newVal) => {
+  sliderValue.value = 0;
+});
 
 // ---------------------------- Test CardView --------------------------------//
 
@@ -350,51 +381,52 @@ const shipIcon = new L.Icon({
 });
 
 const searchMapdata = async () => {
-  let req = `http://localhost:9998/api/v1/trajectory?test_number=2`;
-  if (selectedtrialrun.value) {
-    const selectedNumber = selectedtrialrun.value.match(/\d+/)[0]; // 숫자만 추출
-    alert(selectedNumber);
-    testAis.value = [];
-    aisData.value = {};
+  try {
+    if (selectedtrialrun.value) {
+      testAis.value = [];
+      aisData.value = {};
 
-    const waypoint = await readWaypoint(tokenid.value, selectedNumber);
-    const ais = await readAis(tokenid.value, selectedNumber);
+      const waypoint = await readWaypoint(
+        tokenid.value,
+        selectedtrialrun.value
+      );
+      const ais = await readAis(tokenid.value, selectedtrialrun.value);
 
-    console.log(ais);
-    maxValue.value = ais.length;
+      console.log(ais);
+      maxValue.value = ais.length;
 
-    if (selectedNumber === "100") {
       testAis.value = ais;
       testWaypoint.value = waypoint;
       fetchData();
+      sliderCardVisible.value = true;
+
+      if (map) {
+        map.remove(); // 기존 지도 제거
+      }
+
+      defalutMap();
+      // aisMapping(sliderValue.value);
+      sliderValue.value = 0;
+      addWaypoints();
+      // shipMarker 다시 추가
+      if (shipMarker) {
+        const latlng = [
+          parseFloat(testAis.value[sliderValue.value].latitude),
+          parseFloat(testAis.value[sliderValue.value].longitude),
+        ];
+        shipMarker = L.marker(latlng, { icon: shipIcon }).addTo(map);
+      }
+
+      searchCardVisible.value = false;
+      metadataCardVisible.value = true;
     } else {
-      testAis.value = ais;
-      testWaypoint.value = waypoint;
-      fetchData();
+      alert("항차를 선택하세요.");
     }
-    sliderCardVisible.value = true;
-
-    if (map) {
-      map.remove(); // 기존 지도 제거
+  } catch (error) {
+    console.log(error);
+    if (error.request.response == 'argument "content" is null') {
+      console.error('Error: argument "content" is null');
     }
-
-    defalutMap();
-    // aisMapping(sliderValue.value);
-    sliderValue.value = 0;
-    addWaypoints();
-    // shipMarker 다시 추가
-    if (shipMarker) {
-      const latlng = [
-        parseFloat(testAis.value[sliderValue.value].latitude),
-        parseFloat(testAis.value[sliderValue.value].longitude),
-      ];
-      shipMarker = L.marker(latlng, { icon: shipIcon }).addTo(map);
-    }
-
-    searchCardVisible.value = false;
-    metadataCardVisible.value = true;
-  } else {
-    alert("항차를 선택하세요.");
   }
 };
 
@@ -413,32 +445,24 @@ const testWaypoint = ref([]);
 
 const testArea = [
   {
-    latitude: "35.690000",
-    longitude: "129.477700",
+    latitude: "35.4944",
+    longitude: "129.4517",
   },
   {
-    latitude: "35.690000",
-    longitude: "129.887700",
+    latitude: "35.5650",
+    longitude: "129.4850",
   },
   {
-    latitude: "35.390000",
-    longitude: "129.847700",
+    latitude: "35.5350",
+    longitude: "129.5533",
   },
   {
-    latitude: "35.130000",
-    longitude: "129.677700",
+    latitude: "35.4533",
+    longitude: "129.5333",
   },
   {
-    latitude: "35.030000",
-    longitude: "129.277700",
-  },
-  {
-    latitude: "35.050000",
-    longitude: "129.200000",
-  },
-  {
-    latitude: "35.100000",
-    longitude: "129.124300",
+    latitude: "35.4944",
+    longitude: "129.4517",
   },
 ];
 
@@ -446,16 +470,18 @@ const testArea = [
 const fetchData = async () => {
   try {
     testAis.value.forEach((data) => timeData.value.push(data.routeName));
-    testAis.value.forEach(({ latitude, longitude, modeType, scenarioNumber }) => {
-      if (!aisData.value[scenarioNumber]) {
-        aisData.value[scenarioNumber] = [];
+    testAis.value.forEach(
+      ({ latitude, longitude, modeType, scenarioNumber }) => {
+        if (!aisData.value[scenarioNumber]) {
+          aisData.value[scenarioNumber] = [];
+        }
+        aisData.value[scenarioNumber].push([
+          parseFloat(latitude),
+          parseFloat(longitude),
+          modeType,
+        ]);
       }
-      aisData.value[scenarioNumber].push([
-        parseFloat(latitude),
-        parseFloat(longitude),
-        modeType,
-      ]);
-    });
+    );
   } catch (error) {
     console.error("Error fetching data:", error);
   }
@@ -498,10 +524,14 @@ const aisMapping = (index) => {
     }
 
     // 현재 시나리오의 데이터를 순차적으로 추가
-    const dataToShow = testAis.value
-      .slice(0, index + 1)
-      .filter((data) => data.scenarioNumber === scenario);
-
+    let dataToShow;
+    if (nonScenario.value) {
+      dataToShow = testAis.value.slice(0, index + 1);
+    } else {
+      dataToShow = testAis.value
+        .slice(0, index + 1)
+        .filter((data) => data.scenarioNumber === scenario);
+    }
     // 기존 폴리라인 제거
     currentPolylines.forEach((polyline) => map.removeLayer(polyline));
     currentPolylines = [];
@@ -534,13 +564,20 @@ const aisMapping = (index) => {
   }
 
   //metadata view
-  metadata.value.test = testAis.value[index].testNumber;
-  metadata.value.mode = testAis.value[index].modeType === "1" ? 'Menual' : testAis.value[index].modeType === "2" ? 'Auto' : testAis.value[index].modeType === "3" ? 'REMOTE' : '';
+  metadata.value.test = testAis.value[index].test;
+  metadata.value.mode =
+    testAis.value[index].modeType === "1"
+      ? "Menual"
+      : testAis.value[index].modeType === "2"
+      ? "Auto"
+      : testAis.value[index].modeType === "3"
+      ? "REMOTE"
+      : "";
   metadata.value.latitude = testAis.value[index].latitude;
   metadata.value.longitude = testAis.value[index].longitude;
   metadata.value.time = testAis.value[index].time;
   metadata.value.routeName = testAis.value[index].routeName;
-  metadata.value.scenario = testAis.value[index].scenarioNumber
+  metadata.value.scenario = testAis.value[index].scenarioNumber;
 };
 
 const addWaypoints = () => {
@@ -585,7 +622,7 @@ onMounted(() => {
 
 const defalutMap = () => {
   // 지도 초기화
-  map = L.map("map").setView([35.29, 129.26], 10);
+  map = L.map("map").setView([35.4944, 129.4517], 13);
 
   // OSM 타일 레이어 추가
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
