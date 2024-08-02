@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="map" style="height: 30vh"></div>
+    <div id="map" style="height: 39vh"></div>
     <div style="text-align: right">
       <span style="font-size: 13px">lat: {{ latvalue }}</span
       >&nbsp;&nbsp; <span style="font-size: 13px">lon: {{ lonvalue }}</span>
@@ -29,6 +29,13 @@ const latvalue = ref(35.46);
 const lonvalue = ref(129.38);
 let intervalId = null;
 const updateMapCheck = ref(false);
+
+const shipIcon = new L.Icon({
+  iconUrl: "/image/shipicon.png",
+  iconSize: [32, 32],
+  iconAnchor: [16, 16],
+  popupAnchor: [0, -18],
+});
 
 onMounted(() => {
   // 지도 초기화
@@ -68,13 +75,16 @@ const executeUpdateMap = () => {
 };
 
 const updateValue = () => {
+  console.log('props.lat');
+  console.log(props.lat);
+  console.log(props.lon);
   state.value = props.state;
   latview.value = props.lat;
   lonview.value = props.lon;
   // console.log("updateValue");
 
-  latvalue.value = (props.lat / 100).toFixed(6);
-  lonvalue.value = (props.lon / 100).toFixed(6);
+  latvalue.value = (props.lat / 100);
+  lonvalue.value = (props.lon / 100);
 };
 
 // 컴포넌트가 파괴될 때 clearInterval 호출
@@ -100,7 +110,7 @@ const updateMap = () => {
       shadowSize: [41, 41],
     });
     console.log(latview.value / 100, lonview.value / 100);
-    L.marker([latview.value / 100, lonview.value / 100], { icon: blueIcon })
+    L.marker([latview.value / 100, lonview.value / 100], { icon: shipIcon })
       .addTo(map)
       .bindPopup("Realtime Location.")
       .openPopup();

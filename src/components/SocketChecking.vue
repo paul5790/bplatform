@@ -1,5 +1,4 @@
 <template>
-  <div class="item-wrapper">
     <v-sheet
       :style="{
         display: 'flex',
@@ -336,8 +335,8 @@
           </v-list-item>
         </v-list-group>
       </v-list>
+      
     </v-sheet>
-  </div>
 </template>
 
 <script setup props>
@@ -472,11 +471,4 @@ const getIconIcon = (key) =>
 </script>
 
 <style>
-.item-wrapper {
-  padding: 0;
-  width: 100%;
-  display: flex;
-  align-items: center; /* 교차 축 정렬: 세로 중앙 정렬 */
-  justify-content: flex-start; /* 주 축 정렬: 가로 왼쪽 정렬 */
-}
 </style>

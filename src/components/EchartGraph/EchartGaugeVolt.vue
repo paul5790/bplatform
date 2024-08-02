@@ -127,7 +127,7 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  padding: 5px;
+  padding: 8px;
 }
 
 :root {

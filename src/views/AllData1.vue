@@ -47,7 +47,10 @@
                 (periodSettingCardVisible = false)
             "
             class="custom-text-field"
-          ></v-text-field>
+          ><v-tooltip
+        activator="parent"
+        location="bottom"
+      >{{ formattedSearchTarget  }}</v-tooltip></v-text-field>
           <v-text-field
             v-model="textboxs.tb3"
             density="compact"
@@ -514,74 +517,101 @@
               </template>
             </v-tab-item>
           </v-tabs-items>
+          <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-select
+          v-model="selectDownloadFormat"
+          :items="downloadFormats"
+          density="compact"
+          label="format"
+          style="max-width: 150px; margin-top: 20px"
+          variant="solo"
+        ></v-select>
+        <v-btn
+          :loading="downloadBtnLoading"
+          :color="btnTextColor"
+          :style="{
+            'background-color': btnColor,
+            'margin-top': '0px',
+            'margin-left': '20px',
+            width: '200px',
+          }"
+          @click="dataDownloadServer()"
+          :disabled="downloadBtnDisabled"
+          >데이터 다운로드</v-btn
+        >
+      </v-card-actions>
         </v-container>
 
-      <!-- 데이터 원문 -->
-      <v-container
-        v-if="showType == 'json'"
-        style="padding: 50px; padding-top: 15px"
-      >
-        <v-tabs v-model="activeTab2">
-          <v-tab v-for="(tab, index) in dataKeys" :key="index">{{ tab }}</v-tab>
-        </v-tabs>
+        <!-- 데이터 원문 -->
+        <v-container
+          v-if="showType == 'json'"
+          style="padding: 50px; padding-top: 15px"
+        >
+          <v-tabs v-model="activeTab2">
+            <v-tab v-for="(tab, index) in dataKeys" :key="index">{{
+              tab
+            }}</v-tab>
+          </v-tabs>
 
-        <v-tabs-items v-model="activeTab2">
-          <v-tab-item
-            v-for="(tab, index) in dataKeys"
-            :key="index"
-            :value="tab"
-          >
-            <template v-if="activeTab2 === index">
-              <v-row style="margin-top: 10px">
-                <v-col v-if="data[tab].length === 0" cols="12">
-                <v-card>
-                  <v-card-title class="d-flex align-center">
-                    <span class="ml-2" style="font-size: 16px">No Data</span>
-                  </v-card-title>
-                </v-card>
-              </v-col>
-                <v-col
-                v-else
-                  v-for="(item, itemIndex) in getPaginatedData(tab)"
-                  :key="item.id"
-                  cols="12"
-                >
-                  <v-card>
-                    <v-card-title class="d-flex align-center">
-                      <v-icon
-                        @click="toggleDetails(tab, itemIndex)"
-                        class="expand-icon"
-                      >
-                        {{
-                          isItemExpanded(tab, itemIndex)
-                            ? "mdi-chevron-up"
-                            : "mdi-chevron-down"
-                        }}
-                      </v-icon>
-                      <span class="ml-2" style="font-size: 16px">
-                        {{ getCardName(item) }}
-                      </span>
-                    </v-card-title>
-                    <v-card-text style="padding: 0; padding-left: 50px">
-                      <pre v-if="isItemExpanded(tab, itemIndex)">{{
-                        JSON.stringify(item, null, 2)
-                      }}</pre>
-                    </v-card-text>
-                  </v-card>
-                </v-col>
-              </v-row>
-              <v-pagination
-                v-if="viewState == 'ondata'"
-                style="margin-top: 10px"
-                v-model="pages[tab]"
-                :length="getTotalPages(tab)"
-                @input="changePage(tab)"
-              ></v-pagination>
-            </template>
-          </v-tab-item>
-        </v-tabs-items>
-      </v-container>
-      
+          <v-tabs-items v-model="activeTab2">
+            <v-tab-item
+              v-for="(tab, index) in dataKeys"
+              :key="index"
+              :value="tab"
+            >
+              <template v-if="activeTab2 === index">
+                <v-row style="margin-top: 10px">
+                  <v-col v-if="data[tab].length === 0" cols="12">
+                    <v-card>
+                      <v-card-title class="d-flex align-center">
+                        <span class="ml-2" style="font-size: 16px"
+                          >No Data</span
+                        >
+                      </v-card-title>
+                    </v-card>
+                  </v-col>
+                  <v-col
+                    v-else
+                    v-for="(item, itemIndex) in getPaginatedData(tab)"
+                    :key="item.id"
+                    cols="12"
+                  >
+                    <v-card>
+                      <v-card-title class="d-flex align-center">
+                        <v-icon
+                          @click="toggleDetails(tab, itemIndex)"
+                          class="expand-icon"
+                        >
+                          {{
+                            isItemExpanded(tab, itemIndex)
+                              ? "mdi-chevron-up"
+                              : "mdi-chevron-down"
+                          }}
+                        </v-icon>
+                        <span class="ml-2" style="font-size: 16px">
+                          {{ getCardName(item) }}
+                        </span>
+                      </v-card-title>
+                      <v-card-text style="padding: 0; padding-left: 50px">
+                        <pre v-if="isItemExpanded(tab, itemIndex)">{{
+                          JSON.stringify(item, null, 2)
+                        }}</pre>
+                      </v-card-text>
+                    </v-card>
+                  </v-col>
+                </v-row>
+                <v-pagination
+                  v-if="viewState == 'ondata'"
+                  style="margin-top: 10px"
+                  v-model="pages[tab]"
+                  :length="getTotalPages(tab)"
+                  @input="changePage(tab)"
+                ></v-pagination>
+              </template>
+            </v-tab-item>
+          </v-tabs-items>
+        </v-container>
       </template>
       <template v-if="viewState == 'loading'">
         <div style="text-align: center">
@@ -605,6 +635,17 @@ import { readTrialData, readDataTrial } from "../api/index.js";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 import "@/styles/datepicker-theme.css";
 
+const {
+  btnColor,
+  textColor,
+  themeColor,
+  btnTextColor,
+  themeSelectedTabColor,
+  themeNoNSelectedTabColor,
+  themeSelectedTabTextColor,
+  themeNoNSelectedTabTextColor,
+  tableStyle,
+} = themeConfig;
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
@@ -624,7 +665,7 @@ const textboxs = ref({
   tb4: "",
 });
 
-// for API Request variable
+// for View API Request variable
 const requests = ref({
   type: "",
   data: "",
@@ -632,6 +673,15 @@ const requests = ref({
   index: "",
   signal: "",
 });
+
+// for Download API Request variable
+const downloadReq = ref({
+  type: "",
+  data: "",
+  file_type: "",
+  period: "",
+  signal: "",
+})
 
 // ---------------- Main Component Card View -------------------------//
 const SelectedDataCardVisible = ref(false);
@@ -652,6 +702,14 @@ const selectedHour = ref(6);
 const selectedMinute = ref(19);
 
 const viewState = ref("");
+
+const selectBoxClick1 = () => {};
+
+const selectBoxClick2 = () => {};
+
+const selectBoxClick3 = () => {};
+
+const selectBoxClick4 = () => {};
 
 // ------------------- 0번째 데이터 선정 Method ------------------------ //
 const ShipData = ref();
@@ -1060,7 +1118,7 @@ const completeData0 = () => {
 
 const completeData1 = () => {
   // 데이터 선택 박스 text 할당
-  textboxs.value.tb2 = searchTarget.value[0];
+  textboxs.value.tb2 = formattedSearchTarget;
 
   let signalParams = "";
 
@@ -1072,12 +1130,15 @@ const completeData1 = () => {
 
   // 다음 선택 시, 다음 조건 CardView로 이동
   SelectedShipContentsCardVisible.value = false;
-  DataTypeCardVisible.value = true;
+
+  if (selectDataType.value == null) {
+    DataTypeCardVisible.value = true;
+  }
 };
 
 const completeData1_1 = () => {
   // 데이터 선택 박스 text 할당
-  textboxs.value.tb2 = searchTarget.value[0];
+  textboxs.value.tb2 = formattedSearchTarget;
 
   let signalParams = "";
 
@@ -1089,7 +1150,9 @@ const completeData1_1 = () => {
 
   // 다음 선택 시, 다음 조건 CardView로 이동
   SelectedVtsContentsCardVisible.value = false;
-  DataTypeCardVisible.value = true;
+  if (selectDataType.value == null) {
+    DataTypeCardVisible.value = true;
+  }
 };
 
 const completeData2 = () => {
@@ -1102,7 +1165,9 @@ const completeData2 = () => {
 
   // 다음 선택 시, 다음 조건 CardView로 이동
   DataTypeCardVisible.value = false;
-  periodSettingCardVisible.value = true;
+  if (searchTimeRange.value == null) {
+    periodSettingCardVisible.value = true;
+  }
 };
 
 const completeData3 = () => {
@@ -1112,9 +1177,11 @@ const completeData3 = () => {
   if (selectedTest.value === 0) {
     // 직접 선택이라면
     requests.value.period = `period?start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`;
+    downloadReq.value.period = `find_method=period&start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`;
   } else {
     // 시험 선택이라면
     requests.value.period = `test?test_name=${searchTimeRange.value}`;
+    downloadReq.value.period = `find_method=test&test_name=${searchTimeRange.value}`
   }
 
   // 다음 선택 시, 다음 조건 CardView로 이동
@@ -1150,6 +1217,11 @@ const dataSearchBtn = async () => {
     }
     ShipDataState.value = ShipData.value;
     viewState.value = "ondata";
+
+    downloadReq.value.type = requests.value.type;
+    downloadReq.value.data = requests.value.data;
+    downloadReq.value.period = requests.value.period;
+    downloadReq.value.signal = requests.value.signal;
   }
 };
 
@@ -1339,6 +1411,42 @@ const getCardName = (item) => {
 
   return cardName.value;
 };
+
+const formattedSearchTarget = computed(() => {
+  return searchTarget.value.join(', ');
+});
+
+
+
+
+
+
+
+// 다운로드
+const downloadFormats = ref(["csv", "txt"]);
+const downloadFormatv = ref(["csv", "txt"]);
+const selectDownloadFormat = ref("csv");
+
+
+const downloadData = async () => {
+    let apiReq = `table_data              /information            /download?file_type=txt   &find_method=test&test_number=3                                                                    &signal_name=ais_vdm&signal_name=ais_vdo`;
+    let apiRe2 = `table_data              /information            /download?file_type=csv   &find_method=period&start_utctime=2023-08-08T04:15:28.000Z&end_utctime=2023-08-08T08:45:38.000Z    &signal_name=ais_vdm&signal_name=ais_vdo`
+    apiReq = `${downloadReq.value.type}/${downloadReq.value.data}/${downloadReq.value.file_type}/${requests.value.period}${requests.value.signal} /download?file_type=${selectDownloadFormat.value}`;
+    console.log(apiReq);
+    await searchApi(apiReq);
+}
+
+
+// for Download API Request variable
+// const downloadReq = ref({
+//   type: "",
+//   data: "",
+//   file_type: "",
+//   period: "",
+//   signal: "",
+// })
+
+
 </script>
 
 <style scoped>

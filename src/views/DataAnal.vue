@@ -243,6 +243,7 @@ import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 import { readTrialData, readDataTrial } from "../api/index.js";
+import html2canvas from "html2canvas";
 import "@/styles/datepicker-theme.css";
 import {
   DatasetComponent,
@@ -393,10 +394,9 @@ const getTrialDate = async () => {
   try {
     const response = await readTrialData(tokenid.value);
     for (let i = 0; i < response.length; i++) {
-      setStartTime.value.push(`${response[i].startTimeUtc}`);
-      setEndTime.value.push(`${response[i].endTimeUtc}`);
-      selectedtrialNum.value = i + 1;
-      trialrun.value.push(`시험 ${i + 1}번`);
+      const testName = response[i].testName;
+      selectedtrialNum.value = testName;
+      trialrun.value.push(`${testName}`);
     }
   } catch (error) {
     console.error(error);
@@ -657,7 +657,9 @@ const updateSeries = () => {
 
   selectedItem.value.forEach((component) => {
     if (component in dataMap) {
-      const seriesData = sortedTimestamps.map((timestamp) => dataMap[component][timestamp] || null);
+      const seriesData = sortedTimestamps.map(
+        (timestamp) => dataMap[component][timestamp] || null
+      );
 
       series.push({
         name: component,
@@ -692,10 +694,10 @@ const updateSeries = () => {
         ${date.getDate().toString().padStart(2, "0")} ${date
           .getHours()
           .toString()
-          .padStart(2, "0")}:${date.getMinutes().toString().padStart(2, "0")}:${date
-          .getSeconds()
+          .padStart(2, "0")}:${date
+          .getMinutes()
           .toString()
-          .padStart(2, "0")}`;
+          .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
         return formattedDate;
       },
     },
@@ -710,11 +712,32 @@ const updateSeries = () => {
 // 데이터 업데이트
 const axiosData = async () => {};
 
+const requests = ref({
+  type: "",
+  data: "",
+  period: "",
+  signal: "",
+});
+
 // 데이터 API 요청
 const fetchData = async (subComponent, contents) => {
   try {
-    let dataFomat = `period?start_utctime=${startDate.value}&end_utctime=${endDate.value}&signal_name=${subComponent}_${contents}`;
-    return await readDataTrial(tokenid.value, dataFomat);
+    if (selectedtrialrun.value === "직접 선택") {
+      // 직접 선택이라면
+      requests.value.period = `period?start_utctime=${startDate.value}&end_utctime=${endDate.value}`;
+      console.log(requests.value.period);
+    } else {
+      // 시험 선택이라면
+      requests.value.period = `test?test_name=${selectedtrialrun.value}`;
+      console.log(requests.value.period);
+    }
+
+    let apiReq = `table_data/information/test?test_name=TestCase1&signal_name=ais_vdo&signal_name=ais_vdm`;
+    apiReq = `table_data/information/${requests.value.period}&signal_name=${subComponent}_${contents}`;
+    console.log(apiReq);
+    let a = await readDataTrial(tokenid.value, apiReq);
+    console.log(a);
+    return a;
   } catch (error) {
     console.error(error);
     throw error; // 에러를 호출자에게 전파
@@ -724,17 +747,20 @@ const fetchData = async (subComponent, contents) => {
 let n = 0;
 
 const processData = (
-  data,
+  dataArray,
   timestampKey,
   dataKey,
   unitValue,
   contentsItemValue,
   analysisName
 ) => {
-  analysisData.value[n] = data.map((item) => item[dataKey]);
+  // const dataArray = data.DGPS_GGA;
+
+  analysisData.value[n] = dataArray.map((item) => item[dataKey]);
+  console.log(analysisData.value[n]);
 
   // 중복된 타임스탬프를 제거하면서 analysisTime에 값을 추가
-  const newTimestamps = data.map((item) => item[timestampKey]);
+  const newTimestamps = dataArray.map((item) => item[timestampKey]);
   const allTimestamps = new Set([...analysisTime.value, ...newTimestamps]);
   analysisTime.value = Array.from(allTimestamps).sort(
     (a, b) => new Date(a) - new Date(b)
@@ -742,7 +768,7 @@ const processData = (
 
   // analysisTime.value = data.map((item) => item[timestampKey]);
   // gData[analysisName] = data.map((item) => item[dataKey]);
-  gData[analysisName] = data.map((item) => {
+  gData[analysisName] = dataArray.map((item) => {
     let obj = {};
     obj[item[timestampKey]] = item[dataKey];
     return obj;
@@ -796,157 +822,135 @@ const searchData = async () => {
 
     console.log("구간 1");
     if (
-      selectedItem.value.includes("latitude") ||
-      selectedItem.value.includes("longitude") ||
-      selectedItem.value.includes("altitude")
-    ) {
-      itemsData.gga = await fetchData("DGPS", "GGA");
-    }
-    if (
-      selectedItem.value.includes("speedovergroundknots") ||
-      selectedItem.value.includes("courseovergrounddegreestrue")
-    ) {
-      itemsData.vtg = await fetchData("DGPS", "VTG");
-    }
-    if (selectedItem.value.includes("heading")) {
-      itemsData.hdt = await fetchData("GYRO", "HDT");
-    }
-    if (selectedItem.value.includes("rateofturn")) {
-      itemsData.rot = await fetchData("GYRO", "ROT");
-    }
-    if (
-      selectedItem.value.includes("anemometerangle") ||
-      selectedItem.value.includes("anemometerspeed")
-    ) {
-      itemsData.mwv = await fetchData("ANEMOMETER", "MWV");
-    }
-    if (selectedItem.value.includes("speedn")) {
-      itemsData.vhw = await fetchData("SPEEDLOG", "VHW");
-    }
-    if (
-      selectedItem.value.includes("starboardruddersensor") ||
-      selectedItem.value.includes("portruddersensor")
-    ) {
-      itemsData.rsa = await fetchData("AUTOPILOT", "RSA");
-    }
-    if (selectedItem.value.includes("1_Engine Speed")) {
-      itemsData.engine_SPEED = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_61444"
-      );
-    }
-    if (selectedItem.value.includes("1_Engine Oil Temperature")) {
-      itemsData.engine_OIL_TEMPERATURE1 = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_65262"
-      );
-    }
-    if (
-      selectedItem.value.includes("1_Engine Oil Pressure") ||
-      selectedItem.value.includes("1_Engine Coolant Level")
-    ) {
-      itemsData.engine_OIL_PRESSURE = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_65263"
-      );
-    }
-    if (selectedItem.value.includes("1_Transmission Oil Pressure")) {
-      itemsData.transmission_OIL_PRESSURE = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_65272"
-      );
-    }
-    if (
-      selectedItem.value.includes("1_Charging System Potential") ||
-      selectedItem.value.includes("1_Battery Potential")
-    ) {
-      itemsData.charging_SYSTEM_POTENTIAL = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_65271"
-      );
-    }
-    if (selectedItem.value.includes("1_Engine total hours")) {
-      itemsData.engine_TOTAL_HOURS = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_65253"
-      );
-    }
-    if (
-      selectedItem.value.includes("1_Engine Intake Manifold Pressure") ||
-      selectedItem.value.includes("1_Engine Intake Manifold Temp") ||
-      selectedItem.value.includes("1_Engine Exhaust Gas Temperature")
-    ) {
-      itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_65270"
-      );
-    }
-    if (selectedItem.value.includes("1_fuel_LEVEL")) {
-      itemsData.fuel_LEVEL_1 = await fetchData(
-        "NO1ENGINEPANEL",
-        "NO1ENGINE_PANEL_65276"
-      );
-    }
-    if (selectedItem.value.includes("2_Engine Speed")) {
-      itemsData.engine_SPEED2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_61444"
-      );
-    }
-    if (selectedItem.value.includes("2_Engine Oil Temperature")) {
-      itemsData.engine_OIL_TEMPERATURE2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_65262"
-      );
-    }
-    if (
-      selectedItem.value.includes("2_Engine Oil Pressure") ||
-      selectedItem.value.includes("2_Engine Coolant Level")
-    ) {
-      itemsData.engine_OIL_PRESSURE2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_65263"
-      );
-    }
-    if (selectedItem.value.includes("2_Transmission Oil Pressure")) {
-      itemsData.transmission_OIL_PRESSURE2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_65272"
-      );
-    }
-    if (
-      selectedItem.value.includes("2_Charging System Potential") ||
-      selectedItem.value.includes("2_Battery Potential")
-    ) {
-      itemsData.charging_SYSTEM_POTENTIAL2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_65271"
-      );
-    }
-    if (selectedItem.value.includes("2_Engine total hours")) {
-      itemsData.engine_TOTAL_HOURS2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_65253"
-      );
-    }
-    if (
-      selectedItem.value.includes("2_Engine Intake Manifold Pressure") ||
-      selectedItem.value.includes("2_Engine Intake Manifold Temp") ||
-      selectedItem.value.includes("2_Engine Exhaust Gas Temperature")
-    ) {
-      itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_65270"
-      );
-    }
-    if (selectedItem.value.includes("2_fuel_LEVEL")) {
-      itemsData.fuel_LEVEL_2 = await fetchData(
-        "NO2ENGINEPANEL",
-        "NO2ENGINE_PANEL_65276"
-      );
-    }
+  selectedItem.value.includes("latitude") ||
+  selectedItem.value.includes("longitude") ||
+  selectedItem.value.includes("altitude")
+) {
+  const fetchedData = await fetchData("DGPS", "GGA");
+  itemsData.gga = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("speedovergroundknots") ||
+  selectedItem.value.includes("courseovergrounddegreestrue")
+) {
+  const fetchedData = await fetchData("DGPS", "VTG");
+  itemsData.vtg = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("heading")) {
+  const fetchedData = await fetchData("GYRO", "HDT");
+  itemsData.hdt = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("rateofturn")) {
+  const fetchedData = await fetchData("GYRO", "ROT");
+  itemsData.rot = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("anemometerangle") ||
+  selectedItem.value.includes("anemometerspeed")
+) {
+  const fetchedData = await fetchData("ANEMOMETER", "MWV");
+  itemsData.mwv = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("speedn")) {
+  const fetchedData = await fetchData("SPEEDLOG", "VHW");
+  itemsData.vhw = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("starboardruddersensor") ||
+  selectedItem.value.includes("portruddersensor")
+) {
+  const fetchedData = await fetchData("AUTOPILOT", "RSA");
+  itemsData.rsa = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("1_Engine Speed")) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_61444");
+  itemsData.engine_SPEED = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("1_Engine Oil Temperature")) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_65262");
+  itemsData.engine_OIL_TEMPERATURE1 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("1_Engine Oil Pressure") ||
+  selectedItem.value.includes("1_Engine Coolant Level")
+) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_65263");
+  itemsData.engine_OIL_PRESSURE = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("1_Transmission Oil Pressure")) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_65272");
+  itemsData.transmission_OIL_PRESSURE = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("1_Charging System Potential") ||
+  selectedItem.value.includes("1_Battery Potential")
+) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_65271");
+  itemsData.charging_SYSTEM_POTENTIAL = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("1_Engine total hours")) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_65253");
+  itemsData.engine_TOTAL_HOURS = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("1_Engine Intake Manifold Pressure") ||
+  selectedItem.value.includes("1_Engine Intake Manifold Temp") ||
+  selectedItem.value.includes("1_Engine Exhaust Gas Temperature")
+) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_65270");
+  itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("1_fuel_LEVEL")) {
+  const fetchedData = await fetchData("NO1ENGINEPANEL", "NO1ENGINE_PANEL_65276");
+  itemsData.fuel_LEVEL_1 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("2_Engine Speed")) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_61444");
+  itemsData.engine_SPEED2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("2_Engine Oil Temperature")) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_65262");
+  itemsData.engine_OIL_TEMPERATURE2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("2_Engine Oil Pressure") ||
+  selectedItem.value.includes("2_Engine Coolant Level")
+) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_65263");
+  itemsData.engine_OIL_PRESSURE2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("2_Transmission Oil Pressure")) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_65272");
+  itemsData.transmission_OIL_PRESSURE2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("2_Charging System Potential") ||
+  selectedItem.value.includes("2_Battery Potential")
+) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_65271");
+  itemsData.charging_SYSTEM_POTENTIAL2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("2_Engine total hours")) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_65253");
+  itemsData.engine_TOTAL_HOURS2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (
+  selectedItem.value.includes("2_Engine Intake Manifold Pressure") ||
+  selectedItem.value.includes("2_Engine Intake Manifold Temp") ||
+  selectedItem.value.includes("2_Engine Exhaust Gas Temperature")
+) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_65270");
+  itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
+if (selectedItem.value.includes("2_fuel_LEVEL")) {
+  const fetchedData = await fetchData("NO2ENGINEPANEL", "NO2ENGINE_PANEL_65276");
+  itemsData.fuel_LEVEL_2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+}
     console.log("구간 2");
+    console.log(itemsData.gga);
+
     selectedItem.value.forEach((item) => {
+      console.log(item);
       switch (item) {
         case "latitude":
           processData(
@@ -1443,8 +1447,8 @@ const searchData = async () => {
       analysis.value[n].error = standardError.value.toFixed(4);
       // console.log(`Variance: ${variance.value}`); // 분산
       analysis.value[n].variance = variance.value.toFixed(4);
-     }
-     console.log("구간 n");
+    }
+    console.log("구간 n");
   } catch (error) {
     console.error(error);
   } finally {
@@ -1454,9 +1458,7 @@ const searchData = async () => {
   updateDate();
   clearChart();
   option.value.series = [];
-  console.log("구간 n1");
   updateSeries();
-  console.log("구간 n2");
   chart.value.setOption(updateSeries);
   n = 0;
   analysis.value.forEach((item, index) => {
@@ -1467,6 +1469,36 @@ const searchData = async () => {
 const clearChart = () => {
   option.value.series = [];
   chart.value.setOption(option.value, true); // true를 통해 기존 옵션을 덮어쓰고 초기화
+};
+
+const captureImage = async () => {
+  const graphSheet = document.getElementById("graph");
+  if (graphSheet) {
+    try {
+      const canvas = await html2canvas(graphSheet);
+      const imageData = canvas.toDataURL("image/png");
+
+      // 데이터 URI를 Blob으로 변환
+      const blobData = await fetch(imageData).then((res) => res.blob());
+
+      // Blob을 URL로 변환
+      const blobUrl = URL.createObjectURL(blobData);
+
+      // 다운로드 링크 생성
+      const downloadLink = document.createElement("a");
+      downloadLink.href = blobUrl;
+      downloadLink.download = `${analysis.value[0].name}_image.png`; // 파일명 지정
+
+      // 링크 클릭 및 다운로드
+      downloadLink.click();
+
+      // URL 객체 해제
+      URL.revokeObjectURL(blobUrl);
+
+    } catch (error) {
+      console.error("Error capturing image:", error);
+    }
+  }
 };
 </script>
 

@@ -39,7 +39,7 @@ const option = ref({
     text: props.name,
     left: "center",
     textStyle: {
-      fontSize: 14,
+      fontSize: 10,
       color: textColor.value,
     },
   },
@@ -47,10 +47,11 @@ const option = ref({
     {
       max: 50,
       min: -50,
-      center: ["50%", "45%"],
+      radius: "90%",
+      center: ["50%", "60%"],
       axisLine: {
         lineStyle: {
-          width: 12,
+          width: 6,
           color: [
             [0.5, "#20d25a"],
             [1, "#ed060d"],
@@ -61,11 +62,11 @@ const option = ref({
         itemStyle: {
           color: "auto",
         },
-        width: 5,
-        length: "60%",
+        width: 3,
+        length: "50%",
       },
       axisTick: {
-        distance: -12,
+        distance: -8,
         length: 5,
         lineStyle: {
           color: "#fff",
@@ -83,8 +84,8 @@ const option = ref({
       },
       axisLabel: {
         color: "inherit",
-        distance: 20,
-        fontSize: 10,
+        distance: 12,
+        fontSize: 8,
         formatter: function (value) {
           if (value === -50) {
             return "PORT";
@@ -105,7 +106,7 @@ const option = ref({
           return isNullValue.value ? "NaN" : value;
         },
         color: "inherit",
-        fontSize: 14,
+        fontSize: 10,
       },
       data: [
         {
@@ -142,8 +143,8 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  height: 40vh;
   padding: 0px;
+  padding-top: 8px;
 }
 body {
   margin: 0;

@@ -50,7 +50,7 @@ const option = ref({
       startAngle: 90,
       endAngle: 450,
       center: ["50%", "50%"],
-      radius: "75%",
+      radius: "73%",
       splitNumber: 8,
       min: 0,
       max: 360,
@@ -110,7 +110,7 @@ const option = ref({
         },
       },
       detail: {
-        fontSize: 10,
+        fontSize: 12,
         // formatter: function () {
         //   return `${windspeed.value} m/s`;
         // },
@@ -155,7 +155,8 @@ onMounted(() => {
 
 <style scoped>
 .chart {
-  padding: 7px;
+  padding: 0px;
+  padding-top: 8px;
 }
 body {
   margin: 0;

@@ -7,7 +7,7 @@
       icon="mdi-magnify"
       color="primary"
       fab
-      @click="searchCardVisible = true"
+      @click="(searchCardVisible = true), (metadataCardVisible = false)"
       style="position: absolute; bottom: 16px; right: 16px; z-index: 1000"
     ></v-btn>
 
@@ -385,12 +385,16 @@ const searchMapdata = async () => {
     if (selectedtrialrun.value) {
       testAis.value = [];
       aisData.value = {};
-
-      const waypoint = await readWaypoint(
-        tokenid.value,
-        selectedtrialrun.value
-      );
-      const ais = await readAis(tokenid.value, selectedtrialrun.value);
+      let waypoint = [];
+      let ais = [];
+      try {
+        waypoint = await readWaypoint(tokenid.value, selectedtrialrun.value);
+        ais = await readAis(tokenid.value, selectedtrialrun.value);
+      } catch (error) {
+        alert("선택한 항차의 항적 정보가 없습니다.");
+        console.error("error:", error);
+        return; // 에러 발생 시 함수 종료
+      }
 
       console.log(ais);
       maxValue.value = ais.length;
@@ -489,8 +493,6 @@ const fetchData = async () => {
 
 fetchData();
 
-let shipMarker = null;
-
 // 슬라이더 값이 변경될 때 호출되는 함수
 const onSliderChange = (newVal) => {
   const index = Math.floor(newVal);
@@ -500,15 +502,54 @@ const onSliderChange = (newVal) => {
   aisMapping(index);
 };
 
+let shipMarker = null;
+let lastValidAngle = 0; // 마지막 유효한 각도 저장
+
+const getDirection = (degreeLati, degreeLongi) => {
+  const angle = Math.atan2(degreeLongi, degreeLati) * (180 / Math.PI); // 동쪽 기준 0도
+  return ((angle + 90 + 360) % 360); // 0-360도 범위로 변환
+};
 const aisMapping = (index) => {
   const latlng = [
     parseFloat(testAis.value[index].latitude),
     parseFloat(testAis.value[index].longitude),
   ];
 
+  // console.log(`\n index(n) : ${index}, lati(n) : ${testAis.value[index].latitude}, longi(n) : ${testAis.value[index].longitude} \n
+  // index(n) : ${index+1}, lati(n+1) : ${testAis.value[index+1].latitude}, longi(n+1) : ${testAis.value[index+1].longitude}`);
+
+  const degreeLati =
+    testAis.value[index + 1].latitude - testAis.value[index].latitude;
+  const degreeLongi =
+    testAis.value[index + 1].longitude - testAis.value[index].longitude;
+
+  let angle = lastValidAngle; // 기본값은 마지막 유효한 각도
+
+  if (degreeLati !== 0 || degreeLongi !== 0) {
+    // 좌표 변화가 있을 경우에만 방향 업데이트
+    angle = getDirection(degreeLati, degreeLongi);
+    lastValidAngle = angle; // 마지막 유효한 각도 업데이트
+  }
+
+  console.log(`배의 방향: ${angle} degrees`);
+
+  const iconUrl = "/image/shipicon.png";
+  const iconSize = [48, 48];
+  const iconAnchor = [16, 16];
+  const popupAnchor = [0, -18];
+
+  const shipIcon = new L.DivIcon({
+    html: `<div style="transform: rotate(${angle}deg); width: ${iconSize[0]}px; height: ${iconSize[1]}px; background: url(${iconUrl}) no-repeat center center; background-size: contain;"></div>`,
+    iconSize: iconSize,
+    iconAnchor: iconAnchor,
+    popupAnchor: popupAnchor,
+    className: "", // 기본 클래스를 비우면 기본 스타일이 적용되지 않습니다.
+  });
+
   // shipMarker가 이미 존재하면 위치를 업데이트하고, 그렇지 않으면 새로운 마커를 생성합니다.
   if (shipMarker) {
     shipMarker.setLatLng(latlng);
+    shipMarker.setIcon(shipIcon);
   } else {
     shipMarker = L.marker(latlng, { icon: shipIcon }).addTo(map);
   }
@@ -564,7 +605,7 @@ const aisMapping = (index) => {
   }
 
   //metadata view
-  metadata.value.test = testAis.value[index].test;
+  metadata.value.test = testAis.value[index].testName;
   metadata.value.mode =
     testAis.value[index].modeType === "1"
       ? "Menual"

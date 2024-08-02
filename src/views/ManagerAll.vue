@@ -22,7 +22,7 @@
       <v-tab :value="1">시험 설정</v-tab>
       <v-tab :value="2">사용자 설정</v-tab>
       <v-tab :value="3">로그 관리</v-tab>
-      <v-tab :value="4">사용자 별 권한 관리</v-tab>
+      <!-- <v-tab :value="4">사용자 별 권한 관리</v-tab> -->
     </v-tabs>
     <v-window
       v-model="tab"
@@ -53,12 +53,11 @@
                 <!-- <SettingAll/> -->
               </div>
             </div>
-            <div v-if="tab === 4">
+            <!-- <div v-if="tab === 4">
               <div>
                 <UserPermission />
-                <!-- <SettingAll/> -->
               </div>
-            </div>
+            </div> -->
           </v-card-item>
         </v-card>
       </v-window-item>

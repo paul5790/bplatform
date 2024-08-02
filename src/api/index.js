@@ -234,10 +234,10 @@ export const deleteUserData = async (tokenid, data) => {
 };
 
 // 웹 로그 가져오기
-export const readWebLogData = async (tokenid) => {
+export const readWebLogData = async (tokenid, filter) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/log/webapp`,
+      `http://${apiLocation}/api/v1/log/${filter}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -481,7 +481,7 @@ export const readDataTrial = async (tokenid, data) => {
 export const downloadDataFile = async (tokenid, data) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/information/${data}`,
+      `http://${apiLocation}/api/v1/${data}`,
       {
         responseType: "blob",
         headers: {

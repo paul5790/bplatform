@@ -291,7 +291,7 @@ const getTrialDate = async () => {
       setStartTime.value.push(`${response[i].startTimeUtc}`);
       setEndTime.value.push(`${response[i].endTimeUtc}`);
       selectedtrialNum.value = i + 1;
-      trialrun.value.push(`시험 ${i + 1}번`);
+      trialrun.value.push(`${i + 1}`);
     }
   } catch (error) {
     console.error(error);
@@ -1051,37 +1051,6 @@ const captureImage = async () => {
       console.error("Error capturing image:", error);
     }
   }
-
-  // const graphSheet = document.getElementById("graph");
-  // if (graphSheet) {
-  //   try {
-  //     // HTML2Canvas로 캡쳐할 요소 복제
-  //     const cloneGraphSheet = graphSheet.cloneNode(true);
-      
-  //     // 로고 이미지 추가
-  //     const logoImage = document.createElement("img");
-  //     logoImage.src = "/image/kriso_kren.png";
-  //     logoImage.style.position = "absolute";
-  //     logoImage.style.bottom = "10px";
-  //     logoImage.style.right = "10px";
-  //     cloneGraphSheet.appendChild(logoImage);
-
-  //     // HTML2Canvas로 캡쳐
-  //     const canvas = await html2canvas(cloneGraphSheet);
-
-  //     // 캡쳐 이미지 다운로드
-  //     const imageData = canvas.toDataURL("image/png");
-  //     const blobData = await fetch(imageData).then((res) => res.blob());
-  //     const blobUrl = URL.createObjectURL(blobData);
-  //     const downloadLink = document.createElement("a");
-  //     downloadLink.href = blobUrl;
-  //     downloadLink.download = `${analysis.value[0].name}_image.png`;
-  //     downloadLink.click();
-  //     URL.revokeObjectURL(blobUrl);
-  //   } catch (error) {
-  //     console.error("Error capturing image:", error);
-  //   }
-  // }
 };
 </script>
 
