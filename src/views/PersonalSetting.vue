@@ -58,7 +58,7 @@
           </v-list-item-subtitle>
         </v-list-item>
 
-        <v-list-item @click="realtimeStandardDialog = true">
+        <v-list-item @click="realtimeStandardDialog = true, getMinMax();">
           <v-list-item-title>실시간 데이터 기준 설정</v-list-item-title>
 
           <v-list-item-subtitle>
@@ -1582,7 +1582,7 @@
             <v-btn
               color="blue-darken-1"
               variant="text"
-              @click="axiosrealtime()"
+              @click="axiosMinMax()"
               v-show="!rsShow"
               >설정</v-btn
             >
@@ -1604,12 +1604,12 @@
                   >
                     <v-col cols="4">
                       <v-list-subheader class="compact-label"
-                        >{{ item.label }} :
+                        >{{ item.signalName }} :
                       </v-list-subheader>
                     </v-col>
                     <v-col cols="3">
                       <v-text-field
-                        v-model="item.min"
+                        v-model="item.minValue"
                         label="min"
                         :rules="[standardRules.required]"
                         variant="underlined"
@@ -1624,7 +1624,7 @@
                     >
                     <v-col cols="3">
                       <v-text-field
-                        v-model="item.max"
+                        v-model="item.maxValue"
                         label="max"
                         :rules="[standardRules.required]"
                         variant="underlined"
@@ -1648,7 +1648,7 @@
                 <v-btn
                   color="blue-darken-1"
                   variant="text"
-                  @click="axiosrealtime()"
+                  @click="axiosMinMax()"
                   v-show="rsShow"
                   >설정</v-btn
                 >
@@ -1672,6 +1672,8 @@ import {
   updateLossTimeData,
   readPwData,
   resetPwData,
+  readRealtimeMinMax,
+  updateRealtimeMinMax,
 } from "../api/index.js";
 
 const themeMode = ref(localStorage.getItem("themeMode") || "light");
@@ -1716,7 +1718,7 @@ const resetPasswordDialog = ref(false);
 const losstimeDialog = ref(false);
 const ALLlosstimeDialog = ref(false); // 소실주기 전체
 const realtimeCycleDialog = ref(false);
-const realtimeStandardDialog = ref(true);
+const realtimeStandardDialog = ref(false);
 
 // 데이터 소실주기 설정
 const losstime = ref();
@@ -2205,15 +2207,39 @@ const standardRules = {
 };
 
 const standardItems = ref([
-  { label: "Rudder Value", min: "-50", max: "50" },
-  { label: "Ship Speed", min: "0", max: "15" },
-  { label: "Wind Speed", min: "0", max: "40" },
-  { label: "Engine Speed", min: "0", max: "1000" },
-  { label: "Oil Pressure", min: "0", max: "10" },
-  { label: "Oil Temp", min: "0", max: "200" },
-  { label: "Trans Pressure", min: "0", max: "40" },
-  { label: "Gas Temp", min: "0", max: "900" },
+  { signalName: "Rudder Value", minValue: "-", maxValue: "-" },
+  { signalName: "Ship Speed", minValue: "-", maxValue: "-" },
+  { signalName: "Wind Speed", minValue: "-", maxValue: "-" },
+  { signalName: "Engine Speed", minValue: "-", maxValue: "-" },
+  { signalName: "Oil Pressure", minValue: "-", maxValue: "-" },
+  { signalName: "Oil Temp", minValue: "-", maxValue: "-"  },
+  { signalName: "Trans Pressure", minValue: "-", maxValue: "-" },
+  { signalName: "Gas Temp", minValue: "-", maxValue: "-"  },
 ]);
+
+const getMinMax = async () => {
+  const response = await readRealtimeMinMax(tokenid.value);
+
+    // 표준 항목을 response의 데이터로 업데이트
+  standardItems.value = response.map(item => {
+    return {
+      signalName: item.signalName,
+      minValue: item.minValue,
+      maxValue: item.maxValue
+    };
+  });
+
+}
+
+const axiosMinMax = async () => {
+  console.log(standardItems.value);
+  const response = await updateRealtimeMinMax(tokenid.value, standardItems.value);
+  alert(response);
+  location.reload();
+}
+
+
+
 </script>
 
 <style scoped>

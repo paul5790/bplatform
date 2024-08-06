@@ -93,6 +93,7 @@
                 range
                 :enableTimePicker="false"
                 style="padding-top: 5px"
+                @open="adjustDialogHeight()"
               />
             </v-col>
           </v-row>
@@ -147,7 +148,9 @@
         <div v-show="rsShow">
           <v-divider></v-divider>
 
-          <v-card-text style="padding: 40px; padding-bottom: 0px; padding-top: 10px">
+          <v-card-text
+            style="padding: 40px; padding-bottom: 0px; padding-top: 10px"
+          >
             <v-container>
               <v-row v-if="filter_logtype === 'webapp'">
                 <v-col cols="12"
@@ -263,7 +266,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watchEffect, watch, onMounted } from "vue";
+import { computed, ref, watchEffect, watch, onMounted, nextTick } from "vue";
 import { readWebLogData, readAppLogData } from "../../api/index.js";
 import moment from "moment";
 import dayjs from "dayjs";
@@ -275,7 +278,7 @@ const search = ref("");
 const searchInput = ref("");
 
 // ----------------------------- 조회 조건 검색 다이어로그 ----------------------------- //
-const showText = ref("3일 · 웹 서버 · 전체")
+const showText = ref("3일 · 웹 서버 · 전체");
 const searchFilterDialog = ref(false);
 const rsShow = ref(false);
 
@@ -336,24 +339,47 @@ const filterCancle = () => {
 };
 
 const filterApply = () => {
-
-  if ((filter_method.value === "all" && filter_logtype.value === "webapp")|| (filter_type.value === "all" && filter_logtype.value === "winapp")){
+  if (
+    (filter_method.value === "all" && filter_logtype.value === "webapp") ||
+    (filter_type.value === "all" && filter_logtype.value === "winapp")
+  ) {
     search_method.value = "";
-    text_method.value = "전체"
+    text_method.value = "전체";
     console.log("1");
-  } else if (filter_method.value != "all" && filter_logtype.value === "webapp"){
-    search_method.value = `&request_method=${filter_method.value}`
-    text_method.value = filter_method.value
+  } else if (
+    filter_method.value != "all" &&
+    filter_logtype.value === "webapp"
+  ) {
+    search_method.value = `&request_method=${filter_method.value}`;
+    text_method.value = filter_method.value;
     console.log("2");
-  } else if (filter_type.value != "all" && filter_logtype.value === "winapp"){
-    search_method.value = `&type=${filter_type.value}`
-    text_method.value = filter_type.value
+  } else if (filter_type.value != "all" && filter_logtype.value === "winapp") {
+    search_method.value = `&type=${filter_type.value}`;
+    text_method.value = filter_type.value;
     console.log("3");
   } else {
     console.log("망함 ㅋㅋ");
   }
 
   console.log(search_method.value);
+
+  if (filter_logtype.value === "webapp") {
+    headers.value = [
+      { title: "timestamp", key: "timestamp" },
+      { title: "type", key: "type" },
+      { title: "method", key: "method" },
+      { title: "state", key: "state" },
+      { title: "url", key: "url" },
+      { title: "log", key: "log" },
+    ];
+  } else {
+    headers.value = [
+      { title: "timestamp", key: "timestamp" },
+      { title: "type", key: "type" },
+      { title: "details", key: "details" },
+      { title: "log", key: "log" },
+    ];
+  }
 
   webData();
   search.value = searchInput.value;
@@ -365,7 +391,6 @@ const filterApply = () => {
 
 const selectionLog = ref(["Web Dashboard Log", "Window App Log"]);
 const selectedLog = ref(selectionLog.value[0]);
-
 
 const pageCount = computed(() => {
   return Math.ceil(filteredItems.value.length / itemsPerPage.value);
@@ -384,17 +409,27 @@ const filteredItems = computed(() => {
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
-
 const items = ref([]);
+
+const headers = ref([
+  { title: "timestamp", key: "timestamp" },
+  { title: "type", key: "type" },
+  { title: "method", key: "method" },
+  { title: "state", key: "state" },
+  { title: "url", key: "url" },
+  { title: "log", key: "log" },
+]);
+
 const webData = async () => {
   items.value = [];
   let apiReq = `${filter_logtype.value}?start_time=${startTime.value}&end_time=${endTime.value}${search_method.value}`;
-  console.log(apiReq);
   try {
     const response = await readWebLogData(tokenid.value, apiReq);
+    console.log(response);
     for (let i = 0; i < response.length; i++) {
       items.value.push({
         timestamp: response[i].timeStamp || "",
+        details: response[i].details || "",
         // id: response[i].userId || "",
         type: response[i].type || "",
         method: response[i].requestMethod || "",
@@ -413,6 +448,45 @@ const webData = async () => {
     console.error(error);
   }
 };
+
+const dialogHeight = ref("auto");
+const isDatePickerOpen = ref(false);
+const dialogStyle = ref({});
+
+const adjustDialogHeight = () => {
+  alert("열림!");
+  dialogStyle.value = { height: "500px" };
+};
+
+// const resetDialogHeight = () => {
+//   alert("닫힘!");
+// };
+
+// watch(isDatePickerOpen, async (newValue, oldValue) => {
+//   if (newValue === true) {
+//     await nextTick(); // 다음 DOM 업데이트 후 실행
+//     isDatePickerOpen.value = true;
+//   } else {
+//     isDatePickerOpen.value = false;
+//   }
+// });
+
+watch(filter_date, async (newValue, oldValue) => {
+  if (newValue === "직접입력") {
+    isDatePickerOpen.value = true;
+    alert("1");
+  } else {
+    isDatePickerOpen.value = false;
+    alert("2");
+  }
+});
+
+// watch(isDatePickerOpen, async (newValue) => {
+//   if (!newValue) {
+//     await nextTick(); // 다음 DOM 업데이트 후 실행
+//     resetDialogHeight();
+//   }
+// });
 
 onMounted(() => {
   // 컴포넌트가 마운트될 때 실행되는 코드

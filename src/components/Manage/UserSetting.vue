@@ -96,72 +96,74 @@
                     </v-row>
                   </v-container>
 
-                  <v-col cols="12"
-                    ><p style="font-size: 13px">권한 설정</p></v-col
-                  >
-                  <v-card
-                    style="
-                      flex: 1;
-                      margin-right: 15px;
-                      margin-left: 15px;
-                      display: flex;
-                      flex-direction: column;
-                    "
-                  >
-                    <v-card-item style="padding-top: 10px">
-                      <v-window>
-                        <table>
-                          <thead>
-                            <tr>
-                              <th>신호명(SubComponents)</th>
-                              <th>download</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr style="background-color: #f6f2f2">
-                              <td>ALL</td>
-                              <td>
-                                <input
-                                  type="checkbox"
-                                  v-model="allDownload"
-                                  @change="toggleAll('download')"
-                                />
-                              </td>
-                            </tr>
-                            <tr
-                              v-for="(item, index) in permissionFrame"
-                              :key="index"
-                            >
-                              <td>{{ item.name }}</td>
-                              <td>
-                                <input
-                                  type="checkbox"
-                                  v-model="item.download"
-                                />
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                        <p style="font-size: 13px; margin-top: 10px">
-                          접근제어 가능 기간 설정
-                        </p>
-                        <VueDatePicker
-                          time-picker-inline
-                          :min-date="new Date()"
-                          :class="
-                            themeMode === 'dark'
-                              ? 'dp__theme_dark'
-                              : 'dp__theme_light'
-                          "
-                          style="--dp-input-padding: 8px"
-                          v-model="datePermission"
-                          density="compact"
-                          :dark="themeMode === 'dark'"
-                          :readonly="date_readonly"
-                        />
-                      </v-window>
-                    </v-card-item>
-                  </v-card>
+                  <v-container v-if="permissionView">
+                    <v-col cols="12"
+                      ><p style="font-size: 13px">권한 설정</p></v-col
+                    >
+                    <v-card
+                      style="
+                        flex: 1;
+                        margin-right: 15px;
+                        margin-left: 15px;
+                        display: flex;
+                        flex-direction: column;
+                      "
+                    >
+                      <v-card-item style="padding-top: 10px">
+                        <v-window>
+                          <table>
+                            <thead>
+                              <tr>
+                                <th>신호명(SubComponents)</th>
+                                <th>download</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr style="background-color: #f6f2f2">
+                                <td>ALL</td>
+                                <td>
+                                  <input
+                                    type="checkbox"
+                                    v-model="allDownload"
+                                    @change="toggleAll('download')"
+                                  />
+                                </td>
+                              </tr>
+                              <tr
+                                v-for="(item, index) in permissionFrame"
+                                :key="index"
+                              >
+                                <td>{{ item.name }}</td>
+                                <td>
+                                  <input
+                                    type="checkbox"
+                                    v-model="item.download"
+                                  />
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
+                          <p style="font-size: 13px; margin-top: 10px">
+                            접근제어 가능 기간 설정
+                          </p>
+                          <VueDatePicker
+                            time-picker-inline
+                            :min-date="new Date()"
+                            :class="
+                              themeMode === 'dark'
+                                ? 'dp__theme_dark'
+                                : 'dp__theme_light'
+                            "
+                            style="--dp-input-padding: 8px"
+                            v-model="datePermission"
+                            density="compact"
+                            :dark="themeMode === 'dark'"
+                            :readonly="date_readonly"
+                          />
+                        </v-window>
+                      </v-card-item>
+                    </v-card>
+                  </v-container>
                 </v-card-text>
                 <v-card-actions>
                   <v-btn
@@ -354,6 +356,7 @@ const toggleAll = (type) => {
 };
 
 const datePermission = ref();
+const permissionView = ref(false);
 
 // ---------------------------------------------
 
@@ -417,15 +420,26 @@ const check = () => {
       console.log("No user selected");
     } else {
       // permission 적용
-      resetPermissions();
-      selectedItems.value[0].permission.forEach((permissionName) => {
-        const perm = permissionFrame.value.find(
-          (p) => p.name === permissionName
-        );
-        if (perm) {
-          perm.download = true;
-        }
-      });
+
+      console.log("--");
+      console.log(selectedItems.value[0].userGroup);
+      console.log("--");
+
+      if (selectedItems.value[0].userGroup === "ADMIN") {
+        permissionView.value = false;
+      } else {
+        permissionView.value = true;
+        resetPermissions();
+        selectedItems.value[0].permission.forEach((permissionName) => {
+          const perm = permissionFrame.value.find(
+            (p) => p.name === permissionName
+          );
+          if (perm) {
+            perm.download = true;
+          }
+        });
+      }
+
       dialog.value = true;
     }
   } else {

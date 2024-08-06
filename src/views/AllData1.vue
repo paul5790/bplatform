@@ -17,7 +17,7 @@
       <v-card-text style="padding-bottom: 0px">
         <div style="display: flex; gap: 16px">
           <v-text-field
-            v-model="textboxs.tb1"
+            v-model="tb1"
             density="compact"
             append-inner-icon="mdi-roman-numeral-3"
             label="ShipData"
@@ -33,7 +33,7 @@
             class="custom-text-field"
           ></v-text-field>
           <v-text-field
-            v-model="textboxs.tb2"
+            v-model="tb2"
             body-1
             density="compact"
             append-inner-icon="mdi-roman-numeral-1"
@@ -47,12 +47,12 @@
                 (periodSettingCardVisible = false)
             "
             class="custom-text-field"
-          ><v-tooltip
-        activator="parent"
-        location="bottom"
-      >{{ formattedSearchTarget  }}</v-tooltip></v-text-field>
+            ><v-tooltip activator="parent" location="bottom">{{
+              formattedSearchTarget
+            }}</v-tooltip></v-text-field
+          >
           <v-text-field
-            v-model="textboxs.tb3"
+            v-model="tb3"
             density="compact"
             append-inner-icon="mdi-roman-numeral-2"
             label="Sub Component"
@@ -69,7 +69,7 @@
           >
           </v-text-field>
           <v-text-field
-            v-model="textboxs.tb4"
+            v-model="tb4"
             density="compact"
             append-inner-icon="mdi-calendar-range"
             label="Data Scope"
@@ -517,30 +517,30 @@
               </template>
             </v-tab-item>
           </v-tabs-items>
-          <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-select
-          v-model="selectDownloadFormat"
-          :items="downloadFormats"
-          density="compact"
-          label="format"
-          style="max-width: 150px; margin-top: 20px"
-          variant="solo"
-        ></v-select>
-        <v-btn
-          :loading="downloadBtnLoading"
-          :color="btnTextColor"
-          :style="{
-            'background-color': btnColor,
-            'margin-top': '0px',
-            'margin-left': '20px',
-            width: '200px',
-          }"
-          @click="dataDownloadServer()"
-          :disabled="downloadBtnDisabled"
-          >데이터 다운로드</v-btn
-        >
-      </v-card-actions>
+          <v-card-actions v-if="downloadPermission">
+            <v-spacer></v-spacer>
+            <v-select
+              v-model="selectDownloadFormat"
+              :items="downloadFormats"
+              density="compact"
+              label="format"
+              style="max-width: 150px; margin-top: 20px"
+              variant="solo"
+            ></v-select>
+            <v-btn
+              :loading="downloadBtnLoading"
+              :color="btnTextColor"
+              :style="{
+                'background-color': btnColor,
+                'margin-top': '0px',
+                'margin-left': '20px',
+                width: '200px',
+              }"
+              @click="dataDownloadServer()"
+              :disabled="downloadBtnDisabled"
+              >데이터 다운로드</v-btn
+            >
+          </v-card-actions>
         </v-container>
 
         <!-- 데이터 원문 -->
@@ -611,6 +611,30 @@
               </template>
             </v-tab-item>
           </v-tabs-items>
+          <v-card-actions v-if="downloadPermission">
+            <v-spacer></v-spacer>
+            <v-select
+              v-model="selectDownloadFormat"
+              :items="downloadFormats"
+              density="compact"
+              label="format"
+              style="max-width: 150px; margin-top: 20px"
+              variant="solo"
+            ></v-select>
+            <v-btn
+              :loading="downloadBtnLoading"
+              :color="btnTextColor"
+              :style="{
+                'background-color': btnColor,
+                'margin-top': '0px',
+                'margin-left': '20px',
+                width: '200px',
+              }"
+              @click="dataDownloadServer()"
+              :disabled="downloadBtnDisabled"
+              >데이터 다운로드</v-btn
+            >
+          </v-card-actions>
         </v-container>
       </template>
       <template v-if="viewState == 'loading'">
@@ -631,7 +655,12 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
-import { readTrialData, readDataTrial } from "../api/index.js";
+import {
+  readTrialData,
+  readDataTrial,
+  downloadDataFile,
+  readMineData,
+} from "../api/index.js";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 import "@/styles/datepicker-theme.css";
 
@@ -658,12 +687,10 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // text field
-const textboxs = ref({
-  tb1: "",
-  tb2: "",
-  tb3: "",
-  tb4: "",
-});
+let tb1 = '';
+let tb2 = '';
+let tb3 = '';
+let tb4 = '';
 
 // for View API Request variable
 const requests = ref({
@@ -681,7 +708,7 @@ const downloadReq = ref({
   file_type: "",
   period: "",
   signal: "",
-})
+});
 
 // ---------------- Main Component Card View -------------------------//
 const SelectedDataCardVisible = ref(false);
@@ -730,7 +757,7 @@ watch(ShipData, (newValue, oldValue) => {
   if (newValue !== oldValue) {
     recentSearches.value = [];
     searchTarget.value = [];
-    textboxs.value.tb2 = "";
+    tb2 = "";
     selectedItems.value = [];
     selectedCategory.value = null;
     selectedDestination.value = null;
@@ -1098,7 +1125,7 @@ const handleDateChange = () => {
 const showType = ref("none");
 const completeData0 = () => {
   // 데이터 선택 박스 text 할당
-  textboxs.value.tb1 = ShipData.value;
+  tb1 = ShipData.value;
 
   // 검색 조건 할당
   requests.value.data =
@@ -1118,7 +1145,7 @@ const completeData0 = () => {
 
 const completeData1 = () => {
   // 데이터 선택 박스 text 할당
-  textboxs.value.tb2 = formattedSearchTarget;
+  tb2 = formattedSearchTarget;
 
   let signalParams = "";
 
@@ -1138,7 +1165,7 @@ const completeData1 = () => {
 
 const completeData1_1 = () => {
   // 데이터 선택 박스 text 할당
-  textboxs.value.tb2 = formattedSearchTarget;
+  tb2 = formattedSearchTarget;
 
   let signalParams = "";
 
@@ -1157,7 +1184,7 @@ const completeData1_1 = () => {
 
 const completeData2 = () => {
   // 데이터 선택 박스 text 할당
-  textboxs.value.tb3 = selectDataType.value;
+  tb3 = selectDataType.value;
 
   // 검색 조건 할당
   requests.value.type =
@@ -1172,17 +1199,11 @@ const completeData2 = () => {
 
 const completeData3 = () => {
   // 데이터 선택 박스 text 할당
-  textboxs.value.tb4 = searchTimeRange.value;
+  tb4 = searchTimeRange.value;
 
-  if (selectedTest.value === 0) {
-    // 직접 선택이라면
-    requests.value.period = `period?start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`;
-    downloadReq.value.period = `find_method=period&start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`;
-  } else {
-    // 시험 선택이라면
-    requests.value.period = `test?test_name=${searchTimeRange.value}`;
-    downloadReq.value.period = `find_method=test&test_name=${searchTimeRange.value}`
-  }
+  requests.value.period = selectedTest.value === 0 
+  ? `period?start_utctime=${startUtc.value}&end_utctime=${endUtc.value}` 
+  : `test?test_name=${searchTimeRange.value}`;
 
   // 다음 선택 시, 다음 조건 CardView로 이동
   periodSettingCardVisible.value = false;
@@ -1195,10 +1216,10 @@ const completeData3 = () => {
 ///////////////////////////////////////////////////////////
 const dataSearchBtn = async () => {
   if (
-    textboxs.value.tb1 &&
-    textboxs.value.tb2 &&
-    textboxs.value.tb3 &&
-    textboxs.value.tb4
+    tb1 &&
+    tb2 &&
+    tb3 &&
+    tb4
   ) {
     viewState.value = "loading";
     ShipDataState.value = ShipData.value;
@@ -1220,8 +1241,11 @@ const dataSearchBtn = async () => {
 
     downloadReq.value.type = requests.value.type;
     downloadReq.value.data = requests.value.data;
-    downloadReq.value.period = requests.value.period;
     downloadReq.value.signal = requests.value.signal;
+    downloadReq.value.period =
+      selectedTest.value === 0
+        ? `find_method=period&start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`
+        : `find_method=test&test_name=${searchTimeRange.value}`;
   }
 };
 
@@ -1413,29 +1437,65 @@ const getCardName = (item) => {
 };
 
 const formattedSearchTarget = computed(() => {
-  return searchTarget.value.join(', ');
+  return searchTarget.value.join(", ");
+});
+
+// ----------------------------- 다운로드 ----------------------------- //
+const downloadPermission = ref(false);
+
+onMounted(async() => {
+  const userDataResponse = await readMineData(tokenid.value);
+  console.log(userDataResponse);
+  if (userDataResponse.userGroup === "ADMIN"){
+    downloadPermission.value = true;
+  } else {
+    downloadPermission.value = false;
+  }
 });
 
 
 
 
-
-
-
-// 다운로드
 const downloadFormats = ref(["csv", "txt"]);
 const downloadFormatv = ref(["csv", "txt"]);
 const selectDownloadFormat = ref("csv");
 
+const dataDownloadServer = async () => {
+  downloadReq.value.file_type =
+    downloadReq.value.type === "table_data"
+      ? `download?file_type=${selectDownloadFormat.value}`
+      : "download?";
 
-const downloadData = async () => {
-    let apiReq = `table_data              /information            /download?file_type=txt   &find_method=test&test_number=3                                                                    &signal_name=ais_vdm&signal_name=ais_vdo`;
-    let apiRe2 = `table_data              /information            /download?file_type=csv   &find_method=period&start_utctime=2023-08-08T04:15:28.000Z&end_utctime=2023-08-08T08:45:38.000Z    &signal_name=ais_vdm&signal_name=ais_vdo`
-    apiReq = `${downloadReq.value.type}/${downloadReq.value.data}/${downloadReq.value.file_type}/${requests.value.period}${requests.value.signal} /download?file_type=${selectDownloadFormat.value}`;
-    console.log(apiReq);
-    await searchApi(apiReq);
-}
+  let apiReq = ``;
+  apiReq = `${downloadReq.value.type}/${downloadReq.value.data}/${downloadReq.value.file_type}&${downloadReq.value.period}${downloadReq.value.signal}`;
+  console.log(apiReq);
+  const loadData = await downloadDataFile(tokenid.value, apiReq);
 
+  const contentDispositionHeader = loadData.headers["content-disposition"];
+  const match = contentDispositionHeader.match(/filename=([^;]+)/);
+  const fileName = match ? match[1] : "downloaded-file";
+
+  console.log("1");
+  console.log(contentDispositionHeader);
+  console.log(match);
+  console.log("File name:", fileName);
+
+  const blob = new Blob([loadData.data]);
+  // Blob 객체를 다운로드할 수 있는 URL로 변환
+  const url = window.URL.createObjectURL(blob);
+
+  // <a> 태그를 생성하고 다운로드 링크 설정
+  const link = document.createElement("a");
+  link.href = url;
+  link.setAttribute("download", fileName); // 다운로드할 ZIP 파일의 이름 설정
+  document.body.appendChild(link);
+
+  // 다운로드 링크 클릭하여 파일 다운로드
+  link.click();
+
+  // 사용이 끝난 URL 객체 제거
+  window.URL.revokeObjectURL(url);
+};
 
 // for Download API Request variable
 // const downloadReq = ref({
@@ -1445,8 +1505,6 @@ const downloadData = async () => {
 //   period: "",
 //   signal: "",
 // })
-
-
 </script>
 
 <style scoped>

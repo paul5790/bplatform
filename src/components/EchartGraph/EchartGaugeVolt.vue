@@ -24,6 +24,7 @@ const props = defineProps({
   value: String,
   unit: String,
   max_value: Number,
+  min_value: Number,
   height: String,
 });
 
@@ -42,7 +43,7 @@ const option = ref({
     text: props.name,
     left: "center",
     textStyle: {
-      fontSize: 10, // 폰트 크기 설정
+      fontSize: 12, // 폰트 크기 설정
       color: textColor.value,
     },
   },
@@ -56,7 +57,7 @@ const option = ref({
       radius: "90%",
       center: ["50%", "60%"],
       splitNumber: 5,
-      min: 0,
+      min: props.min_value,
       max: props.max_value,
       axisLine: {
         lineStyle: {
@@ -79,6 +80,7 @@ const option = ref({
         show: false,
       },
       splitLine: {
+        distance: 5,
         length: 6,
         lineStyle: {
           width: 2,
@@ -92,7 +94,7 @@ const option = ref({
       detail: {
         valueAnimation: true,
         formatter: `{value} ${props.unit}`,
-        fontSize: 12,
+        fontSize: 13,
         textStyle: {
           color: textColor.value, // 텍스트 컬러 설정
         },
@@ -118,6 +120,14 @@ const updateValue = () => {
     }
   }
 };
+
+watch(
+  () => [props.min_value, props.max_value],
+  ([newMin, newMax]) => {
+    option.value.series[0].min = newMin;
+    option.value.series[0].max = newMax;
+  }
+);
 
 onMounted(() => {
   setInterval(updateValue, 1000);

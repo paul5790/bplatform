@@ -96,10 +96,13 @@
                       >{{ selectedcontentsItem }} contents</span
                     >
                   </v-card-title>
-                  <div ref="chartRef" class="chart" autoresize></div>
-                  <div>
-                    <p>Zoom Range: {{ zoomRange }}</p>
-                  </div>
+                  <v-chart
+                    ref="chart"
+                    class="chart"
+                    :option="option"
+                    autoresize
+                  />
+                  <p>Zoom Range: {{ zoomRange }}</p>
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -242,21 +245,14 @@
 </template>
 
 <script setup>
-import {
-  ref,
-  provide,
-  onMounted,
-  onBeforeUnmount,
-  watch,
-  watchEffect,
-} from "vue";
+import { ref, provide, onMounted, onBeforeUnmount, watch, watchEffect } from "vue";
 import { use } from "echarts/core";
 import { CanvasRenderer } from "echarts/renderers";
 import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 import { readTrialData, readDataTrial } from "../api/index.js";
-import * as echarts from "echarts";
+import * as echarts from 'echarts';
 import html2canvas from "html2canvas";
 import "@/styles/datepicker-theme.css";
 import {
@@ -485,239 +481,18 @@ const analysis = ref([
     median: "-",
   },
 ]);
-
 const unit = ref();
 
 // =============================== 차트 변수 ===========================================
 
 const chart = ref(null);
+const zoomRange = ref('');
 
-const chartRef = ref(null);
-const zoomRange = ref("");
-const timeRange = ref({
-  start: 0,
-  end: 0,
-});
-let myChart = null;
 
-const option = ref({
-  dataset: [
-    {
-      id: "dataset_raw",
-    },
-  ],
-  tooltip: {
-    trigger: "axis",
-  },
-  legend: {
-    data: selectedsubComponent.value,
-  },
-  toolbox: {
-    feature: {
-      saveAsImage: {},
-    },
-  },
-  grid: {
-    top: "13%", // top margin을 15%로 설정
-  },
-  xAxis: {
-    type: "category",
-    boundaryGap: false,
-    data: [],
-  },
-  yAxis: {
-    type: "value",
-  },
-  series: [
-    {
-      name: "Data",
-      type: "line",
-      data: [],
-    },
-  ],
-  dataZoom: [
-    {
-      type: "inside",
-      xAxisIndex: 0,
-      filterMode: "none",
-    },
-    {
-      type: "slider",
-      xAxisIndex: 0,
-      filterMode: "none",
-      height: "4%", // 높이를 20%로 설정
-      bottom: "1%", // 위치를 아래로 조정
-    },
-    {
-      type: "slider",
-      yAxisIndex: 0,
-      filterMode: "none",
-      width: "2%",
-    },
-    {
-      type: "inside",
-      yAxisIndex: 0,
-      filterMode: "none",
-    },
-  ],
-});
+
 
 const analysisData = ref([]);
-const analysisCal = ref([]);
 const analysisTime = ref([]);
-
-const initChart = () => {
-  const series = [];
-  analysisCal.value = [];
-  myChart = echarts.init(chartRef.value);
-
-  myChart.setOption(option.value);
-
-  // 모든 타임스탬프 수집
-  const allTimestamps = new Set();
-  selectedItem.value.forEach((component) => {
-    if (component in gData) {
-      gData[component].forEach((item) => {
-        const timestamp = Object.keys(item)[0];
-        allTimestamps.add(timestamp);
-      });
-    }
-  });
-
-  // 타임스탬프를 정렬
-  const sortedTimestamps = Array.from(allTimestamps).sort(
-    (a, b) => new Date(a) - new Date(b)
-  );
-
-  // const sortedTimestamps = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
-
-  // dataMap을 자동으로 생성
-  const dataMap = Object.keys(gData).reduce((map, key) => {
-    // 타임스탬프를 키로 사용한 맵 생성
-    map[key] = gData[key].reduce((subMap, item) => {
-      const timestamp = Object.keys(item)[0];
-      subMap[timestamp] = item[timestamp];
-      return subMap;
-    }, {});
-    return map;
-  }, {});
-
-  selectedItem.value.forEach((component) => {
-    if (component in dataMap) {
-      const seriesData = sortedTimestamps.map(
-        (timestamp) => dataMap[component][timestamp] || null
-      );
-
-      // console.log(seriesData);
-
-      analysisCal.value.push(seriesData);
-
-      series.push({
-        name: component,
-        type: "line",
-        data: seriesData,
-        connectNulls: true, // null 값을 선으로 연결
-        markPoint: {
-          data: [
-            { type: "max", name: "Max" },
-            { type: "min", name: "Min" },
-          ],
-        },
-      });
-    }
-  });
-
-  option.value.series = series;
-
-  option.value.legend = {
-    data: selectedItem.value,
-  };
-
-  option.value.xAxis = {
-    type: "category",
-    nameLocation: "middle",
-    boundaryGap: false,
-    data: sortedTimestamps, // x축 데이터를 타임스탬프로 설정
-    axisLabel: {
-      color: textColor.value, // 텍스트 색상을 흰색으로 설정
-      formatter: (value) => {
-        const date = new Date(value);
-        const formattedDate = `
-        ${date.getDate().toString().padStart(2, "0")} ${date
-          .getHours()
-          .toString()
-          .padStart(2, "0")}:${date
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
-        return formattedDate;
-      },
-    },
-  };
-
-  myChart.setOption(option.value); // 옵션 설정
-
-  // Add event listener for dataZoom
-  // myChart.on('dataZoom', (params) => {
-  //   const xAxis = option.value.xAxis.data;
-  //   const startIndex = Math.round(params.start / 100 * (xAxis.length - 1));
-  //   const endIndex = Math.round(params.end / 100 * (xAxis.length - 1));
-  //   zoomRange.value = `${xAxis[startIndex]} to ${xAxis[endIndex]}`;
-  // });
-
-  myChart.on("dataZoom", (params) => {
-    const xAxis = option.value.xAxis.data;
-
-    // 옵션 객체와 xAxis 값이 있는지 확인
-    if (!xAxis || xAxis.length === 0) {
-      console.error("xAxis 데이터가 없습니다.");
-      zoomRange.value = "No data";
-      return;
-    }
-
-    if (params.batch) {
-      // 스크롤 이벤트 처리
-      const startIndex = Math.round(
-        (params.batch[0].start / 100) * (xAxis.length - 1)
-      );
-      const endIndex = Math.round(
-        (params.batch[0].end / 100) * (xAxis.length - 1)
-      );
-
-      const startValue = xAxis[startIndex];
-      const endValue = xAxis[endIndex];
-
-      timeRange.value.start = startIndex;
-      timeRange.value.end = endIndex;
-
-      zoomRange.value = `${startValue} to ${endValue}`;
-    } else {
-      // 드래그 이벤트 처리
-      const startIndex = Math.round((params.start / 100) * (xAxis.length - 1));
-      const endIndex = Math.round((params.end / 100) * (xAxis.length - 1));
-
-      timeRange.value.start = startIndex;
-      timeRange.value.end = endIndex;
-
-      const startValue = xAxis[startIndex];
-      const endValue = xAxis[endIndex];
-
-      zoomRange.value = `${startValue} to ${endValue}`;
-    }
-  });
-};
-
-watch(timeRange.value, (newVal) => {
-  calculateData(newVal.start, newVal.end);
-});
-
-onMounted(() => {});
-
-onBeforeUnmount(() => {
-  if (myChart) {
-    myChart.dispose();
-  }
-});
 
 // 데이터 전체 담기
 const itemsData = {
@@ -786,163 +561,164 @@ const gData = {
   "2_fuel_LEVEL": [],
 };
 
-// const option = ref({
-//   dataset: [
-//     {
-//       id: "dataset_raw",
-//     },
-//   ],
-//   // tooltip: {
-//   //   formatter: "{a} <br/>{b} : {c} mb",
-//   // },
-//   tooltip: {
-//     trigger: "axis",
-//   },
-//   legend: {
-//     data: selectedsubComponent.value,
-//   },
-//   toolbox: {
-//     feature: {
-//       saveAsImage: {},
-//     },
-//   },
-//   grid: {
-//     top: "13%", // top margin을 15%로 설정
-//   },
-//   dataZoom: [
-//     {
-//       type: "slider",
-//       xAxisIndex: 0,
-//       filterMode: "none",
-//       height: "4%", // 높이를 20%로 설정
-//       bottom: "1%", // 위치를 아래로 조정
-//     },
-//     {
-//       type: "slider",
-//       yAxisIndex: 0,
-//       filterMode: "none",
-//       width: "2%",
-//     },
-//     {
-//       type: "inside",
-//       xAxisIndex: 0,
-//       filterMode: "none",
-//     },
-//     {
-//       type: "inside",
-//       yAxisIndex: 0,
-//       filterMode: "none",
-//     },
-//     // {
-//     //   show: true,
-//     //   realtime: true,
-//     //   start: 0,
-//     //   end: 100,
-//     //   xAxisIndex: [0, 1],
-//     //   height: "2%",
-//     // },
-//   ],
-//   xAxis: {
-//     type: "category",
-//     nameLocation: "middle",
-//     data: analysisTime.value, // x축 데이터를 times 배열로 설정
-//     axisLabel: {
-//       color: textColor.value, // 텍스트 색상을 흰색으로 설정
-//     },
-//   },
-//   yAxis: {},
-//   series: [],
-// });
+const option = ref({
+  dataset: [
+    {
+      id: "dataset_raw",
+    },
+  ],
+  // tooltip: {
+  //   formatter: "{a} <br/>{b} : {c} mb",
+  // },
+  tooltip: {
+    trigger: "axis",
+  },
+  legend: {
+    data: selectedsubComponent.value,
+  },
+  toolbox: {
+    feature: {
+      saveAsImage: {},
+    },
+  },
+  grid: {
+    top: "13%", // top margin을 15%로 설정
+  },
+  dataZoom: [
+    {
+      type: "slider",
+      xAxisIndex: 0,
+      filterMode: "none",
+      height: "4%", // 높이를 20%로 설정
+      bottom: "1%", // 위치를 아래로 조정
+    },
+    {
+      type: "slider",
+      yAxisIndex: 0,
+      filterMode: "none",
+      width: "2%",
+    },
+    {
+      type: "inside",
+      xAxisIndex: 0,
+      filterMode: "none",
+    },
+    {
+      type: "inside",
+      yAxisIndex: 0,
+      filterMode: "none",
+    },
+    // {
+    //   show: true,
+    //   realtime: true,
+    //   start: 0,
+    //   end: 100,
+    //   xAxisIndex: [0, 1],
+    //   height: "2%",
+    // },
+  ],
+  xAxis: {
+    type: "category",
+    nameLocation: "middle",
+    data: analysisTime.value, // x축 데이터를 times 배열로 설정
+    axisLabel: {
+      color: textColor.value, // 텍스트 색상을 흰색으로 설정
+    },
+  },
+  yAxis: {},
+  series: [],
+});
 // =============================== 데이터 검색 및 업데이트 ===========================================
 
-// const updateSeries = () => {
-//   console.log("@");
-//   const series = [];
+const updateSeries = () => {
+  console.log("@");
+  const series = [];
 
-//   // 모든 타임스탬프 수집
-//   const allTimestamps = new Set();
-//   selectedItem.value.forEach((component) => {
-//     if (component in gData) {
-//       gData[component].forEach((item) => {
-//         const timestamp = Object.keys(item)[0];
-//         allTimestamps.add(timestamp);
-//       });
-//     }
-//   });
+  // 모든 타임스탬프 수집
+  const allTimestamps = new Set();
+  selectedItem.value.forEach((component) => {
+    if (component in gData) {
+      gData[component].forEach((item) => {
+        const timestamp = Object.keys(item)[0];
+        allTimestamps.add(timestamp);
+      });
+    }
+  });
 
-//   // 타임스탬프를 정렬
-//   const sortedTimestamps = Array.from(allTimestamps).sort(
-//     (a, b) => new Date(a) - new Date(b)
-//   );
+  // 타임스탬프를 정렬
+  const sortedTimestamps = Array.from(allTimestamps).sort(
+    (a, b) => new Date(a) - new Date(b)
+  );
 
-//   // dataMap을 자동으로 생성
-//   const dataMap = Object.keys(gData).reduce((map, key) => {
-//     // 타임스탬프를 키로 사용한 맵 생성
-//     map[key] = gData[key].reduce((subMap, item) => {
-//       const timestamp = Object.keys(item)[0];
-//       subMap[timestamp] = item[timestamp];
-//       return subMap;
-//     }, {});
-//     return map;
-//   }, {});
+  // dataMap을 자동으로 생성
+  const dataMap = Object.keys(gData).reduce((map, key) => {
+    // 타임스탬프를 키로 사용한 맵 생성
+    map[key] = gData[key].reduce((subMap, item) => {
+      const timestamp = Object.keys(item)[0];
+      subMap[timestamp] = item[timestamp];
+      return subMap;
+    }, {});
+    return map;
+  }, {});
 
-//   selectedItem.value.forEach((component) => {
-//     if (component in dataMap) {
-//       const seriesData = sortedTimestamps.map(
-//         (timestamp) => dataMap[component][timestamp] || null
-//       );
+  selectedItem.value.forEach((component) => {
+    if (component in dataMap) {
+      const seriesData = sortedTimestamps.map(
+        (timestamp) => dataMap[component][timestamp] || null
+      );
 
-//       series.push({
-//         name: component,
-//         type: "line",
-//         data: seriesData,
-//         connectNulls: true, // null 값을 선으로 연결
-//         markPoint: {
-//           data: [
-//             { type: "max", name: "Max" },
-//             { type: "min", name: "Min" },
-//           ],
-//         },
-//       });
-//     }
-//   });
+      series.push({
+        name: component,
+        type: "line",
+        data: seriesData,
+        connectNulls: true, // null 값을 선으로 연결
+        markPoint: {
+          data: [
+            { type: "max", name: "Max" },
+            { type: "min", name: "Min" },
+          ],
+        },
+      });
+    }
+  });
 
-//   option.value.series = series;
+  option.value.series = series;
 
-//   option.value.legend = {
-//     data: selectedItem.value,
-//   };
+  option.value.legend = {
+    data: selectedItem.value,
+  };
 
-//   option.value.xAxis = {
-//     type: "category",
-//     nameLocation: "middle",
-//     data: sortedTimestamps, // x축 데이터를 타임스탬프로 설정
-//     axisLabel: {
-//       color: textColor.value, // 텍스트 색상을 흰색으로 설정
-//       formatter: (value) => {
-//         const date = new Date(value);
-//         const formattedDate = `
-//         ${date.getDate().toString().padStart(2, "0")} ${date
-//           .getHours()
-//           .toString()
-//           .padStart(2, "0")}:${date
-//           .getMinutes()
-//           .toString()
-//           .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
-//         return formattedDate;
-//       },
-//     },
-//   };
+  option.value.xAxis = {
+    type: "category",
+    nameLocation: "middle",
+    data: sortedTimestamps, // x축 데이터를 타임스탬프로 설정
+    axisLabel: {
+      color: textColor.value, // 텍스트 색상을 흰색으로 설정
+      formatter: (value) => {
+        const date = new Date(value);
+        const formattedDate = `
+        ${date.getDate().toString().padStart(2, "0")} ${date
+          .getHours()
+          .toString()
+          .padStart(2, "0")}:${date
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+        return formattedDate;
+      },
+    },
+  };
 
-//   // if (chartInstance.value) {
-//   //   chartInstance.value.clear(); // 이전 데이터 제거
-//   //   chartInstance.value.setOption(option.value);
-//   // }
-//   initializeChart();
-// };
+  // if (chartInstance.value) {
+  //   chartInstance.value.clear(); // 이전 데이터 제거
+  //   chartInstance.value.setOption(option.value);
+  // }
+  initializeChart();
+};
 
 // x축의 범위를 업데이트하는 dataZoom 이벤트 핸들러 추가
 const updateZoomRange = (params) => {
+  console.log("?");
   const { startValue, endValue } = params.batch[0];
   const start = option.value.xAxis.data[startValue];
   const end = option.value.xAxis.data[endValue];
@@ -954,13 +730,16 @@ const initializeChart = () => {
   if (chartInstance.value) {
     chartInstance.value.clear();
     chartInstance.value.setOption(option.value);
-    chartInstance.value.on("dataZoom", updateZoomRange);
+    chartInstance.value.on('dataZoom', updateZoomRange);
   }
 };
 
+
 const testData = () => {
-  initChart();
-};
+  console.log(option.value.xAxis.data);
+  console.log(option.value.dataZoom);
+}
+
 
 const requests = ref({
   type: "",
@@ -975,14 +754,18 @@ const fetchData = async (subComponent, contents) => {
     if (selectedtrialrun.value === "직접 선택") {
       // 직접 선택이라면
       requests.value.period = `period?start_utctime=${startDate.value}&end_utctime=${endDate.value}`;
+      console.log(requests.value.period);
     } else {
       // 시험 선택이라면
       requests.value.period = `test?test_name=${selectedtrialrun.value}`;
+      console.log(requests.value.period);
     }
 
     let apiReq = `table_data/information/test?test_name=TestCase1&signal_name=ais_vdo&signal_name=ais_vdm`;
     apiReq = `table_data/information/${requests.value.period}&signal_name=${subComponent}_${contents}`;
+    console.log(apiReq);
     let a = await readDataTrial(tokenid.value, apiReq);
+    console.log(a);
     return a;
   } catch (error) {
     console.error(error);
@@ -1003,6 +786,7 @@ const processData = (
   // const dataArray = data.DGPS_GGA;
 
   analysisData.value[n] = dataArray.map((item) => item[dataKey]);
+  console.log(analysisData.value[n]);
 
   // 중복된 타임스탬프를 제거하면서 analysisTime에 값을 추가
   const newTimestamps = dataArray.map((item) => item[timestampKey]);
@@ -1018,6 +802,8 @@ const processData = (
     obj[item[timestampKey]] = item[dataKey];
     return obj;
   });
+
+  console.log(gData[analysisName]);
 
   unit.value = unitValue;
   // selectedcontentsItem.value = contentsItemValue;
@@ -1041,7 +827,7 @@ const searchData = async () => {
   //   alert("선택항목을 선택해주세요.");
   // }
   updateDate();
-  // clearChart();
+  clearChart();
 
   try {
     analysisData.value = [];
@@ -1063,6 +849,7 @@ const searchData = async () => {
     };
     analysis.value = Array.from({ length: newLength }, () => ({ ...template }));
 
+    console.log("구간 1");
     if (
       selectedItem.value.includes("latitude") ||
       selectedItem.value.includes("longitude") ||
@@ -1238,8 +1025,11 @@ const searchData = async () => {
       );
       itemsData.fuel_LEVEL_2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
+    console.log("구간 2");
+    console.log(itemsData.gga);
 
     selectedItem.value.forEach((item) => {
+      console.log(item);
       switch (item) {
         case "latitude":
           processData(
@@ -1605,6 +1395,139 @@ const searchData = async () => {
           break;
       }
     });
+    console.log("구간 3");
+
+    const datasetRaw2 = ref([["time", "value"]]);
+    datasetRaw2.value = [];
+
+    analysisTime.value.sort((a, b) => {
+      // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+      const timeA = new Date(a);
+      const timeB = new Date(b);
+      return timeA - timeB;
+    });
+
+    datasetRaw2.value.sort((a, b) => {
+      // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
+      const timeA = new Date(a[0]);
+      const timeB = new Date(b[0]);
+      return timeA - timeB;
+    });
+
+    console.log("구간 그래프");
+    //updateSeries();
+
+    for (let n = 0; n < selectedItem.value.length; n++) {
+      console.log(`구간 ${4 + n}`);
+      for (let i = 0; i <= analysisTime.value.length; i++) {
+        datasetRaw2.value.push([
+          analysisTime.value[i + 1],
+          analysisData.value[n][i],
+        ]);
+      }
+
+      if (analysisTime.value.length <= 0) {
+        console.log("yolololololol~~");
+        analysis.value[n].min = "-"; // 최댓값
+        analysis.value[n].max = "-"; // 평균값
+        analysis.value[n].average = "-"; // 표준편차
+        analysis.value[n].rmse = "-"; // 제곱평균제곱근
+        analysis.value[n].rms = "-"; // 중앙값
+        analysis.value[n].median = "-"; // 표준 오차
+        analysis.value[n].error = "-"; // 분산
+        analysis.value[n].variance = "-";
+
+        // nodata.value = true;
+        // loading.value = false;
+      } else {
+        // nodata.value = false;
+      }
+
+      const minValue = ref(); // 최솟값
+      const maxValue = ref(); // 최댓값
+      const averageValue = ref(); // 평균값
+      const standardDeviation = ref(); // 표준편차
+      const rms = ref(); // 제곱평균제곱근
+      const median = ref(); // 중앙값
+      const standardError = ref(); // 표준오차
+      const variance = ref();
+      const numericValues = analysisData.value[n]
+        .map((value) => Number(value))
+        .filter((value) => !isNaN(value));
+
+      // console.log( "통계:", analysisData.value); // if(analysisData)
+
+      if (numericValues.length > 1) {
+        // 최솟값 구하기
+        minValue.value = Math.min(...analysisData.value[n]);
+
+        // 최댓값 구하기
+        maxValue.value = Math.max(...analysisData.value[n]);
+        // 평균 계산sortedValues
+        const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
+        averageValue.value = sum.value / numericValues.length;
+
+        // 표준편차 계산
+        const squaredDifferences = ref(
+          numericValues.map((value) => Math.pow(value - averageValue.value, 2))
+        );
+        const sumOfSquaredDifferences = squaredDifferences.value.reduce(
+          (acc, value) => acc + value,
+          0
+        );
+        variance.value = sumOfSquaredDifferences / numericValues.length;
+        standardDeviation.value = Math.sqrt(variance.value);
+
+        // 제곱평균제곱근(RMS) 계산
+        const sumOfSquares = ref(
+          numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
+        );
+        rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
+
+        // 중앙값 계산
+        const sortedValues = numericValues.sort((a, b) => a - b);
+        const mid = ref(Math.floor(sortedValues.length / 2));
+
+        if (sortedValues.length % 2 === 0) {
+          // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
+          median.value =
+            (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
+          console.log("짝수");
+        } else {
+          // 홀수일 경우 중간 값이 중앙값
+          median.value = sortedValues[mid.value];
+          console.log("홀수");
+        }
+        // 표준 오차 계산
+        standardError.value =
+          standardDeviation.value / Math.sqrt(numericValues.length);
+      } else {
+        alert("데이터가 존재하지 않습니다.");
+        averageValue.value = 0;
+        standardDeviation.value = 0;
+        rms.value = 0;
+        median.value = 0;
+        standardError.value = 0;
+      }
+      // analysis.value[n].unit = unit.value;
+      // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
+      analysis.value[n].min = minValue.value.toFixed(4);
+      // console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
+      analysis.value[n].max = maxValue.value.toFixed(4);
+      // console.log(`Average Value: ${averageValue.value}`); // 평균값
+      analysis.value[n].average = averageValue.value.toFixed(4);
+      // console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
+      analysis.value[n].rmse = standardDeviation.value.toFixed(4);
+      // console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
+      analysis.value[n].rms = rms.value.toFixed(4);
+      // console.log(`Median: ${median.value}`); // 중앙값
+      analysis.value[n].median = median.value.toFixed(4);
+      // console.log(`Standard Error: ${standardError.value}`); // 표준 오차
+      analysis.value[n].error = standardError.value.toFixed(4);
+      // console.log(`Variance: ${variance.value}`); // 분산
+      analysis.value[n].variance = variance.value.toFixed(4);
+    }
+    console.log("구간 n");
   } catch (error) {
     console.error(error);
   } finally {
@@ -1612,144 +1535,14 @@ const searchData = async () => {
   }
 
   updateDate();
-  // clearChart();
+  clearChart();
   option.value.series = [];
-  // updateSeries();
-  initChart();
-  calculateData(0, analysisTime.value.length);
-  // chart.value.setOption(updateSeries);
+  updateSeries();
+  chart.value.setOption(updateSeries);
   n = 0;
-};
-
-const calculateData = (start, end) => {
-  const datasetRaw2 = ref([["time", "value"]]);
-  datasetRaw2.value = [];
-
-  const reTime = analysisTime.value.slice(start, end);
-
-  reTime.sort((a, b) => {
-    // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
-    const timeA = new Date(a);
-    const timeB = new Date(b);
-    return timeA - timeB;
+  analysis.value.forEach((item, index) => {
+    console.log(`Item ${index}:`, item);
   });
-
-  datasetRaw2.value.sort((a, b) => {
-    // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
-    const timeA = new Date(a[0]);
-    const timeB = new Date(b[0]);
-    return timeA - timeB;
-  });
-
-  //updateSeries();
-
-  for (let n = 0; n < selectedItem.value.length; n++) {
-    const reData = analysisCal.value[n].slice(start, end);
-    const isData = reData.filter((value) => value !== null);
-
-    console.log(isData);
-    for (let i = 0; i <= reTime.length; i++) {
-      datasetRaw2.value.push([reTime[i + 1], isData[i]]);
-    }
-
-    if (reTime.length <= 0) {
-      analysis.value[n].min = "-"; // 최댓값
-      analysis.value[n].max = "-"; // 평균값
-      analysis.value[n].average = "-"; // 표준편차
-      analysis.value[n].rmse = "-"; // 제곱평균제곱근
-      analysis.value[n].rms = "-"; // 중앙값
-      analysis.value[n].median = "-"; // 표준 오차
-      analysis.value[n].error = "-"; // 분산
-      analysis.value[n].variance = "-";
-
-      // nodata.value = true;
-      // loading.value = false;
-    } else {
-      // nodata.value = false;
-    }
-
-    const minValue = ref(); // 최솟값
-    const maxValue = ref(); // 최댓값
-    const averageValue = ref(); // 평균값
-    const standardDeviation = ref(); // 표준편차
-    const rms = ref(); // 제곱평균제곱근
-    const median = ref(); // 중앙값
-    const standardError = ref(); // 표준오차
-    const variance = ref();
-    const numericValues = isData
-      .map((value) => Number(value))
-      .filter((value) => !isNaN(value));
-
-    // console.log( "통계:", analysisData.value); // if(analysisData)
-
-    if (numericValues.length > 1) {
-      // 최솟값 구하기
-      minValue.value = Math.min(...isData);
-
-      // 최댓값 구하기
-      maxValue.value = Math.max(...isData);
-      // 평균 계산sortedValues
-      const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
-      averageValue.value = sum.value / numericValues.length;
-
-      // 표준편차 계산
-      const squaredDifferences = ref(
-        numericValues.map((value) => Math.pow(value - averageValue.value, 2))
-      );
-      const sumOfSquaredDifferences = squaredDifferences.value.reduce(
-        (acc, value) => acc + value,
-        0
-      );
-      variance.value = sumOfSquaredDifferences / numericValues.length;
-      standardDeviation.value = Math.sqrt(variance.value);
-
-      // 제곱평균제곱근(RMS) 계산
-      const sumOfSquares = ref(
-        numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
-      );
-      rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
-
-      // 중앙값 계산
-      const sortedValues = numericValues.sort((a, b) => a - b);
-      const mid = ref(Math.floor(sortedValues.length / 2));
-
-      if (sortedValues.length % 2 === 0) {
-        // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
-        median.value =
-          (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
-      } else {
-        // 홀수일 경우 중간 값이 중앙값
-        median.value = sortedValues[mid.value];
-      }
-      // 표준 오차 계산
-      standardError.value =
-        standardDeviation.value / Math.sqrt(numericValues.length);
-    } else {
-      alert("데이터가 존재하지 않습니다.");
-      averageValue.value = 0;
-      standardDeviation.value = 0;
-      rms.value = 0;
-      median.value = 0;
-      standardError.value = 0;
-    }
-    // analysis.value[n].unit = unit.value;
-    // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
-    analysis.value[n].min = minValue.value.toFixed(4);
-    // console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
-    analysis.value[n].max = maxValue.value.toFixed(4);
-    // console.log(`Average Value: ${averageValue.value}`); // 평균값
-    analysis.value[n].average = averageValue.value.toFixed(4);
-    // console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
-    analysis.value[n].rmse = standardDeviation.value.toFixed(4);
-    // console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
-    analysis.value[n].rms = rms.value.toFixed(4);
-    // console.log(`Median: ${median.value}`); // 중앙값
-    analysis.value[n].median = median.value.toFixed(4);
-    // console.log(`Standard Error: ${standardError.value}`); // 표준 오차
-    analysis.value[n].error = standardError.value.toFixed(4);
-    // console.log(`Variance: ${variance.value}`); // 분산
-    analysis.value[n].variance = variance.value.toFixed(4);
-  }
 };
 
 const clearChart = () => {

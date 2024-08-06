@@ -355,6 +355,47 @@ export const updateSetTime = async (tokenid, data) => {
   }
 };
 
+// 실시간 모니터링의 데이터 min max값 읽어오기 v1  readRealtimeMinMax
+export const readRealtimeMinMax = async (tokenid) => {
+  try {
+    const response = await axios.get(
+      `http://${apiLocation}/api/v1/realtime_signal_info`,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
+// 실시간 모니터링의 데이터 주기 수정 v1
+export const updateRealtimeMinMax = async (tokenid, data) => {
+  try {
+    const response = await axios.put(
+      `http://${apiLocation}/api/v1/realtime_signal_info`,
+      data,
+      {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${tokenid}`,
+        },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+};
+
 
 // 데이터 소실 빈도 확인 v1
 export const readlossData = async (

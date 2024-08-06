@@ -22,11 +22,11 @@
                 <v-sheet style="height: 43vh; display: flex">
                   <v-card style="flex: 1">
                     <v-card-item>
-                      <OSMap
-                    :lat="parseFloat(latitude)"
-                    :lon="parseFloat(longitude)"
-                    :state="mapstart"
-                  />
+                      <!-- <OSMap
+                        :lat="parseFloat(latitude)"
+                        :lon="parseFloat(longitude)"
+                        :state="mapstart"
+                      /> -->
                     </v-card-item>
                   </v-card>
                 </v-sheet>
@@ -46,7 +46,7 @@
                     backgroundColor: themeColor,
                     paddingTop: `${getLampPaddingTop()}px`,
                     paddingLeft: `16px`,
-                    paddingBottom: `${getLampPaddingBottom1()}px`,
+                    paddingBottom: `0px`,
                     display: 'flex',
                   }"
                 >
@@ -76,7 +76,9 @@
                             >mdi-weather-windy</v-icon
                           >
                           <div class="weather-label">바람</div>
-                          <div class="weather-value">{{ vts_wind_angle }} {{ vts_wind_speed }} m/s</div>
+                          <div class="weather-value">
+                            {{ vts_wind_angle }} {{ vts_wind_speed }} m/s
+                          </div>
                         </v-col>
                         <v-divider vertical></v-divider>
                         <v-col class="weather-item" cols="12" sm="3">
@@ -99,7 +101,7 @@
                 no-gutters
                 :style="{
                   padding: '0px',
-                  paddingLeft: '16px',
+                  paddingLeft: '4px',
                   paddingTop: '20px',
                 }"
               >
@@ -113,7 +115,6 @@
                           :style="{
                             paddingTop: `${getheadingPaddingTop()}px`,
                             paddingBottom: '0px',
-                            
                           }"
                         >
                           <v-sheet
@@ -122,10 +123,21 @@
                               display: flex,
                             }"
                           >
-                            <EchartGaugeVolt
+                            <!-- <EchartGaugeVolt
                               :name="'SpeedN'"
                               :unit="'kt'"
-                              :max_value="15"
+                              :max_value="standardItems[0].maxValue"
+                              :min_value="standardItems[0].minValue"
+                              :value="parseFloat(speed)"
+                            /> -->
+                            <EchartGauge
+                              :name="'SpeedN'"
+                              :left="'center'"
+                              :unit="'kt'"
+                              :center_y="'40%'"
+                              :splitNumber="5"
+                              :max_value="standardItems[0].maxValue"
+                              :min_value="standardItems[0].minValue"
                               :value="parseFloat(speed)"
                             />
                           </v-sheet>
@@ -145,11 +157,15 @@
                               display: flex,
                             }"
                           >
-                            <EchartGaugeVolt
+                            <EchartGauge
                               :name="'Anemometer Speed'"
-                              :value="parseFloat(windspeed)"
+                              :left="'center'"
                               :unit="'m/s'"
-                              :max_value="40"
+                              :center_y="'40%'"
+                              :splitNumber="5"
+                              :max_value="standardItems[1].maxValue"
+                              :min_value="standardItems[1].minValue"
+                              :value="parseFloat(windspeed)"
                             />
                           </v-sheet>
                         </v-col>
@@ -174,8 +190,6 @@
                         </v-col>
                       </v-row>
                       <v-row>
-                        
-                        
                         <v-col
                           :cols="getColsValue3()"
                           no-gutters
@@ -238,7 +252,6 @@
                             />
                           </v-sheet>
                         </v-col>
-
                       </v-row>
                     </v-card-item>
                   </v-card>
@@ -266,8 +279,10 @@
                         :name="'Engine Speed'"
                         :left="'center'"
                         :unit="'rpm'"
+                        :splitNumber="10"
                         :center_y="'50%'"
-                        :max_speed="3000"
+                        :max_value="standardItems[2].maxValue"
+                        :min_value="standardItems[2].minValue"
                         :value="parseFloat(engine1Speed)"
                       />
                     </v-sheet>
@@ -281,7 +296,8 @@
                             :name="'OilPressure'"
                             :value="parseFloat(engine1oilPressure)"
                             :unit="'bar'"
-                            :max_value="10"
+                            :max_value="standardItems[3].maxValue"
+                            :min_value="standardItems[3].minValue"
                           />
                         </v-sheet>
                       </v-col>
@@ -294,7 +310,8 @@
                             :name="'OilTemperature'"
                             :value="parseFloat(engine1oilTemperature)"
                             :unit="'°C'"
-                            :max_value="200"
+                            :max_value="standardItems[4].maxValue"
+                            :min_value="standardItems[4].minValue"
                           /> </v-sheet
                       ></v-col>
                     </v-row>
@@ -308,7 +325,8 @@
                             :name="'TransmissionPressure'"
                             :value="parseFloat(engine1transmissionPressure)"
                             :unit="'bar'"
-                            :max_value="40"
+                            :max_value="standardItems[5].maxValue"
+                            :min_value="standardItems[5].minValue"
                           />
                         </v-sheet>
                       </v-col>
@@ -321,7 +339,8 @@
                             :name="'ExhaustGasTemperature'"
                             :value="parseFloat(engine1gasTemperature)"
                             :unit="'°C'"
-                            :max_value="900"
+                            :max_value="standardItems[6].maxValue"
+                            :min_value="standardItems[6].minValue"
                           />
                         </v-sheet>
                       </v-col>
@@ -351,8 +370,10 @@
                         :name="'Engine Speed'"
                         :left="'center'"
                         :unit="'rpm'"
+                        :splitNumber="10"
                         :center_y="'50%'"
-                        :max_speed="3000"
+                        :max_value="standardItems[2].maxValue"
+                        :min_value="standardItems[2].minValue"
                         :value="parseFloat(engine2Speed)"
                       />
                     </v-sheet>
@@ -366,7 +387,8 @@
                             :name="'OilPressure'"
                             :value="parseFloat(engine2oilPressure)"
                             :unit="'kPa'"
-                            :max_value="10"
+                            :max_value="standardItems[3].maxValue"
+                            :min_value="standardItems[3].minValue"
                           />
                         </v-sheet>
                       </v-col>
@@ -379,7 +401,8 @@
                             :name="'OilTemperature'"
                             :value="parseFloat(engine2oilTemperature)"
                             :unit="'°C'"
-                            :max_value="200"
+                            :max_value="standardItems[4].maxValue"
+                            :min_value="standardItems[4].minValue"
                           /> </v-sheet
                       ></v-col>
                     </v-row>
@@ -393,7 +416,8 @@
                             :name="'TransmissionPressure'"
                             :value="parseFloat(engine2transmissionPressure)"
                             :unit="'kPa'"
-                            :max_value="40"
+                            :max_value="standardItems[5].maxValue"
+                            :min_value="standardItems[5].minValue"
                           />
                         </v-sheet>
                       </v-col>
@@ -406,7 +430,8 @@
                             :name="'ExhaustGasTemperature'"
                             :value="parseFloat(engine2gasTemperature)"
                             :unit="'°C'"
-                            :max_value="900"
+                            :max_value="standardItems[6].maxValue"
+                            :min_value="standardItems[6].minValue"
                           />
                         </v-sheet>
                       </v-col>
@@ -748,7 +773,7 @@ import BridgeRudder from "../components/OpenBridge/RudderGraph.vue";
 import EchartGauge from "../components/EchartGraph/EchartGauge.vue";
 import EchartGaugeVolt from "../components/EchartGraph/EchartGaugeVolt.vue";
 import EchartStarPort from "../components/EchartGraph/EchartStarPort.vue";
-import { readLampTimeData, cctvUrl } from "../api/index.js";
+import { readLampTimeData, cctvUrl, readRealtimeMinMax } from "../api/index.js";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 
 // 웹소켓 관련, Web Socket
@@ -774,7 +799,7 @@ ws.onopen = function (event) {
 };
 
 ws.onmessage = function (event) {
-  // console.log("Message received: " + event.data);
+  console.log("Message received: " + event.data);
   try {
     const parsedMessage = JSON.parse(event.data);
     let headerName = parsedMessage.Package.Header.Author;
@@ -786,31 +811,35 @@ ws.onmessage = function (event) {
     // 'Package' 내의 데이터 중 "DataSet"의 첫 번째 항목 추출
     // 위치
 
-    
     // 관제 기상정보
     if (headerName === "WeatherInfo") {
-      vts_tem.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[5]
-      )/10;
-      vts_hum.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[6]
-      )/10;
+      vts_tem.value =
+        Number(
+          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+            .Value[5]
+        ) / 10;
+      vts_hum.value =
+        Number(
+          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+            .Value[6]
+        ) / 10;
       const angle = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0].Value[3]
+        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+          .Value[3]
       );
       vts_wind_angle.value = getWindDirection(angle);
       console.log(angle); // 방향 값을 콘솔에 출력
       console.log(vts_wind_angle.value); // 방향 값을 콘솔에 출력
-      vts_wind_speed.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[2]
-      )/10;
-      vts_visible.value = Number(
-        parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
-          .Value[4]
-      )/10;
+      vts_wind_speed.value =
+        Number(
+          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+            .Value[2]
+        ) / 10;
+      vts_visible.value =
+        Number(
+          parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
+            .Value[4]
+        ) / 10;
       clearTimeout(vtsTimeout); // 이전 타임아웃을 취소
       vtsTimeout = setTimeout(() => {
         // 3초 이상 데이터가 오지 않으면 "no"로 변경
@@ -1116,6 +1145,9 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 
 const checkTime = ref();
 
+// -------------------- Min,Max ------------------------ //
+
+// -------------------- CCTV --------------------------- //
 const videoD = ref(null);
 
 const cctvDialog = ref(false);
@@ -1973,6 +2005,40 @@ const getVariableName = (headerName) => {
 
   return nameMappings[headerName];
 };
+
+// ---------------------- 게이지 min-max값 설정 ----------------------------- //
+const standardItems = ref([
+  { signalName: "Ship Speed", minValue: "0", maxValue: "11" },
+  { signalName: "Wind Speed", minValue: "0", maxValue: "12" },
+  { signalName: "Engine Speed", minValue: "0", maxValue: "13" },
+  { signalName: "Oil Pressure", minValue: "0", maxValue: "14" },
+  { signalName: "Oil Temp", minValue: "0", maxValue: "15" },
+  { signalName: "Trans Pressure", minValue: "0", maxValue: "16" },
+  { signalName: "Gas Temp", minValue: "0", maxValue: "17" },
+]);
+
+// standardItems.value[0].minValue
+
+const getMinMax = async () => {
+  const response = await readRealtimeMinMax(tokenid.value);
+
+  // 표준 항목을 response의 데이터로 업데이트
+  standardItems.value = response.map((item) => {
+    return {
+      signalName: item.signalName,
+      minValue: item.minValue,
+      maxValue: item.maxValue,
+    };
+  });
+  console.log(standardItems.value);
+};
+
+onMounted(() => {
+  getMinMax();
+  // 초기에도 업데이트 수행
+});
+
+// -------------------- 화면 비율 변경 시 발생하는 이벤트 --------------------------- //
 
 const screenWidth = ref(window.innerWidth);
 

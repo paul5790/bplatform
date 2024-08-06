@@ -40,7 +40,7 @@ const option = ref({
     text: props.name,
     left: "center",
     textStyle: {
-      fontSize: 10,
+      fontSize: 12,
       color: textColor.value,
     },
   },
@@ -50,35 +50,24 @@ const option = ref({
       startAngle: 90,
       endAngle: 450,
       center: ["50%", "50%"],
-      radius: "73%",
+      radius: "67%",
       splitNumber: 8,
       min: 0,
       max: 360,
       axisLine: {
         lineStyle: {
-          width: 6,
-          color: [
-            [0.125, "#ca7060"],
-            [0.375, "#dada90"],
-            [0.625, "#78A9D9"],
-            [0.875, "#3CbF92"],
-            [1, "#ca7060"],
-          ],
+          width: 3,
         },
       },
       pointer: {
-        length: "45%",
+        length: "60%",
         width: 3,
         offsetCenter: [0, 0],
-        itemStyle: {
-          color: "auto",
-        },
       },
       axisTick: {
         distance: 5,
         length: 4,
         lineStyle: {
-          color: "auto",
           width: 0.7,
         },
       },
@@ -86,15 +75,14 @@ const option = ref({
         distance: 5,
         length: 5,
         lineStyle: {
-          color: "auto",
           width: 2,
         },
       },
       axisLabel: {
-        show: false,
+        show: true,
         color: textColor.value,
-        fontSize: 7,
-        distance: -35,
+        fontSize: 9,
+        distance: -17,
         rotate: "tangential",
         formatter: function (value) {
           if (value === 90) {
@@ -105,19 +93,28 @@ const option = ref({
             return "W";
           } else if (value === 360) {
             return "  N (0°)";
+          } else if (value === 45) {
+            return "NE";
+          } else if (value === 135) {
+            return "NW";
+          } else if (value === 225) {
+            return "SW";
+          } else if (value === 315) {
+            return "SE";
           }
+          
           return "";
         },
       },
       detail: {
-        fontSize: 12,
+        fontSize: 13,
         // formatter: function () {
         //   return `${windspeed.value} m/s`;
         // },
         formatter: function (value) {
           return `degree: ${value} °`;
         },
-        offsetCenter: ["0%", "115%"],
+        offsetCenter: ["0%", "127%"],
         valueAnimation: true,
                 textStyle: {
           color: textColor.value, // 텍스트 컬러 설정

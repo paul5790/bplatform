@@ -39,7 +39,7 @@ const option = ref({
     text: props.name,
     left: "center",
     textStyle: {
-      fontSize: 10,
+      fontSize: 12,
       color: textColor.value,
     },
   },
@@ -85,7 +85,7 @@ const option = ref({
       axisLabel: {
         color: "inherit",
         distance: 12,
-        fontSize: 8,
+        fontSize: 10,
         formatter: function (value) {
           if (value === -50) {
             return "PORT";
@@ -106,7 +106,7 @@ const option = ref({
           return isNullValue.value ? "NaN" : value;
         },
         color: "inherit",
-        fontSize: 10,
+        fontSize: 15,
       },
       data: [
         {

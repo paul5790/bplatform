@@ -32,7 +32,9 @@ const props = defineProps({
   left: String,
   unit: String,
   center_y: String,
-  max_speed: Number,
+  max_value: Number,
+  min_value: Number,
+  splitNumber: Number,
   value: Number,
 });
 
@@ -40,8 +42,9 @@ const option = ref({
   title: {
     text: props.name,
     left: props.left,
+    top: "2%", // 제목을 아래로 이동
     textStyle: {
-      fontSize: 14, 
+      fontSize: 12, 
       color: textColor.value,
     },
   },
@@ -51,17 +54,32 @@ const option = ref({
   series: [
     {
       name: "SPEEDLOG",
-      min: 0,
-      max: props.max_speed,
+      min: props.min_value,
+      max: props.max_value,
+      splitNumber: props.splitNumber, // 분할 수를 줄여 눈금을 덜 촘촘하게 만듭니다
       type: "gauge",
       center: ["50%", `${props.center_y}`],
       pointer: {
         offsetCenter: [0, "0%"],
         length: "50%",
-        width: 5,
+        width: 3,
       },
       progress: {
         show: true,
+      },
+      splitLine: {
+        length: 8,
+        lineStyle: {
+          width: 2,
+        },
+      },
+      axisTick: {
+        distance: 10,
+        length: 4,
+        
+        lineStyle: {
+          width: 0.7,
+        },
       },
       detail: {
         valueAnimation: true,
@@ -70,6 +88,7 @@ const option = ref({
         textStyle: {
           color: textColor.value,
         },
+        offsetCenter: [0, "70%"],
       },
       axisLabel: {
         color: textColor.value,
@@ -94,6 +113,14 @@ const updateValue = () => {
     }
   }
 };
+
+watch(
+  () => [props.min_value, props.max_value],
+  ([newMin, newMax]) => {
+    option.value.series[0].min = newMin;
+    option.value.series[0].max = newMax;
+  }
+);
 
 onMounted(() => {
   setInterval(updateValue, 1000);

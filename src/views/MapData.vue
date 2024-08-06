@@ -396,7 +396,6 @@ const searchMapdata = async () => {
         return; // 에러 발생 시 함수 종료
       }
 
-      console.log(ais);
       maxValue.value = ais.length;
 
       testAis.value = ais;
@@ -507,31 +506,32 @@ let lastValidAngle = 0; // 마지막 유효한 각도 저장
 
 const getDirection = (degreeLati, degreeLongi) => {
   const angle = Math.atan2(degreeLongi, degreeLati) * (180 / Math.PI); // 동쪽 기준 0도
-  return ((angle + 90 + 360) % 360); // 0-360도 범위로 변환
+  return (angle + 90 + 360) % 360; // 0-360도 범위로 변환
 };
+
 const aisMapping = (index) => {
   const latlng = [
     parseFloat(testAis.value[index].latitude),
     parseFloat(testAis.value[index].longitude),
   ];
 
-  // console.log(`\n index(n) : ${index}, lati(n) : ${testAis.value[index].latitude}, longi(n) : ${testAis.value[index].longitude} \n
-  // index(n) : ${index+1}, lati(n+1) : ${testAis.value[index+1].latitude}, longi(n+1) : ${testAis.value[index+1].longitude}`);
-
-  const degreeLati =
-    testAis.value[index + 1].latitude - testAis.value[index].latitude;
-  const degreeLongi =
-    testAis.value[index + 1].longitude - testAis.value[index].longitude;
-
-  let angle = lastValidAngle; // 기본값은 마지막 유효한 각도
-
-  if (degreeLati !== 0 || degreeLongi !== 0) {
-    // 좌표 변화가 있을 경우에만 방향 업데이트
-    angle = getDirection(degreeLati, degreeLongi);
-    lastValidAngle = angle; // 마지막 유효한 각도 업데이트
+  let degreeLati = 0;
+  let degreeLongi = 0;
+  try {
+    degreeLati =
+      testAis.value[index + 1].latitude - testAis.value[index].latitude;
+    degreeLongi =
+      testAis.value[index + 1].longitude - testAis.value[index].longitude;
+  } catch (error) {
+    console.log("마지막");
   }
 
-  console.log(`배의 방향: ${angle} degrees`);
+  let angle = lastValidAngle;
+
+  if (degreeLati !== 0 || degreeLongi !== 0) {
+    angle = getDirection(degreeLati, degreeLongi);
+    lastValidAngle = angle;
+  }
 
   const iconUrl = "/image/shipicon.png";
   const iconSize = [48, 48];
@@ -543,10 +543,9 @@ const aisMapping = (index) => {
     iconSize: iconSize,
     iconAnchor: iconAnchor,
     popupAnchor: popupAnchor,
-    className: "", // 기본 클래스를 비우면 기본 스타일이 적용되지 않습니다.
+    className: "",
   });
 
-  // shipMarker가 이미 존재하면 위치를 업데이트하고, 그렇지 않으면 새로운 마커를 생성합니다.
   if (shipMarker) {
     shipMarker.setLatLng(latlng);
     shipMarker.setIcon(shipIcon);
@@ -557,14 +556,12 @@ const aisMapping = (index) => {
   if (map && index >= 0 && index < testAis.value.length) {
     const scenario = testAis.value[index]?.scenarioNumber;
 
-    // 시나리오가 변경되면 기존 폴리라인 제거
     if (currentScenario !== scenario) {
       currentPolylines.forEach((polyline) => map.removeLayer(polyline));
       currentPolylines = [];
       currentScenario = scenario;
     }
 
-    // 현재 시나리오의 데이터를 순차적으로 추가
     let dataToShow;
     if (nonScenario.value) {
       dataToShow = testAis.value.slice(0, index + 1);
@@ -573,38 +570,79 @@ const aisMapping = (index) => {
         .slice(0, index + 1)
         .filter((data) => data.scenarioNumber === scenario);
     }
-    // 기존 폴리라인 제거
+
     currentPolylines.forEach((polyline) => map.removeLayer(polyline));
     currentPolylines = [];
 
     if (dataToShow.length > 0) {
-      let latlngs = dataToShow.map((data) => [
-        parseFloat(data.latitude),
-        parseFloat(data.longitude),
-      ]);
-      let dashtype;
+      let segmentLatlngs = [];
+      let lastModeType = dataToShow[0].modeType;
 
-      if (dataToShow[0].modeType === "1") {
-        dashtype = "1";
-      } else if (dataToShow[0].modeType === "2") {
-        dashtype = "5, 5";
-      } else if (dataToShow[0].modeType === "3") {
-        dashtype = "10, 5, 1, 5";
-      } else {
-        dashtype = "1";
+      dataToShow.forEach((data, i) => {
+        const currentLatlng = [
+          parseFloat(data.latitude),
+          parseFloat(data.longitude),
+        ];
+
+        if (data.modeType !== lastModeType && segmentLatlngs.length > 0) {
+          let dashtype;
+          let dashcolor;
+          if (lastModeType === "1") {
+            dashtype = "1";
+            dashcolor = "blue";
+          } else if (lastModeType === "2") {
+            dashtype = "5, 5";
+            dashcolor = "green";
+          } else if (lastModeType === "3") {
+            dashtype = "10, 5, 1, 5";
+            dashcolor = "red";
+          } else {
+            dashtype = "1";
+            dashcolor = "blue";
+          }
+
+          const polyline = L.polyline(segmentLatlngs, {
+            color: dashcolor,
+            weight: 2,
+            dashArray: dashtype,
+          }).addTo(map);
+
+          currentPolylines.push(polyline);
+          segmentLatlngs = [];
+        }
+
+        segmentLatlngs.push(currentLatlng);
+        lastModeType = data.modeType;
+      });
+
+      if (segmentLatlngs.length > 0) {
+        let dashtype;
+        let dashcolor;
+        if (lastModeType === "1") {
+          dashtype = "1";
+          dashcolor = "blue";
+        } else if (lastModeType === "2") {
+          dashtype = "5, 5";
+          dashcolor = "green";
+        } else if (lastModeType === "3") {
+          dashtype = "10, 5, 1, 5";
+          dashcolor = "red";
+        } else {
+          dashtype = "1";
+          dashcolor = "blue";
+        }
+
+        const polyline = L.polyline(segmentLatlngs, {
+          color: dashcolor,
+          weight: 2,
+          dashArray: dashtype,
+        }).addTo(map);
+
+        currentPolylines.push(polyline);
       }
-
-      const polyline = L.polyline(latlngs, {
-        color: "blue",
-        weight: 2,
-        dashArray: dashtype,
-      }).addTo(map);
-
-      currentPolylines.push(polyline);
     }
   }
 
-  //metadata view
   metadata.value.test = testAis.value[index].testName;
   metadata.value.mode =
     testAis.value[index].modeType === "1"
