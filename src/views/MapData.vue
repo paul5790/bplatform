@@ -127,7 +127,7 @@
       "
     >
       <v-card-title>
-        <span>현재 데이터</span>
+        <span>Test Name: {{ metadata.test }}</span>
         <p
           @click="metadataCardVisible = false"
           style="position: absolute; top: 3px; right: 8px"
@@ -139,6 +139,79 @@
         <!-- 여기에 검색 창 컨텐츠를 추가하세요 -->
         <div style="position: relative; z-index: 1100">
           <v-row>
+            <v-col cols="12">
+              <v-list-item>
+                <v-list-item-content>
+                  <v-list-item-subtitle>
+                    <span class="label"
+                      >Total Time :</span
+                    > </v-list-item-subtitle
+                  ><v-list-item-subtitle>
+                    <span
+                      >{{ totalTime1 }} ~ {{ totalTime2 }}</span
+                    > </v-list-item-subtitle
+                  ><br />
+                  <v-list-item-subtitle>
+                    <span class="label"
+                      >Scenario Time :</span
+                    ></v-list-item-subtitle
+                  ><v-list-item-subtitle>
+                    <span
+                      >{{ scenarioTime1 }} ~ {{ scenarioTime2 }}</span
+                    > </v-list-item-subtitle
+                  ><br />
+                </v-list-item-content>
+              </v-list-item>
+              <div class="table-container">
+                <table class="custom-table">
+                  <thead>
+                    <tr>
+                      <th>No.</th>
+                      <th>운항모드</th>
+                      <th>경로이름</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr
+                      v-for="(item, index) in tableItems"
+                      :key="index"
+                      :class="{
+                        selected: selectedRow === index,
+                        scenarioSelected: metadata.scenario === item.no,
+                      }"
+                      @click="handleRowClick(item, index)"
+                    >
+                      <td>{{ item.no }}</td>
+                      <td>{{ item.mode }}</td>
+                      <td>{{ item.route }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <v-list-item>
+                <v-list-item-content>
+                  <br />
+                  <v-list-item-subtitle>
+                    <span class="label">Simul Time : </span>
+                    <span>{{ metadata.time }}</span> </v-list-item-subtitle
+                  ><br />
+                  <v-list-item-subtitle>
+                    <span class="label">위도 : </span>
+                    <span>{{ metadata.latitude }}</span>
+                  </v-list-item-subtitle>
+                  <v-list-item-subtitle>
+                    <span class="label">경도 : </span>
+                    <span>{{ metadata.longitude }}</span>
+                  </v-list-item-subtitle>
+                </v-list-item-content>
+              </v-list-item>
+              <v-checkbox
+                v-model="nonScenario"
+                label="경로 이어보기"
+              ></v-checkbox>
+            </v-col>
+          </v-row>
+          <!-- <v-row>
             <v-col cols="6">
               <v-list-item>
                 <v-list-item-content>
@@ -226,7 +299,7 @@
                 ></v-checkbox
               ></v-list-item-subtitle>
             </v-list-item-content>
-          </v-list-item>
+          </v-list-item> -->
         </div>
       </v-card-text>
     </v-card>
@@ -383,6 +456,23 @@ const metadata = ref({
 // 항적 쌓기 체크박스
 const nonScenario = ref(false);
 
+const totalTime1 = ref("2024-06-26T00:59:03.225566Z");
+const totalTime2 = ref("2024-06-26T00:59:03.225566Z");
+const scenarioTime1 = ref("2024-06-26T00:59:03.225566Z");
+const scenarioTime2 = ref("2024-06-26T00:59:03.225566Z");
+
+const tableItems = ref([
+  // { no: 1, mode: "Manual", route: "PNT 8 CENTER Anti clock", selected: false },
+  // { no: 2, mode: "Auto", route: "PNT 8 CENTER Clock", selected: true },
+  // { no: 3, mode: "Remote", route: "ATT 8 CENTER Anti clock", selected: false },
+  // { no: 4, mode: "Manual", route: "PNT 8 LEFT Anti clock", selected: false },
+  // { no: 5, mode: "Manual", route: "PNT 8 LEFT Anti clock", selected: false },
+  // { no: 6, mode: "Manual", route: "PNT 8 LEFT Anti clock", selected: false },
+  // { no: 7, mode: "Manual", route: "PNT 8 LEFT Anti clock", selected: false },
+  // { no: 8, mode: "Manual", route: "PNT 8 LEFT Anti clock", selected: false },
+  // { no: 9, mode: "Manual", route: "PNT 8 LEFT Anti clock", selected: false },
+]);
+
 watch(nonScenario, (newVal) => {
   sliderValue.value = 0;
 });
@@ -398,8 +488,12 @@ let waypointMarkers = [];
 let waypointLine = null;
 
 let scenarioIndex = {};
-let customTicks = {};
+let scenarioEnd = [];
+let customTicks = [];
 let tickLabels = {};
+
+let waypoint = [];
+let ais = [];
 
 const shipIcon = new L.Icon({
   iconUrl: "/image/shipicon.png",
@@ -413,8 +507,7 @@ const searchMapdata = async () => {
     if (selectedtrialrun.value) {
       testAis.value = [];
       aisData.value = {};
-      let waypoint = [];
-      let ais = [];
+      tableItems.value = [];
       try {
         waypoint = await readWaypoint(tokenid.value, selectedtrialrun.value);
         ais = await readAis(tokenid.value, selectedtrialrun.value);
@@ -423,6 +516,9 @@ const searchMapdata = async () => {
         console.error("error:", error);
         return; // 에러 발생 시 함수 종료
       }
+      console.log(ais);
+      totalTime1.value = ais[0].time;
+      totalTime2.value = ais[ais.length - 1].time;
 
       maxValue.value = ais.length;
 
@@ -431,26 +527,84 @@ const searchMapdata = async () => {
       fetchData();
       sliderCardVisible.value = true;
 
+      let first = 0;
+
+      console.log("start");
       ais.forEach((item, index) => {
         if (
           index === 0 ||
           item.scenarioNumber !== ais[index - 1].scenarioNumber
         ) {
+          scenarioEnd.push(index);
+        }
+      });
+      scenarioEnd.push(ais.length);
+      console.log(scenarioEnd);
+
+      ais.forEach((item, index) => {
+        if (
+          index === 0 ||
+          item.scenarioNumber !== ais[index - 1].scenarioNumber
+        ) {
+          console.log(index);
+
+          console.log(`${scenarioEnd[first]} ~ ${scenarioEnd[first+1] - 1}`);
+          
+          // modeType 값을 수집
+          let modeTypes = new Set();
+
+          for (let i = scenarioEnd[first]; i <= scenarioEnd[first+1] - 1; i++) {
+            modeTypes.add(ais[i].modeType);
+          }
+
+          console.log(modeTypes);
+          first++;
+          // modeType 값을 기반으로 modeValue 설정
+          let modeValue;
+          if (modeTypes.size === 1) {
+            const singleModeType = Array.from(modeTypes)[0] // null 값을 필터링;
+            switch (singleModeType) {
+              case "1":
+                modeValue = "Manual";
+                break;
+              case "2":
+                modeValue = "Auto";
+                break;
+              case "3":
+                modeValue = "Remote";
+                break;
+              default:
+                modeValue = "Unknown"; // 필요한 경우 기본값을 설정하세요
+            }
+          } else {
+            // 중복이 없는 경우 여러 값들을 문자열로 결합
+            modeValue = Array.from(modeTypes)
+            .filter((type) => type !== null)  // null 값을 필터링
+              .map((type) => {
+                switch (type) {
+                  case "1":
+                    return "Manual";
+                  case "2":
+                    return "Auto";
+                  case "3":
+                    return "Remote";
+                  default:
+                    return "Unknown"; // 필요한 경우 기본값을 설정하세요
+                    
+                }
+              })
+              .join(", ");
+          }
+          const test = {
+            no: ais[index].scenarioNumber,
+            mode: modeValue,
+            route: ais[index].routeName,
+            selected: false,
+          };
+          tableItems.value.push(test);
           scenarioIndex[index] = item.scenarioNumber;
         }
       });
-      customTicks = Object.keys(scenarioIndex).map((index) => ({
-        value: parseInt(index),
-        label: scenarioIndex[index],
-      }));
-
-      tickLabels = customTicks.map(item => ({
-        value: item.value,
-        label: item.label
-      }));
-
-      console.log(scenarioIndex);
-      console.log(customTicks);
 
       if (map) {
         map.remove(); // 기존 지도 제거
@@ -579,7 +733,7 @@ const aisMapping = (index) => {
     degreeLongi =
       testAis.value[index + 1].longitude - testAis.value[index].longitude;
   } catch (error) {
-    console.log("마지막");
+    //
   }
 
   let angle = lastValidAngle;
@@ -837,6 +991,31 @@ const startDrag = (event, cardName) => {
   document.addEventListener("mousemove", onMouseMove);
   document.addEventListener("mouseup", onMouseUp);
 };
+
+const selectedRow = ref(null);
+
+const handleRowClick = (item, index) => {
+  selectedRow.value = index;
+  sliderValue.value = scenarioEnd[index + 1] - 1;
+  metadata.value.scenario = item.no;
+};
+
+watch(
+  () => metadata.value.scenario,
+  (newScenario) => {
+    const rowIndex = tableItems.value.findIndex(
+      (item) => item.no === newScenario
+    );
+    if (rowIndex !== -1) {
+      selectedRow.value = rowIndex;
+    } else {
+      selectedRow.value = null;
+    }
+
+    scenarioTime1.value = ais[scenarioEnd[newScenario - 1]].time;
+    scenarioTime2.value = ais[scenarioEnd[newScenario] - 1].time;
+  }
+);
 </script>
 
 <style scoped>
@@ -872,5 +1051,60 @@ body,
   margin: 0;
   padding: 0;
   height: 100%;
+}
+.custom-card {
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.card-title {
+  font-weight: bold;
+  font-size: 1.25rem;
+}
+
+.label {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 8px;
+  text-align: left;
+}
+
+.custom-table th {
+  background-color: #f5f5f5;
+  font-weight: bold;
+}
+
+.custom-table td {
+  border-bottom: 1px solid #ddd;
+}
+
+.custom-table .v-input--selection-controls__input {
+  margin: 0;
+}
+.table-container {
+  width: 100%;
+  display: flex;
+  justify-content: center; /* 왼쪽 정렬로 변경 */
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+.selected {
+  background-color: #ff8888;
+  color: white;
+}
+
+.scenarioSelected {
+  background-color: #ff8888;
+  color: white;
 }
 </style>

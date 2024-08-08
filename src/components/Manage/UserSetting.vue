@@ -97,14 +97,12 @@
                     </v-row>
                   </v-container>
 
-                  <v-container v-if="permissionView">
-                    <p style="font-size: 13px; margin-bottom: 10px;">권한 설정</p>
+                  <v-container v-if="selecteduserGroup === 'USER'">
+                    <p style="font-size: 13px; margin-bottom: 10px">
+                      권한 설정
+                    </p>
                     <v-card
-                      style="
-                        flex: 1;
-                        display: flex;
-                        flex-direction: column;
-                      "
+                      style="flex: 1; display: flex; flex-direction: column"
                     >
                       <v-card-item style="padding-top: 10px">
                         <v-window>
@@ -326,6 +324,8 @@ const permissionFrame = ref([
   { name: "RUDDER", download: false },
   { name: "ENGINE", download: false },
   { name: "MODE", download: false },
+
+  { name: "INTEGRATEDCTRLSYSTEM", download: false },
 ]);
 
 const toggleAll = (type) => {
@@ -336,7 +336,6 @@ const toggleAll = (type) => {
 };
 
 const datePermission = ref();
-const permissionView = ref(false);
 
 // ---------------------------------------------
 
@@ -405,20 +404,15 @@ const check = () => {
       console.log(selectedItems.value[0].userGroup);
       console.log("--");
 
-      if (selectedItems.value[0].userGroup === "ADMIN") {
-        permissionView.value = false;
-      } else {
-        permissionView.value = true;
-        resetPermissions();
-        selectedItems.value[0].permission.forEach((permissionName) => {
-          const perm = permissionFrame.value.find(
-            (p) => p.name === permissionName
-          );
-          if (perm) {
-            perm.download = true;
-          }
-        });
-      }
+      resetPermissions();
+      selectedItems.value[0].permission.forEach((permissionName) => {
+        const perm = permissionFrame.value.find(
+          (p) => p.name === permissionName
+        );
+        if (perm) {
+          perm.download = true;
+        }
+      });
 
       dialog.value = true;
     }
@@ -550,40 +544,54 @@ resetPermissions();
 fetchData();
 
 const changeData = async () => {
-    try {
-      const data = {
-        id: selectedId.value,
-        userName: selecteduserName.value,
-        userGroup: selecteduserGroup.value,
-        department: selecteddepartment.value,
-        phoneNumber: selectedphoneNumber.value,
-        eMail: selectedeMail.value,
-        description: selecteddescription.value,
-      };
+  try {
+    const data = {
+      id: selectedId.value,
+      userName: selecteduserName.value,
+      userGroup: selecteduserGroup.value,
+      department: selecteddepartment.value,
+      phoneNumber: selectedphoneNumber.value,
+      eMail: selectedeMail.value,
+      description: selecteddescription.value,
+    };
 
-      const selectedPermission = permissionFrame.value
-        .filter((permission) => permission.download)
-        .map((permission) => permission.name);
-      data.permissions = selectedPermission;
+    const selectedPermission = permissionFrame.value
+      .filter((permission) => permission.download)
+      .map((permission) => permission.name);
 
-      const formattedDate = getFormattedDate(datePermission.value);
-      data.permissionsExpiryTime = formattedDate;
+    const formattedDate = getFormattedDate(datePermission.value);
 
-      console.log(data);
-
-      try {
-        await updateUserData(tokenid.value, data);
-
-        alert("선택된 사용자의 정보 수정이 완료되었습니다.");
-      } catch (error) {
-        console.error(error);
-        alert(error.response?.data || "An error occurred during signup.");
+    if (selecteduserGroup.value === "USER") {
+      if (
+        !datePermission.value ||
+        isNaN(new Date(datePermission.value).getTime())
+      ) {
+        alert("접근 기간을 설정하세요");
+        return;
+      } else {
+        data.permissions = selectedPermission;
+        data.permissionsExpiryTime = formattedDate;
       }
+    } else {
+      data.permissions = [];
+      data.permissionsExpiryTime = "";
+    }
+
+    console.log(data);
+
+    try {
+      await updateUserData(tokenid.value, data);
+
+      alert("선택된 사용자의 정보 수정이 완료되었습니다.");
     } catch (error) {
       console.error(error);
+      alert(error.response?.data || "An error occurred during signup.");
     }
-    nullDialog();
-    // location.reload();
+  } catch (error) {
+    console.error(error);
+  }
+  nullDialog();
+  // location.reload();
 };
 
 const cancel = () => {
