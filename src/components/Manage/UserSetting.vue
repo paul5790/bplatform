@@ -32,79 +32,76 @@
                         <v-text-field
                           :readonly="true"
                           label="사용자 ID"
+                          variant="outlined"
                           required
                           v-model="selectedId"
+                          hide-details="auto"
                         ></v-text-field>
                       </v-col>
                       <v-col cols="12" sm="6">
                         <v-text-field
                           :readonly="true"
                           label="이름"
-                          hint="example of persistent helper text"
+                          variant="outlined"
                           persistent-hint
                           v-model="selecteduserName"
                           required
+                          hide-details="auto"
                         ></v-text-field>
                       </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-text-field
-                          :readonly="true"
-                          v-model="selectedemail"
-                          label="이메일"
-                          required
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-text-field
-                          :readonly="true"
-                          v-model="selectedphoneNumber"
-                          label="전화번호"
-                          required
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12"
-                        ><p style="font-size: 13px">유저 설정</p></v-col
-                      >
-                      <v-col cols="12" sm="6">
-                        <v-text-field
-                          label="소속"
-                          type="text"
-                          :rules="rules.department"
-                          v-model="selecteddepartment"
-                          required
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="12" sm="6">
-                        <v-select
-                          :items="['ADMIN', 'USER', 'GUEST']"
-                          label="권한*"
-                          v-model="selecteduserGroup"
-                          required
-                        ></v-select>
-                      </v-col>
-                      <v-col cols="12">
+                      <v-col cols="12" style="padding-bottom: 0px">
                         <v-textarea
                           counter="25"
                           label="설명"
+                          variant="outlined"
                           type="text"
                           :rules="rules.description"
                           maxlength="25"
                           v-model="selecteddescription"
                           multi-line
+                          hide-details="auto"
                         ></v-textarea>
+                      </v-col>
+
+                      <v-col cols="12" style="padding-bottom: 0px"
+                        ><p style="font-size: 13px">
+                          접근제어 가능 기간 설정
+                        </p></v-col
+                      >
+                      <v-col cols="6">
+                        <v-select
+                          :items="['ADMIN', 'USER', 'GUEST']"
+                          label="권한*"
+                          variant="outlined"
+                          v-model="selecteduserGroup"
+                          required
+                        ></v-select>
+                      </v-col>
+                      <v-col cols="6">
+                        <VueDatePicker
+                          v-if="selecteduserGroup === 'USER'"
+                          time-picker-inline
+                          :min-date="new Date()"
+                          :class="
+                            themeMode === 'dark'
+                              ? 'dp__theme_dark'
+                              : 'dp__theme_light'
+                          "
+                          style="--dp-input-padding: 16px"
+                          v-model="datePermission"
+                          density="compact"
+                          :dark="themeMode === 'dark'"
+                          :readonly="date_readonly"
+                        />
                       </v-col>
                     </v-row>
                   </v-container>
 
                   <v-container v-if="permissionView">
-                    <v-col cols="12"
-                      ><p style="font-size: 13px">권한 설정</p></v-col
-                    >
+                    <p style="font-size: 13px; margin-bottom: 10px;">권한 설정</p>
                     <v-card
                       style="
                         flex: 1;
-                        margin-right: 15px;
-                        margin-left: 15px;
                         display: flex;
                         flex-direction: column;
                       "
@@ -143,23 +140,6 @@
                               </tr>
                             </tbody>
                           </table>
-                          <p style="font-size: 13px; margin-top: 10px">
-                            접근제어 가능 기간 설정
-                          </p>
-                          <VueDatePicker
-                            time-picker-inline
-                            :min-date="new Date()"
-                            :class="
-                              themeMode === 'dark'
-                                ? 'dp__theme_dark'
-                                : 'dp__theme_light'
-                            "
-                            style="--dp-input-padding: 8px"
-                            v-model="datePermission"
-                            density="compact"
-                            :dark="themeMode === 'dark'"
-                            :readonly="date_readonly"
-                          />
                         </v-window>
                       </v-card-item>
                     </v-card>
@@ -366,7 +346,7 @@ const loadDialog = ref(false);
 const selectedId = ref();
 const selecteduserName = ref();
 const selecteddepartment = ref();
-const selectedemail = ref();
+const selectedeMail = ref();
 const selecteduserGroup = ref();
 const selecteddescription = ref();
 const selectedphoneNumber = ref();
@@ -406,7 +386,7 @@ const check = () => {
     selectedId.value = selectedItems.value[0].userId;
     selecteduserName.value = selectedItems.value[0].userName;
     selecteddepartment.value = selectedItems.value[0].department;
-    selectedemail.value = selectedItems.value[0].email;
+    selectedeMail.value = selectedItems.value[0].eMail;
     selecteduserGroup.value = selectedItems.value[0].userGroup;
     selecteddescription.value = selectedItems.value[0].description;
     selectedphoneNumber.value = selectedItems.value[0].phoneNumber;
@@ -506,8 +486,9 @@ const headers = ref([
   { title: "사용자 ID", key: "userId" },
   { title: "이름", key: "userName" },
   { title: "권한", key: "userGroup" },
+  { title: "접근 기간", key: "permissionTime" },
   { title: "소속", key: "department" },
-  { title: "이메일", key: "email" },
+  { title: "이메일", key: "eMail" },
   { title: "전화번호", key: "phoneNumber" },
   { title: "설명", key: "description" },
 ]);
@@ -540,6 +521,7 @@ const fetchData = async () => {
     //   // items.value.push(response.data[i]);
     // }
 
+    console.log(response);
     response.forEach((user) => {
       items.value.push({
         userId: user.id || "",
@@ -548,7 +530,7 @@ const fetchData = async () => {
         department: user.department || "",
         phoneNumber: user.phoneNumber || "",
         description: user.description || "",
-        email: user.email || "",
+        eMail: user.eMail || "",
         permission: user.permissions || "",
         permissionTime: user.permissionsExpiryTime || "",
       });
@@ -568,7 +550,6 @@ resetPermissions();
 fetchData();
 
 const changeData = async () => {
-  if (rulesdepartment.value === true && rulesdescription.value === true) {
     try {
       const data = {
         id: selectedId.value,
@@ -576,7 +557,7 @@ const changeData = async () => {
         userGroup: selecteduserGroup.value,
         department: selecteddepartment.value,
         phoneNumber: selectedphoneNumber.value,
-        eMail: selectedemail.value,
+        eMail: selectedeMail.value,
         description: selecteddescription.value,
       };
 
@@ -603,9 +584,6 @@ const changeData = async () => {
     }
     nullDialog();
     // location.reload();
-  } else {
-    alert("소속을 입력해주세요.");
-  }
 };
 
 const cancel = () => {
@@ -617,7 +595,7 @@ const nullDialog = () => {
   selectedId.value = "";
   selecteduserName.value = "";
   selecteddepartment.value = "";
-  selectedemail.value = "";
+  selectedeMail.value = "";
   selecteduserGroup.value = "";
   selecteddescription.value = "";
   selectedphoneNumber.value = "";

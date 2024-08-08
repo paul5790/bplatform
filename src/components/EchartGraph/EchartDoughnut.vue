@@ -1,8 +1,8 @@
 <template>
   <div class="autocomplete-container">
     <v-select
-      v-model="selectedtrialNum"
-      label="select"
+      v-model="selectedTestName"
+      label="Test Name"
       :items="trialrun"
       variant="underlined"
       style="width: 120px; height: 5vh"
@@ -40,7 +40,7 @@ const { textColor } = themeConfig;
 
 // 시운전 데이터
 const trialrun = ref([]);
-const selectedtrialNum = ref();
+const selectedTestName = ref();
 
 const DGPS = ref({ value: 0, name: "DGPS", itemStyle: { color: "#2Fe7b3" } });
 const GYRO = ref({ value: 0, name: "GYRO" });
@@ -50,9 +50,9 @@ const AIS = ref({ value: 0, name: "AIS" });
 const ECDIS = ref({ value: 0, name: "ECDIS" });
 const AUTOPILOT = ref({ value: 0, name: "AUTOPILOT" });
 const SPEEDLOG = ref({ value: 0, name: "SPEEDLOG" });
-const Canthrottle = ref({
+const CANTHROTTLE = ref({
   value: 0,
-  name: "Canthrottle",
+  name: "CANTHROTTLE",
   itemStyle: { color: "#2F55b3" },
 });
 const AUTOPILOTCONTACT = ref({
@@ -68,8 +68,8 @@ const AllData = ref(0);
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const trialNum = ref(0);
 
-watch(selectedtrialNum, async (newTrialNum) => {
-  console.log(selectedtrialNum.value);
+watch(selectedTestName, async (newTrialNum) => {
+  console.log(selectedTestName.value);
 
   // 항차 N번에서 N 추출
   AIS.value.value = 0;
@@ -80,14 +80,13 @@ watch(selectedtrialNum, async (newTrialNum) => {
   ECDIS.value.value = 0;
   AUTOPILOT.value.value = 0;
   SPEEDLOG.value.value = 0;
-  Canthrottle.value.value = 0;
+  CANTHROTTLE.value.value = 0;
   AUTOPILOTCONTACT.value.value = 0;
   NO1ENGINEPANEL.value.value = 0;
   NO2ENGINEPANEL.value.value = 0;
 
   if (newTrialNum != "전체") {
-    const num = parseInt(newTrialNum.match(/\d+/)[0]);
-    await fetchTrialData(num);
+    await fetchTrialData();
   } else {
     await fetchAllData();
   }
@@ -113,9 +112,11 @@ const fetchAllData = async () => {
   }
 };
 
-const fetchTrialData = async (trialnum) => {
+const fetchTrialData = async () => {
   try {
-    const data = await readDataTrialStorage(tokenid.value, trialnum);
+    const data = await readDataTrialStorage(tokenid.value, selectedTestName.value);
+    console.log('data');
+    console.log(data);
     dataFilter1(data);
   } catch (error) {
     console.error(error);
@@ -156,7 +157,7 @@ const dataFilter1 = (data) => {
         SPEEDLOG.value.value = (Number(SPEEDLOG.value.value) + compValue).toFixed(2);
         break;
       case "canthrottle":
-        Canthrottle.value.value = (Number(Canthrottle.value.value) + compValue).toFixed(2);
+        CANTHROTTLE.value.value = (Number(CANTHROTTLE.value.value) + compValue).toFixed(2);
         break;
       case "autopilotcontact":
         AUTOPILOTCONTACT.value.value = (Number(AUTOPILOTCONTACT.value.value) + compValue).toFixed(2);
@@ -177,7 +178,7 @@ const dataFilter1 = (data) => {
       Number(ECDIS.value.value) +
       Number(AUTOPILOT.value.value) +
       Number(SPEEDLOG.value.value) +
-      Number(Canthrottle.value.value) +
+      Number(CANTHROTTLE.value.value) +
       Number(AUTOPILOTCONTACT.value.value) +
       Number(NO1ENGINEPANEL.value.value) +
       Number(NO2ENGINEPANEL.value.value) 
@@ -218,7 +219,7 @@ const dataFilter = (data) => {
         SPEEDLOG.value.value += Number(item.tableSize);
         break;
       case "canthrottle":
-        Canthrottle.value.value += Number(item.tableSize);
+        CANTHROTTLE.value.value += Number(item.tableSize);
         break;
       case "autopilotcontact":
         AUTOPILOTCONTACT.value.value += Number(item.tableSize);
@@ -239,7 +240,7 @@ const dataFilter = (data) => {
       Number(ECDIS.value.value) +
       Number(AUTOPILOT.value.value) +
       Number(SPEEDLOG.value.value) +
-      Number(Canthrottle.value.value) +
+      Number(CANTHROTTLE.value.value) +
       Number(AUTOPILOTCONTACT.value.value) +
       Number(NO1ENGINEPANEL.value.value) +
       Number(NO2ENGINEPANEL.value.value) 
@@ -254,8 +255,8 @@ const getTrialDate = async () => {
     trialrun.value.push("전체");
     for (let i = 0; i < response.length; i++) {
       const testName = response[i].testName;
-      trialrun.value.push(`시험: ${testName}`);
-      selectedtrialNum.value = trialrun.value[0];
+      trialrun.value.push(testName);
+      selectedTestName.value = trialrun.value[0];
     }
   } catch (error) {
     console.error(error);
@@ -274,7 +275,7 @@ use([
 
 provide(THEME_KEY);
 
-watch([DGPS.value, GYRO.value, ANEMOMETER.value, RADAR.value, AIS.value, ECDIS.value, AUTOPILOT.value, SPEEDLOG.value, Canthrottle.value, AUTOPILOTCONTACT.value, NO1ENGINEPANEL.value, NO2ENGINEPANEL.value], () => {
+watch([DGPS.value, GYRO.value, ANEMOMETER.value, RADAR.value, AIS.value, ECDIS.value, AUTOPILOT.value, SPEEDLOG.value, CANTHROTTLE.value, AUTOPILOTCONTACT.value, NO1ENGINEPANEL.value, NO2ENGINEPANEL.value], () => {
   option.value.legend.data = getLegendData(); // 데이터 변경 시 legend 업데이트
 });
 
@@ -288,7 +289,7 @@ function getLegendData() {
       { name: 'ECDIS', icon: 'circle', value: ECDIS.value.value },
       { name: 'AUTOPILOT', icon: 'circle', value: AUTOPILOT.value.value },
       { name: 'SPEEDLOG', icon: 'circle', value: SPEEDLOG.value.value },
-      { name: 'Canthrottle', icon: 'circle', value: Canthrottle.value.value },
+      { name: 'CANTHROTTLE', icon: 'circle', value: CANTHROTTLE.value.value },
       { name: 'AUTOPILOTCONTACT', icon: 'circle', value: AUTOPILOTCONTACT.value.value },
       { name: 'NO.1ENGINEPANEL', icon: 'circle', value: NO1ENGINEPANEL.value.value },
       { name: 'NO.2ENGINEPANEL', icon: 'circle', value: NO2ENGINEPANEL.value.value },
@@ -363,7 +364,7 @@ const option = ref({
         ECDIS.value,
         AUTOPILOT.value,
         SPEEDLOG.value,
-        Canthrottle.value,
+        CANTHROTTLE.value,
         AUTOPILOTCONTACT.value,
         NO1ENGINEPANEL.value,
         NO2ENGINEPANEL.value,

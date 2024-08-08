@@ -1,25 +1,15 @@
 <template>
   <!-- 전체화면 패딩100px -->
   <v-card-actions>
-    <v-card
-      ref="searchCard"
-      :style="{
-        position: 'absolute',
-        top: searchState ? '80px' : '100px',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 1100,
-        width: '70%',
-        height: '75px',
-        overflow: 'visible',
-      }"
-    >
+    <v-card ref="searchCard" :style="cardStyle">
       <v-card-text style="padding-bottom: 0px">
         <div style="display: flex; gap: 16px">
           <v-text-field
             v-model="tb1"
             density="compact"
-            append-inner-icon="mdi-roman-numeral-3"
+            :append-inner-icon="
+              ShipData === '관제 데이터' ? 'mdi-radar' : 'mdi-ferry'
+            "
             label="ShipData"
             variant="outlined"
             readonly
@@ -36,7 +26,7 @@
             v-model="tb2"
             body-1
             density="compact"
-            append-inner-icon="mdi-roman-numeral-1"
+            append-inner-icon="mdi-format-list-checks"
             label="Main Component"
             variant="outlined"
             @click="
@@ -54,7 +44,11 @@
           <v-text-field
             v-model="tb3"
             density="compact"
-            append-inner-icon="mdi-roman-numeral-2"
+            :append-inner-icon="
+              selectDataType === '비정형 데이터'
+                ? 'mdi-code-json'
+                : 'mdi-table-large'
+            "
             label="Sub Component"
             variant="outlined"
             readonly
@@ -92,17 +86,82 @@
             height="40px"
             >검색</v-btn
           >
-          <v-btn
-            @click="test()"
-            color="#5865f2"
-            variant="flat"
-            width="1%"
-            height="40px"
-            >test</v-btn
-          >
         </div>
       </v-card-text>
     </v-card>
+
+    <v-card
+      v-if="viewState === ''"
+      ref="searchCard"
+      :style="{
+        position: 'absolute',
+        top:
+          SelectedDataCardVisible ||
+          SelectedShipContentsCardVisible ||
+          SelectedVtsContentsCardVisible ||
+          DataTypeCardVisible ||
+          periodSettingCardVisible
+            ? '500px'
+            : '450px',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 1000,
+        width: '70%',
+        overflow: 'visible',
+      }"
+    >
+      <v-card-text style="padding-bottom: 0px">
+        <div class="file-upload-page">
+          <div
+            class="drop-zone"
+            @dragover.prevent
+            @dragenter.prevent
+            @drop.prevent="handleDrop"
+            @click="triggerFileSelect"
+          >
+            <input
+              type="file"
+              ref="fileInput"
+              @change="handleFileSelect"
+              accept=".xls,.xlsx"
+              style="display: none"
+            />
+            <div v-if="!file">
+              <img
+                src="/image/uploadfile.png"
+                alt="upload icon"
+                class="upload-icon"
+              />
+              <p style="font-size: 16px; font-weight: 550">
+                클릭 혹은 파일을 이곳에 드롭하세요.
+              </p>
+              <p>1개씩, 파일당 최대 5MB</p>
+            </div>
+            <div v-else class="file-info">
+              <table>
+                <tr>
+                  <td><strong>파일 이름:</strong></td>
+                  <td>{{ file.name }}</td>
+                </tr>
+                <tr>
+                  <td><strong>최근 수정일:</strong></td>
+                  <td>{{ file.lastModifiedDate.toLocaleString() }}</td>
+                </tr>
+                <tr>
+                  <td><strong>용량:</strong></td>
+                  <td>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</td>
+                </tr>
+              </table>
+              <button @click.stop="removeFile" class="remove-button">X</button>
+            </div>
+          </div>
+          <button @click="uploadFile" :disabled="!file" class="upload-button">
+            다운로드
+          </button>
+        </div>
+      </v-card-text>
+    </v-card>
+
     <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
 
     <!-- 0번째 데이터 타입 선택 카드 -->
@@ -110,7 +169,7 @@
       v-if="SelectedDataCardVisible"
       :style="{
         position: 'absolute',
-        top: searchState ? '150px' : '180px',
+        top: searchState ? '150px' : '310px',
         left: '15%',
         zIndex: 1100,
         width: '27%',
@@ -176,8 +235,8 @@
       v-if="SelectedShipContentsCardVisible"
       :style="{
         position: 'absolute',
-        top: searchState ? '150px' : '180px',
-        left: '30%',
+        top: searchState ? '150px' : '310px',
+        left: '31%',
         zIndex: 1100,
         width: '50%',
         overflow: 'visible',
@@ -260,8 +319,8 @@
       v-if="SelectedVtsContentsCardVisible"
       :style="{
         position: 'absolute',
-        top: searchState ? '150px' : '180px',
-        left: '30%',
+        top: searchState ? '150px' : '310px',
+        left: '31%',
         zIndex: 1100,
         width: '16%',
         overflow: 'visible',
@@ -305,8 +364,8 @@
       v-if="DataTypeCardVisible"
       :style="{
         position: 'absolute',
-        top: searchState ? '150px' : '180px',
-        left: '44.5%',
+        top: searchState ? '150px' : '310px',
+        left: '46.5%',
         zIndex: 1100,
         width: '27%',
         overflow: 'visible',
@@ -371,8 +430,8 @@
       v-if="periodSettingCardVisible"
       :style="{
         position: 'absolute',
-        top: searchState ? '150px' : '180px',
-        left: selectedTest === 0 ? '67.5%' : '67%',
+        top: searchState ? '150px' : '310px',
+        left: selectedTest === 0 ? '67.5%' : '70.5%',
         zIndex: 1100,
         width: selectedTest === 0 ? '35%' : '17%',
         overflow: 'visible',
@@ -520,6 +579,7 @@
           <v-card-actions v-if="downloadPermission">
             <v-spacer></v-spacer>
             <v-select
+              v-if="downloadReq.type === 'table_data'"
               v-model="selectDownloadFormat"
               :items="downloadFormats"
               density="compact"
@@ -614,6 +674,7 @@
           <v-card-actions v-if="downloadPermission">
             <v-spacer></v-spacer>
             <v-select
+              v-if="downloadReq.type === 'table_data'"
               v-model="selectDownloadFormat"
               :items="downloadFormats"
               density="compact"
@@ -687,10 +748,10 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // text field
-let tb1 = '';
-let tb2 = '';
-let tb3 = '';
-let tb4 = '';
+let tb1 = "";
+let tb2 = "";
+let tb3 = "";
+let tb4 = "";
 
 // for View API Request variable
 const requests = ref({
@@ -1201,9 +1262,10 @@ const completeData3 = () => {
   // 데이터 선택 박스 text 할당
   tb4 = searchTimeRange.value;
 
-  requests.value.period = selectedTest.value === 0 
-  ? `period?start_utctime=${startUtc.value}&end_utctime=${endUtc.value}` 
-  : `test?test_name=${searchTimeRange.value}`;
+  requests.value.period =
+    selectedTest.value === 0
+      ? `period?start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`
+      : `test?test_name=${searchTimeRange.value}`;
 
   // 다음 선택 시, 다음 조건 CardView로 이동
   periodSettingCardVisible.value = false;
@@ -1215,18 +1277,14 @@ const completeData3 = () => {
 // --------------- 데이터 검색 버튼 -----------------------//
 ///////////////////////////////////////////////////////////
 const dataSearchBtn = async () => {
-  if (
-    tb1 &&
-    tb2 &&
-    tb3 &&
-    tb4
-  ) {
+  if (tb1 && tb2 && tb3 && tb4) {
+    checkPermission();
     viewState.value = "loading";
     ShipDataState.value = ShipData.value;
     showType.value = selectDataType.value === "정형 데이터" ? "table" : "json";
     let apiReq = `collection_data/information/period?start_utctime=2024-05-27T15:15:28.000Z&end_utctime=2024-05-27T15:45:38.000Z&signal_name=AIS_VDM&signal_name=AIS_VDO`;
     apiReq = `${requests.value.type}/${requests.value.data}/${requests.value.period}${requests.value.signal}`;
-    console.log(apiReq);
+    console.log(formattedSearchTarget.value);
     await searchApi(apiReq);
     if (selectDataType.value == "비정형 데이터") {
       dataKeys2.value = Object.keys(data.value);
@@ -1254,27 +1312,6 @@ const activeTab = ref(0);
 const dataTables = ref({});
 const dataKeys = ref([]);
 const headers = ref([]);
-
-const test = async () => {
-  ShipDataState.value = ShipData.value;
-  let apiReq = `collection_data/information/period?start_utctime=2024-05-27T15:15:28.000Z&end_utctime=2024-05-27T15:45:38.000Z&signal_name=AIS_VDM&signal_name=AIS_VDO`; // (선내,원문,기간)
-  // let apiReq = `collection_data/vts/period?start_utctime=2023-03-14T04:15:28.488521Z&end_utctime=2024-08-15T08:45:38.739842Z&signal_name=integratedctrlsystem_weatherInfo`; // (선내,원문,기간)
-  ShipData.value = "선내 데이터";
-  showType.value = "json";
-
-  await searchApi(apiReq);
-
-  dataKeys2.value = Object.keys(data.value);
-
-  pages.value = dataKeys2.value.reduce((acc, key) => {
-    acc[key] = 1;
-    return acc;
-  }, {});
-
-  ShipDataState.value = ShipData.value;
-  console.log();
-  viewState.value = "ondata";
-};
 
 const searchApi = async (apiReq) => {
   const response = await readDataTrial(tokenid.value, apiReq);
@@ -1442,19 +1479,39 @@ const formattedSearchTarget = computed(() => {
 
 // ----------------------------- 다운로드 ----------------------------- //
 const downloadPermission = ref(false);
+const sampleChoice1 = ref("GYRO_HDT, GYRO_ROT, ANEMOMETER_MWV");
 
-onMounted(async() => {
+const checkPermission = async () => {
   const userDataResponse = await readMineData(tokenid.value);
   console.log(userDataResponse);
-  if (userDataResponse.userGroup === "ADMIN"){
+  if (userDataResponse.userGroup === "ADMIN") {
     downloadPermission.value = true;
   } else {
-    downloadPermission.value = false;
+    const getTime = "2024-08-24T10:03:00";
+    const getPermission = ["GYRO", "ANEMOMETER"];
+
+    const currentTime = new Date();
+    const permissionTime = new Date(getTime);
+
+    // 조건 1: 현재 시간이 getTime보다 이른지 확인
+    const isTimeValid = currentTime < permissionTime;
+
+    // 조건 2: sampleChoice1의 데이터가 getPermission에 포함되는지 확인
+    const isDataValid = formattedSearchTarget.value
+      .split(", ")
+      .every((choice) => {
+        return getPermission.some((permission) =>
+          choice.startsWith(permission)
+        );
+      });
+
+    console.log(isTimeValid);
+    console.log(isDataValid);
+
+    // 두 조건을 모두 만족하는지 확인
+    downloadPermission.value = isTimeValid && isDataValid;
   }
-});
-
-
-
+};
 
 const downloadFormats = ref(["csv", "txt"]);
 const downloadFormatv = ref(["csv", "txt"]);
@@ -1505,6 +1562,108 @@ const dataDownloadServer = async () => {
 //   period: "",
 //   signal: "",
 // })
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// 엑셀파일 업로드 및 다운로드 설정
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+import axios from "axios";
+const file = ref(null);
+
+const handleDrop = (event) => {
+  const droppedFiles = event.dataTransfer.files;
+  if (droppedFiles.length > 0) {
+    processFile(droppedFiles[0]);
+  }
+};
+
+const handleFileSelect = (event) => {
+  const selectedFiles = event.target.files;
+  if (selectedFiles.length > 0) {
+    processFile(selectedFiles[0]);
+  }
+};
+
+const processFile = (selectedFile) => {
+  if (selectedFile.size > 5 * 1024 * 1024) {
+    alert("파일 크기는 최대 5MB까지 가능합니다.");
+    return;
+  }
+  file.value = selectedFile;
+};
+
+const removeFile = () => {
+  file.value = null;
+};
+
+const triggerFileSelect = () => {
+  fileInput.value.click();
+};
+
+const fileInput = ref(null);
+
+const uploadFile = async () => {
+  if (!file.value) return;
+
+  const formData = new FormData();
+  formData.append("file", file.value);
+
+  try {
+    const response = await axios.post(
+      "http://localhost:9998/api/v1/table_data/batch_download",
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log("파일 업로드 성공:", response.data);
+  } catch (error) {
+    console.error("파일 업로드 실패:", error);
+  }
+};
+
+//////////////////////////////////// 스타일 관련 js /////////////////////////////////////////
+
+const cardStyle = computed(() => {
+  let topValue = "320px";
+
+  if (searchState.value) {
+    topValue = "80px";
+  } else {
+    if (
+      SelectedDataCardVisible.value ||
+      SelectedShipContentsCardVisible.value ||
+      SelectedVtsContentsCardVisible.value ||
+      DataTypeCardVisible.value ||
+      periodSettingCardVisible.value
+    ) {
+      topValue = "220px";
+    } else {
+      topValue = "320px";
+    }
+  }
+
+  // 다른 조건들을 추가할 수 있습니다.
+  // if (또 다른 조건) {
+  //   topValue = '200px';
+  // }
+
+  return {
+    position: "absolute",
+    top: topValue,
+    left: "50%",
+    transform: "translateX(-50%)",
+    zIndex: 1100,
+    width: "70%",
+    height: "75px",
+    overflow: "visible",
+  };
+});
 </script>
 
 <style scoped>
@@ -1592,6 +1751,68 @@ const dataDownloadServer = async () => {
 
 .v-data-table__wrapper {
   overflow-x: auto;
+}
+.file-upload-page {
+  text-align: center;
+  padding: 20px;
+}
+
+.drop-zone {
+  border: 2px dashed #ccc;
+  border-radius: 10px;
+  padding: 20px;
+  cursor: pointer;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.upload-icon {
+  width: 50px;
+  height: 50px;
+}
+
+.file-info {
+  text-align: left;
+  margin: 0 auto;
+  max-width: 400px;
+}
+
+.file-info table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.file-info td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.remove-button {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.upload-button {
+  width: 300px;
+  background-color: #5865f2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.upload-button:disabled {
+  width: 300px;
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 </style>
 

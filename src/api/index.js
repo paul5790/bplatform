@@ -3,7 +3,7 @@ import axios from "axios";
 
 const apiLocation = "bdpback.ias.xinnos.com";
 // const apiLocation = "10.16.152.120"; //
-// const apiLocation = "192.168.0.73:9999";
+// const apiLocation = "192.168.0.32:9998";
 export const cctvUrl = `http://${apiLocation}/api/v1/stream/index.m3u8`;
 
 // 취소 토큰 생성
@@ -100,7 +100,6 @@ export const readMineData = async (tokenid) => {
         Authorization: `Bearer ${tokenid}`,
       },
     });
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -403,7 +402,7 @@ export const readlossData = async (
 ) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/lossfreq/${dataFormat}`,
+      `http://${apiLocation}/api/v1/lossfreq/all?test_name=TestCase1`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -562,10 +561,10 @@ export const readDataStorage = async (tokenid) => {
 };
 
 // (Echart 도넛) 항차별 데이터 저장 용량 비교 v1
-export const readDataTrialStorage = async (tokenid, trialnum) => {
+export const readDataTrialStorage = async (tokenid, trialname) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/db/status/tables/test?test_number=${trialnum}`,
+      `http://${apiLocation}/api/v1/db/status/tables/test?test_name=${trialname}`,
       {
         headers: {
           "Content-Type": "application/json",

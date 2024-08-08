@@ -1,8 +1,8 @@
 <template>
   <div class="autocomplete-container">
     <v-select
-      v-model="selectedtrialNum"
-      label="select"
+      v-model="selectedTestName"
+      label="Test Name"
       :items="trialrun"
       variant="underlined"
       style="width: 120px; height: 5vh"
@@ -78,18 +78,16 @@ use([
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
 const trialrun = ref([]);
-const selectedtrialNum = ref();
+const selectedTestName = ref();
 const trialNum = ref(100);
 
 const getTrialDate = async () => {
   try {
     const response = await readTrialData(tokenid.value);
     for (let i = 0; i < response.length; i++) {
-            
       const testName = response[i].testName;
-      trialrun.value.push(`항차 ${testName}번`);
-      selectedtrialNum.value = trialrun.value[0];
-      
+      trialrun.value.push(testName);
+      selectedTestName.value = trialrun.value[0];
     }
   } catch (error) {
     console.error(error);
@@ -102,10 +100,10 @@ const createRefObject = () => {
   const dataRef = {};
 
   const createRef = (key) => {
-    refs[key] = ref(0);
-    refs[`ALL${key}`] = ref(0);
-    dataRef[key] = ref(0);
-    dataRef[`ALL${key}`] = ref(0);
+    refs[key] = ref(null); // 초기 값을 null로 설정
+    refs[`ALL${key}`] = ref(null);
+    dataRef[key] = ref(null);
+    dataRef[`ALL${key}`] = ref(null);
   };
 
   const keys = [
@@ -119,22 +117,22 @@ const createRefObject = () => {
     "HDT",
     "ROT",
     "MWV",
-    "RSCREEN",
+    "RADARSCREEN",
     "VDM",
     "VDO",
     "ROUTEINFO",
     "WAYPOINTS",
     "RTZ",
-    "ESCREEN",
+    "ECDISSCREEN",
     "RSA",
     "HTD",
     "VBW",
     "VHW",
     "VLW",
-    "CAN_Online_State",
-    "Engine_RPM",
-    "Rudder",
-    "Rudder_Scale",
+    "CANONLINESTATE",
+    "ENGINERPM",
+    "RUDDER",
+    "RUDDERSCALE",
     "AUTOPILOTCONTACT",
     "NO1ENGINE_PANEL_61444",
     "NO1ENGINE_PANEL_65262",
@@ -168,311 +166,133 @@ const createRefObject = () => {
 
   keys.forEach((key) => createRef(key));
 
+  console.log(refs["GLL"].value);
+  console.log(refs["ALLGLL"].value);
+
   return { refs, dataRef };
 };
 
 const { refs, dataRef } = createRefObject();
-
-const dataRefs = [
-  refs.GLL,
-  refs.GGA,
-  refs.RMC,
-  refs.VTG,
-  refs.ZDA,
-  refs.GSV,
-  refs.GSA,
-  refs.HDT,
-  refs.ROT,
-  refs.MWV,
-  refs.RSCREEN,
-  refs.VDM,
-  refs.VDO,
-  refs.ROUTEINFO,
-  refs.WAYPOINTS,
-  refs.RTZ,
-  refs.ESCREEN,
-  refs.RSA,
-  refs.HTD,
-  refs.VBW,
-  refs.VHW,
-  refs.VLW,
-  refs.CAN_Online_State,
-  refs.Engine_RPM,
-  refs.Rudder,
-  refs.Rudder_Scale,
-  refs.AUTOPILOTCONTACT,
-  refs.NO1ENGINE_PANEL_61444,
-  refs.NO1ENGINE_PANEL_65262,
-  refs.NO1ENGINE_PANEL_65263,
-  refs.NO1ENGINE_PANEL_65272,
-  refs.NO1ENGINE_PANEL_65271,
-  refs.NO1ENGINE_PANEL_65253,
-  refs.NO1ENGINE_PANEL_65270,
-  refs.NO1ENGINE_PANEL_65276,
-  refs.NO1ENGINE_PANEL_65360,
-  refs.NO1ENGINE_PANEL_65361_LAMP,
-  refs.NO1ENGINE_PANEL_65361_STATUS,
-  refs.NO1ENGINE_PANEL_65378,
-  refs.NO1ENGINE_PANEL_65376,
-  refs.NO1ENGINE_PANEL_65379,
-  refs.NO2ENGINE_PANEL_61444,
-  refs.NO2ENGINE_PANEL_65262,
-  refs.NO2ENGINE_PANEL_65263,
-  refs.NO2ENGINE_PANEL_65272,
-  refs.NO2ENGINE_PANEL_65271,
-  refs.NO2ENGINE_PANEL_65253,
-  refs.NO2ENGINE_PANEL_65270,
-  refs.NO2ENGINE_PANEL_65276,
-  refs.NO2ENGINE_PANEL_65360,
-  refs.NO2ENGINE_PANEL_65361_LAMP,
-  refs.NO2ENGINE_PANEL_65361_STATUS,
-  refs.NO2ENGINE_PANEL_65378,
-  refs.NO2ENGINE_PANEL_65376,
-  refs.NO2ENGINE_PANEL_65379,
-];
-
-const responseKeys = [
-  "DGPS_GLL",
-  "DGPS_GGA",
-  "DGPS_RMC",
-  "DGPS_VTG",
-  "DGPS_ZDA",
-  "DGPS_GSV",
-  "DGPS_GSA",
-  "GYRO_HDT",
-  "GYRO_ROT",
-  "ANEMOMETER_MWV",
-  "RADAR_RADARSCREEN",
-  "AIS_VDM",
-  "AIS_VDO",
-  "ECDIS_ROUTEINFO",
-  "ECDIS_WAYPOINTS",
-  "ECDIS_RTZ",
-  "ECDIS_ECDISSCREEN",
-  "AUTOPILOT_RSA",
-  "AUTOPILOT_HTD",
-  "SPEEDLOG_VBW",
-  "SPEEDLOG_VHW",
-  "SPEEDLOG_VLW",
-  "CANTHROTTLE_CANONLINESTATE",
-  "CANTHROTTLE_ENGINERPM",
-  "CANTHROTTLE_RUDDER",
-  "CANTHROTTLE_RUDDERSCALE",
-  "AUTOPILOTCONTACT_AUTOPILOTCONTACT",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_61444",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65262",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65263",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65272",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65271",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65253",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65270",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65276",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65360",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_LAMP",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65361_STATUS",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65378",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65376",
-  "NO1ENGINEPANEL_NO1ENGINE_PANEL_65379",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_61444",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65262",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65263",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65272",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65271",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65253",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65270",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65276",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65360",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_LAMP",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65361_STATUS",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65378",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65376",
-  "NO2ENGINEPANEL_NO2ENGINE_PANEL_65379",
-];
-
-const alldataRefs = [
-  refs.ALLGLL,
-  refs.ALLGGA,
-  refs.ALLRMC,
-  refs.ALLVTG,
-  refs.ALLZDA,
-  refs.ALLGSV,
-  refs.ALLGSA,
-  refs.ALLHDT,
-  refs.ALLROT,
-  refs.ALLMWV,
-  refs.ALLRSCREEN,
-  refs.ALLVDM,
-  refs.ALLVDO,
-  refs.ALLROUTEINFO,
-  refs.ALLWAYPOINTS,
-  refs.ALLRTZ,
-  refs.ALLESCREEN,
-  refs.ALLRSA,
-  refs.ALLHTD,
-  refs.ALLVBW,
-  refs.ALLVHW,
-  refs.ALLVLW,
-  refs.ALLCAN_Online_State,
-  refs.ALLEngine_RPM,
-  refs.ALLRudder,
-  refs.ALLRudder_Scale,
-  refs.ALLAUTOPILOTCONTACT,
-  refs.ALLNO1ENGINE_PANEL_61444,
-  refs.ALLNO1ENGINE_PANEL_65262,
-  refs.ALLNO1ENGINE_PANEL_65263,
-  refs.ALLNO1ENGINE_PANEL_65272,
-  refs.ALLNO1ENGINE_PANEL_65271,
-  refs.ALLNO1ENGINE_PANEL_65253,
-  refs.ALLNO1ENGINE_PANEL_65270,
-  refs.ALLNO1ENGINE_PANEL_65276,
-  refs.ALLNO1ENGINE_PANEL_65360,
-  refs.ALLNO1ENGINE_PANEL_65361_LAMP,
-  refs.ALLNO1ENGINE_PANEL_65361_STATUS,
-  refs.ALLNO1ENGINE_PANEL_65378,
-  refs.ALLNO1ENGINE_PANEL_65376,
-  refs.ALLNO1ENGINE_PANEL_65379,
-  refs.ALLNO2ENGINE_PANEL_61444,
-  refs.ALLNO2ENGINE_PANEL_65262,
-  refs.ALLNO2ENGINE_PANEL_65263,
-  refs.ALLNO2ENGINE_PANEL_65272,
-  refs.ALLNO2ENGINE_PANEL_65271,
-  refs.ALLNO2ENGINE_PANEL_65253,
-  refs.ALLNO2ENGINE_PANEL_65270,
-  refs.ALLNO2ENGINE_PANEL_65276,
-  refs.ALLNO2ENGINE_PANEL_65360,
-  refs.ALLNO2ENGINE_PANEL_65361_LAMP,
-  refs.ALLNO2ENGINE_PANEL_65361_STATUS,
-  refs.ALLNO2ENGINE_PANEL_65378,
-  refs.ALLNO2ENGINE_PANEL_65376,
-  refs.ALLNO2ENGINE_PANEL_65379,
-];
-
-const axioslist = ref([
-  "dgps/gll",
-  "dgps/gga",
-  "dgps/rmc",
-  "dgps/vtg",
-  "dgps/zda",
-  "dgps/gsv",
-  "dgps/gsa",
-  "gyro/hdt",
-  "gyro/rot",
-  "anemometer/mwv",
-  "radar/radarscreen",
-  "ais/vdm",
-  "ais/vdo",
-  "ecdis/routeinfo",
-  "ecdis/waypoints",
-  "ecdis/rtz",
-  "ecdis/ecdisscreen",
-  "autopilot/rsa",
-  "autopilot/htd",
-  "speedlog/vbw",
-  "speedlog/vhw",
-  "speedlog/vlw",
-  "canthrottle/canonlinestate",
-  "canthrottle/enginerpm",
-  "canthrottle/rudder",
-  "canthrottle/rudderscale",
-  "autopilotcontact/autopilotcontact",
-  "no1enginepanel/no1engine_panel_61444",
-  "no1enginepanel/no1engine_panel_65262",
-  "no1enginepanel/no1engine_panel_65263",
-  "no1enginepanel/no1engine_panel_65272",
-  "no1enginepanel/no1engine_panel_65271",
-  "no1enginepanel/no1engine_panel_65253",
-  "no1enginepanel/no1engine_panel_65270",
-  "no1enginepanel/no1engine_panel_65276",
-  "no1enginepanel/no1engine_panel_65360",
-  "no1enginepanel/no1engine_panel_65361_lamp",
-  "no1enginepanel/no1engine_panel_65361_status",
-  "no1enginepanel/no1engine_panel_65378",
-  "no1enginepanel/no1engine_panel_65376",
-  "no1enginepanel/no1engine_panel_65379",
-  "no2enginepanel/no2engine_panel_61444",
-  "no2enginepanel/no2engine_panel_65262",
-  "no2enginepanel/no2engine_panel_65263",
-  "no2enginepanel/no2engine_panel_65272",
-  "no2enginepanel/no2engine_panel_65271",
-  "no2enginepanel/no2engine_panel_65253",
-  "no2enginepanel/no2engine_panel_65270",
-  "no2enginepanel/no2engine_panel_65276",
-  "no2enginepanel/no2engine_panel_65360",
-  "no2enginepanel/no2engine_panel_65361_lamp",
-  "no2enginepanel/no2engine_panel_65361_status",
-  "no2enginepanel/no2engine_panel_65378",
-  "no2enginepanel/no2engine_panel_65376",
-  "no2enginepanel/no2engine_panel_65379",
-]);
-
 const createDataObject = (groupId, values, allValues) => {
   const valueSum = values.reduce((acc, val) => acc + val.value, 0);
   const allValueSum = allValues.reduce((acc, val) => acc + val.value, 0);
-  const percent = ((valueSum / allValueSum) * 100).toFixed(2);
+
+  // `countDelay` 값의 합산 계산
+  const countDelaySum = values.reduce((acc, refObj) => {
+    // null 체크를 통해 안전하게 _value와 countDelay에 접근
+    if (refObj._value && refObj._value.countDelay) {
+      return acc + Number(refObj._value.countDelay);
+    }
+    return acc;
+  }, 0);
+  const numOfDataSum = allValues.reduce((acc, refObj) => {
+    // null 체크를 통해 안전하게 _value와 countDelay에 접근
+    if (refObj._value && refObj._value.numOfData) {
+      return acc + Number(refObj._value.numOfData);
+    }
+    return acc;
+  }, 0);
+
+  const percent = ((countDelaySum / numOfDataSum) * 100).toFixed(2);
 
   return {
-    value: valueSum,
+    value: countDelaySum,
     groupId: groupId,
     percent: percent,
     itemStyle: {
-      color: percent > 30 ? '#FF6666' : undefined // 30% 초과 시 빨간색, 이하 시 기본 색상 (여기서는 파란색)
-    }
+      color: percent > 30 ? "#FF6666" : undefined, // 30% 초과 시 빨간색, 이하 시 기본 색상 (여기서는 파란색)
+    },
   };
 };
 
 // 로딩
 const loading = ref(true);
 
-const fetchData = async () => {
-  loading.value = true;
-  try {
-    const response = await readLossTimeData(tokenid.value);
-    const timeDataRefs = responseKeys.map((key) => response[key]);
-    const axiosPromises = axioslist.value.map(async (endpoint, i) => {
-      try {
-        const [Sc, Co] = endpoint.split("/");
-        const dataFormat = `signal?signal_name=${Sc}_${Co}&test_number=${trialNum.value}&settime=${timeDataRefs[i]}`;
-        console.log(dataFormat);
+// response 데이터를 refs에 넣는 함수
+const populateRefs = (responseData) => {
+  responseData.forEach((item) => {
+    let signalName = item.signalName;
 
-        const response = await readlossData(
-          tokenid.value,
-          dataFormat
-        );
-
-        if (response) {
-      dataRefs[i].value = Number(response.countDelay) || 0;
-      alldataRefs[i].value = Number(response.numOfData) || 0;
+    // 엔진 데이터인 경우 접두사 포함
+    if (
+      signalName.includes("ENGINE_PANEL") ||
+      signalName.includes("NO1ENGINE_PANEL") ||
+      signalName.includes("NO2ENGINE_PANEL")
+    ) {
+      signalName = signalName.substring(signalName.indexOf("_") + 1);
     } else {
-      dataRefs[i].value = 0;
-      alldataRefs[i].value = 0;
+      // 접두사를 제거하고 나머지 부분만 사용
+      signalName = signalName.split("_").pop();
     }
-      } catch (error) {
-        //console.error(error);
-      }
-    });
 
-    // 모든 axios 호출이 완료될 때까지 기다림
-    await Promise.all(axiosPromises);
-    loading.value = false;
-
-    // 데이터를 모두 받아온 후에 차트 업데이트
-
-    await updateChart();
-  } catch (error) {
-    console.error("Error during fetchData:", error);
-  }
+    if (refs[signalName] && refs[`ALL${signalName}`]) {
+      refs[signalName].value = item;
+      refs[`ALL${signalName}`].value = item;
+    }
+  });
 };
 
-onMounted(() => {
-  fetchData();
-});
+const fetchData = async () => {
+  loading.value = true;
 
-// selectedtrialNum의 변경을 감시하고 변경되면 trialNum을 갱신하고 fetchData 실행
-watch(selectedtrialNum, (newTrialNum) => {
+  const response = await readlossData(tokenid.value, selectedTestName);
+
+  console.log(response);
+  await populateRefs(response);
+
+  loading.value = false;
+  updateChart();
+
+  // try {
+  //   const response = await readLossTimeData(tokenid.value);
+  //   const timeDataRefs = responseKeys.map((key) => response[key]);
+  //   const axiosPromises = axioslist.value.map(async (endpoint, i) => {
+  //     try {
+  //       const [Sc, Co] = endpoint.split("/");
+  //       const dataFormat = `signal?signal_name=${Sc}_${Co}&test_name=${selectedTestName.value}&settime=${timeDataRefs[i]}`;
+  //       console.log(dataFormat);
+
+  //       const response = await readlossData(
+  //         tokenid.value,
+  //         selectedTestName
+  //       );
+
+  //   if (response) {
+  //     dataRefs[i].value = Number(response.countDelay) || 0;
+  //     alldataRefs[i].value = Number(response.numOfData) || 0;
+  //   } else {
+  //     dataRefs[i].value = 0;
+  //     alldataRefs[i].value = 0;
+  //   }
+  //     } catch (error) {
+  //       //console.error(error);
+  //     }
+  //   });
+
+  //   // 모든 axios 호출이 완료될 때까지 기다림
+  //   await Promise.all(axiosPromises);
+  //   loading.value = false;
+
+  //   // 데이터를 모두 받아온 후에 차트 업데이트
+
+  //   await updateChart();
+  // } catch (error) {
+  //   console.error("Error during fetchData:", error);
+  // }
+};
+
+// onMounted(() => {
+//   fetchData();
+// });
+
+// selectedTestName 변경을 감시하고 변경되면 trialNum을 갱신하고 fetchData 실행
+watch(selectedTestName, (newTrialNum) => {
   // 항차 N번에서 N 추출
   const num = parseInt(newTrialNum.match(/\d+/)[0]);
   trialNum.value = num;
   fetchData();
+
+  option.value.title.text = `${newTrialNum} 데이터 저장 용량`;
 });
 
 provide(THEME_KEY);
@@ -496,7 +316,12 @@ const option = ref({
       let value = params.data ? params.data.value : null; // value 값
       let percent = params.data ? params.data.percent : null;
       // params.data가 존재하고 groupId, value, percent 속성이 존재하는지 확인
-      if (params.data && groupId !== null && value !== null && percent !== null) {
+      if (
+        params.data &&
+        groupId !== null &&
+        value !== null &&
+        percent !== null
+      ) {
         // 툴팁 형식 설정
         return `${groupId} : ${value}번 <br> 소실률 : ${percent}%`;
       } else {
@@ -540,18 +365,34 @@ const option = ref({
       createDataObject(
         "DGPS",
         [refs.GLL, refs.GGA, refs.RMC, refs.VTG, refs.ZDA, refs.GSV, refs.GSA],
-        [refs.ALLGLL, refs.ALLGGA, refs.ALLRMC, refs.ALLVTG, refs.ALLZDA, refs.ALLGSV, refs.ALLGSA]
+        [
+          refs.ALLGLL,
+          refs.ALLGGA,
+          refs.ALLRMC,
+          refs.ALLVTG,
+          refs.ALLZDA,
+          refs.ALLGSV,
+          refs.ALLGSA,
+        ]
       ),
-      createDataObject("GYRO", [refs.HDT, refs.ROT], [refs.ALLHDT, refs.ALLROT]),
+      createDataObject(
+        "GYRO",
+        [refs.HDT, refs.ROT],
+        [refs.ALLHDT, refs.ALLROT]
+      ),
       createDataObject("ANEMOMETER", [refs.MWV], [refs.ALLMWV]),
-      createDataObject("RADAR", [refs.RSCREEN], [refs.ALLRSCREEN]),
+      createDataObject("RADAR", [refs.RADARSCREEN], [refs.ALLRADARSCREEN]),
       createDataObject("AIS", [refs.VDM, refs.VDO], [refs.ALLVDM, refs.ALLVDO]),
       createDataObject(
         "ECDIS",
-        [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ESCREEN],
-        [refs.ALLROUTEINFO, refs.ALLWAYPOINTS, refs.ALLRTZ, refs.ALLESCREEN]
+        [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ECDISSCREEN],
+        [refs.ALLROUTEINFO, refs.ALLWAYPOINTS, refs.ALLRTZ, refs.ALLECDISSCREEN]
       ),
-      createDataObject("AUTOPILOT", [refs.RSA, refs.HTD], [refs.ALLRSA, refs.ALLHTD]),
+      createDataObject(
+        "AUTOPILOT",
+        [refs.RSA, refs.HTD],
+        [refs.ALLRSA, refs.ALLHTD]
+      ),
       createDataObject(
         "SPEEDLOG",
         [refs.VBW, refs.VHW, refs.VLW],
@@ -559,8 +400,13 @@ const option = ref({
       ),
       createDataObject(
         "CanThrottle",
-        [refs.CAN_Online_State, refs.Engine_RPM, refs.Rudder, refs.Rudder_Scale],
-        [refs.ALLCAN_Online_State, refs.ALLEngine_RPM, refs.ALLRudder, refs.ALLRudder_Scale]
+        [refs.CANONLINESTATE, refs.ENGINERPM, refs.RUDDER, refs.RUDDERSCALE],
+        [
+          refs.ALLCANONLINESTATE,
+          refs.ALLENGINERPM,
+          refs.ALLRUDDER,
+          refs.ALLRUDDERSCALE,
+        ]
       ),
       createDataObject(
         "AUTOPILOTCONTACT",
@@ -645,11 +491,8 @@ const option = ref({
   },
 });
 
-
 let drilldownData = [];
 // 그래프 클릭 이벤트 핸들러
-
-
 
 const handleChartClick = async (event) => {
   if (event.data) {
@@ -717,19 +560,61 @@ const handleChartClick = async (event) => {
                   data: [
                     createDataObject(
                       "DGPS",
-                      [refs.GLL, refs.GGA, refs.RMC, refs.VTG, refs.ZDA, refs.GSV, refs.GSA],
-                      [refs.ALLGLL, refs.ALLGGA, refs.ALLRMC, refs.ALLVTG, refs.ALLZDA, refs.ALLGSV, refs.ALLGSA]
+                      [
+                        refs.GLL,
+                        refs.GGA,
+                        refs.RMC,
+                        refs.VTG,
+                        refs.ZDA,
+                        refs.GSV,
+                        refs.GSA,
+                      ],
+                      [
+                        refs.ALLGLL,
+                        refs.ALLGGA,
+                        refs.ALLRMC,
+                        refs.ALLVTG,
+                        refs.ALLZDA,
+                        refs.ALLGSV,
+                        refs.ALLGSA,
+                      ]
                     ),
-                    createDataObject("GYRO", [refs.HDT, refs.ROT], [refs.ALLHDT, refs.ALLROT]),
+                    createDataObject(
+                      "GYRO",
+                      [refs.HDT, refs.ROT],
+                      [refs.ALLHDT, refs.ALLROT]
+                    ),
                     createDataObject("ANEMOMETER", [refs.MWV], [refs.ALLMWV]),
-                    createDataObject("RADAR", [refs.RSCREEN], [refs.ALLRSCREEN]),
-                    createDataObject("AIS", [refs.VDM, refs.VDO], [refs.ALLVDM, refs.ALLVDO]),
+                    createDataObject(
+                      "RADAR",
+                      [refs.RADARSCREEN],
+                      [refs.ALLRADARSCREEN]
+                    ),
+                    createDataObject(
+                      "AIS",
+                      [refs.VDM, refs.VDO],
+                      [refs.ALLVDM, refs.ALLVDO]
+                    ),
                     createDataObject(
                       "ECDIS",
-                      [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ESCREEN],
-                      [refs.ALLROUTEINFO, refs.ALLWAYPOINTS, refs.ALLRTZ, refs.ALLESCREEN]
+                      [
+                        refs.ROUTEINFO,
+                        refs.WAYPOINTS,
+                        refs.RTZ,
+                        refs.ECDISSCREEN,
+                      ],
+                      [
+                        refs.ALLROUTEINFO,
+                        refs.ALLWAYPOINTS,
+                        refs.ALLRTZ,
+                        refs.ALLECDISSCREEN,
+                      ]
                     ),
-                    createDataObject("AUTOPILOT", [refs.RSA, refs.HTD], [refs.ALLRSA, refs.ALLHTD]),
+                    createDataObject(
+                      "AUTOPILOT",
+                      [refs.RSA, refs.HTD],
+                      [refs.ALLRSA, refs.ALLHTD]
+                    ),
                     createDataObject(
                       "SPEEDLOG",
                       [refs.VBW, refs.VHW, refs.VLW],
@@ -737,12 +622,17 @@ const handleChartClick = async (event) => {
                     ),
                     createDataObject(
                       "CanThrottle",
-                      [refs.CAN_Online_State, refs.Engine_RPM, refs.Rudder, refs.Rudder_Scale],
                       [
-                        refs.ALLCAN_Online_State,
-                        refs.ALLEngine_RPM,
-                        refs.ALLRudder,
-                        refs.ALLRudder_Scale,
+                        refs.CANONLINESTATE,
+                        refs.ENGINERPM,
+                        refs.RUDDER,
+                        refs.RUDDERSCALE,
+                      ],
+                      [
+                        refs.ALLCANONLINESTATE,
+                        refs.ALLENGINERPM,
+                        refs.ALLRUDDER,
+                        refs.ALLRUDDERSCALE,
                       ]
                     ),
                     createDataObject(
@@ -865,25 +755,35 @@ const calculateGroupPercentage = (values, allValues) => {
   return { value, percent };
 };
 
-const updateDataObject = (id, value, allValue) => ({
-  value: value,
-  groupId: id,
-  percent: ((value / allValue) * 100).toFixed(2),
-    itemStyle: {
-    color: ((value / allValue) * 100) > 30 ? '#FF6666' : undefined // 소실률이 30% 초과 시 빨간색
+const updateDataObject = (id, value, allValue) => {
+  if (!value || !value.countDelay || !allValue || !allValue.numOfData) {
+    // 필요한 값이 없으면 기본 객체를 반환하거나 에러를 처리할 수 있음
+    return {
+      value: 0,
+      groupId: id,
+      percent: "0.00",
+      itemStyle: {
+        color: undefined, // 기본 색상
+      },
+    };
   }
-});
 
-watch(selectedtrialNum, (newTrialNum) => {
-  option.value.title.text = `${newTrialNum} 데이터 저장 용량`;
-});
+  return {
+    value: value.countDelay,
+    groupId: id,
+    percent: ((value.countDelay / allValue.numOfData) * 100).toFixed(2),
+    itemStyle: {
+      color: (value.countDelay / allValue.numOfData) * 100 > 30 ? "#FF6666" : undefined, // 소실률이 30% 초과 시 빨간색
+    },
+  };
+};
 
 const updateChart = () => {
   if (chart.value) {
     // 차트 데이터 업데이트 로직
     const updatedOption = {
       title: {
-        text: `${selectedtrialNum.value} 데이터 소실 빈도`,
+        text: `${selectedTestName.value} 데이터 소실 빈도`,
         left: "center",
         textStyle: {
           fontSize: 19, // 폰트 크기 설정
@@ -897,19 +797,52 @@ const updateChart = () => {
         data: [
           createDataObject(
             "DGPS",
-            [refs.GLL, refs.GGA, refs.RMC, refs.VTG, refs.ZDA, refs.GSV, refs.GSA],
-            [refs.ALLGLL, refs.ALLGGA, refs.ALLRMC, refs.ALLVTG, refs.ALLZDA, refs.ALLGSV, refs.ALLGSA]
+            [
+              refs.GLL,
+              refs.GGA,
+              refs.RMC,
+              refs.VTG,
+              refs.ZDA,
+              refs.GSV,
+              refs.GSA,
+            ],
+            [
+              refs.ALLGLL,
+              refs.ALLGGA,
+              refs.ALLRMC,
+              refs.ALLVTG,
+              refs.ALLZDA,
+              refs.ALLGSV,
+              refs.ALLGSA,
+            ]
           ),
-          createDataObject("GYRO", [refs.HDT, refs.ROT], [refs.ALLHDT, refs.ALLROT]),
+          createDataObject(
+            "GYRO",
+            [refs.HDT, refs.ROT],
+            [refs.ALLHDT, refs.ALLROT]
+          ),
           createDataObject("ANEMOMETER", [refs.MWV], [refs.ALLMWV]),
-          createDataObject("RADAR", [refs.RSCREEN], [refs.ALLRSCREEN]),
-          createDataObject("AIS", [refs.VDM, refs.VDO], [refs.ALLVDM, refs.ALLVDO]),
+          createDataObject("RADAR", [refs.RADARSCREEN], [refs.ALLRADARSCREEN]),
+          createDataObject(
+            "AIS",
+            [refs.VDM, refs.VDO],
+            [refs.ALLVDM, refs.ALLVDO]
+          ),
           createDataObject(
             "ECDIS",
-            [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ESCREEN],
-            [refs.ALLROUTEINFO, refs.ALLWAYPOINTS, refs.ALLRTZ, refs.ALLESCREEN]
+            [refs.ROUTEINFO, refs.WAYPOINTS, refs.RTZ, refs.ECDISSCREEN],
+            [
+              refs.ALLROUTEINFO,
+              refs.ALLWAYPOINTS,
+              refs.ALLRTZ,
+              refs.ALLECDISSCREEN,
+            ]
           ),
-          createDataObject("AUTOPILOT", [refs.RSA, refs.HTD], [refs.ALLRSA, refs.ALLHTD]),
+          createDataObject(
+            "AUTOPILOT",
+            [refs.RSA, refs.HTD],
+            [refs.ALLRSA, refs.ALLHTD]
+          ),
           createDataObject(
             "SPEEDLOG",
             [refs.VBW, refs.VHW, refs.VLW],
@@ -917,8 +850,18 @@ const updateChart = () => {
           ),
           createDataObject(
             "CanThrottle",
-            [refs.CAN_Online_State, refs.Engine_RPM, refs.Rudder, refs.Rudder_Scale],
-            [refs.ALLCAN_Online_State, refs.ALLEngine_RPM, refs.ALLRudder, refs.ALLRudder_Scale]
+            [
+              refs.CANONLINESTATE,
+              refs.ENGINERPM,
+              refs.RUDDER,
+              refs.RUDDERSCALE,
+            ],
+            [
+              refs.ALLCANONLINESTATE,
+              refs.ALLENGINERPM,
+              refs.ALLRUDDER,
+              refs.ALLRUDDERSCALE,
+            ]
           ),
           createDataObject(
             "AUTOPILOTCONTACT",
@@ -1025,14 +968,20 @@ const updateChart = () => {
       },
       {
         dataGroupId: "ANEMOMETER",
-        data: [["MWV", updateDataObject("MWV", refs.MWV.value, refs.ALLMWV.value)]],
+        data: [
+          ["MWV", updateDataObject("MWV", refs.MWV.value, refs.ALLMWV.value)],
+        ],
       },
       {
         dataGroupId: "RADAR",
         data: [
           [
-            "RSCREEN",
-            updateDataObject("RSCREEN", refs.RSCREEN.value, refs.ALLRSCREEN.value),
+            "RADARSCREEN",
+            updateDataObject(
+              "RADARSCREEN",
+              refs.RADARSCREEN.value,
+              refs.ALLRADARSCREEN.value
+            ),
           ],
         ],
       },
@@ -1048,16 +997,28 @@ const updateChart = () => {
         data: [
           [
             "ROUTEINFO",
-            updateDataObject("ROUTEINFO", refs.ROUTEINFO.value, refs.ALLROUTEINFO.value),
+            updateDataObject(
+              "ROUTEINFO",
+              refs.ROUTEINFO.value,
+              refs.ALLROUTEINFO.value
+            ),
           ],
           [
             "WAYPOINTS",
-            updateDataObject("WAYPOINTS", refs.WAYPOINTS.value, refs.ALLWAYPOINTS.value),
+            updateDataObject(
+              "WAYPOINTS",
+              refs.WAYPOINTS.value,
+              refs.ALLWAYPOINTS.value
+            ),
           ],
           ["RTZ", updateDataObject("RTZ", refs.RTZ.value, refs.ALLRTZ.value)],
           [
-            "ESCREEN",
-            updateDataObject("ESCREEN", refs.ESCREEN.value, refs.ALLESCREEN.value),
+            "ECDISSCREEN",
+            updateDataObject(
+              "ECDISSCREEN",
+              refs.ECDISSCREEN.value,
+              refs.ALLECDISSCREEN.value
+            ),
           ],
         ],
       },
@@ -1080,28 +1041,31 @@ const updateChart = () => {
         dataGroupId: "CanThrottle",
         data: [
           [
-            "CAN_Online_State",
+            "CANONLINESTATE",
             updateDataObject(
-              "CAN_Online_State",
-              refs.CAN_Online_State.value,
-              refs.ALLCAN_Online_State.value
+              "CANONLINESTATE",
+              refs.CANONLINESTATE.value,
+              refs.ALLCANONLINESTATE.value
             ),
           ],
           [
-            "Engine_RPM",
+            "ENGINERPM",
             updateDataObject(
-              "Engine_RPM",
-              refs.Engine_RPM.value,
-              refs.ALLEngine_RPM.value
+              "ENGINERPM",
+              refs.ENGINERPM.value,
+              refs.ALLENGINERPM.value
             ),
           ],
-          ["Rudder", updateDataObject("Rudder", refs.Rudder.value, refs.ALLRudder.value)],
           [
-            "Rudder_Scale",
+            "RUDDER",
+            updateDataObject("RUDDER", refs.RUDDER.value, refs.ALLRUDDER.value),
+          ],
+          [
+            "RUDDERSCALE",
             updateDataObject(
-              "Rudder_Scale",
-              refs.Rudder_Scale.value,
-              refs.ALLRudder_Scale.value
+              "RUDDERSCALE",
+              refs.RUDDERSCALE.value,
+              refs.ALLRUDDERSCALE.value
             ),
           ],
         ],

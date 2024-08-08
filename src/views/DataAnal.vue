@@ -91,10 +91,10 @@
             >
               <v-card style="flex: 1">
                 <v-card-item id="graph" :style="tableStyle">
-                  <v-card-title>
-                    <span class="text-h6"
-                      >{{ selectedcontentsItem }} contents</span
-                    >
+                  <v-card-title class="card-title">
+                    <span class="text-h6">{{ selectedcontentsItem }} contents</span>
+                    <v-spacer></v-spacer>
+                    <span class="text-span">*This data was provided by Xinnos. Unauthorized distribution or disclosure of this data is strictly prohibited.</span>
                   </v-card-title>
                   <div ref="chartRef" class="chart" autoresize></div>
                   <div>
@@ -512,11 +512,7 @@ const option = ref({
   legend: {
     data: selectedsubComponent.value,
   },
-  toolbox: {
-    feature: {
-      saveAsImage: {},
-    },
-  },
+  toolbox: {},
   grid: {
     top: "13%", // top margin을 15%로 설정
   },
@@ -1799,5 +1795,14 @@ body {
 }
 .v-data-table-footer {
   display: none !important;
+}
+.card-title {
+  display: flex;
+  align-items: center;
+}
+.text-span {
+  margin-top: 5px;
+  font-size: 11px;
+  color: #ff4444;
 }
 </style>

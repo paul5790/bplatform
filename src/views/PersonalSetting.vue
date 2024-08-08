@@ -1548,12 +1548,12 @@
       <!-- 실시간 주기 설정 모달 -->
       <v-dialog
         v-model="realtimeStandardDialog"
-        max-width="500"
+        max-width="600"
         max-height="600"
       >
         <v-card class="scrollable-card-1">
           <v-card-title>실시간 데이터 기준 설정</v-card-title>
-          <v-card-text style="padding-bottom: 0px">
+          <!-- <v-card-text style="padding-bottom: 0px">
             <v-btn-toggle
               v-model="shipType"
               variant="outlined"
@@ -1586,7 +1586,7 @@
               v-show="!rsShow"
               >설정</v-btn
             >
-          </v-card-actions>
+          </v-card-actions> -->
           <v-expand-transition>
             <div v-show="rsShow">
               <v-divider></v-divider>
@@ -1611,14 +1611,14 @@
                       <v-text-field
                         v-model="item.minValue"
                         label="min"
-                        :rules="[standardRules.required]"
+                        :rules="[standardRules.required, isNumber, isMinLessThanMax(index)]"
                         variant="underlined"
                         density="compact"
                         required
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="1.5" class="compact-label-left">
-                      <v-list-subheader class="compact-label">
+                    <v-col cols="1.5">
+                      <v-list-subheader  class="compact-label-left">
                         ~
                       </v-list-subheader></v-col
                     >
@@ -1626,7 +1626,7 @@
                       <v-text-field
                         v-model="item.maxValue"
                         label="max"
-                        :rules="[standardRules.required]"
+                        :rules="[standardRules.required, isNumber, isMaxGreaterThanMin(index)]"
                         variant="underlined"
                         density="compact"
                         required
@@ -1648,7 +1648,7 @@
                 <v-btn
                   color="blue-darken-1"
                   variant="text"
-                  @click="axiosMinMax()"
+                  @click="handleSubmit()"
                   v-show="rsShow"
                   >설정</v-btn
                 >
@@ -2197,14 +2197,56 @@ const rules = ref({
   ],
 });
 
+const standardRules = {
+  required: (value) => !!value || "필수 입력 항목입니다.",
+};
+
+const isNumber = (value) => !isNaN(value) || 'Must be a number.';
+
+const isMinLessThanMax = (index) => {
+  return (value) => {
+    const minValue = parseFloat(value);
+    const maxValue = parseFloat(standardItems.value[index].maxValue);
+    return isNaN(maxValue) || minValue < maxValue || 'Min must be less than Max.';
+  };
+};
+
+const isMaxGreaterThanMin = (index) => {
+  return (value) => {
+    const maxValue = parseFloat(value);
+    const minValue = parseFloat(standardItems.value[index].minValue);
+    return isNaN(minValue) || maxValue > minValue || 'Max must be greater than Min.';
+  };
+};
+
+const validateAllFields = () => {
+  for (const item of standardItems.value) {
+    if (
+      standardRules.required(item.minValue) !== true ||
+      isNumber(item.minValue) !== true ||
+      isMinLessThanMax(standardItems.value.indexOf(item))(item.minValue) !== true ||
+      standardRules.required(item.maxValue) !== true ||
+      isNumber(item.maxValue) !== true ||
+      isMaxGreaterThanMin(standardItems.value.indexOf(item))(item.maxValue) !== true
+    ) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const handleSubmit = () => {
+  if (validateAllFields()) {
+    axiosMinMax();
+  } else {
+    alert('올바르지 않은 데이터 요청입니다');
+  }
+};
+
 // ------------------------ realtime standard --------------------------
 
 const shipType = ref("시험선");
 const rsShow = ref(true);
-
-const standardRules = {
-  required: (value) => !!value || "필수 입력 항목입니다.",
-};
 
 const standardItems = ref([
   { signalName: "Rudder Value", minValue: "-", maxValue: "-" },

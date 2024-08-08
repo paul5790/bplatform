@@ -557,15 +557,14 @@ const login = async () => {
     // 로그인 요청
     const response = await checkLogin(data);
 
-    console.log(response);
-
     sessionStorage.setItem("token", response);
 
     // 사용자 정보 요청
     const userDataResponse = await readMineData(response);
-    console.log("userlog : " + userDataResponse.value);
+    console.log(userDataResponse);
 
     const tokenPayload = jwtDecode(response);
+    console.log(tokenPayload);
     decodedTokenData.value = tokenPayload;
     const id = tokenPayload.id;
 

@@ -736,23 +736,93 @@
             </v-card-item>
           </v-card>
         </v-sheet>
+        <v-sheet
+          :style="{
+            backgroundColor: themeColor,
+            paddingTop: '0px',
+            paddingLeft: '0px',
+            paddingRight: '9px',
+            height: `${5}vh`,
+            display: 'flex',
+          }"
+        >
+          <v-btn style="width: 100%; height: 90%" @click="openLamp()"
+            >Engine Lamp</v-btn
+          >
+        </v-sheet>
       </v-col>
     </v-row>
   </v-card>
   <!-- CCTV 화면 -->
-  <v-dialog v-model="cctvDialog" persistent max-width="1335">
-    <v-card>
-      <v-card-title>cctv</v-card-title>
-      <v-card-text>
+  <v-dialog v-model="cctvDialog" persistent max-width="1200">
+    <v-card class="cctv-card">
+      <v-toolbar flat dark color="#eeeeee">
+        <v-toolbar-title>CCTV Monitoring</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-btn icon @click="closeCCTV()">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </v-toolbar>
+      <v-card-text class="cctv-card-text">
         <v-container>
           <v-row class="video-container">
-            <video ref="videoD" controls muted="muted"></video>
+            <video ref="videoD" controls muted="muted" class="cctv-video"></video>
           </v-row>
         </v-container>
       </v-card-text>
-      <v-card-actions>
+    </v-card>
+  </v-dialog>
+  <v-dialog v-model="lampDialog" persistent max-width="1335">
+    <v-card outlined class="pa-5">
+      <v-card-title>Engine Lamp</v-card-title>
+      <v-divider></v-divider>
+      <v-card-text style="padding-bottom: 0px;">
+        <v-container class="pb-0">
+          <v-row>
+            <v-col cols="12">
+              <v-subheader>Engine1 Lamp</v-subheader>
+              <v-sheet class="engine-lamp-container">
+                <v-sheet
+                  v-for="item in engine1Data"
+                  :key="item.key"
+                  class="engine-lamp-item"
+                >
+                  <v-icon
+                    :color="getColor1(item.key)"
+                    :icon="'mdi-alarm-light'"
+                    size="small"
+                    class="mr-2"
+                  ></v-icon>
+                  <span class="engine-lamp-text">{{ item.name }}</span>
+                </v-sheet>
+              </v-sheet>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <v-subheader>Engine2 Lamp</v-subheader>
+              <v-sheet class="engine-lamp-container">
+                <v-sheet
+                  v-for="item in engine2Data"
+                  :key="item.key"
+                  class="engine-lamp-item"
+                >
+                  <v-icon
+                    :color="getColor2(item.key)"
+                    :icon="'mdi-alarm-light'"
+                    size="small"
+                    class="mr-2"
+                  ></v-icon>
+                  <span class="engine-lamp-text">{{ item.name }}</span>
+                </v-sheet>
+              </v-sheet>
+            </v-col>
+          </v-row>
+        </v-container>
+      </v-card-text>
+       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue-darken-1" variant="text" @click="closeCCTV()"
+        <v-btn color="blue-darken-1" variant="text" @click="closeLamp()"
           >닫기</v-btn
         >
       </v-card-actions>
@@ -1162,6 +1232,15 @@ const openCCTV = () => {
   setCCTV();
 };
 
+const lampDialog = ref(false);
+const openLamp = () => {
+  lampDialog.value = true;
+};
+
+const closeLamp = () => {
+  lampDialog.value = false;
+};
+
 const setCCTV = () => {
   const url = cctvUrl;
   nextTick(() => {
@@ -1553,6 +1632,9 @@ const getIconColor = (key) =>
 const getIconIcon = (key) =>
   checkdata.value[key] === "ok" ? "mdi-check-circle" : "mdi-alert-circle";
 
+const getColor1 = (key) => (checkdata1.value[key] === "ok" ? "error" : "#bbbbbb");
+const getColor2 = (key) => (checkdata2.value[key] === "ok" ? "error" : "#bbbbbb");
+
 const checkdata1 = ref({
   1: "no", // "Low Volt"
   2: "no", // "Fuel Leak"
@@ -1589,6 +1671,45 @@ const checkdata2 = ref({
   15: "no", // "Main connector Removed"
   16: "no", // "High Exhaust Gas Temperature"
 });
+
+const engine1Data = [
+  { key: 1, name: " Low Volt" },
+  { key: 2, name: " Fuel Leak" },
+  { key: 3, name: " Over Speed" },
+  { key: 4, name: " Battery Charge" },
+  { key: 5, name: " Low Fuel Level" },
+  { key: 6, name: " Low Water Level" },
+  { key: 7, name: " Engine Shutdown" },
+  { key: 8, name: " Low Engine Speed" },
+  { key: 9, name: " Water Temperature" },
+  { key: 10, name: " Engine Oil Over Heat" },
+  { key: 11, name: " Low Boost Air Pressure" },
+  { key: 12, name: " Low Engine Oil Pressure" },
+  { key: 13, name: " High Boost Air Pressure" },
+  { key: 14, name: " Low Gearbox Oil Pressure" },
+  { key: 15, name: " Main connector Removed" },
+  { key: 16, name: " High Exhaust Gas Temperature" },
+];
+
+const engine2Data = [
+  { key: 1, name: " Low Volt" },
+  { key: 2, name: " Fuel Leak" },
+  { key: 3, name: " Over Speed" },
+  { key: 4, name: " Battery Charge" },
+  { key: 5, name: " Low Fuel Level" },
+  { key: 6, name: " Low Water Level" },
+  { key: 7, name: " Engine Shutdown" },
+  { key: 8, name: " Low Engine Speed" },
+  { key: 9, name: " Water Temperature" },
+  { key: 10, name: " Engine Oil Over Heat" },
+  { key: 11, name: " Low Boost Air Pressure" },
+  { key: 12, name: " Low Engine Oil Pressure" },
+  { key: 13, name: " High Boost Air Pressure" },
+  { key: 14, name: " Low Gearbox Oil Pressure" },
+  { key: 15, name: " Main connector Removed" },
+  { key: 16, name: " High Exhaust Gas Temperature" },
+];
+
 console.log(checkdata.value.gll);
 console.log(checkdata.value.gga);
 console.log(checkdata.value.rmc);
@@ -2070,8 +2191,8 @@ const getheightValue2 = () => {
   return screenWidth.value <= 1800
     ? 184 // 1800 이하일 경우 130 반환
     : screenWidth.value <= 1890
-    ? 120 // 1800 초과이면서 1890 이하일 경우 120 반환
-    : 93; // 그 외의 경우 93 반환
+    ? 115 // 1800 초과이면서 1890 이하일 경우 120 반환
+    : 88; // 그 외의 경우 93 반환
 };
 
 const getLampheightValue1 = () => {
@@ -2131,19 +2252,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
-.video-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 70vh; /* 비디오가 차지하는 높이 조절 */
-}
 
-.video-container video {
-  max-width: 100%;
-  max-height: 100%;
-  width: auto;
-  height: auto;
-}
 
 .custom-title {
   font-size: 16px;
@@ -2164,5 +2273,77 @@ v-sheet {
 
 .single-column {
   flex-direction: column;
+}
+
+.engine-lamp-container {
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid #d3d3d3;
+  border-radius: 8px;
+  padding: 10px;
+}
+
+.engine-lamp-item {
+  flex: 1 0 21%; /* 21% 정도로 설정하여 한 줄에 4개가 들어가도록 합니다. */
+  display: flex;
+  align-items: center;
+  margin: 10px 1%; /* 아이템 사이의 간격을 줍니다. */
+  padding: 5px;
+  border: 1px solid #f0f0f0; /* 각 아이템에 연한 테두리를 추가합니다. */
+  border-radius: 4px;
+  background-color: #fbfbfb; /* 배경색을 추가합니다. */
+}
+
+.engine-lamp-text {
+  font-size: 14px;
+}
+
+.pa-5 {
+  padding: 20px;
+}
+
+.pb-0 {
+  padding-bottom: 0px
+}
+
+.cctv-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.cctv-card-text {
+  background-color: #fbfbfb;
+  padding: 0px;
+}
+
+.video-container video {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+.video-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  padding-bottom: 0px;
+  height: 70vh; /* 비디오가 차지하는 높이 조절 */
+}
+
+.cctv-video {
+  width: 100%;
+  max-width: 1280px;
+  border: 5px solid #eee;
+  border-radius: 8px;
+}
+
+.v-toolbar-title {
+  font-weight: bold;
+}
+
+.cctv-card-actions {
+  background-color: #888888;
 }
 </style>

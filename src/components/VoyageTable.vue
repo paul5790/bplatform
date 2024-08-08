@@ -78,15 +78,16 @@ const page = ref(1);
 const itemsPerPage = ref(15);
 
 const headers = ref([
-  { title: "구분", align: "start", key: "division" },
-  { title: "Ship ID", align: "start", key: "shipid" },
+  { title: "시험 이름", align: "start", key: "division" },
   { title: "진행 시간", align: "start", key: "time" },
   { title: "시작시간", align: "start", key: "startdate" },
   { title: "종료시간", align: "start", key: "enddate" },
-  { title: "시험 이름", align: "start", key: "name" },
+  { title: "Ship ID", align: "start", key: "shipid" },
+  { title: "선박 이름", align: "start", key: "name" },
   { title: "목적", align: "start", key: "purpose" },
   // { title: "map", key: "actions", sortable: false },
   { title: "해역 위치", align: "start", key: "location" },
+  { title: "항해 거리", align: "start", key: "distance" },
   { title: "저장 용량", align: "start", key: "storage" },
   
   { title: "설명", align: "start", key: "description" },
@@ -113,7 +114,7 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 const fetchData = async () => {
   try {
     const response = await readTrialData(tokenid.value);
-    
+    console.log(response);
     const newItems = [];
     for (let i = 0; i < response.length; i++) {
       const startTime = new Date(response[i].startTimeUtc);
@@ -128,6 +129,9 @@ const fetchData = async () => {
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
       const storageSizeFloat = parseFloat(response[i].storageSize).toFixed(2);
+      const Storage = storageSizeFloat === 'NaN'? "0.00MB" : storageSizeFloat + "MB";
+      const distanceFloat = parseFloat(response[i].voyageDistance).toFixed(2);
+      const Distance = distanceFloat === 'NaN'? "0.00km" : distanceFloat + "km";
       newItems.push({
         division: response[i].testName,
         name: response[i].shipName,
@@ -135,7 +139,8 @@ const fetchData = async () => {
         startdate: response[i].startTimeUtc,
         purpose: response[i].testPurpose,
         location: response[i].navigationArea,
-        storage: storageSizeFloat + "MB",
+        storage: Storage,
+        distance: Distance,
         enddate: response[i].endTimeUtc,
         description: response[i].description,
         time: formattedTime,

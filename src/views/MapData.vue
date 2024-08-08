@@ -2,6 +2,28 @@
   <div
     style="padding: 0px; position: relative; height: 93vh; overflow: visible"
   >
+    <!-- <v-row>
+      <v-col class="pa-12">
+        <v-range-slider
+          :model-value="[0, 44]"
+          :step="1"
+          :ticks="seasons"
+          max="44"
+          min="0"
+          show-ticks="always"
+          thumb-label="always"
+          tick-size="4"
+        >
+          <template v-slot:tick-label="{ tick }">
+            <span v-if="tick.value === 0">Winter</span>
+            <span v-else-if="tick.value === 17">Spring</span>
+            <span v-else-if="tick.value === 20">Summer</span>
+            <span v-else-if="tick.value === 45">Fall</span>
+            <span v-else>{{ tick.value }}</span>
+          </template>
+        </v-range-slider>
+      </v-col>
+    </v-row> -->
     <div id="map" style="height: 100%"></div>
     <v-btn
       icon="mdi-magnify"
@@ -36,7 +58,9 @@
             :max="maxValue - 1"
             thumb-label="always"
             class="custom-slider"
-            @change="onSliderChange"
+            @change="onSliderChange(), test(tick)"
+            ticks
+            :tick-labels="tickLabels"
           >
             <template v-slot:thumb-label="{ modelValue }">
               <span class="thumb-label">{{
@@ -373,6 +397,10 @@ let aisData = ref({});
 let waypointMarkers = [];
 let waypointLine = null;
 
+let scenarioIndex = {};
+let customTicks = {};
+let tickLabels = {};
+
 const shipIcon = new L.Icon({
   iconUrl: "/image/shipicon.png",
   iconSize: [32, 32],
@@ -402,6 +430,27 @@ const searchMapdata = async () => {
       testWaypoint.value = waypoint;
       fetchData();
       sliderCardVisible.value = true;
+
+      ais.forEach((item, index) => {
+        if (
+          index === 0 ||
+          item.scenarioNumber !== ais[index - 1].scenarioNumber
+        ) {
+          scenarioIndex[index] = item.scenarioNumber;
+        }
+      });
+      customTicks = Object.keys(scenarioIndex).map((index) => ({
+        value: parseInt(index),
+        label: scenarioIndex[index],
+      }));
+
+      tickLabels = customTicks.map(item => ({
+        value: item.value,
+        label: item.label
+      }));
+
+      console.log(scenarioIndex);
+      console.log(customTicks);
 
       if (map) {
         map.remove(); // 기존 지도 제거
@@ -491,6 +540,13 @@ const fetchData = async () => {
 };
 
 fetchData();
+
+const test = (tick) => {
+  console.log(tick);
+  if (scenarioIndex[tick] !== undefined) {
+    console.log(scenarioIndex[tick]);
+  }
+};
 
 // 슬라이더 값이 변경될 때 호출되는 함수
 const onSliderChange = (newVal) => {
