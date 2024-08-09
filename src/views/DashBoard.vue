@@ -94,7 +94,7 @@ const charts = ref([
     cols: 4,
     component: EchartDrillDown,
     style: {
-      height: "43vh",
+      height: "48vh",
       backgroundColor: themeColor.value,
       paddingLeft: "13px",
       paddingTop: "15px",
@@ -106,7 +106,7 @@ const charts = ref([
     cols: 4,
     component: EchartDoughnut,
     style: {
-      height: "43vh",
+      height: "48vh",
       backgroundColor: themeColor.value,
       paddingLeft: "3px",
       paddingTop: "15px",
@@ -118,7 +118,7 @@ const charts = ref([
     cols: 4,
     component: EchartHalfDoughnut,
     style: {
-      height: "43vh",
+      height: "48vh",
       backgroundColor: themeColor.value,
       paddingLeft: "3px",
       paddingTop: "15px",

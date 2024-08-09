@@ -1157,8 +1157,8 @@ const editData = async () => {
         shipId: "440714900",
         testPurpose: editpurpose.value,
         navigationArea: editlocation.value,
-        startTimeUtc: editstartdate.value,
-        endTimeUtc: editenddate.value,
+        startTimeUtc: start,
+        endTimeUtc: end,
         description: editdescription.value,
       };
       console.log(data);
@@ -1223,21 +1223,12 @@ const changeData = async () => {
         endTimeUtc: selectedenddate.value,
         description: selecteddescription.value,
       };
-      console.log("testName = " + data.testName);
-      console.log("shipName = " + data.shipName);
-      console.log("shipId = " + data.shipId);
-      console.log("testPurpose = " + data.testPurpose);
-      console.log("navigationArea = " + data.navigationArea);
-      console.log("startTimeUtc = " + data.startTimeUtc);
-      console.log("endTimeUtc = " + data.endTimeUtc);
-      console.log("description = " + data.description);
       try {
         await updateTrialData(tokenid.value, data);
         nullDialog3();
         alert("선택된 시험의 수정이 완료되었습니다.");
         location.reload();
       } catch (error) {
-        console.log(1127);
         if (error instanceof TypeError && error.message.includes("toString")) {
           alert("시험 정보를 올바르게 입력해 주세요.");
           console.error("toString error occurred in waitStart:", error.message);

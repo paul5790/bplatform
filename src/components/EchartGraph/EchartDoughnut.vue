@@ -13,7 +13,12 @@
       :elevation="elevation"
       style="display: flex; flex-direction: column; align-items: center"
     >
-      <v-chart class="chart" :option="option" autoresize @legendselectchanged="handleLegendSelectChange"/>
+      <v-chart
+        class="chart"
+        :option="option"
+        autoresize
+        @legendselectchanged="handleLegendSelectChange"
+      />
     </v-sheet>
   </div>
 </template>
@@ -42,6 +47,7 @@ const { textColor } = themeConfig;
 const trialrun = ref([]);
 const selectedTestName = ref();
 
+const ALL = ref({ value: 0, name: "ALL" });
 const DGPS = ref({ value: 0, name: "DGPS", itemStyle: { color: "#2Fe7b3" } });
 const GYRO = ref({ value: 0, name: "GYRO" });
 const ANEMOMETER = ref({ value: 0, name: "ANEMOMETER" });
@@ -62,15 +68,15 @@ const AUTOPILOTCONTACT = ref({
 });
 const NO1ENGINEPANEL = ref({ value: 0, name: "NO.1ENGINEPANEL" });
 const NO2ENGINEPANEL = ref({ value: 0, name: "NO.2ENGINEPANEL" });
+const VTS = ref({ value: 0, name: "VTS" });
 
 const AllData = ref(0);
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 const trialNum = ref(0);
 
+let titleData;
 watch(selectedTestName, async (newTrialNum) => {
-  console.log(selectedTestName.value);
-
   // 항차 N번에서 N 추출
   AIS.value.value = 0;
   GYRO.value.value = 0;
@@ -84,18 +90,17 @@ watch(selectedTestName, async (newTrialNum) => {
   AUTOPILOTCONTACT.value.value = 0;
   NO1ENGINEPANEL.value.value = 0;
   NO2ENGINEPANEL.value.value = 0;
+  VTS.value.value = 0;
 
   if (newTrialNum != "전체") {
     await fetchTrialData();
   } else {
     await fetchAllData();
   }
-  let titleData;
-  if(AllData.value > 1000){
-    titleData = `${(AllData.value/1000).toFixed(2)}GB`
-  }
-  else{
-    titleData = `${(AllData.value)}MB`
+  if (AllData.value > 1000) {
+    titleData = `${(AllData.value / 1000).toFixed(2)}GB`;
+  } else {
+    titleData = `${AllData.value}MB`;
   }
   option.value.title.text = `${newTrialNum} 데이터 저장 용량 (${titleData})`;
   // const num = parseInt(newTrialNum.match(/\d+/)[0]);
@@ -114,8 +119,11 @@ const fetchAllData = async () => {
 
 const fetchTrialData = async () => {
   try {
-    const data = await readDataTrialStorage(tokenid.value, selectedTestName.value);
-    console.log('data');
+    const data = await readDataTrialStorage(
+      tokenid.value,
+      selectedTestName.value
+    );
+    console.log("data");
     console.log(data);
     dataFilter1(data);
   } catch (error) {
@@ -127,8 +135,6 @@ const dataFilter1 = (data) => {
   Object.keys(data).forEach((key) => {
     // Extracting the prefix before the underscore
     const prefix = key.split("_")[0];
-    //console.log("prefix = " + prefix);
-    //console.log("value = " + data[key]);
     const compValue = Number(data[key]);
 
     switch (prefix) {
@@ -139,7 +145,9 @@ const dataFilter1 = (data) => {
         GYRO.value.value = (Number(GYRO.value.value) + compValue).toFixed(2);
         break;
       case "anemometer":
-        ANEMOMETER.value.value = (Number(ANEMOMETER.value.value) + compValue).toFixed(2);
+        ANEMOMETER.value.value = (
+          Number(ANEMOMETER.value.value) + compValue
+        ).toFixed(2);
         break;
       case "radar":
         RADAR.value.value = (Number(RADAR.value.value) + compValue).toFixed(2);
@@ -151,22 +159,37 @@ const dataFilter1 = (data) => {
         ECDIS.value.value = (Number(ECDIS.value.value) + compValue).toFixed(2);
         break;
       case "autopilot":
-        AUTOPILOT.value.value = (Number(AUTOPILOT.value.value) + compValue).toFixed(2);
+        AUTOPILOT.value.value = (
+          Number(AUTOPILOT.value.value) + compValue
+        ).toFixed(2);
         break;
       case "speedlog":
-        SPEEDLOG.value.value = (Number(SPEEDLOG.value.value) + compValue).toFixed(2);
+        SPEEDLOG.value.value = (
+          Number(SPEEDLOG.value.value) + compValue
+        ).toFixed(2);
         break;
       case "canthrottle":
-        CANTHROTTLE.value.value = (Number(CANTHROTTLE.value.value) + compValue).toFixed(2);
+        CANTHROTTLE.value.value = (
+          Number(CANTHROTTLE.value.value) + compValue
+        ).toFixed(2);
         break;
       case "autopilotcontact":
-        AUTOPILOTCONTACT.value.value = (Number(AUTOPILOTCONTACT.value.value) + compValue).toFixed(2);
+        AUTOPILOTCONTACT.value.value = (
+          Number(AUTOPILOTCONTACT.value.value) + compValue
+        ).toFixed(2);
         break;
       case "no1ENGINEPANEL":
-        NO1ENGINEPANEL.value.value = (Number(NO1ENGINEPANEL.value.value) + compValue).toFixed(2);
+        NO1ENGINEPANEL.value.value = (
+          Number(NO1ENGINEPANEL.value.value) + compValue
+        ).toFixed(2);
         break;
       case "no2ENGINEPANEL":
-        NO2ENGINEPANEL.value.value = (Number(NO2ENGINEPANEL.value.value) + compValue).toFixed(2);
+        NO2ENGINEPANEL.value.value = (
+          Number(NO2ENGINEPANEL.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "integratedctrlsystem":
+        VTS.value.value = (Number(VTS.value.value) + compValue).toFixed(2);
         break;
     }
     AllData.value = (
@@ -181,10 +204,10 @@ const dataFilter1 = (data) => {
       Number(CANTHROTTLE.value.value) +
       Number(AUTOPILOTCONTACT.value.value) +
       Number(NO1ENGINEPANEL.value.value) +
-      Number(NO2ENGINEPANEL.value.value) 
+      Number(NO2ENGINEPANEL.value.value) +
+      Number(VTS.value.value)
     ).toFixed(2);
   });
-  console.log(AllData.value);
 };
 
 const dataFilter = (data) => {
@@ -230,8 +253,11 @@ const dataFilter = (data) => {
       case "no2enginepanel":
         NO2ENGINEPANEL.value.value += Number(item.tableSize);
         break;
+      case "integratedctrlsystem":
+        VTS.value.value += Number(item.tableSize);
+        break;
     }
-      AllData.value = (
+    AllData.value =
       Number(AIS.value.value) +
       Number(GYRO.value.value) +
       Number(ANEMOMETER.value.value) +
@@ -243,10 +269,9 @@ const dataFilter = (data) => {
       Number(CANTHROTTLE.value.value) +
       Number(AUTOPILOTCONTACT.value.value) +
       Number(NO1ENGINEPANEL.value.value) +
-      Number(NO2ENGINEPANEL.value.value) 
-    );
+      Number(NO2ENGINEPANEL.value.value) +
+      Number(VTS.value.value);
   });
-  console.log(AllData.value);
 };
 
 const getTrialDate = async () => {
@@ -275,34 +300,65 @@ use([
 
 provide(THEME_KEY);
 
-watch([DGPS.value, GYRO.value, ANEMOMETER.value, RADAR.value, AIS.value, ECDIS.value, AUTOPILOT.value, SPEEDLOG.value, CANTHROTTLE.value, AUTOPILOTCONTACT.value, NO1ENGINEPANEL.value, NO2ENGINEPANEL.value], () => {
-  option.value.legend.data = getLegendData(); // 데이터 변경 시 legend 업데이트
-});
+watch(
+  [
+    DGPS.value,
+    GYRO.value,
+    ANEMOMETER.value,
+    RADAR.value,
+    AIS.value,
+    ECDIS.value,
+    AUTOPILOT.value,
+    SPEEDLOG.value,
+    CANTHROTTLE.value,
+    AUTOPILOTCONTACT.value,
+    NO1ENGINEPANEL.value,
+    NO2ENGINEPANEL.value,
+    VTS.value,
+  ],
+  () => {
+    option.value.legend.data = getLegendData(); // 데이터 변경 시 legend 업데이트
+  }
+);
 
 function getLegendData() {
   const legendData = [
-      { name: 'DGPS', icon: 'circle', value: DGPS.value.value },
-      { name: 'GYRO', icon: 'circle', value: GYRO.value.value },
-      { name: 'ANEMOMETER', icon: 'circle', value: ANEMOMETER.value.value },
-      { name: 'RADAR', icon: 'circle', value: RADAR.value.value },
-      { name: 'AIS', icon: 'circle', value: AIS.value.value },
-      { name: 'ECDIS', icon: 'circle', value: ECDIS.value.value },
-      { name: 'AUTOPILOT', icon: 'circle', value: AUTOPILOT.value.value },
-      { name: 'SPEEDLOG', icon: 'circle', value: SPEEDLOG.value.value },
-      { name: 'CANTHROTTLE', icon: 'circle', value: CANTHROTTLE.value.value },
-      { name: 'AUTOPILOTCONTACT', icon: 'circle', value: AUTOPILOTCONTACT.value.value },
-      { name: 'NO.1ENGINEPANEL', icon: 'circle', value: NO1ENGINEPANEL.value.value },
-      { name: 'NO.2ENGINEPANEL', icon: 'circle', value: NO2ENGINEPANEL.value.value },
+    { name: "ALL", icon: "circle", value: ALL.value.value },
+    { name: "DGPS", icon: "circle", value: DGPS.value.value },
+    { name: "GYRO", icon: "circle", value: GYRO.value.value },
+    { name: "ANEMOMETER", icon: "circle", value: ANEMOMETER.value.value },
+    { name: "RADAR", icon: "circle", value: RADAR.value.value },
+    { name: "AIS", icon: "circle", value: AIS.value.value },
+    { name: "ECDIS", icon: "circle", value: ECDIS.value.value },
+    { name: "AUTOPILOT", icon: "circle", value: AUTOPILOT.value.value },
+    { name: "SPEEDLOG", icon: "circle", value: SPEEDLOG.value.value },
+    { name: "CANTHROTTLE", icon: "circle", value: CANTHROTTLE.value.value },
+    {
+      name: "AUTOPILOTCONTACT",
+      icon: "circle",
+      value: AUTOPILOTCONTACT.value.value,
+    },
+    {
+      name: "NO.1ENGINEPANEL",
+      icon: "circle",
+      value: NO1ENGINEPANEL.value.value,
+    },
+    {
+      name: "NO.2ENGINEPANEL",
+      icon: "circle",
+      value: NO2ENGINEPANEL.value.value,
+    },
+    { name: "VTS", icon: "circle", value: VTS.value.value },
     // 다른 항목들도 추가합니다.
   ];
 
   // 데이터가 0이거나 null인 항목은 필터링하여 제외합니다.
-  return legendData.filter(item => item.value != 0 && item.value != null || item.name === '전체');
+  return legendData;
 }
 
 const option = ref({
   title: {
-    text: '',
+    text: "",
     left: "center",
     textStyle: {
       fontSize: 19, // 폰트 크기 설정
@@ -318,21 +374,29 @@ const option = ref({
     data: getLegendData(),
     orient: "vertical", // 수직 방향으로 표시
     top: "40", // 수직 정렬을 중앙으로 설정
-    right: "10%",
+    right: "5%",
     textStyle: {
       color: textColor.value, // 텍스트 컬러 설정
+      fontSize: 12, // 텍스트 크기를 줄임 (기본값: 12)
     },
+    itemGap: 8, // 항목 간의 간격을 줄임 (기본값: 10)
+
+    itemWidth: 9, // 아이콘의 너비
+    itemHeight: 9, // 아이콘의 높이
     formatter: (name) => {
-      if (name === '전체') {
-        return '전체';
+      if (name === "ALL") {
+        return `${name} (${titleData})`;
       }
-      const item = option.value.legend.data.find(d => d.name === name);
+      const item = option.value.legend.data.find((d) => d.name === name);
       if (item) {
-        return `${item.name} (${item.value}MB)`;
+        if (item.value > 1000) {
+          return `${item.name} (${(item.value / 1000).toFixed(2)}GB)`;
+        } else {
+          return `${item.name} (${item.value}MB)`;
+        }
       }
       return name;
     },
-    
   },
   series: [
     {
@@ -356,6 +420,7 @@ const option = ref({
         show: false,
       },
       data: [
+        ALL.value,
         DGPS.value,
         GYRO.value,
         ANEMOMETER.value,
@@ -368,20 +433,18 @@ const option = ref({
         AUTOPILOTCONTACT.value,
         NO1ENGINEPANEL.value,
         NO2ENGINEPANEL.value,
+        VTS.value,
       ],
     },
   ],
 });
 
-// 추가: 모든 항목을 토글하는 함수
 function handleLegendSelectChange(params) {
-  if (params.name === '전체') {
-    const isSelected = params.selected['전체'];
+  if (params.name === "ALL") {
+    const isSelected = params.selected["ALL"];
     const newSelected = {};
-    option.value.legend.data.forEach(item => {
-      if (item.name !== '전체') {
-        newSelected[item.name] = isSelected;
-      }
+    option.value.legend.data.forEach((item) => {
+      newSelected[item.name] = isSelected;
     });
     option.value.legend.selected = newSelected;
   }
@@ -391,7 +454,7 @@ function handleLegendSelectChange(params) {
 <style scoped>
 .chart {
   margin-top: 3vh;
-  height: 37vh;
+  height: 42vh;
   padding: 5px;
 }
 body {

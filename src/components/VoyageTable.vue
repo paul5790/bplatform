@@ -1,7 +1,7 @@
 <template>
   <v-sheet
     style="
-      height: 48vh;
+      height: 43vh;
       display: flex;
       flex-direction: column;
       overflow-y: auto;

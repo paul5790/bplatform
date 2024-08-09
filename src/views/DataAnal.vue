@@ -94,7 +94,7 @@
                   <v-card-title class="card-title">
                     <span class="text-h6">{{ selectedcontentsItem }} contents</span>
                     <v-spacer></v-spacer>
-                    <span class="text-span">*This data was provided by Xinnos. Unauthorized distribution or disclosure of this data is strictly prohibited.</span>
+                    <span class="text-span">*© 2024 [KRISO ASVERC]. All rights reserved.</span>
                   </v-card-title>
                   <div ref="chartRef" class="chart" autoresize></div>
                   <div>

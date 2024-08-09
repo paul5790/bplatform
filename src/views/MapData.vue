@@ -29,11 +29,11 @@
       icon="mdi-magnify"
       color="primary"
       fab
-      @click="(searchCardVisible = true), (metadataCardVisible = false)"
+      @click="searchCardVisible = true"
       style="position: absolute; bottom: 16px; right: 16px; z-index: 1000"
     ></v-btn>
 
-    <!-- --------------------------시험, 날짜 기간 검색------------------------------- -->
+    <!-- --------------------------타임 슬라이더------------------------------- -->
     <v-card
       v-if="sliderCardVisible"
       style="
@@ -78,17 +78,16 @@
     <v-card
       v-if="searchCardVisible"
       ref="searchCard"
-      @mousedown="startDrag($event, 'searchCard')"
       style="
         position: absolute;
         top: 16px;
         right: 16px;
-        z-index: 1100;
+        z-index: 1200;
         width: 350px;
         overflow: visible;
       "
     >
-      <v-card-title>
+      <v-card-title @mousedown="startDrag($event, 'searchCard')">
         <span>검색</span>
         <p
           @click="searchCardVisible = false"
@@ -116,7 +115,6 @@
     <v-card
       v-if="metadataCardVisible"
       ref="searchCard"
-      @mousedown="startDrag($event, 'searchCard')"
       style="
         position: absolute;
         top: 16px;
@@ -126,10 +124,10 @@
         overflow: visible;
       "
     >
-      <v-card-title>
+      <v-card-title @mousedown="startDrag($event, 'searchCard')">
         <span>Test Name: {{ metadata.test }}</span>
         <p
-          @click="metadataCardVisible = false"
+          @click="hideCard()"
           style="position: absolute; top: 3px; right: 8px"
         >
           <v-icon>mdi-close</v-icon>
@@ -147,16 +145,16 @@
                       >Total Time :</span
                     > </v-list-item-subtitle
                   ><v-list-item-subtitle>
-                    <span
+                    <span class="value-label"
                       >{{ totalTime1 }} ~ {{ totalTime2 }}</span
                     > </v-list-item-subtitle
                   ><br />
                   <v-list-item-subtitle>
                     <span class="label"
-                      >Scenario Time :</span
+                      >Scenario({{ metadata.scenario }}) Time : </span
                     ></v-list-item-subtitle
                   ><v-list-item-subtitle>
-                    <span
+                    <span class="value-label"
                       >{{ scenarioTime1 }} ~ {{ scenarioTime2 }}</span
                     > </v-list-item-subtitle
                   ><br />
@@ -192,117 +190,40 @@
                 <v-list-item-content>
                   <br />
                   <v-list-item-subtitle>
-                    <span class="label">Simul Time : </span>
-                    <span>{{ metadata.time }}</span> </v-list-item-subtitle
+                    <span class="label">Simulation Time : </span>
+                    <span class="value-label">{{
+                      metadata.time
+                    }}</span> </v-list-item-subtitle
                   ><br />
                   <v-list-item-subtitle>
                     <span class="label">위도 : </span>
-                    <span>{{ metadata.latitude }}</span>
+                    <span class="value-label">{{ metadata.latitude }}</span>
                   </v-list-item-subtitle>
                   <v-list-item-subtitle>
                     <span class="label">경도 : </span>
-                    <span>{{ metadata.longitude }}</span>
+                    <span class="value-label">{{ metadata.longitude }}</span>
                   </v-list-item-subtitle>
                 </v-list-item-content>
               </v-list-item>
               <v-checkbox
+                class="value-label"
                 v-model="nonScenario"
                 label="경로 이어보기"
               ></v-checkbox>
             </v-col>
           </v-row>
-          <!-- <v-row>
-            <v-col cols="6">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>시험이름</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    metadata.test
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-col>
-            <v-col cols="6">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>운항모드</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    metadata.mode
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>위도</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    metadata.latitude
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-col>
-            <v-col cols="6">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>경도</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    metadata.longitude
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="6">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>시나리오 번호</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    metadata.scenario
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-col>
-            <v-col cols="6">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>시험 경로 이름</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    metadata.routeName
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col cols="12">
-              <v-list-item>
-                <v-list-item-content>
-                  <v-list-item-title>시간</v-list-item-title>
-                  <v-list-item-subtitle>{{
-                    metadata.time
-                  }}</v-list-item-subtitle>
-                </v-list-item-content>
-              </v-list-item>
-            </v-col>
-          </v-row>
-          <v-divider></v-divider>
-          <v-list-item style="padding-bottom: 0px">
-            <v-list-item-content>
-              <v-list-item-subtitle
-                ><v-checkbox
-                  v-model="nonScenario"
-                  :label="`경로 이어보기`"
-                ></v-checkbox
-              ></v-list-item-subtitle>
-            </v-list-item-content>
-          </v-list-item> -->
         </div>
       </v-card-text>
     </v-card>
+
+    <v-btn
+      v-if="metadataHideBtn"
+      icon="mdi-window-maximize"
+      color="white"
+      fab
+      @click="showCard"
+      style="position: absolute; top: 16px; right: 16px; z-index: 1000"
+    ></v-btn>
 
     <!-- --------------------------항적, 웨이포인트 리스트 표출------------------------------- -->
     <v-card
@@ -403,6 +324,7 @@ const searchCardVisible = ref(false);
 const metadataCardVisible = ref(false);
 const testCardVisible = ref(false);
 const sliderCardVisible = ref(false);
+const metadataHideBtn = ref(false);
 const searchCard = ref(null);
 const testCard = ref(null);
 
@@ -548,12 +470,16 @@ const searchMapdata = async () => {
         ) {
           console.log(index);
 
-          console.log(`${scenarioEnd[first]} ~ ${scenarioEnd[first+1] - 1}`);
-          
+          console.log(`${scenarioEnd[first]} ~ ${scenarioEnd[first + 1] - 1}`);
+
           // modeType 값을 수집
           let modeTypes = new Set();
 
-          for (let i = scenarioEnd[first]; i <= scenarioEnd[first+1] - 1; i++) {
+          for (
+            let i = scenarioEnd[first];
+            i <= scenarioEnd[first + 1] - 1;
+            i++
+          ) {
             modeTypes.add(ais[i].modeType);
           }
 
@@ -562,7 +488,7 @@ const searchMapdata = async () => {
           // modeType 값을 기반으로 modeValue 설정
           let modeValue;
           if (modeTypes.size === 1) {
-            const singleModeType = Array.from(modeTypes)[0] // null 값을 필터링;
+            const singleModeType = Array.from(modeTypes)[0]; // null 값을 필터링;
             switch (singleModeType) {
               case "1":
                 modeValue = "Manual";
@@ -579,7 +505,7 @@ const searchMapdata = async () => {
           } else {
             // 중복이 없는 경우 여러 값들을 문자열로 결합
             modeValue = Array.from(modeTypes)
-            .filter((type) => type !== null)  // null 값을 필터링
+              .filter((type) => type !== null) // null 값을 필터링
               .map((type) => {
                 switch (type) {
                   case "1":
@@ -590,7 +516,6 @@ const searchMapdata = async () => {
                     return "Remote";
                   default:
                     return "Unknown"; // 필요한 경우 기본값을 설정하세요
-                    
                 }
               })
               .join(", ");
@@ -966,6 +891,18 @@ const defalutMap = () => {
 //   }
 // };
 
+// 숨기기 버튼을 눌렀을 때 호출되는 함수
+const hideCard = () => {
+  metadataCardVisible.value = false;
+  metadataHideBtn.value = true;
+};
+
+// 아이콘을 눌렀을 때 카드 뷰를 다시 표시하는 함수
+const showCard = () => {
+  metadataCardVisible.value = true;
+  metadataHideBtn.value = false;
+};
+
 const startDrag = (event, cardName) => {
   let card;
   if (cardName === "searchCard") card = searchCard;
@@ -1065,6 +1002,11 @@ body,
 .label {
   font-weight: bold;
   font-size: 15px;
+  color: #000;
+}
+
+.value-label {
+  color: #000;
 }
 
 .custom-table {

@@ -348,7 +348,7 @@ const option = ref({
       "ECDIS",
       "AUTOPILOT",
       "SPEEDLOG",
-      "CanThrottle",
+      "CANTHROTTLE",
       "AUTOPILOTCONTACT",
       "NO.1ENGINE",
       "NO.2ENGINE",
@@ -399,7 +399,7 @@ const option = ref({
         [refs.ALLVBW, refs.ALLVHW, refs.ALLVLW]
       ),
       createDataObject(
-        "CanThrottle",
+        "CANTHROTTLE",
         [refs.CANONLINESTATE, refs.ENGINERPM, refs.RUDDER, refs.RUDDERSCALE],
         [
           refs.ALLCANONLINESTATE,
@@ -547,7 +547,7 @@ const handleChartClick = async (event) => {
                     "ECDIS",
                     "AUTOPILOT",
                     "SPEEDLOG",
-                    "CanThrottle",
+                    "CANTHROTTLE",
                     "AUTOPILOTCONTACT",
                     "NO.1ENGINE",
                     "NO.2ENGINE",
@@ -621,7 +621,7 @@ const handleChartClick = async (event) => {
                       [refs.ALLVBW, refs.ALLVHW, refs.ALLVLW]
                     ),
                     createDataObject(
-                      "CanThrottle",
+                      "CANTHROTTLE",
                       [
                         refs.CANONLINESTATE,
                         refs.ENGINERPM,
@@ -849,7 +849,7 @@ const updateChart = () => {
             [refs.ALLVBW, refs.ALLVHW, refs.ALLVLW]
           ),
           createDataObject(
-            "CanThrottle",
+            "CANTHROTTLE",
             [
               refs.CANONLINESTATE,
               refs.ENGINERPM,
@@ -1038,7 +1038,7 @@ const updateChart = () => {
         ],
       },
       {
-        dataGroupId: "CanThrottle",
+        dataGroupId: "CANTHROTTLE",
         data: [
           [
             "CANONLINESTATE",
@@ -1330,7 +1330,7 @@ const updateChart = () => {
 <style scoped>
 .chart {
   margin-top: 3vh;
-  height: 37vh;
+  height: 42vh;
   padding: 5px;
 }
 body {
