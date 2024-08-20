@@ -53,7 +53,7 @@ const themeConfig = {
       paddingBottom: "10px",
       backgroundImage: `url(${imageUrl})`,
       backgroundSize: "auto 60%",
-      backgroundPosition: "center 30%",
+      backgroundPosition: "center 60%",
       backgroundRepeat: "no-repeat",
     };
   }),

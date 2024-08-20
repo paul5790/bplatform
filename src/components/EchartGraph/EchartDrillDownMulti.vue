@@ -393,30 +393,13 @@ const fetchData = async () => {
   try {
     const response = await readLossTimeData(tokenid.value);
     const timeDataRefs = responseKeys.map((key) => response[key]);
-    const axiosPromises = axioslist.value.map(async (endpoint, i) => {
-      try {
-        const response = await readlossData(
+
+        const response1 = await readlossData(
           tokenid.value,
-          endpoint,
-          trialNum.value,
-          timeDataRefs[i]
         );
 
-        dataRefs[i].value = 0;
-        dataRefs[i].value += Number(response.countDelay);
-        alldataRefs[i].value = 0;
-        alldataRefs[i].value += Number(response.numOfData);
-      } catch (error) {
-        //console.error(error);
-      }
-    });
 
-    // 모든 axios 호출이 완료될 때까지 기다림
-    await Promise.all(axiosPromises);
     loading.value = false;
-
-    console.log("2: "+ dataRefs[0].value);
-    console.log("2: "+ alldataRefs[0].value);
 
     // 데이터를 모두 받아온 후에 차트 업데이트
 
@@ -536,12 +519,9 @@ const handleChartClick = async (event) => {
       const subData = drilldownData.find(
         (data) => data.dataGroupId === event.data.groupId
       );
-      console.log(subData);
       if (subData) {
         const xAxisData = subData.data.map((item) => item[0]);
         const seriesData = subData.data.map((item) => item[1]);
-        console.log(xAxisData);
-        console.log(seriesData);
 
         // 클릭된 데이터에 대한 새로운 그래프 옵션 설정
         const updatedOption = {
@@ -735,12 +715,9 @@ const handleChartClick = async (event) => {
       const subData = drilldownDataTop.find(
         (data) => data.dataGroupId === event.data.groupId
       );
-      console.log(subData);
       if (subData) {
         const xAxisData = subData.data.map((item) => item[0]);
         const seriesData = subData.data.map((item) => item[1]);
-        console.log(xAxisData);
-        console.log(seriesData);
 
         // 클릭된 데이터에 대한 새로운 그래프 옵션 설정
         const updatedOption = {

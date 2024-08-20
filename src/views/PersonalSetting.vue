@@ -1975,10 +1975,8 @@ const privacypost = async () => {
       eMail: userEmail.value,
       description: userDescription.value,
     };
-    console.log(data);
     try {
       const userDataUpdate = await updateMineData(tokenid.value, data);
-      console.log(userDataUpdate);
       alert("개인정보가 변경되었습니다.");
       privacyDialog.value = false;
     } catch (error) {
@@ -1997,10 +1995,8 @@ const passwordOK = async () => {
       password: pw.value,
       newPassword: newpw.value,
     };
-    console.log(data);
     try {
       const userPasswordUpdate = await updatePassword(tokenid.value, data);
-      console.log(userPasswordUpdate);
       alert("개인정보가 변경되었습니다.");
       pw.value = null;
       newpw.value = null;
@@ -2021,7 +2017,6 @@ const passwordChecking = async () => {
   };
   try {
     let A = await readPwData(tokenid.value, passwordCheck);
-    console.log(A);
     if (A === true) {
       passwordcheckingDialog.value = false;
       resetPasswordDialog.value = true;
@@ -2041,7 +2036,6 @@ const resetPassword = async () => {
   };
   try {
     let A = await resetPwData(tokenid.value, passwordCheck);
-    console.log(A);
     resetPasswordDialog.value = false;
     Rpw.value = null;
     alert("초기 비밀번호를 수정하였습니다.");
@@ -2076,7 +2070,6 @@ const axiosrealtime = async () => {
   try {
     // 서버에 POST 요청을 보내고 응답을 받음
     const realtime = await updateSetTime(tokenid.value, data);
-    console.log(realtime);
     alert("수정이 완료되었습니다.");
     realtimeCycleDialog.value = false;
     getInfo();
@@ -2091,7 +2084,6 @@ const getInfo = async () => {
   try {
     // fetchData 함수를 호출하여 데이터를 가져옴
     const userDataResponse = await readMineData(tokenid.value);
-    console.log(userDataResponse);
     userName.value = userDataResponse.userName;
     userDepartment.value = userDataResponse.department;
     userGroup.value = userDataResponse.userGroup;
@@ -2274,7 +2266,6 @@ const getMinMax = async () => {
 }
 
 const axiosMinMax = async () => {
-  console.log(standardItems.value);
   const response = await updateRealtimeMinMax(tokenid.value, standardItems.value);
   alert(response);
   location.reload();

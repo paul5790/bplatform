@@ -217,7 +217,6 @@ const cancelLogout = () => {
 
 const toggleDrawer = () => {
   drawer.value = !drawer.value;
-  console.log(drawer.value);
 };
 
 const checkScreenSize = () => {

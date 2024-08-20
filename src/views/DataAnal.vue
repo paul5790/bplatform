@@ -12,7 +12,7 @@
               v-if="nodata"
               :elevation="elevation"
               :style="{
-                height: '75vh',
+                height: `${82 - tableSize}vh`,
                 padding: '30px',
                 paddingBottom: '0px',
                 paddingRight: '0',
@@ -31,7 +31,7 @@
                       v-if="!first"
                       :elevation="elevation"
                       :style="{
-                        height: '67vh',
+                        height: '62vh',
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
@@ -53,7 +53,7 @@
                     v-if="loading"
                     :elevation="elevation"
                     :style="{
-                      height: '67vh',
+                      height: '62vh',
                       display: 'flex',
                       flexDirection: 'column',
                       alignItems: 'center',
@@ -81,7 +81,7 @@
             <v-sheet
               v-if="!nodata"
               :style="{
-                height: '75vh',
+                height: `${82 - tableSize}vh`,
                 padding: '30px',
                 paddingBottom: '0',
                 paddingRight: '0',
@@ -92,14 +92,15 @@
               <v-card style="flex: 1">
                 <v-card-item id="graph" :style="tableStyle">
                   <v-card-title class="card-title">
-                    <span class="text-h6">{{ selectedcontentsItem }} contents</span>
+                    <span class="text-h6"
+                      >{{ selectedcontentsItem }} contents</span
+                    >
                     <v-spacer></v-spacer>
-                    <span class="text-span">*© 2024 [KRISO ASVERC]. All rights reserved.</span>
+                    <span class="text-span"
+                      >*© 2024 [KRISO ASVERC]. All rights reserved.</span
+                    >
                   </v-card-title>
                   <div ref="chartRef" class="chart" autoresize></div>
-                  <div>
-                    <p>Zoom Range: {{ zoomRange }}</p>
-                  </div>
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -109,7 +110,7 @@
           <v-col cols="12" no-gutters style="padding: 3px">
             <v-sheet
               :style="{
-                height: '20vh',
+                height: `${13 + tableSize}vh`,
                 padding: '30px',
                 paddingTop: '10px',
                 paddingRight: '0',
@@ -123,7 +124,8 @@
                     :headers="headers"
                     :items="analysis"
                     fixed-header
-                    height="120px"
+                    density="dense"
+                    height="160px"
                     hide-default-footer
                   >
                   </v-data-table>
@@ -180,7 +182,7 @@
                       class="custom-select"
                     ></v-select>
 
-                    <VueDatePicker
+                    <!-- <VueDatePicker
                       :class="
                         themeMode === 'dark'
                           ? 'dp__theme_dark'
@@ -191,9 +193,165 @@
                       range
                       :dark="themeMode === 'dark'"
                       :readonly="date_readonly"
-                    />
+                    /> -->
+
+                    <v-row>
+                      <v-col v-if="startDatePickerOpen" cols="6">
+                        <!-- 동적으로 타입을 변경하는 input -->
+                        <div class="date-picker">
+                          <DatePicker
+                            v-model="startDateSelect"
+                            format="YYYY-MM-DD"
+                            value-type="format"
+                            style="width: 180px"
+                            @update:modelValue="handleDateChange"
+                            placeholder=" 캘린더 직접선택 (클릭)"
+                          />
+                        </div>
+                      </v-col>
+                      <v-col v-if="!startDatePickerOpen" cols="6">
+                        <!-- 동적으로 타입을 변경하는 input -->
+                        <input
+                          :type="text"
+                          v-model="startDateInput"
+                          placeholder=" yyyy-mm-dd (직접 입력)"
+                          class="date-input"
+                        />
+                      </v-col>
+                      <v-col cols="1">
+                        <button
+                          v-if="!startDatePickerOpen"
+                          @click="openDatePicker1"
+                          class="icon-btn"
+                        >
+                          📅
+                        </button>
+                        <button
+                          v-if="startDatePickerOpen"
+                          @click="openDatePicker1"
+                          class="icon-btn"
+                        >
+                          📝
+                        </button>
+                      </v-col>
+
+                      <!-- 시간 및 분 선택 -->
+                      <v-col
+                        cols="5"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          padding-left: 15px;
+                        "
+                      >
+                        <select v-model="startHour" class="time-select">
+                          <option
+                            v-for="hour in hours"
+                            :key="hour"
+                            :value="hour"
+                          >
+                            {{ hour }}시
+                          </option>
+                        </select>
+
+                        <select v-model="startMinute" class="time-select">
+                          <option
+                            v-for="minute in minutes"
+                            :key="minute"
+                            :value="minute"
+                          >
+                            {{ minute }}분
+                          </option>
+                          <!-- 배열에 없는 값도 선택 가능하게 유지 -->
+                          <option
+                            v-if="!minutes.includes(startMinute)"
+                            :value="startMinute"
+                          >
+                            {{ startMinute }}분
+                          </option>
+                        </select>
+                      </v-col>
+                    </v-row>
+
+                    <v-row>
+                      <v-col v-if="endDatePickerOpen" cols="6">
+                        <!-- 동적으로 타입을 변경하는 input -->
+                        <div class="date-picker">
+                          <DatePicker
+                            v-model="endDateSelect"
+                            format="YYYY-MM-DD"
+                            value-type="format"
+                            style="width: 180px"
+                            @update:modelValue="handleDateChange"
+                            placeholder=" 캘린더 직접선택 (클릭)"
+                          />
+                        </div>
+                      </v-col>
+                      <v-col v-if="!endDatePickerOpen" cols="6">
+                        <!-- 동적으로 타입을 변경하는 input -->
+                        <input
+                          :type="text"
+                          v-model="endDateInput"
+                          placeholder=" yyyy-mm-dd (직접 입력)"
+                          class="date-input"
+                        />
+                      </v-col>
+                      <v-col cols="1">
+                        <button
+                          v-if="!endDatePickerOpen"
+                          @click="openDatePicker2"
+                          class="icon-btn"
+                        >
+                          📅
+                        </button>
+                        <button
+                          v-if="endDatePickerOpen"
+                          @click="openDatePicker2"
+                          class="icon-btn"
+                        >
+                          📝
+                        </button>
+                      </v-col>
+
+                      <!-- 시간 및 분 선택 -->
+                      <v-col
+                        cols="5"
+                        style="
+                          display: flex;
+                          align-items: center;
+                          padding-left: 15px;
+                        "
+                      >
+                        <select v-model="endHour" class="time-select">
+                          <option
+                            v-for="hour in hours"
+                            :key="hour"
+                            :value="hour"
+                          >
+                            {{ hour }}시
+                          </option>
+                        </select>
+
+                        <select v-model="endMinute" class="time-select">
+                          <option
+                            v-for="minute in minutes"
+                            :key="minute"
+                            :value="minute"
+                          >
+                            {{ minute }}분
+                          </option>
+                          <!-- 배열에 없는 값도 선택 가능하게 유지 -->
+                          <option
+                            v-if="!minutes.includes(endMinute)"
+                            :value="endMinute"
+                          >
+                            {{ endMinute }}분
+                          </option>
+                        </select>
+                      </v-col>
+                    </v-row>
                     <p style="font-size: 12px; font-weight: bold">
-                      &nbsp;&nbsp;* 날짜 검색은 한국 표준시를 기준으로 작성하며,
+                      &nbsp;&nbsp;* 날짜 검색은 UTC를 기준으로 작성하며,
                       &nbsp;&nbsp;
                     </p>
                     <p style="font-size: 12px; font-weight: bold">
@@ -204,14 +362,6 @@
                       width="500px"
                       :color="btnColor"
                       @click="searchData()"
-                    >
-                      조회하기
-                    </v-btn>
-                    <v-btn
-                      style="margin-top: 10px"
-                      width="500px"
-                      :color="test"
-                      @click="testData()"
                     >
                       조회하기
                     </v-btn>
@@ -249,8 +399,10 @@ import {
   onBeforeUnmount,
   watch,
   watchEffect,
+  computed,
 } from "vue";
 import { use } from "echarts/core";
+import DatePicker from "vue3-datepicker";
 import { CanvasRenderer } from "echarts/renderers";
 import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
@@ -304,6 +456,78 @@ onMounted(() => {
 // const loading = ref(false);
 // const first = ref(true);
 
+// =================================================== 데이트 피커 =================================================
+const startDateInput = ref("");
+const endDateInput = ref("");
+const startDateSelect = ref();
+const endDateSelect = ref();
+const today = new Date();
+const dateToday = ref(today.toISOString().split("T")[0]);
+const selectedDate = ref("");
+const startDatePickerOpen = ref(false);
+const endDatePickerOpen = ref(false);
+const startHour = ref("00");
+const startMinute = ref("00");
+const endHour = ref("00");
+const endMinute = ref("00");
+
+// 시간 및 분 옵션
+const hours = Array.from({ length: 24 }, (_, i) =>
+  i.toString().padStart(2, "0")
+);
+const minutes = [
+  "00",
+  "05",
+  "10",
+  "15",
+  "20",
+  "25",
+  "30",
+  "35",
+  "40",
+  "45",
+  "50",
+  "55",
+];
+
+// 날짜 변경 시 호출될 함수
+const handleDateChange = (newDate) => {
+  // console.log(selectedTestStartTime.value[1]);
+  // console.log(selectedTestEndTime.value[1]);
+};
+
+// 사용자가 입력한 날짜를 확인하고 포맷이 맞지 않으면 경고
+const validateDate = () => {
+  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
+  // if (!datePattern.test(dateInput.value)) {
+  //   console.warn("날짜 형식이 맞지 않습니다. (yyyy-mm-dd)");
+  // }
+};
+
+// 달력 열기
+const openDatePicker1 = () => {
+  startDatePickerOpen.value = !startDatePickerOpen.value;
+};
+
+const openDatePicker2 = () => {
+  endDatePickerOpen.value = !endDatePickerOpen.value;
+};
+
+// DatePicker에서 날짜 선택 시 텍스트 박스에 업데이트
+const onDateSelect = () => {
+  const date = new Date(selectedDate.value);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  // dateInput.value = `${year}-${month}-${day}`;
+  startDatePickerOpen.value = false;
+};
+
+// 시간 포맷 (AM/PM)
+const formatHour = (hour) => {
+  return `오후 ${hour}`;
+};
 // =================================================== 신호 선택 ===================================================
 const subComponents = ref([
   "DGPS",
@@ -405,11 +629,16 @@ const endDate = ref(); // 반응적인(ref) 변수로 선언
 const date_readonly = ref(true);
 const dateRange = ref([]);
 
+const selectedTestStartTime = ref([]);
+const selectedTestEndTime = ref([]);
+
 const getTrialDate = async () => {
   try {
     const response = await readTrialData(tokenid.value);
     for (let i = 0; i < response.length; i++) {
       const testName = response[i].testName;
+      selectedTestStartTime.value.push(response[i].startTimeUtc);
+      selectedTestEndTime.value.push(response[i].endTimeUtc);
       selectedtrialNum.value = testName;
       trialrun.value.push(`${testName}`);
     }
@@ -427,8 +656,28 @@ watch(selectedtrialrun, (newVal) => {
     const index = trialrun.value.indexOf(selectedtrialrun.value);
     date_readonly.value = true;
 
-    startDate.value = setStartTime.value[index - 1];
-    endDate.value = setEndTime.value[index - 1];
+    const startDay = selectedTestStartTime.value[index - 1].split("T")[0]; // 2024-08-20
+    const endDay = selectedTestEndTime.value[index - 1].split("T")[0]; // 2024-08-20
+
+    // 시간 값 추출
+    const startTimePart = selectedTestStartTime.value[index - 1].split("T")[1]; // '00:18:59.000000Z'
+    const startHH = startTimePart.split(":")[0]; // '00'
+    const startMM = startTimePart.split(":")[1]; // '18'
+
+    const endTimePart = selectedTestEndTime.value[index - 1].split("T")[1]; // '00:18:59.000000Z'
+    const endHH = endTimePart.split(":")[0]; // '00'
+    const endMM = endTimePart.split(":")[1]; // '18'
+
+    startDateInput.value = startDay;
+    startHour.value = startHH;
+    startMinute.value = startMM;
+
+    endDateInput.value = endDay;
+    endHour.value = endHH;
+    endMinute.value = endMM;
+
+    startDateSelect.value = new Date(startDay);
+    endDateSelect.value = new Date(endDay);
 
     let start = new Date(startDate.value);
     let end = new Date(endDate.value);
@@ -439,8 +688,41 @@ watch(selectedtrialrun, (newVal) => {
 });
 
 const updateDate = () => {
-  let start = new Date(dateRange.value[0]);
-  let end = new Date(dateRange.value[1]);
+  let start;
+  let end;
+
+  if (startDatePickerOpen.value) {
+    start = new Date(startDateSelect.value);
+    start.setHours(startHour.value.padStart(2, "0"));
+    start.setMinutes(startMinute.value.padStart(2, "0"));
+    start.setSeconds(0);
+  } else {
+    // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
+    start = new Date(
+      `${startDateInput.value}T${startHour.value.padStart(
+        2,
+        "0"
+      )}:${startMinute.value.padStart(2, "0")}:00`
+    );
+  }
+
+  if (endDatePickerOpen.value) {
+    end = new Date(endDateSelect.value);
+    end.setHours(endHour.value.padStart(2, "0"));
+    end.setMinutes(endMinute.value.padStart(2, "0"));
+    end.setSeconds(0);
+  } else {
+    // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
+    end = new Date(
+      `${endDateInput.value}T${endHour.value.padStart(
+        2,
+        "0"
+      )}:${endMinute.value.padStart(2, "0")}:00`
+    );
+  }
+
+  start.setHours(start.getHours() + 9);
+  end.setHours(end.getHours() + 9);
 
   if (!isNaN(start) && !isNaN(end)) {
     // 유효한 날짜인 경우에만 ISO 문자열로 변환
@@ -473,7 +755,19 @@ const headers = ref([
 
 const analysis = ref([
   {
-    name: "signal",
+    name: "signal(전체)",
+    unit: "unit",
+    min: "-",
+    max: "-",
+    average: "-",
+    rmse: "-",
+    rms: "-",
+    variance: "-",
+    error: "-",
+    median: "-",
+  },
+  {
+    name: "signal(선택)",
     unit: "unit",
     min: "-",
     max: "-",
@@ -487,6 +781,7 @@ const analysis = ref([
 ]);
 
 const unit = ref();
+const tableSize = ref(0);
 
 // =============================== 차트 변수 ===========================================
 
@@ -587,12 +882,14 @@ const initChart = () => {
 
   // const sortedTimestamps = ["1", "2", "3", "4", "5", "6", "7", "8", "9"];
 
+  let dataMap = {};
   // dataMap을 자동으로 생성
-  const dataMap = Object.keys(gData).reduce((map, key) => {
+  dataMap = Object.keys(gData).reduce((map, key) => {
     // 타임스탬프를 키로 사용한 맵 생성
     map[key] = gData[key].reduce((subMap, item) => {
       const timestamp = Object.keys(item)[0];
       subMap[timestamp] = item[timestamp];
+
       return subMap;
     }, {});
     return map;
@@ -606,6 +903,7 @@ const initChart = () => {
 
       // console.log(seriesData);
 
+      analysisCal.value.push(seriesData);
       analysisCal.value.push(seriesData);
 
       series.push({
@@ -624,7 +922,6 @@ const initChart = () => {
   });
 
   option.value.series = series;
-
   option.value.legend = {
     data: selectedItem.value,
   };
@@ -703,8 +1000,18 @@ const initChart = () => {
   });
 };
 
+let timeoutId = null;
+
 watch(timeRange.value, (newVal) => {
-  calculateData(newVal.start, newVal.end);
+  // 기존 타임아웃이 있으면 클리어
+  if (timeoutId) {
+    clearTimeout(timeoutId);
+  }
+
+  // 3초 후에 calculateData를 실행하도록 설정
+  timeoutId = setTimeout(() => {
+    calculateData(newVal.start, newVal.end);
+  }, 1500); // 3000 밀리초 = 3초
 });
 
 onMounted(() => {});
@@ -782,161 +1089,6 @@ const gData = {
   "2_fuel_LEVEL": [],
 };
 
-// const option = ref({
-//   dataset: [
-//     {
-//       id: "dataset_raw",
-//     },
-//   ],
-//   // tooltip: {
-//   //   formatter: "{a} <br/>{b} : {c} mb",
-//   // },
-//   tooltip: {
-//     trigger: "axis",
-//   },
-//   legend: {
-//     data: selectedsubComponent.value,
-//   },
-//   toolbox: {
-//     feature: {
-//       saveAsImage: {},
-//     },
-//   },
-//   grid: {
-//     top: "13%", // top margin을 15%로 설정
-//   },
-//   dataZoom: [
-//     {
-//       type: "slider",
-//       xAxisIndex: 0,
-//       filterMode: "none",
-//       height: "4%", // 높이를 20%로 설정
-//       bottom: "1%", // 위치를 아래로 조정
-//     },
-//     {
-//       type: "slider",
-//       yAxisIndex: 0,
-//       filterMode: "none",
-//       width: "2%",
-//     },
-//     {
-//       type: "inside",
-//       xAxisIndex: 0,
-//       filterMode: "none",
-//     },
-//     {
-//       type: "inside",
-//       yAxisIndex: 0,
-//       filterMode: "none",
-//     },
-//     // {
-//     //   show: true,
-//     //   realtime: true,
-//     //   start: 0,
-//     //   end: 100,
-//     //   xAxisIndex: [0, 1],
-//     //   height: "2%",
-//     // },
-//   ],
-//   xAxis: {
-//     type: "category",
-//     nameLocation: "middle",
-//     data: analysisTime.value, // x축 데이터를 times 배열로 설정
-//     axisLabel: {
-//       color: textColor.value, // 텍스트 색상을 흰색으로 설정
-//     },
-//   },
-//   yAxis: {},
-//   series: [],
-// });
-// =============================== 데이터 검색 및 업데이트 ===========================================
-
-// const updateSeries = () => {
-//   console.log("@");
-//   const series = [];
-
-//   // 모든 타임스탬프 수집
-//   const allTimestamps = new Set();
-//   selectedItem.value.forEach((component) => {
-//     if (component in gData) {
-//       gData[component].forEach((item) => {
-//         const timestamp = Object.keys(item)[0];
-//         allTimestamps.add(timestamp);
-//       });
-//     }
-//   });
-
-//   // 타임스탬프를 정렬
-//   const sortedTimestamps = Array.from(allTimestamps).sort(
-//     (a, b) => new Date(a) - new Date(b)
-//   );
-
-//   // dataMap을 자동으로 생성
-//   const dataMap = Object.keys(gData).reduce((map, key) => {
-//     // 타임스탬프를 키로 사용한 맵 생성
-//     map[key] = gData[key].reduce((subMap, item) => {
-//       const timestamp = Object.keys(item)[0];
-//       subMap[timestamp] = item[timestamp];
-//       return subMap;
-//     }, {});
-//     return map;
-//   }, {});
-
-//   selectedItem.value.forEach((component) => {
-//     if (component in dataMap) {
-//       const seriesData = sortedTimestamps.map(
-//         (timestamp) => dataMap[component][timestamp] || null
-//       );
-
-//       series.push({
-//         name: component,
-//         type: "line",
-//         data: seriesData,
-//         connectNulls: true, // null 값을 선으로 연결
-//         markPoint: {
-//           data: [
-//             { type: "max", name: "Max" },
-//             { type: "min", name: "Min" },
-//           ],
-//         },
-//       });
-//     }
-//   });
-
-//   option.value.series = series;
-
-//   option.value.legend = {
-//     data: selectedItem.value,
-//   };
-
-//   option.value.xAxis = {
-//     type: "category",
-//     nameLocation: "middle",
-//     data: sortedTimestamps, // x축 데이터를 타임스탬프로 설정
-//     axisLabel: {
-//       color: textColor.value, // 텍스트 색상을 흰색으로 설정
-//       formatter: (value) => {
-//         const date = new Date(value);
-//         const formattedDate = `
-//         ${date.getDate().toString().padStart(2, "0")} ${date
-//           .getHours()
-//           .toString()
-//           .padStart(2, "0")}:${date
-//           .getMinutes()
-//           .toString()
-//           .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
-//         return formattedDate;
-//       },
-//     },
-//   };
-
-//   // if (chartInstance.value) {
-//   //   chartInstance.value.clear(); // 이전 데이터 제거
-//   //   chartInstance.value.setOption(option.value);
-//   // }
-//   initializeChart();
-// };
-
 // x축의 범위를 업데이트하는 dataZoom 이벤트 핸들러 추가
 const updateZoomRange = (params) => {
   const { startValue, endValue } = params.batch[0];
@@ -970,7 +1122,7 @@ const fetchData = async (subComponent, contents) => {
   try {
     if (selectedtrialrun.value === "직접 선택") {
       // 직접 선택이라면
-      requests.value.period = `period?start_utctime=${startDate.value}&end_utctime=${endDate.value}`;
+      requests.value.period = `period?start_time_utc=${startDate.value}&end_time_utc=${endDate.value}`;
     } else {
       // 시험 선택이라면
       requests.value.period = `test?test_name=${selectedtrialrun.value}`;
@@ -1017,28 +1169,33 @@ const processData = (
 
   unit.value = unitValue;
   // selectedcontentsItem.value = contentsItemValue;
-  analysis.value[n].name = analysisName;
+  analysis.value[n].name = `${analysisName}(전체)`;
   analysis.value[n].unit = unitValue;
+  analysis.value[n + 1].name = `${analysisName}(선택)`;
+  analysis.value[n + 1].unit = unitValue;
+  n++;
   n++;
 };
 
+let noData = true;
 //데이터 검색
 const searchData = async () => {
-  // if (
-  //   selectedsubComponent.value !== null &&
-  //   selectedItem.value !== null &&
-  //   selectedtrialrun.value !== null
-  // ) {
-  //   nodata.value = true;
-  //   loading.value = true;
-  //   first.value = false;
-
-  // } else {
-  //   alert("선택항목을 선택해주세요.");
-  // }
   updateDate();
+  // 차트 초기화
+  if (myChart) {
+    myChart.dispose(); // 기존 차트 인스턴스를 제거
+    myChart = echarts.init(chartRef.value); // 새 차트 인스턴스를 생성
+  }
   // clearChart();
+  Object.keys(gData).forEach((key) => {
+    gData[key] = [];
+  });
 
+  Object.keys(itemsData).forEach((key) => {
+    itemsData[key] = [];
+  });
+
+  noData = false;
   try {
     analysisData.value = [];
     analysisTime.value = [];
@@ -1057,7 +1214,9 @@ const searchData = async () => {
       error: "-",
       median: "-",
     };
-    analysis.value = Array.from({ length: newLength }, () => ({ ...template }));
+    analysis.value = Array.from({ length: newLength * 2 }, () => ({
+      ...template,
+    }));
 
     if (
       selectedItem.value.includes("latitude") ||
@@ -1601,8 +1760,12 @@ const searchData = async () => {
           break;
       }
     });
+
+    tableSize.value =
+      selectedItem.value.length < 3 ? (selectedItem.value.length - 1) * 5 : 10;
   } catch (error) {
     console.error(error);
+    noData = true;
   } finally {
     // loading.value = false;
   }
@@ -1615,12 +1778,13 @@ const searchData = async () => {
   calculateData(0, analysisTime.value.length);
   // chart.value.setOption(updateSeries);
   n = 0;
+
+  if (noData) {
+    alert("데이터가 존재하지 않습니다.");
+  }
 };
 
 const calculateData = (start, end) => {
-  const datasetRaw2 = ref([["time", "value"]]);
-  datasetRaw2.value = [];
-
   const reTime = analysisTime.value.slice(start, end);
 
   reTime.sort((a, b) => {
@@ -1629,105 +1793,89 @@ const calculateData = (start, end) => {
     const timeB = new Date(b);
     return timeA - timeB;
   });
-
-  datasetRaw2.value.sort((a, b) => {
-    // 시간을 기준으로 정렬하기 위해 시간을 비교합니다.
-    const timeA = new Date(a[0]);
-    const timeB = new Date(b[0]);
-    return timeA - timeB;
-  });
-
   //updateSeries();
 
-  for (let n = 0; n < selectedItem.value.length; n++) {
+  for (let n = 0; n < selectedItem.value.length * 2; n = n + 2) {
     const reData = analysisCal.value[n].slice(start, end);
+    const ownData = analysisCal.value[n].filter((value) => value !== null);
     const isData = reData.filter((value) => value !== null);
 
-    console.log(isData);
-    for (let i = 0; i <= reTime.length; i++) {
-      datasetRaw2.value.push([reTime[i + 1], isData[i]]);
-    }
+    pushTable(ownData, reTime, n);
+    pushTable(isData, reTime, n + 1);
+  }
+};
 
-    if (reTime.length <= 0) {
-      analysis.value[n].min = "-"; // 최댓값
-      analysis.value[n].max = "-"; // 평균값
-      analysis.value[n].average = "-"; // 표준편차
-      analysis.value[n].rmse = "-"; // 제곱평균제곱근
-      analysis.value[n].rms = "-"; // 중앙값
-      analysis.value[n].median = "-"; // 표준 오차
-      analysis.value[n].error = "-"; // 분산
-      analysis.value[n].variance = "-";
+const pushTable = (data, reTime, n) => {
+  if (reTime.length <= 0) {
+    analysis.value[n].min = "-"; // 최댓값
+    analysis.value[n].max = "-"; // 평균값
+    analysis.value[n].average = "-"; // 표준편차
+    analysis.value[n].rmse = "-"; // 제곱평균제곱근
+    analysis.value[n].rms = "-"; // 중앙값
+    analysis.value[n].median = "-"; // 표준 오차
+    analysis.value[n].error = "-"; // 분산
+    analysis.value[n].variance = "-";
 
-      // nodata.value = true;
-      // loading.value = false;
+    // nodata.value = true;
+    // loading.value = false;
+  } else {
+    // nodata.value = false;
+  }
+
+  const minValue = ref(); // 최솟값
+  const maxValue = ref(); // 최댓값
+  const averageValue = ref(); // 평균값
+  const standardDeviation = ref(); // 표준편차
+  const rms = ref(); // 제곱평균제곱근
+  const median = ref(); // 중앙값
+  const standardError = ref(); // 표준오차
+  const variance = ref();
+  const numericValues = data
+    .map((value) => Number(value))
+    .filter((value) => !isNaN(value));
+
+  if (numericValues.length > 1) {
+    // 최솟값 구하기
+    minValue.value = Math.min(...data);
+
+    // 최댓값 구하기
+    maxValue.value = Math.max(...data);
+    // 평균 계산sortedValues
+    const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
+    averageValue.value = sum.value / numericValues.length;
+
+    // 표준편차 계산
+    const squaredDifferences = ref(
+      numericValues.map((value) => Math.pow(value - averageValue.value, 2))
+    );
+    const sumOfSquaredDifferences = squaredDifferences.value.reduce(
+      (acc, value) => acc + value,
+      0
+    );
+    variance.value = sumOfSquaredDifferences / numericValues.length;
+    standardDeviation.value = Math.sqrt(variance.value);
+
+    // 제곱평균제곱근(RMS) 계산
+    const sumOfSquares = ref(
+      numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
+    );
+    rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
+
+    // 중앙값 계산
+    const sortedValues = numericValues.sort((a, b) => a - b);
+    const mid = ref(Math.floor(sortedValues.length / 2));
+
+    if (sortedValues.length % 2 === 0) {
+      // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
+      median.value =
+        (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
     } else {
-      // nodata.value = false;
+      // 홀수일 경우 중간 값이 중앙값
+      median.value = sortedValues[mid.value];
     }
-
-    const minValue = ref(); // 최솟값
-    const maxValue = ref(); // 최댓값
-    const averageValue = ref(); // 평균값
-    const standardDeviation = ref(); // 표준편차
-    const rms = ref(); // 제곱평균제곱근
-    const median = ref(); // 중앙값
-    const standardError = ref(); // 표준오차
-    const variance = ref();
-    const numericValues = isData
-      .map((value) => Number(value))
-      .filter((value) => !isNaN(value));
-
-    // console.log( "통계:", analysisData.value); // if(analysisData)
-
-    if (numericValues.length > 1) {
-      // 최솟값 구하기
-      minValue.value = Math.min(...isData);
-
-      // 최댓값 구하기
-      maxValue.value = Math.max(...isData);
-      // 평균 계산sortedValues
-      const sum = ref(numericValues.reduce((acc, value) => acc + value, 0));
-      averageValue.value = sum.value / numericValues.length;
-
-      // 표준편차 계산
-      const squaredDifferences = ref(
-        numericValues.map((value) => Math.pow(value - averageValue.value, 2))
-      );
-      const sumOfSquaredDifferences = squaredDifferences.value.reduce(
-        (acc, value) => acc + value,
-        0
-      );
-      variance.value = sumOfSquaredDifferences / numericValues.length;
-      standardDeviation.value = Math.sqrt(variance.value);
-
-      // 제곱평균제곱근(RMS) 계산
-      const sumOfSquares = ref(
-        numericValues.reduce((acc, value) => acc + Math.pow(value, 2), 0)
-      );
-      rms.value = Math.sqrt(sumOfSquares.value / numericValues.length);
-
-      // 중앙값 계산
-      const sortedValues = numericValues.sort((a, b) => a - b);
-      const mid = ref(Math.floor(sortedValues.length / 2));
-
-      if (sortedValues.length % 2 === 0) {
-        // 짝수일 경우 중간의 두 값의 평균을 중앙값으로 사용
-        median.value =
-          (sortedValues[mid.value - 1] + sortedValues[mid.value]) / 2;
-      } else {
-        // 홀수일 경우 중간 값이 중앙값
-        median.value = sortedValues[mid.value];
-      }
-      // 표준 오차 계산
-      standardError.value =
-        standardDeviation.value / Math.sqrt(numericValues.length);
-    } else {
-      alert("데이터가 존재하지 않습니다.");
-      averageValue.value = 0;
-      standardDeviation.value = 0;
-      rms.value = 0;
-      median.value = 0;
-      standardError.value = 0;
-    }
+    // 표준 오차 계산
+    standardError.value =
+      standardDeviation.value / Math.sqrt(numericValues.length);
     // analysis.value[n].unit = unit.value;
     // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
     analysis.value[n].min = minValue.value.toFixed(4);
@@ -1745,6 +1893,13 @@ const calculateData = (start, end) => {
     analysis.value[n].error = standardError.value.toFixed(4);
     // console.log(`Variance: ${variance.value}`); // 분산
     analysis.value[n].variance = variance.value.toFixed(4);
+  } else {
+    noData = true;
+    averageValue.value = 0;
+    standardDeviation.value = 0;
+    rms.value = 0;
+    median.value = 0;
+    standardError.value = 0;
   }
 };
 
@@ -1788,7 +1943,7 @@ const captureImage = async () => {
   --v-select-menu-font-size: 10px;
 }
 .chart {
-  height: 65vh;
+  height: 60vh;
 }
 body {
   margin: 0;
@@ -1804,5 +1959,58 @@ body {
   margin-top: 5px;
   font-size: 11px;
   color: #ff4444;
+}
+
+.date-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 200px;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+/* DatePicker 테두리 스타일 추가 */
+.date-picker {
+  border: 1px solid #ccc;
+  padding: 0.3rem;
+  border-radius: 4px;
+  width: 200px;
+  box-sizing: border-box;
+}
+
+.time-select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 70px;
+}
+
+.time-divider {
+  margin-right: 5px;
+  font-size: 18px;
+}
+
+/* 시간 입력 필드 스타일 */
+.time-input {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 50px;
+  text-align: center;
+  margin: 0 5px;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #007bff;
 }
 </style>

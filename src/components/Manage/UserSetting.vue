@@ -65,7 +65,7 @@
 
                       <v-col cols="12" style="padding-bottom: 0px"
                         ><p style="font-size: 13px">
-                          접근제어 가능 기간 설정
+                          권한 설정
                         </p></v-col
                       >
                       <v-col cols="6">
@@ -99,7 +99,7 @@
 
                   <v-container v-if="selecteduserGroup === 'USER'">
                     <p style="font-size: 13px; margin-bottom: 10px">
-                      권한 설정
+                      접근제어 가능 데이터 설정
                     </p>
                     <v-card
                       style="flex: 1; display: flex; flex-direction: column"
@@ -381,7 +381,6 @@ const rules = ref({
 
 const check = () => {
   if (selectedItems.value.length > 0) {
-    console.log(selectedItems.value);
     selectedId.value = selectedItems.value[0].userId;
     selecteduserName.value = selectedItems.value[0].userName;
     selecteddepartment.value = selectedItems.value[0].department;
@@ -399,10 +398,6 @@ const check = () => {
       console.log("No user selected");
     } else {
       // permission 적용
-
-      console.log("--");
-      console.log(selectedItems.value[0].userGroup);
-      console.log("--");
 
       resetPermissions();
       selectedItems.value[0].permission.forEach((permissionName) => {
@@ -514,8 +509,6 @@ const fetchData = async () => {
     //   });
     //   // items.value.push(response.data[i]);
     // }
-
-    console.log(response);
     response.forEach((user) => {
       items.value.push({
         userId: user.id || "",
@@ -576,8 +569,6 @@ const changeData = async () => {
       data.permissions = [];
       data.permissionsExpiryTime = "";
     }
-
-    console.log(data);
 
     try {
       await updateUserData(tokenid.value, data);

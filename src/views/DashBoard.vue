@@ -99,6 +99,7 @@ const charts = ref([
       paddingLeft: "13px",
       paddingTop: "15px",
       paddingRight: "3px",
+      marginTop: "30px"
     },
   },
   {
@@ -131,23 +132,24 @@ const updateCols = () => {
   const screenWidth = window.innerWidth;
   charts.value.forEach((chart) => {
     if (chart.id === 1) {
-      chart.cols = screenWidth <= 1700 ? 12 : 4;
+      chart.cols = screenWidth <= 1700 ? 12 : 4.5;
       chart.style.paddingLeft = chart.cols === 12 ? "13px" : "13px";
       chart.style.paddingRight = chart.cols === 12 ? "13px" : "3px";
-      chart.style.paddingTop = chart.cols === 12 ? "3px" : "15px";
+      chart.style.paddingTop = chart.cols === 12 ? "15px" : "15px";
+      chart.style.marginTop = chart.cols === 12 ? "10px" : "0px";
     } else if (chart.id === 2) {
-      chart.cols = screenWidth <= 1100 ? 12 : screenWidth <= 1700 ? 6 : 4;
+      chart.cols = screenWidth <= 1100 ? 12 : screenWidth <= 1700 ? 7 : 4.5;
       chart.style.paddingLeft =
-        chart.cols === 6 || chart.cols === 12 ? "13px" : "3px";
+        chart.cols === 7 || chart.cols === 12 ? "13px" : "3px";
       chart.style.paddingTop =
-        chart.cols === 6 || chart.cols === 12 ? "3px" : "15px";
+        chart.cols === 7 || chart.cols === 12 ? "3px" : "15px";
       chart.style.paddingRight = chart.cols === 12 ? "13px" : "3px";
     } else if (chart.id === 3) {
-      chart.cols = screenWidth <= 1100 ? 12 : screenWidth <= 1700 ? 6 : 4;
+      chart.cols = screenWidth <= 1100 ? 12 : screenWidth <= 1700 ? 5 : 3;
       chart.style.paddingLeft = chart.cols === 12 ? "13px" : "3px";
-      chart.style.paddingRight = chart.cols === 6 ? "13px" : "13px";
+      chart.style.paddingRight = chart.cols === 5 ? "13px" : "13px";
       chart.style.paddingTop =
-        chart.cols === 6 || chart.cols === 12 ? "3px" : "15px";
+        chart.cols === 5 || chart.cols === 12 ? "3px" : "15px";
     }
   });
 };

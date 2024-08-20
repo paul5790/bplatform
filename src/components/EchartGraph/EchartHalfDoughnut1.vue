@@ -34,6 +34,9 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 const serverInUsedSize = ref(0);
 const dbSize = ref(0);
 const serverRemainingSize = ref(0);
+const serverInUsedSizeText = ref("");
+const dbSizeText = ref("");
+const serverRemainingSizeText = ref("");
 
 const fetchData = async () => {
   try {
@@ -47,9 +50,11 @@ const fetchData = async () => {
     // serverRemainingSize.value = parseFloat(
     //   response.serverRemainingSize
     // ).toFixed(2);
-    serverInUsedSize.value = 80.0;
-    dbSize.value = 1.1;
-    serverRemainingSize.value = 20.0;
+
+    serverInUsedSize.value = 88.88;
+    dbSize.value = 12.35;
+    serverRemainingSize.value = 155.23;
+
   } catch (error) {
     console.error(error);
   }
@@ -59,11 +64,12 @@ onMounted(() => {
 });
 
 const totalSize = computed(() => {
-  return (
+  const size = 
     parseFloat(serverInUsedSize.value) +
     parseFloat(dbSize.value) +
-    parseFloat(serverRemainingSize.value)
-  );
+    parseFloat(serverRemainingSize.value);
+
+  return parseFloat(size.toFixed(2));
 });
 
 provide(THEME_KEY);
@@ -92,8 +98,8 @@ const option = ref({
   series: [
     {
       type: "pie",
-      radius: ["65%", "100%"],
-      center: ["45%", "85%"], // 이 부분을 수정하여 위치 조절
+      radius: ["55%", "85%"],
+      center: ["50%", "85%"], // 이 부분을 수정하여 위치 조절
       startAngle: 180,
       endAngle: 0,
       label: {
@@ -102,17 +108,17 @@ const option = ref({
       data: [
         {
           value: serverInUsedSize,
-          name: `OS 및 기타 : ${serverInUsedSize.value}GB`,
+          name: `OS 및 기타 : ${serverInUsedSizeText.value}`,
           itemStyle: { color: "#E0E0E0" },
         },
         {
           value: dbSize,
-          name: `DB 사용량 : ${dbSize.value}GB`,
+          name: `DB 사용량 : ${dbSizeText.value}`,
           itemStyle: { color: "#43A047" },
         },
         {
           value: serverRemainingSize,
-          name: `사용 가능한 공간 : ${serverRemainingSize.value}GB`,
+          name: `사용 가능한 공간 : ${serverRemainingSizeText.value}`,
           itemStyle: { color: "#D0E0D0" },
         },
         // {
@@ -135,7 +141,35 @@ const option = ref({
 
 // 데이터 변경 감지하여 차트 업데이트
 watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
-  option.value.title.text = `서버 저장 공간 현황 (${totalSize.value}GB)`;
+  
+
+  let titleText = "";
+  if (totalSize.value > 1024) {
+    titleText = `${(totalSize.value / 1024).toFixed(2)}TB`;
+  } else {
+    titleText = `${totalSize.value}GB`;
+  }
+
+  if (serverInUsedSize.value > 1024) {
+    serverInUsedSizeText.value = `${(serverInUsedSize.value / 1024).toFixed(2)}TB`;
+  } else {
+    serverInUsedSizeText.value = `${serverInUsedSize.value}GB`;
+  }
+
+  if (dbSize.value > 1024) {
+    dbSizeText.value = `${(dbSize.value / 1024).toFixed(2)}TB`;
+  } else {
+    dbSizeText.value = `${dbSize.value}GB`;
+  }
+
+  if (serverRemainingSize.value > 1024) {
+    serverRemainingSizeText.value = `${(serverRemainingSize.value / 1024).toFixed(2)}TB`;
+  } else {
+    serverRemainingSizeText.value = `${serverRemainingSize.value}GB`;
+  }
+
+
+  option.value.title.text = `서버 저장 공간 현황 (${titleText})`;
   option.value.tooltip = {
     trigger: "item",
     formatter: function (params) {
@@ -151,17 +185,17 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
     option.value.series[0].data = [
       {
         value: serverInUsedSize.value,
-        name: `OS 및 기타 : ${serverInUsedSize.value}GB`,
+        name: `OS 및 기타 : ${serverInUsedSizeText.value}`,
         itemStyle: { color: "#E0E0E0" },
       },
       {
         value: dbSize.value,
-        name: `DB 사용량 : ${dbSize.value}GB`,
+        name: `DB 사용량 : ${dbSizeText.value}`,
         itemStyle: { color: "#CC0033" },
       },
       {
         value: serverRemainingSize.value,
-        name: `사용 가능한 공간 : ${serverRemainingSize.value}GB`,
+        name: `사용 가능한 공간 : ${serverRemainingSizeText.value}`,
         itemStyle: { color: "#FF6666" },
       },
       // {
@@ -182,17 +216,17 @@ watch([serverInUsedSize, dbSize, serverRemainingSize], () => {
     option.value.series[0].data = [
       {
         value: serverInUsedSize.value,
-        name: `OS 및 기타 : ${serverInUsedSize.value}GB`,
+        name: `OS 및 기타 : ${serverInUsedSizeText.value}`,
         itemStyle: { color: "#E0E0E0" },
       },
       {
         value: dbSize.value,
-        name: `DB 사용량 : ${dbSize.value}GB`,
+        name: `DB 사용량 : ${dbSizeText.value}`,
         itemStyle: { color: "#43A047" },
       },
       {
         value: serverRemainingSize.value,
-        name: `사용 가능한 공간 : ${serverRemainingSize.value}GB`,
+        name: `사용 가능한 공간 : ${serverRemainingSizeText.value}`,
         itemStyle: { color: "#E1F3DD" },
       },
       // {

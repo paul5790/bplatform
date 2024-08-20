@@ -126,10 +126,7 @@
     >
       <v-card-title @mousedown="startDrag($event, 'searchCard')">
         <span>Test Name: {{ metadata.test }}</span>
-        <p
-          @click="hideCard()"
-          style="position: absolute; top: 3px; right: 8px"
-        >
+        <p @click="hideCard()" style="position: absolute; top: 3px; right: 8px">
           <v-icon>mdi-close</v-icon>
         </p>
       </v-card-title>
@@ -151,8 +148,8 @@
                   ><br />
                   <v-list-item-subtitle>
                     <span class="label"
-                      >Scenario({{ metadata.scenario }}) Time : </span
-                    ></v-list-item-subtitle
+                      >Scenario({{ metadata.scenario }}) Time :
+                    </span></v-list-item-subtitle
                   ><v-list-item-subtitle>
                     <span class="value-label"
                       >{{ scenarioTime1 }} ~ {{ scenarioTime2 }}</span
@@ -180,7 +177,7 @@
                       @click="handleRowClick(item, index)"
                     >
                       <td>{{ item.no }}</td>
-                      <td>{{ item.mode }}</td>
+                      <td v-html="formatMode(item.mode, selectedRow === index || metadata.scenario === item.no)"></td>
                       <td>{{ item.route }}</td>
                     </tr>
                   </tbody>
@@ -196,11 +193,11 @@
                     }}</span> </v-list-item-subtitle
                   ><br />
                   <v-list-item-subtitle>
-                    <span class="label">위도 : </span>
+                    <span class="label">latitude : </span>
                     <span class="value-label">{{ metadata.latitude }}</span>
                   </v-list-item-subtitle>
                   <v-list-item-subtitle>
-                    <span class="label">경도 : </span>
+                    <span class="label">longitude : </span>
                     <span class="value-label">{{ metadata.longitude }}</span>
                   </v-list-item-subtitle>
                 </v-list-item-content>
@@ -438,7 +435,6 @@ const searchMapdata = async () => {
         console.error("error:", error);
         return; // 에러 발생 시 함수 종료
       }
-      console.log(ais);
       totalTime1.value = ais[0].time;
       totalTime2.value = ais[ais.length - 1].time;
 
@@ -451,7 +447,6 @@ const searchMapdata = async () => {
 
       let first = 0;
 
-      console.log("start");
       ais.forEach((item, index) => {
         if (
           index === 0 ||
@@ -461,17 +456,12 @@ const searchMapdata = async () => {
         }
       });
       scenarioEnd.push(ais.length);
-      console.log(scenarioEnd);
 
       ais.forEach((item, index) => {
         if (
           index === 0 ||
           item.scenarioNumber !== ais[index - 1].scenarioNumber
         ) {
-          console.log(index);
-
-          console.log(`${scenarioEnd[first]} ~ ${scenarioEnd[first + 1] - 1}`);
-
           // modeType 값을 수집
           let modeTypes = new Set();
 
@@ -482,8 +472,6 @@ const searchMapdata = async () => {
           ) {
             modeTypes.add(ais[i].modeType);
           }
-
-          console.log(modeTypes);
           first++;
           // modeType 값을 기반으로 modeValue 설정
           let modeValue;
@@ -621,9 +609,8 @@ const fetchData = async () => {
 fetchData();
 
 const test = (tick) => {
-  console.log(tick);
   if (scenarioIndex[tick] !== undefined) {
-    console.log(scenarioIndex[tick]);
+    // console.log(scenarioIndex[tick]);
   }
 };
 
@@ -839,6 +826,7 @@ const defalutMap = () => {
   map = L.map("map").setView([35.4944, 129.4517], 13);
 
   // OSM 타일 레이어 추가
+  // L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
 
   // testArea의 위경도 값을 이어서 빨간색 선으로 그리기
@@ -953,6 +941,27 @@ watch(
     scenarioTime2.value = ais[scenarioEnd[newScenario] - 1].time;
   }
 );
+
+function formatMode(mode, isSelected) {
+  return mode.split(',').map(part => {
+    part = part.trim(); // 공백 제거
+    let color;
+    if (isSelected) {
+      color = 'white'; // 선택된 행의 텍스트 색상을 흰색으로 설정
+    } else {
+      if (part === 'Manual') {
+        color = 'blue';
+      } else if (part === 'Auto') {
+        color = 'green';
+      } else if (part === 'Remote') {
+        color = 'red';
+      } else {
+        color = 'black';
+      }
+    }
+    return `<span style="color:${color}">${part}</span>`;
+  }).join(', ');
+}
 </script>
 
 <style scoped>
@@ -1033,7 +1042,10 @@ body,
   margin: 0;
 }
 .table-container {
+  
   width: 100%;
+  max-height: 300px; /* 높이 제한 설정 */
+    overflow-y: auto; /* 스크롤바 표시 */
   display: flex;
   justify-content: center; /* 왼쪽 정렬로 변경 */
   padding-left: 15px;

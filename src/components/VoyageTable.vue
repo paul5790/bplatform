@@ -75,7 +75,7 @@ import { readTrialData } from "../api/index.js";
 
 const emits = defineEmits(["trial"]);
 const page = ref(1);
-const itemsPerPage = ref(15);
+const itemsPerPage = ref(13);
 
 const headers = ref([
   { title: "시험 이름", align: "start", key: "division" },
@@ -114,7 +114,6 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 const fetchData = async () => {
   try {
     const response = await readTrialData(tokenid.value);
-    console.log(response);
     const newItems = [];
     for (let i = 0; i < response.length; i++) {
       const startTime = new Date(response[i].startTimeUtc);
@@ -128,10 +127,29 @@ const fetchData = async () => {
       const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+
+
+
       const storageSizeFloat = parseFloat(response[i].storageSize).toFixed(2);
-      const Storage = storageSizeFloat === 'NaN'? "0.00MB" : storageSizeFloat + "MB";
+
+      let Storage = ""
+      if (storageSizeFloat === 'NaN'){
+        Storage = "0.00MB";
+      }
+      else if (storageSizeFloat > 1048576){
+        Storage = `${(storageSizeFloat / 1048576).toFixed(2)}TB`;
+      }
+      else if (storageSizeFloat > 1024 && storageSizeFloat <= 1048575) {
+        Storage = `${(storageSizeFloat / 1024).toFixed(2)}GB`;
+      } else {
+        Storage = `${storageSizeFloat}MB`;
+      }
+
+      
       const distanceFloat = parseFloat(response[i].voyageDistance).toFixed(2);
       const Distance = distanceFloat === 'NaN'? "0.00km" : distanceFloat + "km";
+
       newItems.push({
         division: response[i].testName,
         name: response[i].shipName,
@@ -147,7 +165,6 @@ const fetchData = async () => {
       });
     }
 
-    console.log("Fetched data:", newItems); // 로그 추가
     items.value = newItems;
   } catch (error) {
     console.error(error);
@@ -162,7 +179,6 @@ onMounted(() => {
 const seatrialProps = ref();
 const maptitle = ref();
 const map = (item) => {
-  console.log("item : " + item.division);
   seatrialProps.value = `${item.division}`;
   maptitle.value = `시험: ${item.name}의 지도`;
   dialog.value = true;

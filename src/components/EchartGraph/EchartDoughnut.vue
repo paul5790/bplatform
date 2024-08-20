@@ -68,7 +68,25 @@ const AUTOPILOTCONTACT = ref({
 });
 const NO1ENGINEPANEL = ref({ value: 0, name: "NO.1ENGINEPANEL" });
 const NO2ENGINEPANEL = ref({ value: 0, name: "NO.2ENGINEPANEL" });
-const VTS = ref({ value: 0, name: "VTS" });
+const MTIE1ISA = ref({ value: 0, name: "MTIE1ISA" });
+
+const MTIE5VDGS = ref({ value: 0, name: "MTIE5VDGS" });
+const MTIE5DBS = ref({ value: 0, name: "MTIE5DBS" });
+const MOF1ANS = ref({ value: 0, name: "MOF1ANS" });
+const MOF2SYNC = ref({ value: 0, name: "MOF2SYNC" });
+const MOF1GNW = ref({ value: 0, name: "MOF1GNW" });
+const MTIE5SAS = ref({ value: 0, name: "MTIE5SAS" });
+const MTIE4XINNOS = ref({ value: 0, name: "MTIE4XINNOS" });
+const MANAGEMENT = ref({ value: 0, name: "MANAGEMENT" });
+const RUDDER = ref({ value: 0, name: "RUDDER" });
+const ENGINE = ref({ value: 0, name: "ENGINE" });
+const MODE = ref({ value: 0, name: "MODE" });
+
+const VTSAIS = ref({ value: 0, name: "VTSAIS" });
+const DYNAMICAISINFO = ref({ value: 0, name: "DYNAMICAISINFO" });
+const OBJECTINFO = ref({ value: 0, name: "OBJECTINFO" });
+const STATICAISINFO = ref({ value: 0, name: "STATICAISINFO" });
+const WEATHERINFO = ref({ value: 0, name: "WEATHERINFO" });
 
 const AllData = ref(0);
 
@@ -90,18 +108,40 @@ watch(selectedTestName, async (newTrialNum) => {
   AUTOPILOTCONTACT.value.value = 0;
   NO1ENGINEPANEL.value.value = 0;
   NO2ENGINEPANEL.value.value = 0;
-  VTS.value.value = 0;
+  MTIE1ISA.value.value = 0;
+
+  MTIE5VDGS.value.value = 0;
+  MTIE5DBS.value.value = 0;
+  MOF1ANS.value.value = 0;
+  MOF2SYNC.value.value = 0;
+  MOF1GNW.value.value = 0;
+  MTIE5SAS.value.value = 0;
+  MTIE4XINNOS.value.value = 0;
+  MANAGEMENT.value.value = 0;
+  RUDDER.value.value = 0;
+  ENGINE.value.value = 0;
+  MODE.value.value = 0;
+
+  VTSAIS.value.value = 0;
+  DYNAMICAISINFO.value.value = 0;
+  OBJECTINFO.value.value = 0;
+  STATICAISINFO.value.value = 0;
+  WEATHERINFO.value.value = 0;
 
   if (newTrialNum != "전체") {
     await fetchTrialData();
   } else {
     await fetchAllData();
   }
-  if (AllData.value > 1000) {
-    titleData = `${(AllData.value / 1000).toFixed(2)}GB`;
+
+  if (AllData.value > 1048576) {
+    titleData = `${(AllData.value / 1048576).toFixed(2)}TB`;
+  } else if (AllData.value > 1024 && AllData.value <= 1048575) {
+    titleData = `${(AllData.value / 1024).toFixed(2)}GB`;
   } else {
     titleData = `${AllData.value}MB`;
   }
+
   option.value.title.text = `${newTrialNum} 데이터 저장 용량 (${titleData})`;
   // const num = parseInt(newTrialNum.match(/\d+/)[0]);
   // trialNum.value = num;
@@ -123,8 +163,6 @@ const fetchTrialData = async () => {
       tokenid.value,
       selectedTestName.value
     );
-    console.log("data");
-    console.log(data);
     dataFilter1(data);
   } catch (error) {
     console.error(error);
@@ -135,6 +173,7 @@ const dataFilter1 = (data) => {
   Object.keys(data).forEach((key) => {
     // Extracting the prefix before the underscore
     const prefix = key.split("_")[0];
+    const prefix2 = key.split("_")[1];
     const compValue = Number(data[key]);
 
     switch (prefix) {
@@ -188,8 +227,87 @@ const dataFilter1 = (data) => {
           Number(NO2ENGINEPANEL.value.value) + compValue
         ).toFixed(2);
         break;
+      case "mtie1isa":
+        MTIE1ISA.value.value = (
+          Number(MTIE1ISA.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "mtie5vdgs":
+        MTIE5VDGS.value.value = (
+          Number(MTIE5VDGS.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "mtie5dbs":
+        MTIE5DBS.value.value = (
+          Number(MTIE5DBS.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "mof1ans":
+        MOF1ANS.value.value = (Number(MOF1ANS.value.value) + compValue).toFixed(
+          2
+        );
+        break;
+      case "mof2sync":
+        MOF2SYNC.value.value = (
+          Number(MOF2SYNC.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "mof1gnw":
+        MOF1GNW.value.value = (Number(MOF1GNW.value.value) + compValue).toFixed(
+          2
+        );
+        break;
+      case "mtie5sas":
+        MTIE5SAS.value.value = (
+          Number(MTIE5SAS.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "mtie4xinnos":
+        MTIE4XINNOS.value.value = (
+          Number(MTIE4XINNOS.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "management":
+        MANAGEMENT.value.value = (
+          Number(MANAGEMENT.value.value) + compValue
+        ).toFixed(2);
+        break;
+      case "rudder":
+        RUDDER.value.value = (Number(RUDDER.value.value) + compValue).toFixed(
+          2
+        );
+        break;
+      case "engine":
+        ENGINE.value.value = (Number(ENGINE.value.value) + compValue).toFixed(
+          2
+        );
+        break;
+      case "mode":
+        MODE.value.value = (Number(MODE.value.value) + compValue).toFixed(2);
+        break;
+
       case "integratedctrlsystem":
-        VTS.value.value = (Number(VTS.value.value) + compValue).toFixed(2);
+        if (prefix2 === "ais") {
+          VTSAIS.value.value = (Number(VTSAIS.value.value) + compValue).toFixed(
+            2
+          );
+        } else if (prefix2 === "dynamicaisinfo") {
+          DYNAMICAISINFO.value.value = (
+            Number(DYNAMICAISINFO.value.value) + compValue
+          ).toFixed(2);
+        } else if (prefix2 === "objectinfo") {
+          OBJECTINFO.value.value = (
+            Number(OBJECTINFO.value.value) + compValue
+          ).toFixed(2);
+        } else if (prefix2 === "staticaisinfo") {
+          STATICAISINFO.value.value = (
+            Number(STATICAISINFO.value.value) + compValue
+          ).toFixed(2);
+        } else if (prefix2 === "weatherinfo") {
+          WEATHERINFO.value.value = (
+            Number(WEATHERINFO.value.value) + compValue
+          ).toFixed(2);
+        }
         break;
     }
     AllData.value = (
@@ -205,7 +323,23 @@ const dataFilter1 = (data) => {
       Number(AUTOPILOTCONTACT.value.value) +
       Number(NO1ENGINEPANEL.value.value) +
       Number(NO2ENGINEPANEL.value.value) +
-      Number(VTS.value.value)
+      Number(MTIE1ISA.value.value) +
+      Number(MTIE5VDGS.value.value) +
+      Number(MTIE5DBS.value.value) +
+      Number(MOF1ANS.value.value) +
+      Number(MOF2SYNC.value.value) +
+      Number(MOF1GNW.value.value) +
+      Number(MTIE5SAS.value.value) +
+      Number(MTIE4XINNOS.value.value) +
+      Number(MANAGEMENT.value.value) +
+      Number(RUDDER.value.value) +
+      Number(ENGINE.value.value) +
+      Number(MODE.value.value) +
+      Number(VTSAIS.value.value) +
+      Number(DYNAMICAISINFO.value.value) +
+      Number(OBJECTINFO.value.value) +
+      Number(STATICAISINFO.value.value) +
+      Number(WEATHERINFO.value.value)
     ).toFixed(2);
   });
 };
@@ -214,37 +348,37 @@ const dataFilter = (data) => {
   data.forEach((item) => {
     // Extracting the prefix before the underscore
     const prefix = item.tableName.split("_")[0];
-
+    const prefix2 = item.tableName.split("_")[1];
     // Adding dataLength to the corresponding variable based on the prefix
     switch (prefix) {
-      case "ais":
+      case "ais": // ok
         AIS.value.value += Number(item.tableSize);
         break;
-      case "gyro":
+      case "gyro": // ok
         GYRO.value.value += Number(item.tableSize);
         break;
-      case "anemometer":
+      case "anemometer": // ok
         ANEMOMETER.value.value += Number(item.tableSize);
         break;
       case "radar":
         RADAR.value.value += Number(item.tableSize);
         break;
-      case "dgps":
+      case "dgps": // ok
         DGPS.value.value += Number(item.tableSize);
         break;
-      case "ecdis":
+      case "ecdis": // ok
         ECDIS.value.value += Number(item.tableSize);
         break;
-      case "autopilot":
+      case "autopilot": // ok
         AUTOPILOT.value.value += Number(item.tableSize);
         break;
       case "speedlog":
         SPEEDLOG.value.value += Number(item.tableSize);
         break;
-      case "canthrottle":
+      case "canthrottle": // ok
         CANTHROTTLE.value.value += Number(item.tableSize);
         break;
-      case "autopilotcontact":
+      case "autopilotcontact": // ok
         AUTOPILOTCONTACT.value.value += Number(item.tableSize);
         break;
       case "no1enginepanel":
@@ -253,8 +387,54 @@ const dataFilter = (data) => {
       case "no2enginepanel":
         NO2ENGINEPANEL.value.value += Number(item.tableSize);
         break;
-      case "integratedctrlsystem":
-        VTS.value.value += Number(item.tableSize);
+      case "mtie1isa": // ok
+        MTIE1ISA.value.value += Number(item.tableSize);
+        break;
+      case "mtie5vdgs":
+        MTIE5VDGS.value.value += Number(item.tableSize);
+        break;
+      case "mtie5dbs":
+        MTIE5DBS.value.value += Number(item.tableSize);
+        break;
+      case "mof1ans": // ok
+        MOF1ANS.value.value += Number(item.tableSize);
+        break;
+      case "mof2sync": // ok
+        MOF2SYNC.value.value += Number(item.tableSize);
+        break;
+      case "mof1gnw": // ok
+        MOF1GNW.value.value += Number(item.tableSize);
+        break;
+      case "mtie5sas":
+        MTIE5SAS.value.value += Number(item.tableSize);
+        break;
+      case "mtie4xinnos":
+        MTIE4XINNOS.value.value += Number(item.tableSize);
+        break;
+      case "management": // ok
+        MANAGEMENT.value.value += Number(item.tableSize);
+        break;
+      case "rudder":
+        RUDDER.value.value += Number(item.tableSize);
+        break;
+      case "engine": // ok
+        ENGINE.value.value += Number(item.tableSize);
+        break;
+      case "mode": // ok
+        MODE.value.value += Number(item.tableSize);
+        break;
+      case "integratedctrlsystem": // ok
+        if (prefix2 === "ais") {
+          VTSAIS.value.value += Number(item.tableSize);
+        } else if (prefix2 === "dynamicaisinfo") {
+          DYNAMICAISINFO.value.value += Number(item.tableSize);
+        } else if (prefix2 === "objectinfo") {
+          OBJECTINFO.value.value += Number(item.tableSize);
+        } else if (prefix2 === "staticaisinfo") {
+          STATICAISINFO.value.value += Number(item.tableSize);
+        } else if (prefix2 === "weatherinfo") {
+          WEATHERINFO.value.value += Number(item.tableSize);
+        }
         break;
     }
     AllData.value =
@@ -270,7 +450,23 @@ const dataFilter = (data) => {
       Number(AUTOPILOTCONTACT.value.value) +
       Number(NO1ENGINEPANEL.value.value) +
       Number(NO2ENGINEPANEL.value.value) +
-      Number(VTS.value.value);
+      Number(MTIE1ISA.value.value) +
+      Number(MTIE5VDGS.value.value) +
+      Number(MTIE5DBS.value.value) +
+      Number(MOF1ANS.value.value) +
+      Number(MOF2SYNC.value.value) +
+      Number(MOF1GNW.value.value) +
+      Number(MTIE5SAS.value.value) +
+      Number(MTIE4XINNOS.value.value) +
+      Number(MANAGEMENT.value.value) +
+      Number(RUDDER.value.value) +
+      Number(ENGINE.value.value) +
+      Number(MODE.value.value) +
+      Number(VTSAIS.value.value) +
+      Number(DYNAMICAISINFO.value.value) +
+      Number(OBJECTINFO.value.value) +
+      Number(STATICAISINFO.value.value) +
+      Number(WEATHERINFO.value.value);
   });
 };
 
@@ -314,7 +510,23 @@ watch(
     AUTOPILOTCONTACT.value,
     NO1ENGINEPANEL.value,
     NO2ENGINEPANEL.value,
-    VTS.value,
+    MTIE1ISA.value,
+    MTIE5VDGS.value,
+    MTIE5DBS.value,
+    MOF1ANS.value,
+    MOF2SYNC.value,
+    MOF1GNW.value,
+    MTIE5SAS.value,
+    MTIE4XINNOS.value,
+    MANAGEMENT.value,
+    RUDDER.value,
+    ENGINE.value,
+    MODE.value,
+    VTSAIS.value,
+    DYNAMICAISINFO.value,
+    OBJECTINFO.value,
+    STATICAISINFO.value,
+    WEATHERINFO.value,
   ],
   () => {
     option.value.legend.data = getLegendData(); // 데이터 변경 시 legend 업데이트
@@ -348,7 +560,33 @@ function getLegendData() {
       icon: "circle",
       value: NO2ENGINEPANEL.value.value,
     },
-    { name: "VTS", icon: "circle", value: VTS.value.value },
+    { name: "MTIE1ISA", icon: "circle", value: MTIE1ISA.value.value },
+
+    { name: "MTIE5VDGS", icon: "circle", value: MTIE5VDGS.value.value },
+    { name: "MTIE5DBS", icon: "circle", value: MTIE5DBS.value.value },
+    { name: "MOF1ANS", icon: "circle", value: MOF1ANS.value.value },
+    { name: "MOF2SYNC", icon: "circle", value: MOF2SYNC.value.value },
+    { name: "MOF1GNW", icon: "circle", value: MOF1GNW.value.value },
+    { name: "MTIE5SAS", icon: "circle", value: MTIE5SAS.value.value },
+    {
+      name: "MTIE4XINNOS",
+      icon: "circle",
+      value: MTIE4XINNOS.value.value,
+    },
+    { name: "MANAGEMENT", icon: "circle", value: MANAGEMENT.value.value },
+    { name: "RUDDER", icon: "circle", value: RUDDER.value.value },
+    { name: "ENGINE", icon: "circle", value: ENGINE.value.value },
+    { name: "MODE", icon: "circle", value: MODE.value.value },
+
+    { name: "VTSAIS", icon: "circle", value: VTSAIS.value.value },
+    {
+      name: "DYNAMICAISINFO",
+      icon: "circle",
+      value: DYNAMICAISINFO.value.value,
+    },
+    { name: "OBJECTINFO", icon: "circle", value: OBJECTINFO.value.value },
+    { name: "STATICAISINFO", icon: "circle", value: STATICAISINFO.value.value },
+    { name: "WEATHERINFO", icon: "circle", value: WEATHERINFO.value.value },
     // 다른 항목들도 추가합니다.
   ];
 
@@ -374,7 +612,7 @@ const option = ref({
     data: getLegendData(),
     orient: "vertical", // 수직 방향으로 표시
     top: "40", // 수직 정렬을 중앙으로 설정
-    right: "5%",
+    right: "0%",
     textStyle: {
       color: textColor.value, // 텍스트 컬러 설정
       fontSize: 12, // 텍스트 크기를 줄임 (기본값: 12)
@@ -389,8 +627,10 @@ const option = ref({
       }
       const item = option.value.legend.data.find((d) => d.name === name);
       if (item) {
-        if (item.value > 1000) {
-          return `${item.name} (${(item.value / 1000).toFixed(2)}GB)`;
+        if (item.value > 1048576) {
+          return `${item.name} (${(item.value / 1048576).toFixed(2)}TB)`;
+        } else if (item.value > 1024 && item.value <= 1048575) {
+          return `${item.name} (${(item.value / 1024).toFixed(2)}GB)`;
         } else {
           return `${item.name} (${item.value}MB)`;
         }
@@ -403,7 +643,7 @@ const option = ref({
       name: "Traffic Sources",
       type: "pie",
       radius: ["40%", "70%"],
-      center: ["30%", "55%"], // 이 부분을 수정하여 위치 조절
+      center: ["21%", "55%"], // 이 부분을 수정하여 위치 조절
       avoidLabelOverlap: false,
       label: {
         show: false,
@@ -433,7 +673,23 @@ const option = ref({
         AUTOPILOTCONTACT.value,
         NO1ENGINEPANEL.value,
         NO2ENGINEPANEL.value,
-        VTS.value,
+        MTIE1ISA.value,
+        MTIE5VDGS.value,
+        MTIE5DBS.value,
+        MOF1ANS.value,
+        MOF2SYNC.value,
+        MOF1GNW.value,
+        MTIE5SAS.value,
+        MTIE4XINNOS.value,
+        MANAGEMENT.value,
+        RUDDER.value,
+        ENGINE.value,
+        MODE.value,
+        VTSAIS.value,
+        DYNAMICAISINFO.value,
+        OBJECTINFO.value,
+        STATICAISINFO.value,
+        WEATHERINFO.value,
       ],
     },
   ],

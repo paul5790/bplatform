@@ -1,6 +1,6 @@
 <template>
   <!-- 전체화면 패딩100px -->
-  <v-card-actions>
+  <v-card-actions style="padding: 0px">
     <v-card ref="searchCard" :style="cardStyle">
       <v-card-text style="padding-bottom: 0px">
         <div style="display: flex; gap: 16px">
@@ -10,7 +10,7 @@
             :append-inner-icon="
               ShipData === '관제 데이터' ? 'mdi-radar' : 'mdi-ferry'
             "
-            label="ShipData"
+            label="Data Source"
             variant="outlined"
             readonly
             @click="
@@ -27,7 +27,7 @@
             body-1
             density="compact"
             append-inner-icon="mdi-format-list-checks"
-            label="Main Component"
+            label="Select Component"
             variant="outlined"
             @click="
               (SelectedDataCardVisible = false),
@@ -49,7 +49,7 @@
                 ? 'mdi-code-json'
                 : 'mdi-table-large'
             "
-            label="Sub Component"
+            label="Data Format"
             variant="outlined"
             readonly
             @click="
@@ -520,25 +520,43 @@
 
     <v-spacer></v-spacer>
   </v-card-actions>
-  <div style="height: 93vh" @click="windowClick()">
+  <div style="height: 87vh" @click="windowClick()">
     <div style="padding: 30px; padding-bottom: 0px">
       <!-- 데이터 선택창 -->
 
       <!-- 데이터 테이블 -->
       <template v-if="viewState == 'ondata'">
         <v-container v-if="showType == 'table'">
-          <v-tabs v-model="activeTab">
-            <v-tab v-for="(data, index) in dataKeys" :key="index">{{
-              data
-            }}</v-tab>
-          </v-tabs>
+          <v-row>
+            <v-col cols="9"
+              ><v-tabs v-model="activeTab">
+                <v-tab v-for="(data, index) in dataKeys" :key="index">{{
+                  data
+                }}</v-tab>
+              </v-tabs></v-col
+            >
+            <v-col cols="auto" style="padding-bottom: 3px; margin-left: auto"
+              ><v-text-field
+                style="width: 300px"
+                v-model="searchInput"
+                label="Search"
+                prepend-inner-icon="mdi-magnify"
+                variant="underlined"
+                hide-details
+                single-line
+              ></v-text-field
+            ></v-col>
+          </v-row>
+
           <v-tabs-items v-model="activeTab">
             <v-tab-item v-for="(data, index) in dataKeys" :key="index">
               <template v-if="activeTab === index">
                 <v-data-table
                   density="dence"
+                  style="height: 64vh;"
                   :headers="headers[data]"
                   :items="paginatedItems"
+                  :search="search"
                   :items-per-page="itemsPerPage"
                   class="elevation-1"
                 >
@@ -721,6 +739,7 @@ import {
   readDataTrial,
   downloadDataFile,
   readMineData,
+  downloadDataFileXml,
 } from "../api/index.js";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 import "@/styles/datepicker-theme.css";
@@ -799,6 +818,13 @@ const selectBoxClick3 = () => {};
 
 const selectBoxClick4 = () => {};
 
+const search = ref("");
+const searchInput = ref("");
+
+watch(searchInput, async (newValue, oldValue) => {
+  search.value = searchInput.value;
+});
+
 // ------------------- 0번째 데이터 선정 Method ------------------------ //
 const ShipData = ref();
 const ShipDataState = ref();
@@ -806,10 +832,29 @@ const ShipDataState = ref();
 const toggleSelectShipData = (data) => {
   if (data === "ship") {
     ShipData.value = "선내 데이터";
+    requests.value.data = "information";
   } else if (data === "vts") {
     ShipData.value = "관제 데이터";
+    requests.value.data = "vts";
   } else {
-    console.log("있을 수 없는 일 ㅋ");
+    console.log("있을 수 없는 일");
+  }
+
+  tb1 = ShipData.value;
+
+  // 검색 조건 할당
+  // requests.value.data =
+  //   ShipData.value === "선내 데이터" ? "information" : "vts";
+
+  // 다음 선택 시, 다음 조건 CardView로 이동
+  SelectedDataCardVisible.value = false;
+
+  if (ShipData.value === "선내 데이터") {
+    SelectedShipContentsCardVisible.value = true;
+  } else if (ShipData.value === "관제 데이터") {
+    SelectedVtsContentsCardVisible.value = true;
+  } else {
+    alert("항목을 선택해주세요.");
   }
 };
 
@@ -892,39 +937,39 @@ const destinationSubItems = {
   ECDIS: ["VDM", "VDO", "ROUTEINFO", "WAYPOINTS"],
   AUTOPILOT: ["RSA", "HTD"],
   SPEEDLOG: ["VBW", "VHW", "VLW"],
-  CANTHROTTLE: ["CAN_Online_State", "Engine_RPM", "Rudder", "Rudder_Scale"],
+  CANTHROTTLE: ["CANONLINESTATE", "ENGINERPM", "RUDDER", "RUDDERSCALE"],
   AUTOPILOTCONTACT: ["AUTOPILOTCONTACT"],
   NO1ENGINEPANEL: [
-    "NO.1ENGINE_PANEL_61444",
-    "NO.1ENGINE_PANEL_65262",
-    "NO.1ENGINE_PANEL_65263",
-    "NO.1ENGINE_PANEL_65272",
-    "NO.1ENGINE_PANEL_65271",
-    "NO.1ENGINE_PANEL_65253",
-    "NO.1ENGINE_PANEL_65270",
-    "NO.1ENGINE_PANEL_65276",
-    "NO.1ENGINE_PANEL_65360",
-    "NO.1ENGINE_PANEL_65361_LAMP",
-    "NO.1ENGINE_PANEL_65361_STATUS",
-    "NO.1ENGINE_PANEL_65378",
-    "NO.1ENGINE_PANEL_65376",
-    "NO.1ENGINE_PANEL_65379",
+    "NO1ENGINE_PANEL_61444",
+    "NO1ENGINE_PANEL_65262",
+    "NO1ENGINE_PANEL_65263",
+    "NO1ENGINE_PANEL_65272",
+    "NO1ENGINE_PANEL_65271",
+    "NO1ENGINE_PANEL_65253",
+    "NO1ENGINE_PANEL_65270",
+    "NO1ENGINE_PANEL_65276",
+    "NO1ENGINE_PANEL_65360",
+    "NO1ENGINE_PANEL_65361_LAMP",
+    "NO1ENGINE_PANEL_65361_STATUS",
+    "NO1ENGINE_PANEL_65378",
+    "NO1ENGINE_PANEL_65376",
+    "NO1ENGINE_PANEL_65379",
   ],
   NO2ENGINEPANEL: [
-    "NO.2ENGINE_PANEL_61444",
-    "NO.2ENGINE_PANEL_65262",
-    "NO.2ENGINE_PANEL_65263",
-    "NO.2ENGINE_PANEL_65272",
-    "NO.2ENGINE_PANEL_65271",
-    "NO.2ENGINE_PANEL_65253",
-    "NO.2ENGINE_PANEL_65270",
-    "NO.2ENGINE_PANEL_65276",
-    "NO.2ENGINE_PANEL_65360",
-    "NO.2ENGINE_PANEL_65361_LAMP",
-    "NO.2ENGINE_PANEL_65361_STATUS",
-    "NO.2ENGINE_PANEL_65378",
-    "NO.2ENGINE_PANEL_65376",
-    "NO.2ENGINE_PANEL_65379",
+    "NO2ENGINE_PANEL_61444",
+    "NO2ENGINE_PANEL_65262",
+    "NO2ENGINE_PANEL_65263",
+    "NO2ENGINE_PANEL_65272",
+    "NO2ENGINE_PANEL_65271",
+    "NO2ENGINE_PANEL_65253",
+    "NO2ENGINE_PANEL_65270",
+    "NO2ENGINE_PANEL_65276",
+    "NO2ENGINE_PANEL_65360",
+    "NO2ENGINE_PANEL_65361_LAMP",
+    "NO2ENGINE_PANEL_65361_STATUS",
+    "NO2ENGINE_PANEL_65378",
+    "NO2ENGINE_PANEL_65376",
+    "NO2ENGINE_PANEL_65379",
   ],
 
   MTIE1ISA: ["SITUATIONAL"],
@@ -1086,6 +1131,16 @@ const toggleSubItem = (subItem) => {
       searchTarget.value.push(`${selectedDestination.value.name}_${subItem}`);
     }
   }
+
+  tb2 = formattedSearchTarget;
+
+  let signalParams = "";
+
+  for (let i = 0; i < recentSearches.value.length; i++) {
+    signalParams += `&signal_name=${recentSearches.value[i]}`;
+  }
+
+  requests.value.signal = signalParams;
 };
 
 // ---------------------------- 관제 --------------------------- //
@@ -1108,10 +1163,38 @@ const toggleVts = (vts) => {
     );
     removeItemFromArray(searchTarget.value, vts);
   }
+
+  tb2 = formattedSearchTarget;
+
+  let signalParams = "";
+
+  for (let i = 0; i < recentSearches.value.length; i++) {
+    signalParams += `&signal_name=${recentSearches.value[i]}`;
+  }
+
+  requests.value.signal = signalParams;
 };
 
 const handleChipClick = (search) => {
-  const [destination, subItem] = search.split("_");
+  const parts = search.split("_");
+  let destination, subItem;
+
+  if (parts.length > 2) {
+    if (parts[0] === "NO1ENGINEPANEL" || parts[0] === "NO2ENGINEPANEL" || parts[0] === "MANAGEMENT" ) {
+      destination = parts[0];
+      subItem = parts.slice(1).join("_");
+    } else if (parts[0] === "MTIE4XINNOS") {
+      const endIndex = parts[2] === "EMUL" ? 3 : 2;
+      destination = parts.slice(0, endIndex).join("_");
+      subItem = parts.slice(endIndex).join("_");
+    } else {
+      alert("_가 2개 이상 존재합니다.");
+      return;
+    }
+  } else {
+    [destination, subItem] = parts;
+  }
+
   const destObj = destinations.value.find((dest) => dest.name === destination);
 
   if (subItem) {
@@ -1128,10 +1211,21 @@ const selectDataType = ref(null);
 const toggleSelectDataType = (type) => {
   if (type === "정형 데이터") {
     selectDataType.value = "정형 데이터";
+    requests.value.type = "table_data";
   } else if (type === "비정형 데이터") {
     selectDataType.value = "비정형 데이터";
+    requests.value.type = "collection_data";
   } else {
     console.log("가능한가?");
+  }
+
+  // 데이터 선택 박스 text 할당
+  tb3 = selectDataType.value;
+
+  // 다음 선택 시, 다음 조건 CardView로 이동
+  DataTypeCardVisible.value = false;
+  if (searchTimeRange.value == null) {
+    periodSettingCardVisible.value = true;
   }
 };
 
@@ -1166,9 +1260,13 @@ const selectTest = (index, category) => {
   selectedTest.value = index;
   if (index == 0) {
     handleDateChange();
+    requests.value.period = `period?start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`;
   } else {
     searchTimeRange.value = category;
+    requests.value.period = `test?test_name=${searchTimeRange.value}`;
   }
+  // 데이터 선택 박스 text 할당
+  tb4 = searchTimeRange.value;
 };
 
 const handleDateChange = () => {
@@ -1264,7 +1362,7 @@ const completeData3 = () => {
 
   requests.value.period =
     selectedTest.value === 0
-      ? `period?start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`
+      ? `period?start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`
       : `test?test_name=${searchTimeRange.value}`;
 
   // 다음 선택 시, 다음 조건 CardView로 이동
@@ -1282,9 +1380,8 @@ const dataSearchBtn = async () => {
     viewState.value = "loading";
     ShipDataState.value = ShipData.value;
     showType.value = selectDataType.value === "정형 데이터" ? "table" : "json";
-    let apiReq = `collection_data/information/period?start_utctime=2024-05-27T15:15:28.000Z&end_utctime=2024-05-27T15:45:38.000Z&signal_name=AIS_VDM&signal_name=AIS_VDO`;
+    let apiReq = `collection_data/information/period?start_time_utc=2024-05-27T15:15:28.000Z&end_time_utc=2024-05-27T15:45:38.000Z&signal_name=AIS_VDM&signal_name=AIS_VDO`;
     apiReq = `${requests.value.type}/${requests.value.data}/${requests.value.period}${requests.value.signal}`;
-    console.log(formattedSearchTarget.value);
     await searchApi(apiReq);
     if (selectDataType.value == "비정형 데이터") {
       dataKeys2.value = Object.keys(data.value);
@@ -1302,7 +1399,7 @@ const dataSearchBtn = async () => {
     downloadReq.value.signal = requests.value.signal;
     downloadReq.value.period =
       selectedTest.value === 0
-        ? `find_method=period&start_utctime=${startUtc.value}&end_utctime=${endUtc.value}`
+        ? `find_method=period&start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`
         : `find_method=test&test_name=${searchTimeRange.value}`;
   }
 };
@@ -1315,6 +1412,7 @@ const headers = ref([]);
 
 const searchApi = async (apiReq) => {
   const response = await readDataTrial(tokenid.value, apiReq);
+  console.log(apiReq);
   console.log(response);
   data.value = response;
   processData(response);
@@ -1483,7 +1581,6 @@ const sampleChoice1 = ref("GYRO_HDT, GYRO_ROT, ANEMOMETER_MWV");
 
 const checkPermission = async () => {
   const userDataResponse = await readMineData(tokenid.value);
-  console.log(userDataResponse);
   if (userDataResponse.userGroup === "ADMIN") {
     downloadPermission.value = true;
   } else {
@@ -1505,9 +1602,6 @@ const checkPermission = async () => {
         );
       });
 
-    console.log(isTimeValid);
-    console.log(isDataValid);
-
     // 두 조건을 모두 만족하는지 확인
     downloadPermission.value = isTimeValid && isDataValid;
   }
@@ -1525,17 +1619,12 @@ const dataDownloadServer = async () => {
 
   let apiReq = ``;
   apiReq = `${downloadReq.value.type}/${downloadReq.value.data}/${downloadReq.value.file_type}&${downloadReq.value.period}${downloadReq.value.signal}`;
-  console.log(apiReq);
   const loadData = await downloadDataFile(tokenid.value, apiReq);
+  console.log(loadData);
 
   const contentDispositionHeader = loadData.headers["content-disposition"];
   const match = contentDispositionHeader.match(/filename=([^;]+)/);
   const fileName = match ? match[1] : "downloaded-file";
-
-  console.log("1");
-  console.log(contentDispositionHeader);
-  console.log(match);
-  console.log("File name:", fileName);
 
   const blob = new Blob([loadData.data]);
   // Blob 객체를 다운로드할 수 있는 URL로 변환
@@ -1610,18 +1699,30 @@ const uploadFile = async () => {
 
   const formData = new FormData();
   formData.append("file", file.value);
-
   try {
-    const response = await axios.post(
-      "http://localhost:9998/api/v1/table_data/batch_download",
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-    console.log("파일 업로드 성공:", response.data);
+    const loadData = await downloadDataFileXml(tokenid.value, formData);
+    console.log(loadData);
+    const contentDispositionHeader = loadData.headers["content-disposition"];
+    const match = contentDispositionHeader.match(/filename=([^;]+)/);
+    let fileName = match ? match[1] : "downloaded-file";
+
+    fileName = fileName.replace(".xlsx", ".zip");
+
+    const blob = new Blob([loadData.data]);
+    // Blob 객체를 다운로드할 수 있는 URL로 변환
+    const url = window.URL.createObjectURL(blob);
+
+    // <a> 태그를 생성하고 다운로드 링크 설정
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName); // 다운로드할 ZIP 파일의 이름 설정
+    document.body.appendChild(link);
+
+    // 다운로드 링크 클릭하여 파일 다운로드
+    link.click();
+
+    // 사용이 끝난 URL 객체 제거
+    window.URL.revokeObjectURL(url);
   } catch (error) {
     console.error("파일 업로드 실패:", error);
   }

@@ -162,12 +162,19 @@ const createRefObject = () => {
     "NO2ENGINE_PANEL_65378",
     "NO2ENGINE_PANEL_65376",
     "NO2ENGINE_PANEL_65379",
+    "SITUATIONAL",
+    "VIRTUALNAV",
+    "ROUTEDECISION",
+    "SYSTEMSTATE",
+    "MODEINFO",
+    "AIS",
+    "DYNAMICAISINFO",
+    "STATICAISINFO",
+    "OBJECTINFO",
+    "WEATHERINFO",
   ];
 
   keys.forEach((key) => createRef(key));
-
-  console.log(refs["GLL"].value);
-  console.log(refs["ALLGLL"].value);
 
   return { refs, dataRef };
 };
@@ -208,10 +215,19 @@ const createDataObject = (groupId, values, allValues) => {
 // 로딩
 const loading = ref(true);
 
+// response 데이터를 refs에 넣기 전에 모든 값을 0으로 초기화하는 함수
+const initializeRefs = () => {
+  Object.keys(refs).forEach((key) => {
+    refs[key].value = 0;
+  });
+};
+
 // response 데이터를 refs에 넣는 함수
 const populateRefs = (responseData) => {
   responseData.forEach((item) => {
+    
     let signalName = item.signalName;
+    
 
     // 엔진 데이터인 경우 접두사 포함
     if (
@@ -224,7 +240,6 @@ const populateRefs = (responseData) => {
       // 접두사를 제거하고 나머지 부분만 사용
       signalName = signalName.split("_").pop();
     }
-
     if (refs[signalName] && refs[`ALL${signalName}`]) {
       refs[signalName].value = item;
       refs[`ALL${signalName}`].value = item;
@@ -234,51 +249,12 @@ const populateRefs = (responseData) => {
 
 const fetchData = async () => {
   loading.value = true;
-
-  const response = await readlossData(tokenid.value, selectedTestName);
-
-  console.log(response);
+  initializeRefs();
+  let response = await readlossData(tokenid.value, selectedTestName.value);
   await populateRefs(response);
 
   loading.value = false;
   updateChart();
-
-  // try {
-  //   const response = await readLossTimeData(tokenid.value);
-  //   const timeDataRefs = responseKeys.map((key) => response[key]);
-  //   const axiosPromises = axioslist.value.map(async (endpoint, i) => {
-  //     try {
-  //       const [Sc, Co] = endpoint.split("/");
-  //       const dataFormat = `signal?signal_name=${Sc}_${Co}&test_name=${selectedTestName.value}&settime=${timeDataRefs[i]}`;
-  //       console.log(dataFormat);
-
-  //       const response = await readlossData(
-  //         tokenid.value,
-  //         selectedTestName
-  //       );
-
-  //   if (response) {
-  //     dataRefs[i].value = Number(response.countDelay) || 0;
-  //     alldataRefs[i].value = Number(response.numOfData) || 0;
-  //   } else {
-  //     dataRefs[i].value = 0;
-  //     alldataRefs[i].value = 0;
-  //   }
-  //     } catch (error) {
-  //       //console.error(error);
-  //     }
-  //   });
-
-  //   // 모든 axios 호출이 완료될 때까지 기다림
-  //   await Promise.all(axiosPromises);
-  //   loading.value = false;
-
-  //   // 데이터를 모두 받아온 후에 차트 업데이트
-
-  //   await updateChart();
-  // } catch (error) {
-  //   console.error("Error during fetchData:", error);
-  // }
 };
 
 // onMounted(() => {
@@ -352,6 +328,9 @@ const option = ref({
       "AUTOPILOTCONTACT",
       "NO.1ENGINE",
       "NO.2ENGINE",
+      "KASS",
+      "MANAGEMENT",
+      "VTS",
     ],
   },
   yAxis: {},
@@ -483,6 +462,33 @@ const option = ref({
           refs.ALLNO2ENGINE_PANEL_65379,
         ]
       ),
+      createDataObject(
+        "KASS",
+        [refs.SITUATIONAL, refs.VIRTUALNAV, refs.ROUTEDECISION],
+        [refs.ALLSITUATIONAL, refs.ALLVIRTUALNAV, refs.ALLROUTEDECISION]
+      ),
+      createDataObject(
+        "MANAGEMENT",
+        [refs.SYSTEMSTATE, refs.MODEINFO],
+        [refs.ALLSYSTEMSTATE, refs.ALLMODEINFO]
+      ),
+      createDataObject(
+        "VTS",
+        [
+          refs.AIS,
+          refs.DYNAMICAISINFO,
+          refs.OBJECTINFO,
+          refs.STATICAISINFO,
+          refs.WEATHERINFO,
+        ],
+        [
+          refs.ALLAIS,
+          refs.ALLDYNAMICAISINFO,
+          refs.ALLOBJECTINFO,
+          refs.ALLSTATICAISINFO,
+          refs.ALLWEATHERINFO,
+        ]
+      ),
     ],
     universalTransition: {
       enabled: true,
@@ -551,6 +557,9 @@ const handleChartClick = async (event) => {
                     "AUTOPILOTCONTACT",
                     "NO.1ENGINE",
                     "NO.2ENGINE",
+                    "KASS",
+                    "MANAGEMENT",
+                    "VTS",
                   ],
                 },
                 series: {
@@ -710,6 +719,33 @@ const handleChartClick = async (event) => {
                         refs.ALLNO2ENGINE_PANEL_65379,
                       ]
                     ),
+                    createDataObject(
+                      "KASS",
+                      [refs.SITUATIONAL, refs.VIRTUALNAV, refs.ROUTEDECISION],
+                      [refs.ALLSITUATIONAL, refs.ALLVIRTUALNAV, refs.ALLROUTEDECISION]
+                    ),
+                    createDataObject(
+                      "MANAGEMENT",
+                      [refs.SYSTEMSTATE, refs.MODEINFO],
+                      [refs.ALLSYSTEMSTATE, refs.ALLMODEINFO]
+                    ),
+                    createDataObject(
+                      "VTS",
+                      [
+                        refs.AIS,
+                        refs.DYNAMICAISINFO,
+                        refs.OBJECTINFO,
+                        refs.STATICAISINFO,
+                        refs.WEATHERINFO,
+                      ],
+                      [
+                        refs.ALLAIS,
+                        refs.ALLDYNAMICAISINFO,
+                        refs.ALLOBJECTINFO,
+                        refs.ALLSTATICAISINFO,
+                        refs.ALLWEATHERINFO,
+                      ]
+                    ),
                   ],
                   universalTransition: {
                     enabled: true,
@@ -773,7 +809,10 @@ const updateDataObject = (id, value, allValue) => {
     groupId: id,
     percent: ((value.countDelay / allValue.numOfData) * 100).toFixed(2),
     itemStyle: {
-      color: (value.countDelay / allValue.numOfData) * 100 > 30 ? "#FF6666" : undefined, // 소실률이 30% 초과 시 빨간색
+      color:
+        (value.countDelay / allValue.numOfData) * 100 > 30
+          ? "#FF6666"
+          : undefined, // 소실률이 30% 초과 시 빨간색
     },
   };
 };
@@ -936,6 +975,33 @@ const updateChart = () => {
               refs.ALLNO2ENGINE_PANEL_65378,
               refs.ALLNO2ENGINE_PANEL_65376,
               refs.ALLNO2ENGINE_PANEL_65379,
+            ]
+          ),
+          createDataObject(
+            "KASS",
+            [refs.SITUATIONAL, refs.VIRTUALNAV, refs.ROUTEDECISION],
+            [refs.ALLSITUATIONAL, refs.ALLVIRTUALNAV, refs.ALLROUTEDECISION]
+          ),
+          createDataObject(
+            "MANAGEMENT",
+            [refs.SYSTEMSTATE, refs.MODEINFO],
+            [refs.ALLSYSTEMSTATE, refs.ALLMODEINFO]
+          ),
+          createDataObject(
+            "VTS",
+            [
+              refs.AIS,
+              refs.DYNAMICAISINFO,
+              refs.OBJECTINFO,
+              refs.STATICAISINFO,
+              refs.WEATHERINFO,
+            ],
+            [
+              refs.ALLAIS,
+              refs.ALLDYNAMICAISINFO,
+              refs.ALLOBJECTINFO,
+              refs.ALLSTATICAISINFO,
+              refs.ALLWEATHERINFO,
             ]
           ),
         ],
@@ -1313,6 +1379,94 @@ const updateChart = () => {
               "NO2ENGINE_PANEL_65379",
               refs.NO2ENGINE_PANEL_65379.value,
               refs.ALLNO2ENGINE_PANEL_65379.value
+            ),
+          ],
+        ],
+      },
+      {
+        dataGroupId: "KASS",
+        data: [
+          [
+            "SITUATIONAL",
+            updateDataObject(
+              "SITUATIONAL",
+              refs.SITUATIONAL.value,
+              refs.ALLSITUATIONAL.value
+            ),
+          ],
+          [
+            "VIRTUALNAV",
+            updateDataObject(
+              "VIRTUALNAV",
+              refs.VIRTUALNAV.value,
+              refs.ALLVIRTUALNAV.value
+            ),
+          ],
+          [
+            "ROUTEDECISION",
+            updateDataObject(
+              "ROUTEDECISION",
+              refs.ROUTEDECISION.value,
+              refs.ALLROUTEDECISION.value
+            ),
+          ],
+        ],
+      },
+      {
+        dataGroupId: "MANAGEMENT",
+        data: [
+          [
+            "SYSTEMSTATE",
+            updateDataObject(
+              "SYSTEMSTATE",
+              refs.SYSTEMSTATE.value,
+              refs.ALLSYSTEMSTATE.value
+            ),
+          ],
+          [
+            "MODEINFO",
+            updateDataObject(
+              "MODEINFO",
+              refs.MODEINFO.value,
+              refs.ALLMODEINFO.value
+            ),
+          ],
+        ],
+      },
+      {
+        dataGroupId: "VTS",
+        data: [
+          ["AIS", updateDataObject("AIS", refs.AIS.value, refs.ALLAIS.value)],
+          [
+            "DYNAMICAISINFO",
+            updateDataObject(
+              "DYNAMICAISINFO",
+              refs.DYNAMICAISINFO.value,
+              refs.ALLDYNAMICAISINFO.value
+            ),
+          ],
+          [
+            "OBJECTINFO",
+            updateDataObject(
+              "OBJECTINFO",
+              refs.OBJECTINFO.value,
+              refs.ALLOBJECTINFO.value
+            ),
+          ],
+          [
+            "STATICAISINFO",
+            updateDataObject(
+              "STATICAISINFO",
+              refs.STATICAISINFO.value,
+              refs.ALLSTATICAISINFO.value
+            ),
+          ],
+          [
+            "WEATHERINFO",
+            updateDataObject(
+              "WEATHERINFO",
+              refs.WEATHERINFO.value,
+              refs.ALLWEATHERINFO.value
             ),
           ],
         ],

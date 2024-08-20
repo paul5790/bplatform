@@ -381,14 +381,6 @@ const ruleCheck = () => {
     ) {
       termsDialog.value = true
     } else {
-      console.log(
-        rulesid.value,
-        rulespw.value,
-        rulescpw.value,
-        rulesemail.value,
-        rulesname.value,
-        rulesaf.value
-      );
       // 유효성 검사를 통과하지 못한 경우
       alert(
         "입력을 하지 않았거나 유효성 검사를 통과하지 못한 항목이 있습니다.\n다시 확인해주세요."
@@ -398,7 +390,6 @@ const ruleCheck = () => {
 }
 
 const signupBtn = async () => {
-  console.log(newid.value);
 
   if (
     checkbox1.value == true &&
@@ -426,8 +417,6 @@ const signupBtn = async () => {
       try {
         // 회원가입 기능
         const response = await createMineData(data);
-
-        console.log(response.data);
         alert("가입이 완료되었습니다.");
 
         termsDialog.value = false;
@@ -561,14 +550,10 @@ const login = async () => {
 
     // 사용자 정보 요청
     const userDataResponse = await readMineData(response);
-    console.log(userDataResponse);
 
     const tokenPayload = jwtDecode(response);
-    console.log(tokenPayload);
     decodedTokenData.value = tokenPayload;
     const id = tokenPayload.id;
-
-    console.log(decodedTokenData.value);
 
     expirationTime.value = decodedTokenData.value.exp * 1000; // 초 단위를 밀리초로 변환
     tokenlogin.value = true;

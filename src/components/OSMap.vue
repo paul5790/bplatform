@@ -59,11 +59,9 @@ onMounted(() => {
   intervalId = setInterval(() => {
     if (state.value === "start") {
       updateMapCheck.value = true;
-      // console.log(updateMapCheck.value);
       executeUpdateMap();
     } else {
       updateMapCheck.value = false;
-      // console.log(updateMapCheck.value);
     }
   }, 5000);
 });
@@ -75,16 +73,11 @@ const executeUpdateMap = () => {
 };
 
 const updateValue = () => {
-  console.log('props.lat');
-  console.log(props.lat);
-  console.log(props.lon);
   state.value = props.state;
   latview.value = props.lat;
   lonview.value = props.lon;
-  // console.log("updateValue");
-
-  latvalue.value = (props.lat / 100);
-  lonvalue.value = (props.lon / 100);
+  latvalue.value = props.lat.toFixed(6);
+  lonvalue.value = props.lon.toFixed(6);
 };
 
 // 컴포넌트가 파괴될 때 clearInterval 호출
@@ -109,8 +102,7 @@ const updateMap = () => {
       popupAnchor: [1, -34],
       shadowSize: [41, 41],
     });
-    console.log(latview.value / 100, lonview.value / 100);
-    L.marker([latview.value / 100, lonview.value / 100], { icon: shipIcon })
+    L.marker([latview.value, lonview.value], { icon: shipIcon })
       .addTo(map)
       .bindPopup("Realtime Location.")
       .openPopup();
@@ -119,7 +111,7 @@ const updateMap = () => {
       map
     );
 
-    map.setView([latview.value / 100, lonview.value / 100], 10);
+    map.setView([latview.value, lonview.value], 10);
   } catch (error) {
     console.error("Caught an error:", error);
     // stopInterval();

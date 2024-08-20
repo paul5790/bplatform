@@ -81,7 +81,7 @@
           </v-dialog>
         </div>
         <!-- 시작하기 -->
-        <div class="dialog-div">
+        <!-- <div class="dialog-div">
           <v-btn
             v-if="!startstate"
             :color="btnColor"
@@ -100,25 +100,6 @@
                   <v-card style="flex: 1">
                     <v-card-item>
                       <v-container fluid>
-                        <!-- <v-row>
-                            <v-col cols="4" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 번호 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="startdivision"
-                                type="text"
-                                :rules="rules1.division"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row> -->
-
                         <v-row>
                           <v-col cols="4" style="margin-top: 8px">
                             <v-list-subheader
@@ -129,7 +110,6 @@
                           </v-col>
 
                           <v-col cols="8">
-                            <!-- 날짜 설정 -->
 
                             <VueDatePicker
                               :class="
@@ -267,7 +247,7 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </div>
+        </div> -->
         <!-- 추가하기 -->
         <div style="display: flex; margin: 15px; margin-left: 0">
           <v-btn :color="btnColor" v-bind="props" @click="openDialog2()">
@@ -350,7 +330,6 @@
                               v-model="editenddate"
                               text-input
                               :max-date="currentDate"
-                              :max-time="currentTime"
                             />
                           </v-col>
                         </v-row>
@@ -551,7 +530,7 @@
 
                           <v-col cols="8">
                             <v-text-field
-                              style="margin-top: 20px;"
+                              style="margin-top: 20px"
                               variant="outlined"
                               v-model="selectedname"
                               type="text"
@@ -675,8 +654,7 @@
                 <span class="text-h5">시험 정보 삭제</span>
               </v-card-title>
               <v-card-text
-                >{{ selectedname }}의 정보를
-                삭제하시겠습니까?</v-card-text
+                >{{ selectedname }}의 정보를 삭제하시겠습니까?</v-card-text
               >
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -956,7 +934,6 @@ const openDialog3 = () => {
     selectedlocation.value = selectedData.value[0].location;
     selecteddescription.value = selectedData.value[0].description;
     dialog3.value = true;
-    console.log(selectedData.value[0]);
   } else {
     alert("시험을 선택해주세요.");
     console.log("시험을 선택해주세요.");
@@ -965,7 +942,7 @@ const openDialog3 = () => {
 
 const openDialog4 = () => {
   if (selectedData.value.length > 0) {
-     selectedname.value = selectedData.value[0].testName;
+    selectedname.value = selectedData.value[0].testName;
     dialog4.value = true;
   } else {
     alert("시험을 선택해주세요.");
@@ -1021,7 +998,6 @@ const waitStart = () => {
     locationtrue.value === false ||
     descriptiontrue.value === false
   ) {
-    console.log(startname.value);
     alert("빈칸을 전부 기입하세요.");
   } else {
     try {
@@ -1079,7 +1055,6 @@ const startData = async () => {
     description: description,
     storageSize: 0,
   };
-  console.log(data);
   try {
     await createTrialData(tokenid.value, data);
 
@@ -1121,7 +1096,6 @@ const cancelData = async () => {
   nullDialog1_1();
 };
 
-
 // ------------------- 시험 추가하기 ---------------------- //
 const editData = async () => {
   if (
@@ -1140,17 +1114,37 @@ const editData = async () => {
   } else if (editstartdate.value.getTime() === editenddate.value.getTime()) {
     alert("시작시간과 종료시간이 같습니다.");
   } else {
-    console.log("e");
-    let start = new Date(editstartdate.value).toISOString().slice(0, 19);
-    let end = new Date(editenddate.value).toISOString().slice(0, 19);
-    console.log(start);
-    console.log(end);
-    let range = `${start}~${end}`;
-    console.log(range);
+    let start = new Date(editstartdate.value).toISOString();
+    let end = new Date(editenddate.value).toISOString();
     try {
       //overlay.value = true;
       loadDialog.value = true;
       dialog2.value = false;
+      // const data = {
+      //   testName: editname.value,
+      //   shipName: editshipname.value,
+      //   shipId: "440714900",
+      //   testPurpose: editpurpose.value,
+      //   navigationArea: editlocation.value,
+      //   startTimeUtc: start,
+      //   endTimeUtc: end,
+      //   description: editdescription.value,
+      // };
+
+      // const data =
+      // {
+      //   "testName": editname.value,
+      //   "shipName": editshipname.value,
+      //   "shipId": "440714900",
+      //   "testPurpose": editpurpose.value,
+      //   "navigationArea": editlocation.value,
+      //   "startTimeUtc": "2024-06-26T00:18:59.000Z",
+      //   "endTimeUtc": end,
+      //   "description": editdescription.value
+      // }
+
+      // let start = "2024-06-26T00:18:59.000Z";
+
       const data = {
         testName: editname.value,
         shipName: editshipname.value,
@@ -1161,7 +1155,7 @@ const editData = async () => {
         endTimeUtc: end,
         description: editdescription.value,
       };
-      console.log(data);
+
       try {
         await createTrialData(tokenid.value, data);
         overlay.value = false;
@@ -1169,7 +1163,7 @@ const editData = async () => {
         alert("시험 추가가 완료되었습니다.");
         nullDialog2();
         // console.log("API 응답 데이터:", response.data);
-        location.reload();
+        //location.reload();
       } catch (error) {
         // 특정 에러인 경우에 따라 다르게 처리합니다.
         if (error instanceof TypeError && error.message.includes("toString")) {
@@ -1211,7 +1205,7 @@ const changeData = async () => {
   } else if (startDate.getTime() === endDate.getTime()) {
     alert("시작시간과 종료시간이 같습니다.");
   } else {
-    console.log(selectedData.value[0].division);
+    // console.log(selectedData.value[0].division);
     try {
       const data = {
         testName: selectedname.value,
@@ -1267,16 +1261,14 @@ const deleteData = async () => {
 // emits
 const overlayemit = (data) => {
   // 로그아웃 로직을 구현
-  console.log(1);
   emit("overlay", data);
-  console.log(2);
 };
 
 // 데이터 테이블 헤더
 const headers = ref([
   { title: "시험", align: "start", sortable: true, key: "testName" },
   { title: "시작시간", align: "start", key: "startdate", sortable: true },
-  { title: "끝시간", align: "start", key: "enddate" },
+  { title: "종료시간", align: "start", key: "enddate" },
   { title: "진행 시간", align: "start", key: "time" },
   { title: "Ship ID", align: "start", key: "shipid" },
   { title: "선박 이름", align: "start", key: "name" },
@@ -1329,6 +1321,22 @@ const fetchData = async () => {
       const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+
+
+      const storageSizeFloat = parseFloat(response[i].storageSize).toFixed(2);
+
+      let Storage = ""
+      if (storageSizeFloat === 'NaN'){
+        Storage = "0.00MB";
+      }
+      else if (storageSizeFloat > 1048576){
+        Storage = `${(storageSizeFloat / 1048576).toFixed(2)}TB`;
+      }
+      else if (storageSizeFloat > 1024 && storageSizeFloat <= 1048575) {
+        Storage = `${(storageSizeFloat / 1024).toFixed(2)}GB`;
+      } else {
+        Storage = `${storageSizeFloat}MB`;
+      }
       items.value.push({
         index: i,
         division: response[i].testId, // 필요없으면 없애도댐
@@ -1338,7 +1346,7 @@ const fetchData = async () => {
         startdate: startUtc + "Z",
         purpose: response[i].testPurpose,
         location: response[i].navigationArea,
-        storage: size + "MB",
+        storage: Storage,
         enddate: endUtc + "Z",
         description: response[i].description,
         time: formattedTime,
@@ -1354,7 +1362,6 @@ const fetchData = async () => {
     });
 
     division.value = Number(response.length);
-    console.log(timeRange.value);
     // sessionStorage.setItem("division", division.value.toString());
   } catch (error) {
     console.error(error);
@@ -1397,7 +1404,6 @@ onMounted(() => {
 //   return isExist;
 // };
 
-console.log(items);
 </script>
 
 <style scoped>

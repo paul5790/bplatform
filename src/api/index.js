@@ -1,10 +1,29 @@
 // src/api/index.js
 import axios from "axios";
 
-const apiLocation = "bdpback.ias.xinnos.com";
-// const apiLocation = "10.16.152.120"; //
+// const apiLocation = "bdpback.ias.xinnos.com";
+// const apiLocation = "10.16.152.120:9999";
 // const apiLocation = "192.168.0.32:9998";
+// import { apiLocation } from "../../public/api.js";
+// 전역 변수를 선언
+let apiLocation = "";
+
+// config.json 파일을 로드하고 apiLocation 값을 설정
+const loadConfig = async () => {
+  try {
+    const response = await fetch('/config.json');
+    const config = await response.json();
+    apiLocation = config.apiLocation;
+  } catch (error) {
+    console.error('Error loading config:', error);
+  }
+};
+
+// 앱이 실행될 때 config를 로드
+await loadConfig();
+
 export const cctvUrl = `http://${apiLocation}/api/v1/stream/index.m3u8`;
+
 
 // 취소 토큰 생성
 let cancelTokenSource = axios.CancelToken.source();
@@ -398,11 +417,11 @@ export const updateRealtimeMinMax = async (tokenid, data) => {
 
 // 데이터 소실 빈도 확인 v1
 export const readlossData = async (
-  tokenid, dataFormat
+  tokenid, testName
 ) => {
   try {
     const response = await axios.get(
-      `http://${apiLocation}/api/v1/lossfreq/all?test_name=TestCase1`,
+      `http://${apiLocation}/api/v1/lossfreq/all?test_name=${testName}`,
       {
         headers: {
           "Content-Type": "application/json",
@@ -538,6 +557,21 @@ export const downloadDataFile = async (tokenid, data) => {
     console.error("Error fetching data:", error);
     throw error;
   }
+};
+
+export const downloadDataFileXml = async (tokenid, formData) => {
+  const response = await axios.post(
+    `http://${apiLocation}/api/v1/table_data/batch_download`,
+    formData,
+    {
+      responseType: "blob",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${tokenid}`,
+      },
+    }
+  );
+  return response;
 };
 
 // (Echart 도넛) 전체 데이터 저장 용량 비교 v1

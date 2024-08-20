@@ -10,7 +10,7 @@
             v-model="mainSelectedItems"
             :items="mainSelect"
             density="compact"
-            label="Main Component"
+            label="Select Component"
             variant="outlined"
           >
           </v-select>

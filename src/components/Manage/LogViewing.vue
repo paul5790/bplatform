@@ -10,26 +10,95 @@
     "
   >
     <v-card-item style="padding-top: 0px">
-      <v-row justify="space-between">
-        <v-col cols="auto">
-          <v-row
-            align="center"
-            style="height: 5vh; margin-top: 10px; margin-left: 10px"
-          >
-            <v-col
-              cols="auto"
-              class="d-flex align-center clickable"
-              @click="searchFilterDialog = true"
+      <v-row
+        align="center"
+        justify="space-between"
+        style="height: 5vh; margin-top: 10px; margin-left: 10px"
+      >
+        <v-col cols="auto" style="padding-top: 0px">
+          <v-btn-toggle v-model="filter_date" mandatory style="width: 100%">
+            <v-btn
+              value="3일"
+              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              >3일</v-btn
             >
-              <span>{{ showText }}</span>
-              <v-icon style="margin-left: 4px">mdi-chevron-down</v-icon>
-            </v-col>
-          </v-row>
+            <v-btn
+              value="7일"
+              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              >7일</v-btn
+            >
+            <v-btn
+              value="30일"
+              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              >30일</v-btn
+            >
+            <v-btn
+              value="직접입력"
+              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              >직접입력</v-btn
+            >
+          </v-btn-toggle>
         </v-col>
+        <v-col cols="auto" style="padding-top: 0px">
+          <VueDatePicker
+            v-if="filter_date === '직접입력'"
+            v-model="dateRange"
+            density="compact"
+            range
+            :enableTimePicker="false"
+            style="padding-left: 10px; z-index: 1200;"
+            @open="adjustDialogHeight()"
+          />
+        </v-col>
+
+        <v-col cols="auto" style="padding-top: 0px">
+          <v-btn-toggle v-model="filter_logtype" mandatory style="width: 200px">
+            <v-btn
+              value="webapp"
+              style="width: 50%; border: 1px solid #ccc; padding: 5px"
+              >웹 서버</v-btn
+            >
+            <v-btn
+              value="winapp"
+              style="width: 50%; border: 1px solid #ccc; padding: 5px"
+              >윈도우 앱</v-btn
+            >
+          </v-btn-toggle>
+        </v-col>
+
+        <v-col cols="auto" style="padding-top: 0px">
+          <v-btn
+            style="width: 100px; height: 40px"
+            color="blue-darken-1"
+            @click="filterApply()"
+            >적용</v-btn
+          ></v-col
+        >
+
+        <v-col cols="auto" style="padding-top: 0px; margin-left: auto">
+          <v-text-field
+            style="width: 300px"
+            v-model="searchInput"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            variant="underlined"
+            hide-details
+            single-line
+          ></v-text-field>
+        </v-col>
+
+        <!-- <v-col
+          cols="auto"
+          class="d-flex align-center clickable"
+          @click="searchFilterDialog = true"
+        >
+          <span>{{ showText }}</span>
+          <v-icon style="margin-left: 4px">mdi-chevron-down</v-icon>
+        </v-col> -->
       </v-row>
       <v-window class="scrollable-card">
         <v-data-table
-          style="margin-top: 20px"
+          style="margin-top: 20px; height: 66vh;"
           v-model:page="page"
           class="elevation-1"
           :headers="headers"
@@ -345,23 +414,18 @@ const filterApply = () => {
   ) {
     search_method.value = "";
     text_method.value = "전체";
-    console.log("1");
   } else if (
     filter_method.value != "all" &&
     filter_logtype.value === "webapp"
   ) {
     search_method.value = `&request_method=${filter_method.value}`;
     text_method.value = filter_method.value;
-    console.log("2");
   } else if (filter_type.value != "all" && filter_logtype.value === "winapp") {
     search_method.value = `&type=${filter_type.value}`;
     text_method.value = filter_type.value;
-    console.log("3");
   } else {
-    console.log("망함 ㅋㅋ");
+    console.log("no");
   }
-
-  console.log(search_method.value);
 
   if (filter_logtype.value === "webapp") {
     headers.value = [
@@ -425,7 +489,6 @@ const webData = async () => {
   let apiReq = `${filter_logtype.value}?start_time=${startTime.value}&end_time=${endTime.value}${search_method.value}`;
   try {
     const response = await readWebLogData(tokenid.value, apiReq);
-    console.log(response);
     for (let i = 0; i < response.length; i++) {
       items.value.push({
         timestamp: response[i].timeStamp || "",
@@ -454,7 +517,6 @@ const isDatePickerOpen = ref(false);
 const dialogStyle = ref({});
 
 const adjustDialogHeight = () => {
-  alert("열림!");
   dialogStyle.value = { height: "500px" };
 };
 
@@ -474,11 +536,13 @@ const adjustDialogHeight = () => {
 watch(filter_date, async (newValue, oldValue) => {
   if (newValue === "직접입력") {
     isDatePickerOpen.value = true;
-    alert("1");
   } else {
     isDatePickerOpen.value = false;
-    alert("2");
   }
+});
+
+watch(searchInput, async (newValue, oldValue) => {
+  search.value = searchInput.value;
 });
 
 // watch(isDatePickerOpen, async (newValue) => {
