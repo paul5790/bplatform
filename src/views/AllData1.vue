@@ -446,7 +446,7 @@
           <v-list
             class="scrollable-card-1"
             :style="{
-              height: selectedTest === 0 ? '370px' : '250px',
+              height: selectedTest === 0 ? '250px' : '250px',
               width: selectedTest === 0 ? '30%' : '100%',
               borderRight: '1px solid #e0e0e0',
             }"
@@ -472,7 +472,7 @@
               width: '70%',
             }"
           >
-            <VueDatePicker
+            <!-- <VueDatePicker
               v-model="dateRange"
               :inline="true"
               select-text="apply"
@@ -480,31 +480,131 @@
               range
               style="--dp-input-padding: 8px; width: auto"
               @update:model-value="handleDateChange"
-            />
+            /> -->
+
+            <span class="span-title">시작 시점</span>
+            <div class="row-container">
+              <div class="date-picker" v-if="startDatePickerOpen">
+                <DatePicker
+                  v-model="startDateSelect"
+                  format="YYYY-MM-DD"
+                  value-type="format"
+                  style="width: 180px"
+                  @update:modelValue="handleDateChange"
+                  placeholder=" 캘린더 직접선택 (클릭)"
+                />
+              </div>
+              <div v-if="!startDatePickerOpen">
+                <input
+                  :type="text"
+                  v-model="startDateInput"
+                  placeholder=" yyyy-mm-dd (직접 입력)"
+                  class="date-input"
+                />
+              </div>
+              <button
+                v-if="!startDatePickerOpen"
+                @click="openDatePicker1"
+                class="icon-btn"
+              >
+                📅
+              </button>
+              <button
+                  v-if="startDatePickerOpen"
+                  @click="openDatePicker1"
+                  class="icon-btn"
+                >
+                  📝
+                </button>
+              <select v-model="startHour" class="time-select">
+                <option v-for="hour in hours" :key="hour" :value="hour">
+                  {{ hour }}시
+                </option>
+              </select>
+
+              <select v-model="startMinute" class="time-select">
+                <option v-for="minute in minutes" :key="minute" :value="minute">
+                  {{ minute }}분
+                </option>
+                <!-- 배열에 없는 값도 선택 가능하게 유지 -->
+                <option
+                  v-if="!minutes.includes(startMinute)"
+                  :value="startMinute"
+                >
+                  {{ startMinute }}분
+                </option>
+              </select>
+            </div>
+
+            <span class="span-title">종료 시점</span>
+            <div class="row-container">
+              <div class="date-picker" v-if="endDatePickerOpen">
+                  <DatePicker
+                    v-model="endDateSelect"
+                    format="YYYY-MM-DD"
+                    value-type="format"
+                    style="width: 180px"
+                    @update:modelValue="handleDateChange"
+                    placeholder=" 캘린더 직접선택 (클릭)"
+                  />
+                </div>
+                <div v-if="!endDatePickerOpen">
+                  <input
+                  :type="text"
+                  v-model="endDateInput"
+                  placeholder=" yyyy-mm-dd (직접 입력)"
+                  class="date-input"
+                />
+                </div>
+                <button
+                  v-if="!endDatePickerOpen"
+                  @click="openDatePicker2"
+                  class="icon-btn"
+                >
+                  📅
+                </button>
+                <button
+                  v-if="endDatePickerOpen"
+                  @click="openDatePicker2"
+                  class="icon-btn"
+                >
+                  📝
+                </button>
+
+                <select v-model="endHour" class="time-select">
+                  <option v-for="hour in hours" :key="hour" :value="hour">
+                    {{ hour }}시
+                  </option>
+                </select>
+
+                <select v-model="endMinute" class="time-select">
+                  <option
+                    v-for="minute in minutes"
+                    :key="minute"
+                    :value="minute"
+                  >
+                    {{ minute }}분
+                  </option>
+                  <option
+                    v-if="!minutes.includes(endMinute)"
+                    :value="endMinute"
+                  >
+                    {{ endMinute }}분
+                  </option>
+                </select>
+            </div>
+            <p style="font-size: 12px; font-weight: bold; margin-top: 20px;">
+              &nbsp;&nbsp;* 날짜 검색은 UTC를 기준으로 작성하며, &nbsp;&nbsp;
+            </p>
+            <p style="font-size: 12px; font-weight: bold">
+              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로 보여짐
+            </p>
           </div>
         </div>
         <v-divider></v-divider>
-        <div class="chip-container">
-          <v-btn
-            color="#5865f2"
-            width="100px"
-            variant="flat"
-            @click="completeData3()"
-            style="position: absolute; right: 16px; bottom: 8px"
-            >선택</v-btn
-          >
-        </div>
-        <div class="chip-container">
+                <div class="chip-container">
           <div class="recent-search">
-            <h4>조회 기간</h4>
-            <v-chip
-              v-if="searchTimeRange"
-              close
-              @click="handleChipClick(search)"
-              class="chip-item"
-            >
-              {{ searchTimeRange }}
-            </v-chip>
+            <p style="height: 20px"></p>
           </div>
           <v-btn
             color="#5865f2"
@@ -553,7 +653,7 @@
               <template v-if="activeTab === index">
                 <v-data-table
                   density="dence"
-                  style="height: 64vh;"
+                  style="height: 64vh"
                   :headers="headers[data]"
                   :items="paginatedItems"
                   :search="search"
@@ -734,6 +834,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from "vue";
+import DatePicker from "vue3-datepicker";
 import {
   readTrialData,
   readDataTrial,
@@ -1180,7 +1281,11 @@ const handleChipClick = (search) => {
   let destination, subItem;
 
   if (parts.length > 2) {
-    if (parts[0] === "NO1ENGINEPANEL" || parts[0] === "NO2ENGINEPANEL" || parts[0] === "MANAGEMENT" ) {
+    if (
+      parts[0] === "NO1ENGINEPANEL" ||
+      parts[0] === "NO2ENGINEPANEL" ||
+      parts[0] === "MANAGEMENT"
+    ) {
       destination = parts[0];
       subItem = parts.slice(1).join("_");
     } else if (parts[0] === "MTIE4XINNOS") {
@@ -1230,6 +1335,7 @@ const toggleSelectDataType = (type) => {
 };
 
 // ------------------- 3번째 데이터 기간 Method ------------------------ //
+
 // 초기 날짜 설정
 const dateRange = ref(); // 초기 날짜를 설정합니다
 const startUtc = ref(); //검색용 직접선택 시작시간
@@ -1248,11 +1354,107 @@ const getTrialDate = async () => {
     for (let i = 0; i < response.length; i++) {
       testStartTimeList.value.push(`${response[i].startTimeUtc}`);
       testEndTimeList.value.push(`${response[i].endTimeUtc}`);
+
+      selectedTestStartTime.value.push(response[i].startTimeUtc);
+      selectedTestEndTime.value.push(response[i].endTimeUtc);
+
       const testNumber = response[i].testName;
       testList.value.push(`${testNumber}`);
     }
   } catch (error) {
     console.error(error);
+  }
+};
+
+// 새로운 데이트피커
+const startDateInput = ref("");
+const endDateInput = ref("");
+const startDateSelect = ref();
+const endDateSelect = ref();
+const today = new Date();
+const dateToday = ref(today.toISOString().split("T")[0]);
+const selectedDate = ref("");
+const startDatePickerOpen = ref(false);
+const endDatePickerOpen = ref(false);
+const startHour = ref("00");
+const startMinute = ref("00");
+const endHour = ref("00");
+const endMinute = ref("00");
+
+const selectedTestStartTime = ref([]);
+const selectedTestEndTime = ref([]);
+
+// 시간 및 분 옵션
+const hours = Array.from({ length: 24 }, (_, i) =>
+  i.toString().padStart(2, "0")
+);
+const minutes = [
+  "00",
+  "05",
+  "10",
+  "15",
+  "20",
+  "25",
+  "30",
+  "35",
+  "40",
+  "45",
+  "50",
+  "55",
+];
+
+// 달력 열기
+const openDatePicker1 = () => {
+  startDatePickerOpen.value = !startDatePickerOpen.value;
+};
+
+const openDatePicker2 = () => {
+  endDatePickerOpen.value = !endDatePickerOpen.value;
+};
+
+const updateDate = () => {
+  let start;
+  let end;
+
+  if (startDatePickerOpen.value) {
+    start = new Date(startDateSelect.value);
+    start.setHours(startHour.value.padStart(2, "0"));
+    start.setMinutes(startMinute.value.padStart(2, "0"));
+    start.setSeconds(0);
+  } else {
+    // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
+    start = new Date(
+      `${startDateInput.value}T${startHour.value.padStart(
+        2,
+        "0"
+      )}:${startMinute.value.padStart(2, "0")}:00`
+    );
+  }
+
+  if (endDatePickerOpen.value) {
+    end = new Date(endDateSelect.value);
+    end.setHours(endHour.value.padStart(2, "0"));
+    end.setMinutes(endMinute.value.padStart(2, "0"));
+    end.setSeconds(0);
+  } else {
+    // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
+    end = new Date(
+      `${endDateInput.value}T${endHour.value.padStart(
+        2,
+        "0"
+      )}:${endMinute.value.padStart(2, "0")}:00`
+    );
+  }
+
+  start.setHours(start.getHours() + 9);
+  end.setHours(end.getHours() + 9);
+
+  if (!isNaN(start) && !isNaN(end)) {
+    // 유효한 날짜인 경우에만 ISO 문자열로 변환
+    startUtc.value = start.toISOString();
+    endUtc.value = end.toISOString();
+  } else {
+    console.error("Invalid date values in dateRange.value");
   }
 };
 
@@ -1358,7 +1560,10 @@ const completeData2 = () => {
 
 const completeData3 = () => {
   // 데이터 선택 박스 text 할당
-  tb4 = searchTimeRange.value;
+
+  updateDate();
+
+  tb4 = `${startUtc.value}~${endUtc.value}`;
 
   requests.value.period =
     selectedTest.value === 0
@@ -1914,6 +2119,72 @@ const cardStyle = computed(() => {
   width: 300px;
   background-color: #ccc;
   cursor: not-allowed;
+}
+
+/* DatePicker 테두리 스타일 추가 */
+.date-picker {
+  border: 1px solid #ccc;
+  padding: 0.3rem;
+  border-radius: 4px;
+  width: 200px;
+  box-sizing: border-box;
+}
+
+.time-select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 70px;
+}
+
+.time-divider {
+  margin-right: 5px;
+  font-size: 18px;
+}
+
+/* 시간 입력 필드 스타일 */
+.time-input {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 50px;
+  text-align: center;
+  margin: 0 5px;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.date-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.row-container {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 요소 간 간격 조절 */
+}
+
+.span-title {
+  margin-top: 30px;
+  font-size: 16px;
+  font-weight: 550;
 }
 </style>
 

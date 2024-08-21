@@ -80,208 +80,22 @@
             </v-card>
           </v-dialog>
         </div>
-        <!-- 시작하기 -->
-        <!-- <div class="dialog-div">
-          <v-btn
-            v-if="!startstate"
-            :color="btnColor"
-            v-bind="props"
-            @click="openDialog1()"
-          >
-            시작하기
-          </v-btn>
-          <v-dialog v-model="dialog1" persistent width="800">
-            <v-card :style="{ backgroundColor: themeColor }">
-              <v-card-title>
-                <span class="text-h5">시험 측정 시작</span>
-              </v-card-title>
-              <v-card-text>
-                <v-sheet style="display: flex">
-                  <v-card style="flex: 1">
-                    <v-card-item>
-                      <v-container fluid>
-                        <v-row>
-                          <v-col cols="4" style="margin-top: 8px">
-                            <v-list-subheader
-                              ><p style="font-size: 17px">
-                                시험 시작 시간
-                              </p></v-list-subheader
-                            >
-                          </v-col>
 
-                          <v-col cols="8">
-
-                            <VueDatePicker
-                              :class="
-                                themeMode === 'dark'
-                                  ? 'dp__theme_dark'
-                                  : 'dp__theme_light'
-                              "
-                              style="--dp-input-padding: 15px"
-                              v-model="startTimeUtc"
-                              text-input
-                              :dark="themeMode === 'dark'"
-                              :readonly="true"
-                            />
-                          </v-col>
-                        </v-row>
-
-                        <v-row>
-                          <v-col cols="4" style="margin-top: 28px">
-                            <v-list-subheader
-                              ><p style="font-size: 17px">
-                                시험 이름 입력
-                              </p></v-list-subheader
-                            >
-                          </v-col>
-
-                          <v-col cols="8">
-                            <v-text-field
-                              style="margin-top: 20px"
-                              variant="outlined"
-                              v-model="startname"
-                              type="text"
-                              :rules="rules1.name"
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-
-                        <v-row>
-                          <v-col cols="4" style="margin-top: 8px">
-                            <v-list-subheader
-                              ><p style="font-size: 17px">
-                                시험선 이름
-                              </p></v-list-subheader
-                            >
-                          </v-col>
-
-                          <v-col cols="8">
-                            <v-text-field
-                              variant="outlined"
-                              v-model="startshipname"
-                              type="text"
-                              :rules="rules1.purpose"
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-
-                        <v-row>
-                          <v-col cols="4" style="margin-top: 8px">
-                            <v-list-subheader
-                              ><p style="font-size: 17px">
-                                시험 목적 입력
-                              </p></v-list-subheader
-                            >
-                          </v-col>
-
-                          <v-col cols="8">
-                            <v-text-field
-                              variant="outlined"
-                              v-model="startpurpose"
-                              type="text"
-                              :rules="rules1.purpose"
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-
-                        <v-row>
-                          <v-col cols="4" style="margin-top: 8px">
-                            <v-list-subheader
-                              ><p style="font-size: 17px">
-                                항해 해역 위치
-                              </p></v-list-subheader
-                            >
-                          </v-col>
-
-                          <v-col cols="8">
-                            <v-text-field
-                              variant="outlined"
-                              v-model="startlocation"
-                              type="text"
-                              :rules="rules1.location"
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-
-                        <v-row>
-                          <v-col cols="4" style="margin-top: 10px">
-                            <v-list-subheader
-                              ><p style="font-size: 17px">
-                                설명
-                              </p></v-list-subheader
-                            >
-                          </v-col>
-
-                          <v-col cols="8">
-                            <v-text-field
-                              variant="outlined"
-                              v-model="startdescription"
-                              type="text"
-                              :rules="rules1.description"
-                              maxlength="25"
-                              @keyup.enter="waitStart()"
-                            ></v-text-field>
-                          </v-col>
-                        </v-row>
-                      </v-container>
-                    </v-card-item>
-                  </v-card>
-                </v-sheet>
-              </v-card-text>
-              <v-card-actions style="margin-top: 10px">
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="blue-darken-1"
-                  variant="text"
-                  @click="nullDialog1()"
-                >
-                  뒤로가기
-                </v-btn>
-                <v-btn
-                  color="blue-darken-1"
-                  variant="text"
-                  @click="waitStart()"
-                >
-                  측정시작
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-dialog>
-        </div> -->
         <!-- 추가하기 -->
         <div style="display: flex; margin: 15px; margin-left: 0">
           <v-btn :color="btnColor" v-bind="props" @click="openDialog2()">
             추가하기
           </v-btn>
-          <v-dialog v-model="dialog2" persistent width="800">
+          <v-dialog v-model="dialog2" persistent width="750">
             <v-card :style="{ backgroundColor: themeColor }">
               <v-card-title>
                 <span class="text-h5">시험 추가</span>
               </v-card-title>
-              <v-card-text>
+              <v-card-text style="padding-bottom: 0px">
                 <v-sheet style="display: flex">
                   <v-card style="flex: 1">
                     <v-card-item>
                       <v-container fluid>
-                        <!-- <v-row>
-                            <v-col cols="4" style="margin-top: 5px">
-                              <v-list-subheader
-                                ><p style="font-size: 17px">
-                                  시험 번호 입력
-                                </p></v-list-subheader
-                              >
-                            </v-col>
-
-                            <v-col cols="8">
-                              <v-text-field
-                                variant="outlined"
-                                v-model="editdivision"
-                                type="text"
-                                :rules="rules1.division"
-                              ></v-text-field>
-                            </v-col>
-                          </v-row> -->
-
                         <v-row>
                           <v-col cols="4" style="margin-top: 8px">
                             <v-list-subheader
@@ -290,22 +104,76 @@
                               </p></v-list-subheader
                             >
                           </v-col>
-
                           <v-col cols="8">
-                            <!-- 날짜 설정 -->
+                            <div class="row-container">
+                              <div
+                                class="date-picker"
+                                v-if="startDatePickerOpen"
+                              >
+                                <DatePicker
+                                  v-model="startDateSelect"
+                                  format="YYYY-MM-DD"
+                                  value-type="format"
+                                  style="width: 100%"
+                                  placeholder=" 캘린더 직접선택 (클릭)"
+                                />
+                              </div>
+                              <div v-if="!startDatePickerOpen">
+                                <input
+                                  :type="text"
+                                  v-model="startDateInput"
+                                  placeholder=" yyyy-mm-dd (직접 입력)"
+                                  class="date-input"
+                                />
+                              </div>
+                              <button
+                                v-if="!startDatePickerOpen"
+                                @click="openDatePicker1"
+                                class="icon-btn"
+                              >
+                                📅
+                              </button>
+                              <button
+                                v-if="startDatePickerOpen"
+                                @click="openDatePicker1"
+                                class="icon-btn"
+                              >
+                                📝
+                              </button>
+                              <select v-model="startHour" class="time-select">
+                                <option
+                                  v-for="hour in hours"
+                                  :key="hour"
+                                  :value="hour"
+                                >
+                                  {{ hour }}시
+                                </option>
+                              </select>
 
-                            <VueDatePicker
-                              :class="
-                                themeMode === 'dark'
-                                  ? 'dp__theme_dark'
-                                  : 'dp__theme_light'
-                              "
-                              :dark="themeMode === 'dark'"
-                              style="--dp-input-padding: 15px"
-                              v-model="editstartdate"
-                              text-input
-                              :max-date="currentDate"
-                            />
+                              <!-- <select v-model="startMinute" class="time-select">
+                                <option
+                                  v-for="minute in minutes"
+                                  :key="minute"
+                                  :value="minute"
+                                >
+                                  {{ minute }}분
+                                </option>
+                                <option
+                                  v-if="!minutes.includes(startMinute)"
+                                  :value="startMinute"
+                                >
+                                  {{ startMinute }}분
+                                </option>
+                              </select> -->
+                              <input
+                                v-model="startMinute"
+                                @input="validateMinutes"
+                                type="text"
+                                class="m-time-input"
+                                placeholder="00"
+                              />
+                              분
+                            </div>
                           </v-col>
                         </v-row>
 
@@ -318,19 +186,74 @@
                             >
                           </v-col>
 
-                          <v-col cols="8">
-                            <VueDatePicker
-                              :class="
-                                themeMode === 'dark'
-                                  ? 'dp__theme_dark'
-                                  : 'dp__theme_light'
-                              "
-                              :dark="themeMode === 'dark'"
-                              style="margin-top: 20px; --dp-input-padding: 15px"
-                              v-model="editenddate"
-                              text-input
-                              :max-date="currentDate"
-                            />
+                          <v-col cols="8" style="margin-top: 18px">
+                            <div class="row-container">
+                              <div class="date-picker" v-if="endDatePickerOpen">
+                                <DatePicker
+                                  v-model="endDateSelect"
+                                  format="YYYY-MM-DD"
+                                  value-type="format"
+                                  style="width: 180px"
+                                  placeholder=" 캘린더 직접선택 (클릭)"
+                                />
+                              </div>
+                              <div v-if="!endDatePickerOpen">
+                                <input
+                                  :type="text"
+                                  v-model="endDateInput"
+                                  placeholder=" yyyy-mm-dd (직접 입력)"
+                                  class="date-input"
+                                />
+                              </div>
+                              <button
+                                v-if="!endDatePickerOpen"
+                                @click="openDatePicker2"
+                                class="icon-btn"
+                              >
+                                📅
+                              </button>
+                              <button
+                                v-if="endDatePickerOpen"
+                                @click="openDatePicker2"
+                                class="icon-btn"
+                              >
+                                📝
+                              </button>
+
+                              <select v-model="endHour" class="time-select">
+                                <option
+                                  v-for="hour in hours"
+                                  :key="hour"
+                                  :value="hour"
+                                >
+                                  {{ hour }}시
+                                </option>
+                              </select>
+
+                              <!-- <select v-model="endMinute" class="time-select">
+                                <option
+                                  v-for="minute in minutes"
+                                  :key="minute"
+                                  :value="minute"
+                                >
+                                  {{ minute }}분
+                                </option>
+                                <option
+                                  v-if="!minutes.includes(endMinute)"
+                                  :value="endMinute"
+                                >
+                                  {{ endMinute }}분
+                                </option>
+                              </select> -->
+                              <input
+                                v-model="endMinute"
+                                @input="validateMinutee"
+                                type="text"
+                                class="m-time-input"
+                                placeholder="00"
+                              />
+                              분
+                            </div>
                           </v-col>
                         </v-row>
 
@@ -426,7 +349,6 @@
                               variant="outlined"
                               v-model="editdescription"
                               type="text"
-                              style="margin-bottom: 5px"
                               :rules="rules1.description"
                               maxlength="25"
                               @keyup.enter="editData()"
@@ -438,7 +360,7 @@
                   </v-card>
                 </v-sheet>
               </v-card-text>
-              <v-card-actions style="margin-top: 10px">
+              <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
                   color="blue-darken-1"
@@ -459,12 +381,12 @@
           <v-btn :color="btnColor" v-bind="props" @click="openDialog3()">
             수정하기
           </v-btn>
-          <v-dialog v-model="dialog3" persistent width="800">
+          <v-dialog v-model="dialog3" persistent width="750">
             <v-card :style="{ backgroundColor: themeColor }">
               <v-card-title>
                 <span class="text-h5">시험 수정</span>
               </v-card-title>
-              <v-card-text>
+              <v-card-text style="padding-bottom: 0px">
                 <v-sheet style="display: flex">
                   <v-card style="flex: 1">
                     <v-card-item>
@@ -481,7 +403,7 @@
                           <v-col cols="8">
                             <!-- 날짜 설정 -->
 
-                            <VueDatePicker
+                            <!-- <VueDatePicker
                               :class="
                                 themeMode === 'dark'
                                   ? 'dp__theme_dark'
@@ -491,7 +413,77 @@
                               style="--dp-input-padding: 15px"
                               v-model="selectedstartdate"
                               text-input
-                            />
+                            /> -->
+
+                            <div class="row-container">
+                              <div
+                                class="date-picker"
+                                v-if="startDatePickerOpen"
+                              >
+                                <DatePicker
+                                  v-model="startDateSelect"
+                                  format="YYYY-MM-DD"
+                                  value-type="format"
+                                  style="width: 100%"
+                                  placeholder=" 캘린더 직접선택 (클릭)"
+                                />
+                              </div>
+                              <div v-if="!startDatePickerOpen">
+                                <input
+                                  :type="text"
+                                  v-model="startDateInput"
+                                  placeholder=" yyyy-mm-dd (직접 입력)"
+                                  class="date-input"
+                                />
+                              </div>
+                              <button
+                                v-if="!startDatePickerOpen"
+                                @click="openDatePicker1"
+                                class="icon-btn"
+                              >
+                                📅
+                              </button>
+                              <button
+                                v-if="startDatePickerOpen"
+                                @click="openDatePicker1"
+                                class="icon-btn"
+                              >
+                                📝
+                              </button>
+                              <select v-model="startHour" class="time-select">
+                                <option
+                                  v-for="hour in hours"
+                                  :key="hour"
+                                  :value="hour"
+                                >
+                                  {{ hour }}시
+                                </option>
+                              </select>
+
+                              <!-- <select v-model="startMinute" class="time-select">
+                                <option
+                                  v-for="minute in minutes"
+                                  :key="minute"
+                                  :value="minute"
+                                >
+                                  {{ minute }}분
+                                </option>
+                                <option
+                                  v-if="!minutes.includes(startMinute)"
+                                  :value="startMinute"
+                                >
+                                  {{ startMinute }}분
+                                </option>
+                              </select> -->
+                              <input
+                                v-model="startMinute"
+                                @input="validateMinutes"
+                                type="text"
+                                class="m-time-input"
+                                placeholder="00"
+                              />
+                              분
+                            </div>
                           </v-col>
                         </v-row>
 
@@ -504,8 +496,60 @@
                             >
                           </v-col>
 
-                          <v-col cols="8">
-                            <VueDatePicker
+                          <v-col cols="8" style="margin-top: 18px">
+                            <div class="row-container">
+                              <div class="date-picker" v-if="endDatePickerOpen">
+                                <DatePicker
+                                  v-model="endDateSelect"
+                                  format="YYYY-MM-DD"
+                                  value-type="format"
+                                  style="width: 180px"
+                                  placeholder=" 캘린더 직접선택 (클릭)"
+                                />
+                              </div>
+                              <div v-if="!endDatePickerOpen">
+                                <input
+                                  :type="text"
+                                  v-model="endDateInput"
+                                  placeholder=" yyyy-mm-dd (직접 입력)"
+                                  class="date-input"
+                                />
+                              </div>
+                              <button
+                                v-if="!endDatePickerOpen"
+                                @click="openDatePicker2"
+                                class="icon-btn"
+                              >
+                                📅
+                              </button>
+                              <button
+                                v-if="endDatePickerOpen"
+                                @click="openDatePicker2"
+                                class="icon-btn"
+                              >
+                                📝
+                              </button>
+
+                              <select v-model="endHour" class="time-select">
+                                <option
+                                  v-for="hour in hours"
+                                  :key="hour"
+                                  :value="hour"
+                                >
+                                  {{ hour }}시
+                                </option>
+                              </select>
+
+                              <input
+                                v-model="endMinute"
+                                @input="validateMinutee"
+                                type="text"
+                                class="m-time-input"
+                                placeholder="00"
+                              />
+                              분
+                            </div>
+                            <!-- <VueDatePicker
                               :class="
                                 themeMode === 'dark'
                                   ? 'dp__theme_dark'
@@ -515,7 +559,7 @@
                               style="margin-top: 20px; --dp-input-padding: 15px"
                               v-model="selectedenddate"
                               text-input
-                            />
+                            /> -->
                           </v-col>
                         </v-row>
 
@@ -612,7 +656,6 @@
                               variant="outlined"
                               v-model="selecteddescription"
                               type="text"
-                              style="margin-bottom: 35px"
                               :rules="rules1.description"
                               maxlength="25"
                               @keyup.enter="changeData()"
@@ -624,7 +667,7 @@
                   </v-card>
                 </v-sheet>
               </v-card-text>
-              <v-card-actions style="margin-top: 0px">
+              <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
                   color="blue-darken-1"
@@ -681,7 +724,7 @@
         :headers="headers"
         :items="items"
         :items-per-page="itemsPerPage"
-        density="compact"
+        :density="'dense'"
         hide-default-footer
         select-strategy="single"
         return-object
@@ -747,6 +790,7 @@
 
 <script setup>
 import { computed, ref, onMounted, defineEmits, watch } from "vue";
+import DatePicker from "vue3-datepicker";
 import {
   createTrialData,
   updateTrialData,
@@ -899,7 +943,144 @@ const rules1 = ref({
   ],
 });
 
-// 데이트 피커
+// ------------------------------- 데이트 피커
+
+const startDate = ref();
+const endDate = ref();
+
+const startDateInput = ref("");
+const endDateInput = ref("");
+const startDateSelect = ref();
+const endDateSelect = ref();
+const today = new Date();
+const dateToday = ref(today.toISOString().split("T")[0]);
+const selectedDate = ref("");
+const startDatePickerOpen = ref(false);
+const endDatePickerOpen = ref(false);
+const startHour = ref("00");
+const startMinute = ref("00");
+const endHour = ref("00");
+const endMinute = ref("00");
+
+const resetDate = () => {
+  startDateInput.value = "";
+  endDateInput.value = "";
+  startDateSelect.value = "";
+  endDateSelect.value = "";
+  startDatePickerOpen.value = false;
+  endDatePickerOpen.value = false;
+  startHour.value = "00";
+  startMinute.value = "00";
+  endHour.value = "00";
+  endMinute.value = "00";
+};
+
+// const editStartDateSelect = ref();
+// const editEndDateSelect = ref();
+
+// const selectedTestStartTime = ref([]);
+// const selectedTestEndTime = ref([]);
+
+// 시간 및 분 옵션
+const hours = Array.from({ length: 24 }, (_, i) =>
+  i.toString().padStart(2, "0")
+);
+const minutes = [
+  "00",
+  "05",
+  "10",
+  "15",
+  "20",
+  "25",
+  "30",
+  "35",
+  "40",
+  "45",
+  "50",
+  "55",
+];
+
+const validateMinutes = (event) => {
+  const value = validateMinute(event);
+  startMinute.value = value;
+};
+
+const validateMinutee = (event) => {
+  const value = validateMinute(event);
+  endMinute.value = value;
+};
+
+const validateMinute = (event) => {
+  let value = event.target.value;
+  // 숫자만 허용 (최대 두 자리)
+  value = value.replace(/[^0-9]/g, ""); // 숫자 외의 문자 제거
+  if (value.length > 2) value = value.slice(0, 2); // 최대 두 자리만 허용
+  if (value >= 60) value = 59;
+
+  // 입력 값이 0~59 범위에 있는지 확인
+  let minute = parseInt(value, 10);
+
+  if (isNaN(minute)) minute = 0;
+  return minute;
+};
+
+const zeroFormat = () => {
+  startMinute.value = String(startMinute.value).padStart(2, "0");
+  endMinute.value = String(endMinute.value).padStart(2, "0");
+};
+
+const updateDate = () => {
+  let start;
+  let end;
+
+  // 시작 시간 처리
+  if (startDatePickerOpen.value) {
+    start = new Date(startDateSelect.value);
+    start.setHours(String(startHour.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
+    start.setMinutes(String(startMinute.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
+    start.setSeconds(0);
+  } else {
+    // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
+    start = new Date(
+      `${startDateInput.value}T${String(startHour.value).padStart(2, "0")}:${String(startMinute.value).padStart(2, "0")}:00`
+    );
+  }
+
+  // 종료 시간 처리
+  if (endDatePickerOpen.value) {
+    end = new Date(endDateSelect.value);
+    end.setHours(String(endHour.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
+    end.setMinutes(String(endMinute.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
+    end.setSeconds(0);
+  } else {
+    // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
+    end = new Date(
+      `${endDateInput.value}T${String(endHour.value).padStart(2, "0")}:${String(endMinute.value).padStart(2, "0")}:00`
+    );
+  }
+
+  // 시간대 변환
+  start.setHours(start.getHours() + 9);
+  end.setHours(end.getHours() + 9);
+
+  // 유효한 날짜인지 확인
+  if (!isNaN(start) && !isNaN(end)) {
+    startDate.value = start.toISOString();
+    endDate.value = end.toISOString();
+  } else {
+    console.error("Invalid date values in dateRange.value");
+  }
+};
+
+// 달력 열기
+const openDatePicker1 = () => {
+  startDatePickerOpen.value = !startDatePickerOpen.value;
+};
+
+const openDatePicker2 = () => {
+  endDatePickerOpen.value = !endDatePickerOpen.value;
+};
+
 startTimeUtc.value = new Date();
 
 const openDialog1 = () => {
@@ -919,20 +1100,54 @@ const openDialog1_1 = () => {
 };
 
 const openDialog2 = () => {
+  resetDate();
   dialog2.value = true;
 };
 
 const openDialog3 = () => {
+  resetDate;
   if (selectedData.value.length > 0) {
     selecteddivision.value = selectedData.value[0].division;
     selectedname.value = selectedData.value[0].testName;
     selectedstartdate.value = selectedData.value[0].startdate;
+    console.log(selectedData.value[0].startdate);
     selectedenddate.value = selectedData.value[0].enddate;
     selectedshipId.value = selectedData.value[0].shipid;
     selectedshipname.value = selectedData.value[0].name;
     selectedpurpose.value = selectedData.value[0].purpose;
     selectedlocation.value = selectedData.value[0].location;
     selecteddescription.value = selectedData.value[0].description;
+
+    const startDay = selectedData.value[0].startdate.split("T")[0]; // 2024-08-20
+    const endDay = selectedData.value[0].enddate.split("T")[0]; // 2024-08-20
+
+    // 시간 값 추출
+    const startTimePart = selectedData.value[0].startdate.split("T")[1]; // '00:18:59.000000Z'
+    const startHH = startTimePart.split(":")[0]; // '00'
+    const startMM = startTimePart.split(":")[1]; // '18'
+
+    const endTimePart = selectedData.value[0].enddate.split("T")[1]; // '00:18:59.000000Z'
+    const endHH = endTimePart.split(":")[0]; // '00'
+    const endMM = endTimePart.split(":")[1]; // '18'
+
+    startDateInput.value = startDay;
+    startHour.value = startHH;
+    startMinute.value = startMM;
+
+    endDateInput.value = endDay;
+    endHour.value = endHH;
+    endMinute.value = endMM;
+
+    startDateSelect.value = new Date(startDay);
+    endDateSelect.value = new Date(endDay);
+
+    console.log(startDay);
+    console.log(endDay);
+    console.log(startHH);
+    console.log(startMM);
+    console.log(endHH);
+    console.log(endMM);
+
     dialog3.value = true;
   } else {
     alert("시험을 선택해주세요.");
@@ -964,6 +1179,7 @@ const nullDialog1_1 = () => {
   dialog1_1.value = false;
 };
 const nullDialog2 = () => {
+  zeroFormat();
   dialog2.value = false;
   editname.value = null;
   editshipname.value = null;
@@ -1098,52 +1314,31 @@ const cancelData = async () => {
 
 // ------------------- 시험 추가하기 ---------------------- //
 const editData = async () => {
+  updateDate();
+
+  console.log(startDate.value);
+  console.log(endDate.value);
+  zeroFormat();
   if (
     editname.value === "" ||
     editpurpose.value === "" ||
     editlocation.value === "" ||
     editdescription.value === "" ||
-    editstartdate.value === "" ||
-    editstartdate.value === null ||
-    editenddate.value === null ||
-    editenddate.value === ""
+    startDate.value === "" ||
+    startDate.value === null ||
+    endDate.value === null ||
+    endDate.value === ""
   ) {
     alert("시험 정보를 전부 올바르게 입력해 주세요.");
-  } else if (editstartdate.value > editenddate.value) {
+  } else if (startDate.value > endDate.value) {
     alert("종료시간이 시작시간보다 더 빠릅니다.");
-  } else if (editstartdate.value.getTime() === editenddate.value.getTime()) {
+  } else if (startDate.value === endDate.value) {
     alert("시작시간과 종료시간이 같습니다.");
   } else {
-    let start = new Date(editstartdate.value).toISOString();
-    let end = new Date(editenddate.value).toISOString();
     try {
       //overlay.value = true;
       loadDialog.value = true;
       dialog2.value = false;
-      // const data = {
-      //   testName: editname.value,
-      //   shipName: editshipname.value,
-      //   shipId: "440714900",
-      //   testPurpose: editpurpose.value,
-      //   navigationArea: editlocation.value,
-      //   startTimeUtc: start,
-      //   endTimeUtc: end,
-      //   description: editdescription.value,
-      // };
-
-      // const data =
-      // {
-      //   "testName": editname.value,
-      //   "shipName": editshipname.value,
-      //   "shipId": "440714900",
-      //   "testPurpose": editpurpose.value,
-      //   "navigationArea": editlocation.value,
-      //   "startTimeUtc": "2024-06-26T00:18:59.000Z",
-      //   "endTimeUtc": end,
-      //   "description": editdescription.value
-      // }
-
-      // let start = "2024-06-26T00:18:59.000Z";
 
       const data = {
         testName: editname.value,
@@ -1151,10 +1346,12 @@ const editData = async () => {
         shipId: "440714900",
         testPurpose: editpurpose.value,
         navigationArea: editlocation.value,
-        startTimeUtc: start,
-        endTimeUtc: end,
+        startTimeUtc: startDate.value,
+        endTimeUtc: endDate.value,
         description: editdescription.value,
       };
+      startDate.value = null;
+      endDate.value = null;
 
       try {
         await createTrialData(tokenid.value, data);
@@ -1181,11 +1378,10 @@ const editData = async () => {
 
 // 수정하기
 const changeData = async () => {
+  updateDate();
   loadDialog.value = true;
   //overlay.value = true;
-  dialog3.value = false;
-  const startDate = new Date(selectedstartdate.value);
-  const endDate = new Date(selectedenddate.value);
+  
   const saveTimeRange = timeRange.value.slice();
   timeRange.value.splice(selectedData.value[0].index, 1);
   timeRange.value = saveTimeRange;
@@ -1194,15 +1390,15 @@ const changeData = async () => {
     selectedpurpose.value === "" ||
     selectedlocation.value === "" ||
     selecteddescription.value === "" ||
-    selectedstartdate.value === "" ||
-    selectedstartdate.value === null ||
-    selectedenddate.value === null ||
-    selectedenddate.value === ""
+    startDate.value === "" ||
+    startDate.value === null ||
+    endDate.value === null ||
+    endDate.value === ""
   ) {
     alert("시험 정보를 전부 올바르게 입력해 주세요.");
-  } else if (startDate > endDate) {
+  } else if (startDate.value > endDate.value) {
     alert("종료시간이 시작시간보다 더 빠릅니다.");
-  } else if (startDate.getTime() === endDate.getTime()) {
+  } else if (startDate.value === endDate.value) {
     alert("시작시간과 종료시간이 같습니다.");
   } else {
     // console.log(selectedData.value[0].division);
@@ -1213,14 +1409,17 @@ const changeData = async () => {
         shipId: "440714900",
         testPurpose: selectedpurpose.value,
         navigationArea: selectedlocation.value,
-        startTimeUtc: selectedstartdate.value,
-        endTimeUtc: selectedenddate.value,
+        startTimeUtc: startDate.value,
+        endTimeUtc: endDate.value,
         description: selecteddescription.value,
       };
+      startDate.value = null;
+      endDate.value = null;
       try {
         await updateTrialData(tokenid.value, data);
         nullDialog3();
         alert("선택된 시험의 수정이 완료되었습니다.");
+        dialog3.value = false;
         location.reload();
       } catch (error) {
         if (error instanceof TypeError && error.message.includes("toString")) {
@@ -1322,17 +1521,14 @@ const fetchData = async () => {
         .toString()
         .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
 
-
       const storageSizeFloat = parseFloat(response[i].storageSize).toFixed(2);
 
-      let Storage = ""
-      if (storageSizeFloat === 'NaN'){
+      let Storage = "";
+      if (storageSizeFloat === "NaN") {
         Storage = "0.00MB";
-      }
-      else if (storageSizeFloat > 1048576){
+      } else if (storageSizeFloat > 1048576) {
         Storage = `${(storageSizeFloat / 1048576).toFixed(2)}TB`;
-      }
-      else if (storageSizeFloat > 1024 && storageSizeFloat <= 1048575) {
+      } else if (storageSizeFloat > 1024 && storageSizeFloat <= 1048575) {
         Storage = `${(storageSizeFloat / 1024).toFixed(2)}GB`;
       } else {
         Storage = `${storageSizeFloat}MB`;
@@ -1403,10 +1599,84 @@ onMounted(() => {
 
 //   return isExist;
 // };
-
 </script>
 
 <style scoped>
+/* DatePicker 테두리 스타일 추가 */
+.date-picker {
+  border: 1px solid #ccc;
+  padding: 0.3rem;
+  border-radius: 4px;
+  width: 194px;
+  box-sizing: border-box;
+}
+
+.time-select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 70px;
+}
+
+.m-time-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 50px;
+}
+
+.time-divider {
+  margin-right: 5px;
+  font-size: 18px;
+}
+
+/* 시간 입력 필드 스타일 */
+.time-input {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 50px;
+  text-align: center;
+  margin: 0 5px;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.date-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.row-container {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 요소 간 간격 조절 */
+}
+
+.span-title {
+  margin-top: 30px;
+  font-size: 16px;
+  font-weight: 550;
+}
+
 .dp__theme_dark {
   --dp-background-color: #424242;
   --dp-text-color: #fff;
