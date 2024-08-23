@@ -26,9 +26,17 @@ const themeConfig = {
   btnColor: ref(themeMode.value === "light" ? lightbtn : darkbtn),
   btnTextColor: ref(themeMode.value === "light" ? lightbtnText : darkbtnText),
 
+  selectColor: ref(
+    themeMode.value === "light" ? "#ffffff" : darkNonSelectedTab
+  ),
+  selectTextColor: ref(
+    themeMode.value === "light" ? darkbtnText : lightbtnText
+  ),
+
   textColor: ref(themeMode.value === "light" ? lightText : darkText),
 
   themeColor: ref(themeMode.value === "light" ? whitebackcolor : darkbackcolor),
+  cctvColor: ref(themeMode.value === "light" ? "#eeeeee" : "#222222"),
   themeSelectedTabColor: ref(
     themeMode.value === "light" ? lightselectedTab : darkselectedTab
   ),

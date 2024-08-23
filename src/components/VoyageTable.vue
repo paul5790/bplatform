@@ -14,6 +14,7 @@
     </v-card-title>
     <v-data-table
       v-model:page="page"
+      style="height: 44vh;"
       :headers="headers"
       :items="items"
       :items-per-page="itemsPerPage"

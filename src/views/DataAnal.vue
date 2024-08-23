@@ -196,43 +196,15 @@
                     /> -->
 
                     <v-row>
-                      <v-col v-if="startDatePickerOpen" cols="6">
-                        <!-- 동적으로 타입을 변경하는 input -->
-                        <div class="date-picker">
-                          <DatePicker
-                            v-model="startDateSelect"
-                            format="YYYY-MM-DD"
-                            value-type="format"
-                            style="width: 180px"
-                            @update:modelValue="handleDateChange"
-                            placeholder=" 캘린더 직접선택 (클릭)"
-                          />
-                        </div>
-                      </v-col>
-                      <v-col v-if="!startDatePickerOpen" cols="6">
+                      <v-col cols="6">
                         <!-- 동적으로 타입을 변경하는 input -->
                         <input
-                          :type="text"
+                          class="date-picker"
+                          type="date"
                           v-model="startDateInput"
-                          placeholder=" yyyy-mm-dd (직접 입력)"
-                          class="date-input"
+                          min="2000-01-01"
+                          max="9999-12-31"
                         />
-                      </v-col>
-                      <v-col cols="1">
-                        <button
-                          v-if="!startDatePickerOpen"
-                          @click="openDatePicker1"
-                          class="icon-btn"
-                        >
-                          📅
-                        </button>
-                        <button
-                          v-if="startDatePickerOpen"
-                          @click="openDatePicker1"
-                          class="icon-btn"
-                        >
-                          📝
-                        </button>
                       </v-col>
 
                       <!-- 시간 및 분 선택 -->
@@ -244,73 +216,48 @@
                           padding-left: 15px;
                         "
                       >
-                        <select v-model="startHour" class="time-select">
+                        <select
+                          v-model="startHour"
+                          class="time-select"
+                          :style="{
+                            backgroundColor: selectColor,
+                            color: selectTextColor,
+                          }"
+                        >
                           <option
                             v-for="hour in hours"
                             :key="hour"
                             :value="hour"
+                            :style="{
+                              backgroundColor: selectColor,
+                              color: selectTextColor,
+                            }"
                           >
-                            {{ hour }}시
+                            {{ hour }}
                           </option>
                         </select>
+                        시
 
-                        <select v-model="startMinute" class="time-select">
-                          <option
-                            v-for="minute in minutes"
-                            :key="minute"
-                            :value="minute"
-                          >
-                            {{ minute }}분
-                          </option>
-                          <!-- 배열에 없는 값도 선택 가능하게 유지 -->
-                          <option
-                            v-if="!minutes.includes(startMinute)"
-                            :value="startMinute"
-                          >
-                            {{ startMinute }}분
-                          </option>
-                        </select>
+                        <input
+                          v-model="startMinute"
+                          @input="validateMinutes"
+                          type="text"
+                          class="m-time-input"
+                          placeholder="00"
+                        />
+                        분
                       </v-col>
                     </v-row>
 
                     <v-row>
-                      <v-col v-if="endDatePickerOpen" cols="6">
-                        <!-- 동적으로 타입을 변경하는 input -->
-                        <div class="date-picker">
-                          <DatePicker
-                            v-model="endDateSelect"
-                            format="YYYY-MM-DD"
-                            value-type="format"
-                            style="width: 180px"
-                            @update:modelValue="handleDateChange"
-                            placeholder=" 캘린더 직접선택 (클릭)"
-                          />
-                        </div>
-                      </v-col>
-                      <v-col v-if="!endDatePickerOpen" cols="6">
-                        <!-- 동적으로 타입을 변경하는 input -->
+                      <v-col cols="6">
                         <input
-                          :type="text"
+                          class="date-picker"
+                          type="date"
                           v-model="endDateInput"
-                          placeholder=" yyyy-mm-dd (직접 입력)"
-                          class="date-input"
+                          min="1000-01-01"
+                          max="9999-12-31"
                         />
-                      </v-col>
-                      <v-col cols="1">
-                        <button
-                          v-if="!endDatePickerOpen"
-                          @click="openDatePicker2"
-                          class="icon-btn"
-                        >
-                          📅
-                        </button>
-                        <button
-                          v-if="endDatePickerOpen"
-                          @click="openDatePicker2"
-                          class="icon-btn"
-                        >
-                          📝
-                        </button>
                       </v-col>
 
                       <!-- 시간 및 분 선택 -->
@@ -322,32 +269,35 @@
                           padding-left: 15px;
                         "
                       >
-                        <select v-model="endHour" class="time-select">
+                        <select
+                          v-model="endHour"
+                          class="time-select"
+                          :style="{
+                            backgroundColor: selectColor,
+                            color: selectTextColor,
+                          }"
+                        >
                           <option
                             v-for="hour in hours"
                             :key="hour"
                             :value="hour"
+                            :style="{
+                              backgroundColor: selectColor,
+                              color: selectTextColor,
+                            }"
                           >
-                            {{ hour }}시
+                            {{ hour }}
                           </option>
                         </select>
-
-                        <select v-model="endMinute" class="time-select">
-                          <option
-                            v-for="minute in minutes"
-                            :key="minute"
-                            :value="minute"
-                          >
-                            {{ minute }}분
-                          </option>
-                          <!-- 배열에 없는 값도 선택 가능하게 유지 -->
-                          <option
-                            v-if="!minutes.includes(endMinute)"
-                            :value="endMinute"
-                          >
-                            {{ endMinute }}분
-                          </option>
-                        </select>
+                        시
+                        <input
+                          v-model="endMinute"
+                          @input="validateMinutee"
+                          type="text"
+                          class="m-time-input"
+                          placeholder="00"
+                        />
+                        분
                       </v-col>
                     </v-row>
                     <p style="font-size: 12px; font-weight: bold">
@@ -443,7 +393,14 @@ provide(THEME_KEY);
 
 // =================================================== 셋업 ===================================================
 // 다크모드
-const { btnColor, textColor, themeColor, tableStyle } = themeConfig;
+const {
+  btnColor,
+  textColor,
+  themeColor,
+  tableStyle,
+  selectColor,
+  selectTextColor,
+} = themeConfig;
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
 onMounted(() => {
@@ -459,75 +416,16 @@ onMounted(() => {
 // =================================================== 데이트 피커 =================================================
 const startDateInput = ref("");
 const endDateInput = ref("");
-const startDateSelect = ref();
-const endDateSelect = ref();
-const today = new Date();
-const dateToday = ref(today.toISOString().split("T")[0]);
-const selectedDate = ref("");
-const startDatePickerOpen = ref(false);
-const endDatePickerOpen = ref(false);
 const startHour = ref("00");
-const startMinute = ref("00");
+const startMinute = ref("");
 const endHour = ref("00");
-const endMinute = ref("00");
+const endMinute = ref("");
 
 // 시간 및 분 옵션
 const hours = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, "0")
 );
-const minutes = [
-  "00",
-  "05",
-  "10",
-  "15",
-  "20",
-  "25",
-  "30",
-  "35",
-  "40",
-  "45",
-  "50",
-  "55",
-];
 
-// 날짜 변경 시 호출될 함수
-const handleDateChange = (newDate) => {
-  // console.log(selectedTestStartTime.value[1]);
-  // console.log(selectedTestEndTime.value[1]);
-};
-
-// 사용자가 입력한 날짜를 확인하고 포맷이 맞지 않으면 경고
-const validateDate = () => {
-  const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-  // if (!datePattern.test(dateInput.value)) {
-  //   console.warn("날짜 형식이 맞지 않습니다. (yyyy-mm-dd)");
-  // }
-};
-
-// 달력 열기
-const openDatePicker1 = () => {
-  startDatePickerOpen.value = !startDatePickerOpen.value;
-};
-
-const openDatePicker2 = () => {
-  endDatePickerOpen.value = !endDatePickerOpen.value;
-};
-
-// DatePicker에서 날짜 선택 시 텍스트 박스에 업데이트
-const onDateSelect = () => {
-  const date = new Date(selectedDate.value);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-
-  // dateInput.value = `${year}-${month}-${day}`;
-  startDatePickerOpen.value = false;
-};
-
-// 시간 포맷 (AM/PM)
-const formatHour = (hour) => {
-  return `오후 ${hour}`;
-};
 // =================================================== 신호 선택 ===================================================
 const subComponents = ref([
   "DGPS",
@@ -676,9 +574,6 @@ watch(selectedtrialrun, (newVal) => {
     endHour.value = endHH;
     endMinute.value = endMM;
 
-    startDateSelect.value = new Date(startDay);
-    endDateSelect.value = new Date(endDay);
-
     let start = new Date(startDate.value);
     let end = new Date(endDate.value);
 
@@ -691,35 +586,21 @@ const updateDate = () => {
   let start;
   let end;
 
-  if (startDatePickerOpen.value) {
-    start = new Date(startDateSelect.value);
-    start.setHours(startHour.value.padStart(2, "0"));
-    start.setMinutes(startMinute.value.padStart(2, "0"));
-    start.setSeconds(0);
-  } else {
-    // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
-    start = new Date(
-      `${startDateInput.value}T${startHour.value.padStart(
-        2,
-        "0"
-      )}:${startMinute.value.padStart(2, "0")}:00`
-    );
-  }
+  // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
+  start = new Date(
+    `${startDateInput.value}T${startHour.value.padStart(
+      2,
+      "0"
+    )}:${startMinute.value.padStart(2, "0")}:00`
+  );
 
-  if (endDatePickerOpen.value) {
-    end = new Date(endDateSelect.value);
-    end.setHours(endHour.value.padStart(2, "0"));
-    end.setMinutes(endMinute.value.padStart(2, "0"));
-    end.setSeconds(0);
-  } else {
-    // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
-    end = new Date(
-      `${endDateInput.value}T${endHour.value.padStart(
-        2,
-        "0"
-      )}:${endMinute.value.padStart(2, "0")}:00`
-    );
-  }
+  // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
+  end = new Date(
+    `${endDateInput.value}T${endHour.value.padStart(
+      2,
+      "0"
+    )}:${endMinute.value.padStart(2, "0")}:00`
+  );
 
   start.setHours(start.getHours() + 9);
   end.setHours(end.getHours() + 9);
@@ -728,7 +609,11 @@ const updateDate = () => {
     // 유효한 날짜인 경우에만 ISO 문자열로 변환
     startDate.value = start.toISOString();
     endDate.value = end.toISOString();
+    noDate = false;
   } else {
+    startDate.value = "";
+    startDate.value = "";
+    noDate = true;
     console.error("Invalid date values in dateRange.value");
   }
 };
@@ -934,15 +819,20 @@ const initChart = () => {
     axisLabel: {
       color: textColor.value, // 텍스트 색상을 흰색으로 설정
       formatter: (value) => {
+        console.log(value);
         const date = new Date(value);
         const formattedDate = `
-        ${date.getDate().toString().padStart(2, "0")} ${date
-          .getHours()
+    ${date.getUTCDate().toString().padStart(2, "0")} ${date
+          .getUTCHours()
           .toString()
           .padStart(2, "0")}:${date
-          .getMinutes()
+          .getUTCMinutes()
           .toString()
-          .padStart(2, "0")}:${date.getSeconds().toString().padStart(2, "0")}`;
+          .padStart(2, "0")}:${date
+          .getUTCSeconds()
+          .toString()
+          .padStart(2, "0")}`;
+
         return formattedDate;
       },
     },
@@ -1131,6 +1021,7 @@ const fetchData = async (subComponent, contents) => {
     let apiReq = `table_data/information/test?test_name=TestCase1&signal_name=ais_vdo&signal_name=ais_vdm`;
     apiReq = `table_data/information/${requests.value.period}&signal_name=${subComponent}_${contents}`;
     let a = await readDataTrial(tokenid.value, apiReq);
+    console.log(a);
     return a;
   } catch (error) {
     console.error(error);
@@ -1178,6 +1069,7 @@ const processData = (
 };
 
 let noData = true;
+let noDate = false;
 //데이터 검색
 const searchData = async () => {
   updateDate();
@@ -1779,7 +1671,9 @@ const searchData = async () => {
   // chart.value.setOption(updateSeries);
   n = 0;
 
-  if (noData) {
+  if (noDate) {
+    alert("시간 형식이 맞지 않습니다.");
+  } else if (noData) {
     alert("데이터가 존재하지 않습니다.");
   }
 };
@@ -1924,7 +1818,7 @@ const captureImage = async () => {
       // 다운로드 링크 생성
       const downloadLink = document.createElement("a");
       downloadLink.href = blobUrl;
-      downloadLink.download = `${analysis.value[0].name}_image.png`; // 파일명 지정
+      downloadLink.download = `이름을 설정해주세요`; // 파일명 지정
 
       // 링크 클릭 및 다운로드
       downloadLink.click();
@@ -1961,21 +1855,6 @@ body {
   color: #ff4444;
 }
 
-.date-input {
-  padding: 5px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 200px;
-}
-
-.icon-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 1.5em;
-}
-
 /* DatePicker 테두리 스타일 추가 */
 .date-picker {
   border: 1px solid #ccc;
@@ -1983,15 +1862,6 @@ body {
   border-radius: 4px;
   width: 200px;
   box-sizing: border-box;
-}
-
-.time-select {
-  padding: 5px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  margin-left: 5px;
-  width: 70px;
 }
 
 .time-divider {
@@ -2012,5 +1882,56 @@ body {
 .time-input:focus {
   outline: none;
   border-color: #007bff;
+}
+
+.date-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 105%;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+select.time-select {
+  background-color: selectColor; /* 어두운 배경 */
+  color: selectTextColor; /* 텍스트 색상 */
+  border-radius: 4px;
+  padding: 5px;
+}
+
+/* 옵션 목록의 스타일 */
+select.time-select option {
+  background-color: selectColor; /* 옵션 배경색 */
+  color: selectTextColor; /* 옵션 텍스트 색상 */
+}
+
+/* 커서 포인터 추가 */
+select.time-select {
+  cursor: pointer;
+}
+
+.time-select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 70px;
+}
+
+.m-time-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 50px;
 }
 </style>

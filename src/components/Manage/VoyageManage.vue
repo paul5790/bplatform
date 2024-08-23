@@ -106,50 +106,27 @@
                           </v-col>
                           <v-col cols="8">
                             <div class="row-container">
-                              <div
+                              <input
                                 class="date-picker"
-                                v-if="startDatePickerOpen"
+                                type="date"
+                                v-model="startDateInput"
+                                min="2000-01-01"
+                                max="9999-12-31"
+                              />
+                              <select
+                                v-model="startHour"
+                                class="time-select"
+                                style="margin-left: 20px"
                               >
-                                <DatePicker
-                                  v-model="startDateSelect"
-                                  format="YYYY-MM-DD"
-                                  value-type="format"
-                                  style="width: 100%"
-                                  placeholder=" 캘린더 직접선택 (클릭)"
-                                />
-                              </div>
-                              <div v-if="!startDatePickerOpen">
-                                <input
-                                  :type="text"
-                                  v-model="startDateInput"
-                                  placeholder=" yyyy-mm-dd (직접 입력)"
-                                  class="date-input"
-                                />
-                              </div>
-                              <button
-                                v-if="!startDatePickerOpen"
-                                @click="openDatePicker1"
-                                class="icon-btn"
-                              >
-                                📅
-                              </button>
-                              <button
-                                v-if="startDatePickerOpen"
-                                @click="openDatePicker1"
-                                class="icon-btn"
-                              >
-                                📝
-                              </button>
-                              <select v-model="startHour" class="time-select">
                                 <option
                                   v-for="hour in hours"
                                   :key="hour"
                                   :value="hour"
                                 >
-                                  {{ hour }}시
+                                  {{ hour }}
                                 </option>
                               </select>
-
+                              시
                               <!-- <select v-model="startMinute" class="time-select">
                                 <option
                                   v-for="minute in minutes"
@@ -188,48 +165,28 @@
 
                           <v-col cols="8" style="margin-top: 18px">
                             <div class="row-container">
-                              <div class="date-picker" v-if="endDatePickerOpen">
-                                <DatePicker
-                                  v-model="endDateSelect"
-                                  format="YYYY-MM-DD"
-                                  value-type="format"
-                                  style="width: 180px"
-                                  placeholder=" 캘린더 직접선택 (클릭)"
-                                />
-                              </div>
-                              <div v-if="!endDatePickerOpen">
-                                <input
-                                  :type="text"
-                                  v-model="endDateInput"
-                                  placeholder=" yyyy-mm-dd (직접 입력)"
-                                  class="date-input"
-                                />
-                              </div>
-                              <button
-                                v-if="!endDatePickerOpen"
-                                @click="openDatePicker2"
-                                class="icon-btn"
-                              >
-                                📅
-                              </button>
-                              <button
-                                v-if="endDatePickerOpen"
-                                @click="openDatePicker2"
-                                class="icon-btn"
-                              >
-                                📝
-                              </button>
+                              <input
+                                class="date-picker"
+                                type="date"
+                                v-model="endDateInput"
+                                min="1000-01-01"
+                                max="9999-12-31"
+                              />
 
-                              <select v-model="endHour" class="time-select">
+                              <select
+                                v-model="endHour"
+                                class="time-select"
+                                style="margin-left: 20px"
+                              >
                                 <option
                                   v-for="hour in hours"
                                   :key="hour"
                                   :value="hour"
                                 >
-                                  {{ hour }}시
+                                  {{ hour }}
                                 </option>
                               </select>
-
+                              시
                               <!-- <select v-model="endMinute" class="time-select">
                                 <option
                                   v-for="minute in minutes"
@@ -416,50 +373,27 @@
                             /> -->
 
                             <div class="row-container">
-                              <div
+                              <input
                                 class="date-picker"
-                                v-if="startDatePickerOpen"
+                                type="date"
+                                v-model="startDateInput"
+                                min="1000-01-01"
+                                max="9999-12-31"
+                              />
+                              <select
+                                v-model="startHour"
+                                class="time-select"
+                                style="margin-left: 20px"
                               >
-                                <DatePicker
-                                  v-model="startDateSelect"
-                                  format="YYYY-MM-DD"
-                                  value-type="format"
-                                  style="width: 100%"
-                                  placeholder=" 캘린더 직접선택 (클릭)"
-                                />
-                              </div>
-                              <div v-if="!startDatePickerOpen">
-                                <input
-                                  :type="text"
-                                  v-model="startDateInput"
-                                  placeholder=" yyyy-mm-dd (직접 입력)"
-                                  class="date-input"
-                                />
-                              </div>
-                              <button
-                                v-if="!startDatePickerOpen"
-                                @click="openDatePicker1"
-                                class="icon-btn"
-                              >
-                                📅
-                              </button>
-                              <button
-                                v-if="startDatePickerOpen"
-                                @click="openDatePicker1"
-                                class="icon-btn"
-                              >
-                                📝
-                              </button>
-                              <select v-model="startHour" class="time-select">
                                 <option
                                   v-for="hour in hours"
                                   :key="hour"
                                   :value="hour"
                                 >
-                                  {{ hour }}시
+                                  {{ hour }}
                                 </option>
                               </select>
-
+                              시
                               <!-- <select v-model="startMinute" class="time-select">
                                 <option
                                   v-for="minute in minutes"
@@ -498,48 +432,28 @@
 
                           <v-col cols="8" style="margin-top: 18px">
                             <div class="row-container">
-                              <div class="date-picker" v-if="endDatePickerOpen">
-                                <DatePicker
-                                  v-model="endDateSelect"
-                                  format="YYYY-MM-DD"
-                                  value-type="format"
-                                  style="width: 180px"
-                                  placeholder=" 캘린더 직접선택 (클릭)"
-                                />
-                              </div>
-                              <div v-if="!endDatePickerOpen">
-                                <input
-                                  :type="text"
-                                  v-model="endDateInput"
-                                  placeholder=" yyyy-mm-dd (직접 입력)"
-                                  class="date-input"
-                                />
-                              </div>
-                              <button
-                                v-if="!endDatePickerOpen"
-                                @click="openDatePicker2"
-                                class="icon-btn"
-                              >
-                                📅
-                              </button>
-                              <button
-                                v-if="endDatePickerOpen"
-                                @click="openDatePicker2"
-                                class="icon-btn"
-                              >
-                                📝
-                              </button>
+                              <input
+                                class="date-picker"
+                                type="date"
+                                v-model="endDateInput"
+                                min="1000-01-01"
+                                max="9999-12-31"
+                              />
 
-                              <select v-model="endHour" class="time-select">
+                              <select
+                                v-model="endHour"
+                                class="time-select"
+                                style="margin-left: 20px"
+                              >
                                 <option
                                   v-for="hour in hours"
                                   :key="hour"
                                   :value="hour"
                                 >
-                                  {{ hour }}시
+                                  {{ hour }}
                                 </option>
                               </select>
-
+                              시
                               <input
                                 v-model="endMinute"
                                 @input="validateMinutee"
@@ -717,7 +631,7 @@
       </v-row>
 
       <v-data-table
-        style="margin-top: 20px"
+        style="margin-top: 20px; height: 66vh"
         v-model="selectedData"
         v-model:page="page"
         class="elevation-1"
@@ -799,7 +713,7 @@ import {
 } from "../../api/index.js";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 
-const { btnColor, themeColor } = themeConfig;
+const { btnColor, themeColor, selectColor, selectTextColor } = themeConfig;
 // loaddialog
 const loadDialog = ref(false);
 
@@ -950,29 +864,18 @@ const endDate = ref();
 
 const startDateInput = ref("");
 const endDateInput = ref("");
-const startDateSelect = ref();
-const endDateSelect = ref();
-const today = new Date();
-const dateToday = ref(today.toISOString().split("T")[0]);
-const selectedDate = ref("");
-const startDatePickerOpen = ref(false);
-const endDatePickerOpen = ref(false);
 const startHour = ref("00");
 const startMinute = ref("00");
-const endHour = ref("00");
-const endMinute = ref("00");
+const endHour = ref("");
+const endMinute = ref("");
 
 const resetDate = () => {
   startDateInput.value = "";
   endDateInput.value = "";
-  startDateSelect.value = "";
-  endDateSelect.value = "";
-  startDatePickerOpen.value = false;
-  endDatePickerOpen.value = false;
   startHour.value = "00";
-  startMinute.value = "00";
+  startMinute.value = "";
   endHour.value = "00";
-  endMinute.value = "00";
+  endMinute.value = "";
 };
 
 // const editStartDateSelect = ref();
@@ -985,20 +888,6 @@ const resetDate = () => {
 const hours = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, "0")
 );
-const minutes = [
-  "00",
-  "05",
-  "10",
-  "15",
-  "20",
-  "25",
-  "30",
-  "35",
-  "40",
-  "45",
-  "50",
-  "55",
-];
 
 const validateMinutes = (event) => {
   const value = validateMinute(event);
@@ -1020,7 +909,7 @@ const validateMinute = (event) => {
   // 입력 값이 0~59 범위에 있는지 확인
   let minute = parseInt(value, 10);
 
-  if (isNaN(minute)) minute = 0;
+  if (isNaN(minute)) minute = "";
   return minute;
 };
 
@@ -1033,31 +922,20 @@ const updateDate = () => {
   let start;
   let end;
 
-  // 시작 시간 처리
-  if (startDatePickerOpen.value) {
-    start = new Date(startDateSelect.value);
-    start.setHours(String(startHour.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
-    start.setMinutes(String(startMinute.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
-    start.setSeconds(0);
-  } else {
-    // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
-    start = new Date(
-      `${startDateInput.value}T${String(startHour.value).padStart(2, "0")}:${String(startMinute.value).padStart(2, "0")}:00`
-    );
-  }
+  // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
+  start = new Date(
+    `${startDateInput.value}T${String(startHour.value).padStart(
+      2,
+      "0"
+    )}:${String(startMinute.value).padStart(2, "0")}:00`
+  );
 
-  // 종료 시간 처리
-  if (endDatePickerOpen.value) {
-    end = new Date(endDateSelect.value);
-    end.setHours(String(endHour.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
-    end.setMinutes(String(endMinute.value).padStart(2, "0")); // 문자열로 변환 후 padStart 적용
-    end.setSeconds(0);
-  } else {
-    // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
-    end = new Date(
-      `${endDateInput.value}T${String(endHour.value).padStart(2, "0")}:${String(endMinute.value).padStart(2, "0")}:00`
-    );
-  }
+  // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
+  end = new Date(
+    `${endDateInput.value}T${String(endHour.value).padStart(2, "0")}:${String(
+      endMinute.value
+    ).padStart(2, "0")}:00`
+  );
 
   // 시간대 변환
   start.setHours(start.getHours() + 9);
@@ -1070,15 +948,6 @@ const updateDate = () => {
   } else {
     console.error("Invalid date values in dateRange.value");
   }
-};
-
-// 달력 열기
-const openDatePicker1 = () => {
-  startDatePickerOpen.value = !startDatePickerOpen.value;
-};
-
-const openDatePicker2 = () => {
-  endDatePickerOpen.value = !endDatePickerOpen.value;
 };
 
 startTimeUtc.value = new Date();
@@ -1137,9 +1006,6 @@ const openDialog3 = () => {
     endDateInput.value = endDay;
     endHour.value = endHH;
     endMinute.value = endMM;
-
-    startDateSelect.value = new Date(startDay);
-    endDateSelect.value = new Date(endDay);
 
     console.log(startDay);
     console.log(endDay);
@@ -1381,7 +1247,7 @@ const changeData = async () => {
   updateDate();
   loadDialog.value = true;
   //overlay.value = true;
-  
+
   const saveTimeRange = timeRange.value.slice();
   timeRange.value.splice(selectedData.value[0].index, 1);
   timeRange.value = saveTimeRange;
@@ -1617,7 +1483,7 @@ onMounted(() => {
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-left: 5px;
-  width: 70px;
+  width: 50px;
 }
 
 .m-time-input {
@@ -1668,13 +1534,30 @@ onMounted(() => {
   margin-top: 10px;
   display: flex;
   align-items: center;
-  gap: 10px; /* 요소 간 간격 조절 */
+  gap: 3px; /* 요소 간 간격 조절 */
 }
 
 .span-title {
   margin-top: 30px;
   font-size: 16px;
   font-weight: 550;
+}
+select.time-select {
+  background-color: selectColor; /* 어두운 배경 */
+  color: selectTextColor; /* 텍스트 색상 */
+  border-radius: 4px;
+  padding: 5px;
+}
+
+/* 옵션 목록의 스타일 */
+select.time-select option {
+  background-color: selectColor; /* 옵션 배경색 */
+  color: selectTextColor; /* 옵션 텍스트 색상 */
+}
+
+/* 커서 포인터 추가 */
+select.time-select {
+  cursor: pointer;
 }
 
 .dp__theme_dark {

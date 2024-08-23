@@ -66,16 +66,16 @@ const option = ref({
         length: "50%",
       },
       axisTick: {
-        distance: -8,
-        length: 5,
+        distance: -5,
+        length: 3,
         lineStyle: {
           color: "#fff",
           width: 1,
         },
       },
       splitLine: {
-        distance: -10,
-        length: 10,
+        distance: -6,
+        length: 6,
         lineStyle: {
           color: "#fff",
           width: 2,

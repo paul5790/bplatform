@@ -17,7 +17,7 @@
           <div style="display: flex">
             <v-btn :color="btnColor" @click="check()"> 수정하기 </v-btn>
 
-            <v-dialog v-model="dialog" persistent width="1024">
+            <v-dialog v-model="dialog" persistent width="1050">
               <v-card>
                 <v-card-title>
                   <span class="text-h5">유저 정보</span>
@@ -64,11 +64,9 @@
                       </v-col>
 
                       <v-col cols="12" style="padding-bottom: 0px"
-                        ><p style="font-size: 13px">
-                          권한 설정
-                        </p></v-col
+                        ><p style="font-size: 13px">권한 설정</p></v-col
                       >
-                      <v-col cols="6">
+                      <v-col cols="6" style="padding-bottom: 0px">
                         <v-select
                           :items="['ADMIN', 'USER', 'GUEST']"
                           label="권한*"
@@ -77,7 +75,7 @@
                           required
                         ></v-select>
                       </v-col>
-                      <v-col cols="6">
+                      <v-col cols="6" style="padding-bottom: 0px">
                         <VueDatePicker
                           v-if="selecteduserGroup === 'USER'"
                           time-picker-inline
@@ -94,10 +92,97 @@
                           :readonly="date_readonly"
                         />
                       </v-col>
+                      <v-col
+                        cols="6"
+                        style="padding-top: 0px"
+                        v-if="selecteduserGroup === 'USER'"
+                      >
+                        <div class="row-container">
+                          <p style="font-size: 13px">시작기간 :</p>
+                          <input
+                            class="date-picker"
+                            type="date"
+                            v-model="startDateInput"
+                            min="2000-01-01"
+                            max="9999-12-31"
+                          />
+                          <select v-model="startHour" class="time-select">
+                            <option
+                              v-for="hour in hours"
+                              :key="hour"
+                              :value="hour"
+                            >
+                              {{ hour }}시
+                            </option>
+                          </select>
+
+                          <select v-model="startMinute" class="time-select">
+                            <option
+                              v-for="minute in minutes"
+                              :key="minute"
+                              :value="minute"
+                            >
+                              {{ minute }}분
+                            </option>
+                            <!-- 배열에 없는 값도 선택 가능하게 유지 -->
+                            <option
+                              v-if="!minutes.includes(startMinute)"
+                              :value="startMinute"
+                            >
+                              {{ startMinute }}분
+                            </option>
+                          </select>
+                        </div>
+                      </v-col>
+                      <v-col
+                        cols="6"
+                        style="padding-top: 0px"
+                        v-if="selecteduserGroup === 'USER'"
+                      >
+                        <div class="row-container">
+                          <p style="font-size: 13px">종료기간 :</p>
+                          <input
+                            class="date-picker"
+                            type="date"
+                            v-model="endDateInput"
+                            min="1000-01-01"
+                            max="9999-12-31"
+                          />
+
+                          <select v-model="endHour" class="time-select">
+                            <option
+                              v-for="hour in hours"
+                              :key="hour"
+                              :value="hour"
+                            >
+                              {{ hour }}시
+                            </option>
+                          </select>
+
+                          <select v-model="endMinute" class="time-select">
+                            <option
+                              v-for="minute in minutes"
+                              :key="minute"
+                              :value="minute"
+                            >
+                              {{ minute }}분
+                            </option>
+                            <option
+                              v-if="!minutes.includes(endMinute)"
+                              :value="endMinute"
+                            >
+                              {{ endMinute }}분
+                            </option>
+                          </select>
+                        </div>
+                      </v-col>
                     </v-row>
                   </v-container>
 
-                  <v-container v-if="selecteduserGroup === 'USER'">
+                  <v-container
+                    style="margin-top: 5px"
+                    v-if="selecteduserGroup === 'USER'"
+                  >
                     <p style="font-size: 13px; margin-bottom: 10px">
                       접근제어 가능 데이터 설정
                     </p>
@@ -199,7 +284,7 @@
         </div>
       </v-row>
       <v-data-table
-        style="margin-top: 20px"
+        style="margin-top: 20px; height: 66vh"
         v-model="selectedItems"
         v-model:page="page"
         class="elevation-1"
@@ -271,6 +356,7 @@
 
 <script setup>
 import { computed, ref, watch } from "vue";
+import DatePicker from "vue3-datepicker";
 import {
   readUserData,
   deleteUserData,
@@ -279,7 +365,7 @@ import {
 } from "../../api/index.js";
 import { themeMode, themeConfig } from "@/utils/theme.js";
 
-const { btnColor, themeColor } = themeConfig;
+const { btnColor, themeColor, selectColor, selectTextColor } = themeConfig;
 const userId = ref(sessionStorage.getItem("id") || "");
 
 const dialog = ref(false);
@@ -337,7 +423,78 @@ const toggleAll = (type) => {
 
 const datePermission = ref();
 
-// ---------------------------------------------
+// ----------------- 데이트 피커 ----------------------------
+const startDate = ref();
+const endDate = ref();
+
+const startDateInput = ref("");
+const endDateInput = ref("");
+const startHour = ref("00");
+const startMinute = ref("00");
+const endHour = ref("00");
+const endMinute = ref("00");
+
+const hours = Array.from({ length: 24 }, (_, i) =>
+  i.toString().padStart(2, "0")
+);
+const minutes = [
+  "00",
+  "05",
+  "10",
+  "15",
+  "20",
+  "25",
+  "30",
+  "35",
+  "40",
+  "45",
+  "50",
+  "55",
+];
+
+const resetDate = () => {
+  startDateInput.value = "";
+  endDateInput.value = "";
+  startHour.value = "00";
+  startMinute.value = "00";
+  endHour.value = "00";
+  endMinute.value = "00";
+};
+
+const updateDate = () => {
+  let start;
+  let end;
+
+  // 시작 시간 처리
+  // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
+  start = new Date(
+    `${startDateInput.value}T${String(startHour.value).padStart(
+      2,
+      "0"
+    )}:${String(startMinute.value).padStart(2, "0")}:00`
+  );
+
+  // 종료 시간 처리
+
+  // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
+  end = new Date(
+    `${endDateInput.value}T${String(endHour.value).padStart(2, "0")}:${String(
+      endMinute.value
+    ).padStart(2, "0")}:00`
+  );
+
+  // 시간대 변환
+  start.setHours(start.getHours() + 9);
+  end.setHours(end.getHours() + 9);
+
+  // 유효한 날짜인지 확인
+  if (!isNaN(start) && !isNaN(end)) {
+    startDate.value = start.toISOString();
+    endDate.value = end.toISOString();
+  } else {
+    console.error("Invalid date values in dateRange.value");
+  }
+};
 
 // load dialog
 const loadDialog = ref(false);
@@ -380,6 +537,7 @@ const rules = ref({
 });
 
 const check = () => {
+  resetDate();
   if (selectedItems.value.length > 0) {
     selectedId.value = selectedItems.value[0].userId;
     selecteduserName.value = selectedItems.value[0].userName;
@@ -388,7 +546,7 @@ const check = () => {
     selecteduserGroup.value = selectedItems.value[0].userGroup;
     selecteddescription.value = selectedItems.value[0].description;
     selectedphoneNumber.value = selectedItems.value[0].phoneNumber;
-    datePermission.value = selectedItems.value[0].permissionTime;
+    // datePermission.value = selectedItems.value[0].permissionTime;
     if (
       selecteduserName.value === null ||
       selecteduserName.value === "" ||
@@ -398,6 +556,63 @@ const check = () => {
       console.log("No user selected");
     } else {
       // permission 적용
+
+      if (
+        selectedItems.value.length > 0 &&
+        selectedItems.value[0].permissionTime
+      ) {
+        let startDay,
+          endDay,
+          startHH,
+          endHH,
+          startMM,
+          endMM,
+          startTimePart,
+          endTimePart;
+        let start = "",
+          end = ""; // 초기화 추가
+
+        if (selectedItems.value[0].permissionTime.length > 19) {
+          const [start, end] = selectedItems.value[0].permissionTime.split(",");
+          startDay = start.split("T")[0];
+          endDay = end.split("T")[0];
+
+          startTimePart = start.split("T")[1]; // '00:18:59.000000Z'
+          startHH = startTimePart.split(":")[0]; // '00'
+          startMM = startTimePart.split(":")[1]; // '18'
+
+          endTimePart = end.split("T")[1]; // '00:18:59.000000Z'
+          endHH = endTimePart.split(":")[0]; // '00'
+          endMM = endTimePart.split(":")[1]; // '18'
+
+          //
+        } else {
+          startDay = "2020-01-01";
+          startHH = "00"; // '00'
+          startMM = "00"; // '18'
+          endDay = selectedItems.value[0].permissionTime.split("T")[0]; // 2024-08-20
+          endTimePart = selectedItems.value[0].permissionTime.split("T")[1]; // '00:18:59.000000Z'
+          endHH = endTimePart.split(":")[0]; // '00'
+          endMM = endTimePart.split(":")[1]; // '18'
+        }
+
+        // 시간 값 추출
+        // startTimePart = selectedItems.value[0].permissionTime.split("T")[1]; // '00:18:59.000000Z'
+        // startHH = startTimePart.split(":")[0]; // '00'
+        // startMM = startTimePart.split(":")[1]; // '18'
+
+        // endTimePart = selectedItems.value[0].permissionTime.split("T")[1]; // '00:18:59.000000Z'
+        // endHH = endTimePart.split(":")[0]; // '00'
+        // endMM = endTimePart.split(":")[1]; // '18'
+
+        startDateInput.value = startDay;
+        startHour.value = startHH;
+        startMinute.value = startMM;
+
+        endDateInput.value = endDay;
+        endHour.value = endHH;
+        endMinute.value = endMM;
+      }
 
       resetPermissions();
       selectedItems.value[0].permission.forEach((permissionName) => {
@@ -538,6 +753,9 @@ fetchData();
 
 const changeData = async () => {
   try {
+    updateDate();
+    console.log(getFormattedDate(startDate.value));
+    console.log(getFormattedDate(endDate.value));
     const data = {
       id: selectedId.value,
       userName: selecteduserName.value,
@@ -553,6 +771,9 @@ const changeData = async () => {
       .map((permission) => permission.name);
 
     const formattedDate = getFormattedDate(datePermission.value);
+
+    console.log(datePermission.value);
+    console.log(formattedDate);
 
     if (selecteduserGroup.value === "USER") {
       if (
@@ -716,5 +937,97 @@ th {
   --dp-range-between-dates-background-color: var(--dp-hover-color, #f3f3f3);
   --dp-range-between-dates-text-color: var(--dp-hover-text-color, #212121);
   --dp-range-between-border-color: var(--dp-hover-color, #f3f3f3);
+}
+
+.date-picker {
+  border: 1px solid #ccc;
+  padding: 0.3rem;
+  border-radius: 4px;
+  width: 194px;
+  box-sizing: border-box;
+}
+
+.time-select {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 60px;
+}
+
+.m-time-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 50px;
+}
+
+.time-divider {
+  margin-right: 5px;
+  font-size: 18px;
+}
+
+/* 시간 입력 필드 스타일 */
+.time-input {
+  border: 1px solid #ccc;
+  padding: 0.5rem;
+  border-radius: 4px;
+  width: 50px;
+  text-align: center;
+  margin: 0 5px;
+}
+
+.time-input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.date-input {
+  padding: 5px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+}
+
+.icon-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.5em;
+}
+
+.row-container {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px; /* 요소 간 간격 조절 */
+}
+
+.span-title {
+  margin-top: 30px;
+  font-size: 16px;
+  font-weight: 550;
+}
+
+select.time-select {
+  background-color: selectColor; /* 어두운 배경 */
+  color: selectTextColor; /* 텍스트 색상 */
+  border-radius: 4px;
+  padding: 5px;
+}
+
+/* 옵션 목록의 스타일 */
+select.time-select option {
+  background-color: selectColor; /* 옵션 배경색 */
+  color: selectTextColor; /* 옵션 텍스트 색상 */
+}
+
+/* 커서 포인터 추가 */
+select.time-select {
+  cursor: pointer;
 }
 </style>

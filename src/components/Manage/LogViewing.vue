@@ -46,7 +46,7 @@
             density="compact"
             range
             :enableTimePicker="false"
-            style="padding-left: 10px; z-index: 1200;"
+            style="padding-left: 10px; z-index: 1200"
             @open="adjustDialogHeight()"
           />
         </v-col>
@@ -98,7 +98,7 @@
       </v-row>
       <v-window class="scrollable-card">
         <v-data-table
-          style="margin-top: 20px; height: 66vh;"
+          style="margin-top: 20px; height: 66vh"
           v-model:page="page"
           class="elevation-1"
           :headers="headers"
@@ -109,6 +109,14 @@
           :density="'dense'"
           return-object
         >
+          <template v-slot:[`item.log`]="{ item }">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on, attrs }">
+                <span v-bind="attrs" v-on="on">{{ item.log }}</span>
+              </template>
+              <span>{{ item.originalLog }}</span>
+            </v-tooltip>
+          </template>
           <template v-slot:bottom>
             <div class="text-center pt-2">
               <v-pagination
@@ -489,24 +497,34 @@ const webData = async () => {
   let apiReq = `${filter_logtype.value}?start_time=${startTime.value}&end_time=${endTime.value}${search_method.value}`;
   try {
     const response = await readWebLogData(tokenid.value, apiReq);
-    for (let i = 0; i < response.length; i++) {
+    response.forEach((logEntry) => {
+      let logText = logEntry.log || "";
+
+      // 원본 로그를 저장
+      let originalLog = logText;
+      console.log(originalLog);
+
+      // log가 75자 이상인 경우 자르기
+      if (logText.length > 75) {
+        logText = logText.slice(0, 73) + "...";
+      }
+
+      // items에 잘린 log와 원본 log 모두 추가
       items.value.push({
-        timestamp: response[i].timeStamp || "",
-        details: response[i].details || "",
-        // id: response[i].userId || "",
-        type: response[i].type || "",
-        method: response[i].requestMethod || "",
-        state: response[i].statusCode || "",
-        url: response[i].requestUrl || "",
-        log: response[i].log || "",
+        timestamp: logEntry.timeStamp || "",
+        type: logEntry.type || "",
+        method: logEntry.requestMethod || "",
+        state: logEntry.statusCode || "",
+        url: logEntry.requestUrl || "",
+        log: logText, // 잘린 log
+        originalLog: originalLog, // 원본 log
       });
-      // items.value.push(response.data[i]);
-    }
-    items.value.sort((a, b) => {
-      const dateA = new Date(a.timestamp);
-      const dateB = new Date(b.timestamp);
-      return dateB - dateA;
     });
+
+    console.log(items.value.originalLog);
+
+    // 날짜 기준으로 정렬
+    items.value.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
   } catch (error) {
     console.error(error);
   }

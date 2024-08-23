@@ -91,7 +91,7 @@
     </v-card>
 
     <v-card
-      v-if="viewState === ''"
+      v-if="viewState === 'basic'"
       ref="searchCard"
       :style="{
         position: 'absolute',
@@ -117,7 +117,6 @@
             @dragover.prevent
             @dragenter.prevent
             @drop.prevent="handleDrop"
-            @click="triggerFileSelect"
           >
             <input
               type="file"
@@ -126,7 +125,7 @@
               accept=".xls,.xlsx"
               style="display: none"
             />
-            <div v-if="!file">
+            <div v-if="!file" @click="triggerFileSelect">
               <img
                 src="/image/uploadfile.png"
                 alt="upload icon"
@@ -138,24 +137,45 @@
               <p>1개씩, 파일당 최대 5MB</p>
             </div>
             <div v-else class="file-info">
-              <table>
-                <tr>
-                  <td><strong>파일 이름:</strong></td>
-                  <td>{{ file.name }}</td>
-                </tr>
-                <tr>
-                  <td><strong>최근 수정일:</strong></td>
-                  <td>{{ file.lastModifiedDate.toLocaleString() }}</td>
-                </tr>
-                <tr>
-                  <td><strong>용량:</strong></td>
-                  <td>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</td>
-                </tr>
-              </table>
-              <button @click.stop="removeFile" class="remove-button">X</button>
+              <div v-if="loadingFile">
+                <div style="text-align: center; margin-top: 3%">
+                  <v-progress-circular
+                    indeterminate
+                    :size="60"
+                  ></v-progress-circular>
+                </div>
+                <div style="text-align: center; margin-top: 3%">
+                  <v-btn color="red" @click="cancelRequest('1')" size="small"
+                    >요청 취소하기</v-btn
+                  >
+                </div>
+              </div>
+              <div v-else>
+                <table>
+                  <tr>
+                    <td><strong>파일 이름:</strong></td>
+                    <td>{{ file.name }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>최근 수정일:</strong></td>
+                    <td>{{ file.lastModifiedDate.toLocaleString() }}</td>
+                  </tr>
+                  <tr>
+                    <td><strong>용량:</strong></td>
+                    <td>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</td>
+                  </tr>
+                </table>
+                <button @click.stop="removeFile" class="remove-button">
+                  X
+                </button>
+              </div>
             </div>
           </div>
-          <button @click="uploadFile" :disabled="!file" class="upload-button">
+          <button
+            @click="uploadFile"
+            :disabled="!file || loadingFile"
+            class="upload-button"
+          >
             다운로드
           </button>
         </div>
@@ -484,116 +504,87 @@
 
             <span class="span-title">시작 시점</span>
             <div class="row-container">
-              <div class="date-picker" v-if="startDatePickerOpen">
-                <DatePicker
-                  v-model="startDateSelect"
-                  format="YYYY-MM-DD"
-                  value-type="format"
-                  style="width: 180px"
-                  @update:modelValue="handleDateChange"
-                  placeholder=" 캘린더 직접선택 (클릭)"
-                />
-              </div>
-              <div v-if="!startDatePickerOpen">
-                <input
-                  :type="text"
-                  v-model="startDateInput"
-                  placeholder=" yyyy-mm-dd (직접 입력)"
-                  class="date-input"
-                />
-              </div>
-              <button
-                v-if="!startDatePickerOpen"
-                @click="openDatePicker1"
-                class="icon-btn"
+              <input
+                class="date-picker"
+                type="date"
+                v-model="startDateInput"
+                min="2000-01-01"
+                max="9999-12-31"
+              />
+              <select
+                v-model="startHour"
+                class="time-select"
+                :style="{
+                  marginLeft: '20px',
+                  backgroundColor: selectColor,
+                  color: selectTextColor,
+                }"
               >
-                📅
-              </button>
-              <button
-                  v-if="startDatePickerOpen"
-                  @click="openDatePicker1"
-                  class="icon-btn"
-                >
-                  📝
-                </button>
-              <select v-model="startHour" class="time-select">
-                <option v-for="hour in hours" :key="hour" :value="hour">
-                  {{ hour }}시
-                </option>
-              </select>
-
-              <select v-model="startMinute" class="time-select">
-                <option v-for="minute in minutes" :key="minute" :value="minute">
-                  {{ minute }}분
-                </option>
-                <!-- 배열에 없는 값도 선택 가능하게 유지 -->
                 <option
-                  v-if="!minutes.includes(startMinute)"
-                  :value="startMinute"
+                  v-for="hour in hours"
+                  :key="hour"
+                  :value="hour"
+                  :style="{
+                    backgroundColor: selectColor,
+                    color: selectTextColor,
+                  }"
                 >
-                  {{ startMinute }}분
+                  {{ hour }}
                 </option>
               </select>
+              시
+              <input
+                v-model="startMinute"
+                @input="validateMinutes"
+                type="text"
+                class="m-time-input"
+                placeholder="00"
+              />
+              분
             </div>
 
             <span class="span-title">종료 시점</span>
             <div class="row-container">
-              <div class="date-picker" v-if="endDatePickerOpen">
-                  <DatePicker
-                    v-model="endDateSelect"
-                    format="YYYY-MM-DD"
-                    value-type="format"
-                    style="width: 180px"
-                    @update:modelValue="handleDateChange"
-                    placeholder=" 캘린더 직접선택 (클릭)"
-                  />
-                </div>
-                <div v-if="!endDatePickerOpen">
-                  <input
-                  :type="text"
-                  v-model="endDateInput"
-                  placeholder=" yyyy-mm-dd (직접 입력)"
-                  class="date-input"
-                />
-                </div>
-                <button
-                  v-if="!endDatePickerOpen"
-                  @click="openDatePicker2"
-                  class="icon-btn"
+              <input
+                class="date-picker"
+                type="date"
+                v-model="endDateInput"
+                min="1000-01-01"
+                max="9999-12-31"
+              />
+              <select
+                v-model="endHour"
+                class="time-select"
+                :style="{
+                  marginLeft: '20px',
+                  backgroundColor: selectColor,
+                  color: selectTextColor,
+                }"
+              >
+                <option
+                  v-for="hour in hours"
+                  :key="hour"
+                  :value="hour"
+                  :style="{
+                    backgroundColor: selectColor,
+                    color: selectTextColor,
+                  }"
                 >
-                  📅
-                </button>
-                <button
-                  v-if="endDatePickerOpen"
-                  @click="openDatePicker2"
-                  class="icon-btn"
-                >
-                  📝
-                </button>
+                  {{ hour }}
+                </option>
+              </select>
+              시
 
-                <select v-model="endHour" class="time-select">
-                  <option v-for="hour in hours" :key="hour" :value="hour">
-                    {{ hour }}시
-                  </option>
-                </select>
-
-                <select v-model="endMinute" class="time-select">
-                  <option
-                    v-for="minute in minutes"
-                    :key="minute"
-                    :value="minute"
-                  >
-                    {{ minute }}분
-                  </option>
-                  <option
-                    v-if="!minutes.includes(endMinute)"
-                    :value="endMinute"
-                  >
-                    {{ endMinute }}분
-                  </option>
-                </select>
+              <input
+                v-model="endMinute"
+                @input="validateMinutee"
+                type="text"
+                class="m-time-input"
+                placeholder="00"
+              />
+              분
             </div>
-            <p style="font-size: 12px; font-weight: bold; margin-top: 20px;">
+            <p style="font-size: 12px; font-weight: bold; margin-top: 20px">
               &nbsp;&nbsp;* 날짜 검색은 UTC를 기준으로 작성하며, &nbsp;&nbsp;
             </p>
             <p style="font-size: 12px; font-weight: bold">
@@ -602,7 +593,7 @@
           </div>
         </div>
         <v-divider></v-divider>
-                <div class="chip-container">
+        <div class="chip-container">
           <div class="recent-search">
             <p style="height: 20px"></p>
           </div>
@@ -622,17 +613,27 @@
   </v-card-actions>
   <div style="height: 87vh" @click="windowClick()">
     <div style="padding: 30px; padding-bottom: 0px">
-      <!-- 데이터 선택창 -->
-
       <!-- 데이터 테이블 -->
       <template v-if="viewState == 'ondata'">
         <v-container v-if="showType == 'table'">
           <v-row>
             <v-col cols="9"
               ><v-tabs v-model="activeTab">
-                <v-tab v-for="(data, index) in dataKeys" :key="index">{{
-                  data
-                }}</v-tab>
+                <v-tab
+                  :style="{
+                    'background-color':
+                      activeTab === index
+                        ? themeSelectedTabColor
+                        : themeNoNSelectedTabColor,
+                    color:
+                      activeTab === index
+                        ? themeSelectedTabTextColor
+                        : themeNoNSelectedTabTextColor,
+                  }"
+                  v-for="(data, index) in dataKeys"
+                  :key="index"
+                  >{{ data }}</v-tab
+                >
               </v-tabs></v-col
             >
             <v-col cols="auto" style="padding-bottom: 3px; margin-left: auto"
@@ -653,7 +654,7 @@
               <template v-if="activeTab === index">
                 <v-data-table
                   density="dence"
-                  style="height: 64vh"
+                  style="height: 68vh; margin-top: 10px"
                   :headers="headers[data]"
                   :items="paginatedItems"
                   :search="search"
@@ -662,7 +663,7 @@
                 >
                   <template v-slot:bottom>
                     <div
-                      class="text-center pt-2 mb-5"
+                      class="text-center pt-2"
                       style="display: flex; justify-content: center"
                     >
                       <v-pagination
@@ -694,29 +695,65 @@
               </template>
             </v-tab-item>
           </v-tabs-items>
-          <v-card-actions v-if="downloadPermission">
+          <v-card-actions
+            v-if="downloadPermission"
+            style="padding: 0px; margin: 0"
+          >
             <v-spacer></v-spacer>
+            <v-progress-circular
+              v-if="downloading"
+              style="margin-top: 5px"
+              :size="25"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
             <v-select
               v-if="downloadReq.type === 'table_data'"
               v-model="selectDownloadFormat"
               :items="downloadFormats"
               density="compact"
               label="format"
-              style="max-width: 150px; margin-top: 20px"
+              style="
+                max-width: 150px;
+                margin: 0;
+                margin-left: 10px;
+                padding: 0;
+                line-height: 1;
+                height: 36px;
+              "
               variant="solo"
             ></v-select>
             <v-btn
-              :loading="downloadBtnLoading"
-              :color="btnTextColor"
+              v-if="!downloading"
+              :color="'#5865f2'"
+              variant="flat"
               :style="{
-                'background-color': btnColor,
-                'margin-top': '0px',
-                'margin-left': '20px',
-                width: '200px',
+                'margin-top': '5px',
+                'margin-left': '10px',
+                width: '150px',
+                height: '36px',
+                'line-height': '36px',
+                padding: '0',
               }"
               @click="dataDownloadServer()"
               :disabled="downloadBtnDisabled"
               >데이터 다운로드</v-btn
+            >
+            <v-btn
+              v-if="downloading"
+              :color="'red'"
+              variant="flat"
+              :style="{
+                'margin-top': '5px',
+                'margin-left': '10px',
+                width: '150px',
+                height: '36px',
+                'line-height': '36px',
+                padding: '0',
+              }"
+              @click="cancelRequest('2')"
+              :disabled="downloadBtnDisabled"
+              >다운로드 요청 취소</v-btn
             >
           </v-card-actions>
         </v-container>
@@ -791,39 +828,76 @@
           </v-tabs-items>
           <v-card-actions v-if="downloadPermission">
             <v-spacer></v-spacer>
+            <v-progress-circular
+              v-if="!downloading"
+              style="margin-top: 5px"
+              :size="25"
+              color="primary"
+              indeterminate
+            ></v-progress-circular>
             <v-select
               v-if="downloadReq.type === 'table_data'"
               v-model="selectDownloadFormat"
               :items="downloadFormats"
               density="compact"
               label="format"
-              style="max-width: 150px; margin-top: 20px"
+              style="
+                max-width: 150px;
+                margin: 0;
+                margin-left: 10px;
+                padding: 0;
+                line-height: 1;
+                height: 36px;
+              "
               variant="solo"
             ></v-select>
             <v-btn
-              :loading="downloadBtnLoading"
-              :color="btnTextColor"
+              v-if="!downloading"
+              :color="'#5865f2'"
+              variant="flat"
               :style="{
-                'background-color': btnColor,
-                'margin-top': '0px',
-                'margin-left': '20px',
-                width: '200px',
+                'margin-top': '5px',
+                'margin-left': '10px',
+                width: '150px',
+                height: '36px',
+                'line-height': '36px',
+                padding: '0',
               }"
               @click="dataDownloadServer()"
               :disabled="downloadBtnDisabled"
               >데이터 다운로드</v-btn
             >
+            <v-btn
+              v-if="downloading"
+              :color="'red'"
+              variant="flat"
+              :style="{
+                'margin-top': '5px',
+                'margin-left': '10px',
+                width: '150px',
+                height: '36px',
+                'line-height': '36px',
+                padding: '0',
+              }"
+              @click="cancelRequest('2')"
+              :disabled="downloadBtnDisabled"
+              >다운로드 요청 취소</v-btn
+            >
           </v-card-actions>
         </v-container>
       </template>
       <template v-if="viewState == 'loading'">
-        <div style="text-align: center">
+        <div style="text-align: center; margin-top: 40vh">
           <v-progress-circular
-            style="margin-top: 19%"
             :size="50"
             color="primary"
             indeterminate
           ></v-progress-circular>
+        </div>
+        <div style="text-align: center; margin-top: 3%">
+          <v-btn color="red" @click="cancelRequest('1')" size="small"
+            >요청 취소하기?</v-btn
+          >
         </div>
       </template>
 
@@ -855,6 +929,9 @@ const {
   themeSelectedTabTextColor,
   themeNoNSelectedTabTextColor,
   tableStyle,
+
+  selectColor,
+  selectTextColor,
 } = themeConfig;
 // 토큰
 const tokenid = ref(sessionStorage.getItem("token") || "");
@@ -909,7 +986,7 @@ const searchState = ref(false);
 const selectedHour = ref(6);
 const selectedMinute = ref(19);
 
-const viewState = ref("");
+const viewState = ref("basic");
 
 const selectBoxClick1 = () => {};
 
@@ -1033,9 +1110,9 @@ const destinationSubItems = {
   GYRO: ["THS", "HDT", "ROT"],
   DGPS: ["GLL", "GGA", "RMC", "VTG", "ZDA", "DTM", "GSV", "GSA"],
   ANEMOMETER: ["MWV", "MWD", "VWR", "MTW", "VWT"],
-  RADAR: ["TTM", "TLL", "RSCREEN"],
+  RADAR: ["TTM", "TLL", "RADARSCREEN"],
   AIS: ["VDM", "VDO"],
-  ECDIS: ["VDM", "VDO", "ROUTEINFO", "WAYPOINTS"],
+  ECDIS: ["ROUTEINFO", "WAYPOINTS", "RTZ", "ECDISSCREEN"],
   AUTOPILOT: ["RSA", "HTD"],
   SPEEDLOG: ["VBW", "VHW", "VLW"],
   CANTHROTTLE: ["CANONLINESTATE", "ENGINERPM", "RUDDER", "RUDDERSCALE"],
@@ -1369,17 +1446,10 @@ const getTrialDate = async () => {
 // 새로운 데이트피커
 const startDateInput = ref("");
 const endDateInput = ref("");
-const startDateSelect = ref();
-const endDateSelect = ref();
-const today = new Date();
-const dateToday = ref(today.toISOString().split("T")[0]);
-const selectedDate = ref("");
-const startDatePickerOpen = ref(false);
-const endDatePickerOpen = ref(false);
 const startHour = ref("00");
-const startMinute = ref("00");
+const startMinute = ref("");
 const endHour = ref("00");
-const endMinute = ref("00");
+const endMinute = ref("");
 
 const selectedTestStartTime = ref([]);
 const selectedTestEndTime = ref([]);
@@ -1388,40 +1458,10 @@ const selectedTestEndTime = ref([]);
 const hours = Array.from({ length: 24 }, (_, i) =>
   i.toString().padStart(2, "0")
 );
-const minutes = [
-  "00",
-  "05",
-  "10",
-  "15",
-  "20",
-  "25",
-  "30",
-  "35",
-  "40",
-  "45",
-  "50",
-  "55",
-];
-
-// 달력 열기
-const openDatePicker1 = () => {
-  startDatePickerOpen.value = !startDatePickerOpen.value;
-};
-
-const openDatePicker2 = () => {
-  endDatePickerOpen.value = !endDatePickerOpen.value;
-};
 
 const updateDate = () => {
   let start;
   let end;
-
-  if (startDatePickerOpen.value) {
-    start = new Date(startDateSelect.value);
-    start.setHours(startHour.value.padStart(2, "0"));
-    start.setMinutes(startMinute.value.padStart(2, "0"));
-    start.setSeconds(0);
-  } else {
     // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
     start = new Date(
       `${startDateInput.value}T${startHour.value.padStart(
@@ -1429,14 +1469,6 @@ const updateDate = () => {
         "0"
       )}:${startMinute.value.padStart(2, "0")}:00`
     );
-  }
-
-  if (endDatePickerOpen.value) {
-    end = new Date(endDateSelect.value);
-    end.setHours(endHour.value.padStart(2, "0"));
-    end.setMinutes(endMinute.value.padStart(2, "0"));
-    end.setSeconds(0);
-  } else {
     // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
     end = new Date(
       `${endDateInput.value}T${endHour.value.padStart(
@@ -1444,7 +1476,7 @@ const updateDate = () => {
         "0"
       )}:${endMinute.value.padStart(2, "0")}:00`
     );
-  }
+  
 
   start.setHours(start.getHours() + 9);
   end.setHours(end.getHours() + 9);
@@ -1478,7 +1510,7 @@ const handleDateChange = () => {
 
     searchTimeRange.value = `${startUtc.value} - ${endUtc.value}`;
   } else {
-    searchTimeRange.value = "날짜를 선택 후 apply를 클릭하세요.";
+    searchTimeRange.value = "날짜를 입력하세요.";
   }
 };
 
@@ -1563,12 +1595,17 @@ const completeData3 = () => {
 
   updateDate();
 
-  tb4 = `${startUtc.value}~${endUtc.value}`;
-
-  requests.value.period =
-    selectedTest.value === 0
-      ? `period?start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`
-      : `test?test_name=${searchTimeRange.value}`;
+  if (selectedTest.value === 0) {
+    requests.value.period = `period?start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`;
+    if (startUtc.value === undefined || endUtc.value === undefined) {
+      tb4 = "날짜를 입력하세요.";
+    } else {
+      tb4 = `${startUtc.value}~${endUtc.value}`;
+    }
+  } else {
+    requests.value.period = `test?test_name=${searchTimeRange.value}`;
+    tb4 = testList.value[selectedTest.value];
+  }
 
   // 다음 선택 시, 다음 조건 CardView로 이동
   periodSettingCardVisible.value = false;
@@ -1588,24 +1625,27 @@ const dataSearchBtn = async () => {
     let apiReq = `collection_data/information/period?start_time_utc=2024-05-27T15:15:28.000Z&end_time_utc=2024-05-27T15:45:38.000Z&signal_name=AIS_VDM&signal_name=AIS_VDO`;
     apiReq = `${requests.value.type}/${requests.value.data}/${requests.value.period}${requests.value.signal}`;
     await searchApi(apiReq);
-    if (selectDataType.value == "비정형 데이터") {
-      dataKeys2.value = Object.keys(data.value);
+    // 요청이 취소되지 않은 경우에만 실행
+    if (searchState.value) {
+      if (selectDataType.value == "비정형 데이터") {
+        dataKeys2.value = Object.keys(data.value);
 
-      pages.value = dataKeys2.value.reduce((acc, key) => {
-        acc[key] = 1;
-        return acc;
-      }, {});
+        pages.value = dataKeys2.value.reduce((acc, key) => {
+          acc[key] = 1;
+          return acc;
+        }, {});
+      }
+      ShipDataState.value = ShipData.value;
+      viewState.value = "ondata";
+
+      downloadReq.value.type = requests.value.type;
+      downloadReq.value.data = requests.value.data;
+      downloadReq.value.signal = requests.value.signal;
+      downloadReq.value.period =
+        selectedTest.value === 0
+          ? `find_method=period&start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`
+          : `find_method=test&test_name=${searchTimeRange.value}`;
     }
-    ShipDataState.value = ShipData.value;
-    viewState.value = "ondata";
-
-    downloadReq.value.type = requests.value.type;
-    downloadReq.value.data = requests.value.data;
-    downloadReq.value.signal = requests.value.signal;
-    downloadReq.value.period =
-      selectedTest.value === 0
-        ? `find_method=period&start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`
-        : `find_method=test&test_name=${searchTimeRange.value}`;
   }
 };
 
@@ -1615,14 +1655,61 @@ const dataTables = ref({});
 const dataKeys = ref([]);
 const headers = ref([]);
 
+let cancelTokenSource = null; // 요청 취소 토큰
+
 const searchApi = async (apiReq) => {
-  const response = await readDataTrial(tokenid.value, apiReq);
-  console.log(apiReq);
-  console.log(response);
-  data.value = response;
-  processData(response);
-  paginatedComputed();
-  searchState.value = true;
+  try {
+    // 요청 취소를 위한 CancelToken 생성
+    cancelTokenSource = axios.CancelToken.source();
+
+    // readDataTrial 호출, cancelToken 전달
+    const response = await readDataTrial(
+      tokenid.value,
+      apiReq,
+      cancelTokenSource.token
+    );
+
+    // 취소되지 않은 경우에만 응답 처리
+    if (!axios.isCancel(response)) {
+      data.value = response;
+      processData(response);
+      paginatedComputed();
+      searchState.value = true;
+    }
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("요청이 취소되었습니다:", error.message);
+      searchState.value = false;
+    } else {
+      if (error.response && error.response.status) {
+        if (error.response.status === 403) {
+          alert(error.response.data);
+        }
+      } else {
+        // error.response가 없으면 해당 오류를 무시하고 넘어감
+        console.error("정의되지 않은 오류 발생:", error.message || error);
+      }
+
+      viewState.value = "basic";
+      searchState.value = false;
+    }
+  } finally {
+    cancelTokenSource = null; // 요청이 완료된 후 토큰 초기화
+  }
+};
+
+// 요청 취소하기
+const cancelRequest = (loc) => {
+  if (cancelTokenSource) {
+    cancelTokenSource.cancel("요청이 취소되었습니다."); // 요청 취소
+    if (loc === "1") {
+      searchState.value = false;
+      viewState.value = "basic";
+    }
+    alert("요청이 취소되었습니다."); // 취소 알림
+  } else {
+    alert("취소할 요청이 없습니다.");
+  }
 };
 
 const processData = (response) => {
@@ -1641,16 +1728,14 @@ const processData = (response) => {
         ...importantKeys.filter((importantKey) =>
           fields.includes(importantKey)
         ),
-        ...fields.filter((field) => !importantKeys.includes(field)),
+        ...fields.filter(
+          (field) => !importantKeys.includes(field) && field !== "id"
+        ),
       ];
       headers.value[key] = sortedFields.map((field) => ({
-        width:
-          field === "timestamp_EQUIPMENT" || field === "timestamp_PUBLISH"
-            ? "500px"
-            : "auto", // 특정 헤더의 너비 설정
         title:
           field === "timestamp_EQUIPMENT" || field === "timestamp_PUBLISH"
-            ? `${field}_(UTC+09) `
+            ? ` ${field}          `
             : field,
         value: field,
       }));
@@ -1786,11 +1871,12 @@ const sampleChoice1 = ref("GYRO_HDT, GYRO_ROT, ANEMOMETER_MWV");
 
 const checkPermission = async () => {
   const userDataResponse = await readMineData(tokenid.value);
+  console.log(userDataResponse);
   if (userDataResponse.userGroup === "ADMIN") {
     downloadPermission.value = true;
   } else {
-    const getTime = "2024-08-24T10:03:00";
-    const getPermission = ["GYRO", "ANEMOMETER"];
+    const getTime = userDataResponse.permissionsExpiryTime;
+    const getPermission = userDataResponse.permissions;
 
     const currentTime = new Date();
     const permissionTime = new Date(getTime);
@@ -1815,37 +1901,62 @@ const checkPermission = async () => {
 const downloadFormats = ref(["csv", "txt"]);
 const downloadFormatv = ref(["csv", "txt"]);
 const selectDownloadFormat = ref("csv");
+const downloading = ref(false);
 
 const dataDownloadServer = async () => {
-  downloadReq.value.file_type =
-    downloadReq.value.type === "table_data"
-      ? `download?file_type=${selectDownloadFormat.value}`
-      : "download?";
+  try {
+    downloading.value = true;
+    cancelTokenSource = axios.CancelToken.source();
+    downloadReq.value.file_type =
+      downloadReq.value.type === "table_data"
+        ? `download?file_type=${selectDownloadFormat.value}`
+        : "download?";
 
-  let apiReq = ``;
-  apiReq = `${downloadReq.value.type}/${downloadReq.value.data}/${downloadReq.value.file_type}&${downloadReq.value.period}${downloadReq.value.signal}`;
-  const loadData = await downloadDataFile(tokenid.value, apiReq);
-  console.log(loadData);
+    let apiReq = ``;
+    apiReq = `${downloadReq.value.type}/${downloadReq.value.data}/${downloadReq.value.file_type}&${downloadReq.value.period}${downloadReq.value.signal}`;
+    const loadData = await downloadDataFile(
+      tokenid.value,
+      apiReq,
+      cancelTokenSource.token
+    );
 
-  const contentDispositionHeader = loadData.headers["content-disposition"];
-  const match = contentDispositionHeader.match(/filename=([^;]+)/);
-  const fileName = match ? match[1] : "downloaded-file";
+    const contentDispositionHeader = loadData.headers["content-disposition"];
+    const match = contentDispositionHeader.match(/filename=([^;]+)/);
+    const fileName = match ? match[1] : "downloaded-file";
 
-  const blob = new Blob([loadData.data]);
-  // Blob 객체를 다운로드할 수 있는 URL로 변환
-  const url = window.URL.createObjectURL(blob);
+    const blob = new Blob([loadData.data]);
+    // Blob 객체를 다운로드할 수 있는 URL로 변환
+    const url = window.URL.createObjectURL(blob);
 
-  // <a> 태그를 생성하고 다운로드 링크 설정
-  const link = document.createElement("a");
-  link.href = url;
-  link.setAttribute("download", fileName); // 다운로드할 ZIP 파일의 이름 설정
-  document.body.appendChild(link);
+    // <a> 태그를 생성하고 다운로드 링크 설정
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", fileName); // 다운로드할 ZIP 파일의 이름 설정
+    document.body.appendChild(link);
 
-  // 다운로드 링크 클릭하여 파일 다운로드
-  link.click();
+    // 다운로드 링크 클릭하여 파일 다운로드
+    link.click();
 
-  // 사용이 끝난 URL 객체 제거
-  window.URL.revokeObjectURL(url);
+    // 사용이 끝난 URL 객체 제거
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    if (axios.isCancel(error)) {
+      console.log("요청이 취소되었습니다:", error.message);
+      searchState.value = false;
+    } else {
+      if (error.response && error.response.status) {
+        if (error.response.status === 403) {
+          alert(error.response.data);
+        }
+      } else {
+        // error.response가 없으면 해당 오류를 무시하고 넘어감
+        console.error("정의되지 않은 오류 발생:", error.message || error);
+      }
+    }
+  } finally {
+    cancelTokenSource = null; // 요청이 완료된 후 토큰 초기화
+    downloading.value = false;
+  }
 };
 
 // for Download API Request variable
@@ -1865,6 +1976,7 @@ const dataDownloadServer = async () => {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 import axios from "axios";
+const loadingFile = ref(false);
 const file = ref(null);
 
 const handleDrop = (event) => {
@@ -1891,6 +2003,7 @@ const processFile = (selectedFile) => {
 
 const removeFile = () => {
   file.value = null;
+  fileInput.value.value = ""; // input 요소의 값을 초기화하여 동일한 파일을 다시 선택할 수 있게 함
 };
 
 const triggerFileSelect = () => {
@@ -1904,9 +2017,17 @@ const uploadFile = async () => {
 
   const formData = new FormData();
   formData.append("file", file.value);
+
   try {
-    const loadData = await downloadDataFileXml(tokenid.value, formData);
-    console.log(loadData);
+    cancelTokenSource = axios.CancelToken.source();
+    loadingFile.value = true;
+
+    const loadData = await downloadDataFileXml(
+      tokenid.value,
+      formData,
+      cancelTokenSource.token
+    );
+
     const contentDispositionHeader = loadData.headers["content-disposition"];
     const match = contentDispositionHeader.match(/filename=([^;]+)/);
     let fileName = match ? match[1] : "downloaded-file";
@@ -1925,11 +2046,14 @@ const uploadFile = async () => {
 
     // 다운로드 링크 클릭하여 파일 다운로드
     link.click();
-
     // 사용이 끝난 URL 객체 제거
     window.URL.revokeObjectURL(url);
+    loadingFile.value = false;
   } catch (error) {
     console.error("파일 업로드 실패:", error);
+    loadingFile.value = false;
+  } finally {
+    cancelTokenSource = null; // 요청이 완료된 후 토큰 초기화
   }
 };
 
@@ -2136,7 +2260,7 @@ const cardStyle = computed(() => {
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-left: 5px;
-  width: 70px;
+  width: 50px;
 }
 
 .time-divider {
@@ -2178,13 +2302,40 @@ const cardStyle = computed(() => {
   margin-top: 10px;
   display: flex;
   align-items: center;
-  gap: 10px; /* 요소 간 간격 조절 */
+  gap: 3px; /* 요소 간 간격 조절 */
 }
 
 .span-title {
   margin-top: 30px;
   font-size: 16px;
   font-weight: 550;
+}
+
+select.time-select {
+  background-color: selectColor; /* 어두운 배경 */
+  color: selectTextColor; /* 텍스트 색상 */
+  border-radius: 4px;
+  padding: 5px;
+}
+
+/* 옵션 목록의 스타일 */
+select.time-select option {
+  background-color: selectColor; /* 옵션 배경색 */
+  color: selectTextColor; /* 옵션 텍스트 색상 */
+}
+
+/* 커서 포인터 추가 */
+select.time-select {
+  cursor: pointer;
+}
+
+.m-time-input {
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 5px;
+  width: 50px;
 }
 </style>
 

@@ -11,11 +11,11 @@ let apiLocation = "";
 // config.json 파일을 로드하고 apiLocation 값을 설정
 const loadConfig = async () => {
   try {
-    const response = await fetch('/config.json');
+    const response = await fetch("/config.json");
     const config = await response.json();
     apiLocation = config.apiLocation;
   } catch (error) {
-    console.error('Error loading config:', error);
+    console.error("Error loading config:", error);
   }
 };
 
@@ -23,7 +23,6 @@ const loadConfig = async () => {
 await loadConfig();
 
 export const cctvUrl = `http://${apiLocation}/api/v1/stream/index.m3u8`;
-
 
 // 취소 토큰 생성
 let cancelTokenSource = axios.CancelToken.source();
@@ -294,15 +293,12 @@ export const readAppLogData = async (tokenid) => {
 // 데이터 별 소실주기 읽기 v1
 export const readLossTimeData = async (tokenid) => {
   try {
-    const response = await axios.get(
-      `http://${apiLocation}/api/v1/lossfreq`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+    const response = await axios.get(`http://${apiLocation}/api/v1/lossfreq`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -335,15 +331,12 @@ export const updateLossTimeData = async (tokenid, data) => {
 // 실시간 모니터링의 데이터 주기 읽기 v1
 export const readLampTimeData = async (tokenid) => {
   try {
-    const response = await axios.get(
-      `http://${apiLocation}/api/v1/lamptime`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+    const response = await axios.get(`http://${apiLocation}/api/v1/lamptime`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -414,11 +407,8 @@ export const updateRealtimeMinMax = async (tokenid, data) => {
   }
 };
 
-
 // 데이터 소실 빈도 확인 v1
-export const readlossData = async (
-  tokenid, testName
-) => {
+export const readlossData = async (tokenid, testName) => {
   try {
     const response = await axios.get(
       `http://${apiLocation}/api/v1/lossfreq/all?test_name=${testName}`,
@@ -440,15 +430,12 @@ export const readlossData = async (
 // 항차 데이터 가져오기 v1
 export const readTrialData = async (tokenid) => {
   try {
-    const response = await axios.get(
-      `http://${apiLocation}/api/v1/test`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+    const response = await axios.get(`http://${apiLocation}/api/v1/test`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+    });
 
     return response.data;
   } catch (error) {
@@ -518,39 +505,37 @@ export const deleteTrialData = async (tokenid, data) => {
 };
 
 // 데이터 조회하기 v1 (테이블)
-export const readDataTrial = async (tokenid, data) => {
+export const readDataTrial = async (tokenid, data, cancelToken) => {
   try {
-    const response = await axios.get(
-      `http://${apiLocation}/api/v1/${data}`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-      }
-    );
+    const response = await axios.get(`http://${apiLocation}/api/v1/${data}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+      cancelToken: cancelToken, // 취소 토큰 전달
+    });
     return response.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    if (axios.isCancel(error)) {
+      console.log("요청이 취소되었습니다:", error.message);
+    } else {
+      console.error("데이터 요청 중 오류 발생:", error);
+    }
     throw error;
   }
 };
 
 // 데이터 다운로드 v1
-export const downloadDataFile = async (tokenid, data) => {
+export const downloadDataFile = async (tokenid, data, cancelToken) => {
   try {
-    const response = await axios.get(
-      `http://${apiLocation}/api/v1/${data}`,
-      {
-        responseType: "blob",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${tokenid}`,
-        },
-        cancelToken: cancelTokenSource.token,
-      }
-    );
-    console.log(response.headers);
+    const response = await axios.get(`http://${apiLocation}/api/v1/${data}`, {
+      responseType: "blob",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${tokenid}`,
+      },
+      cancelToken: cancelToken, // 취소 토큰 전달
+    });
     sessionStorage.setItem("downloading", false);
     return response;
   } catch (error) {
@@ -559,19 +544,25 @@ export const downloadDataFile = async (tokenid, data) => {
   }
 };
 
-export const downloadDataFileXml = async (tokenid, formData) => {
-  const response = await axios.post(
-    `http://${apiLocation}/api/v1/table_data/batch_download`,
-    formData,
-    {
-      responseType: "blob",
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: `Bearer ${tokenid}`,
-      },
-    }
-  );
-  return response;
+export const downloadDataFileXml = async (tokenid, formData, cancelToken) => {
+  try {
+    const response = await axios.post(
+      `http://${apiLocation}/api/v1/table_data/batch_download`,
+      formData,
+      {
+        responseType: "blob",
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${tokenid}`,
+        },
+        cancelToken: cancelToken, // 취소 토큰 전달
+      }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
 };
 
 // (Echart 도넛) 전체 데이터 저장 용량 비교 v1

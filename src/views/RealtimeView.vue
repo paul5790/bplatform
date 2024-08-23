@@ -22,11 +22,11 @@
                 <v-sheet style="height: 43vh; display: flex">
                   <v-card style="flex: 1">
                     <v-card-item>
-                      <!-- <OSMap
+                      <OSMap
                         :lat="parseFloat(latitude)"
                         :lon="parseFloat(longitude)"
                         :state="mapstart"
-                      /> -->
+                      />
                     </v-card-item>
                   </v-card>
                 </v-sheet>
@@ -759,8 +759,8 @@
   </v-card>
   <!-- CCTV 화면 -->
   <v-dialog v-model="cctvDialog" persistent max-width="1200">
-    <v-card class="cctv-card">
-      <v-toolbar flat dark color="#eeeeee">
+    <v-card class="cctv-card" :style="{ backgroundColor: themeColor }">
+      <v-toolbar flat dark :color="{ backgroundColor: cctvColor }">
         <v-toolbar-title>CCTV Monitoring</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-btn icon @click="closeCCTV()">
@@ -1238,7 +1238,7 @@ onBeforeUnmount(() => {
   console.log("bye");
 });
 
-const { themeColor } = themeConfig;
+const { themeColor, cctvColor } = themeConfig;
 
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
@@ -2318,9 +2318,8 @@ v-sheet {
   align-items: center;
   margin: 10px 1%; /* 아이템 사이의 간격을 줍니다. */
   padding: 5px;
-  border: 1px solid #f0f0f0; /* 각 아이템에 연한 테두리를 추가합니다. */
+  border: 1px solid #eeeeee; /* 각 아이템에 연한 테두리를 추가합니다. */
   border-radius: 4px;
-  background-color: #fbfbfb; /* 배경색을 추가합니다. */
 }
 
 .engine-lamp-text {
@@ -2341,7 +2340,6 @@ v-sheet {
 }
 
 .cctv-card-text {
-  background-color: #fbfbfb;
   padding: 0px;
 }
 
@@ -2373,6 +2371,5 @@ v-sheet {
 }
 
 .cctv-card-actions {
-  background-color: #888888;
 }
 </style>
