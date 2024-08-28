@@ -16,7 +16,11 @@
         style="height: 5vh; margin-top: 15px; margin-left: 10px"
       >
         <v-col cols="auto" style="padding-top: 0px">
-          <v-btn-toggle v-model="filter_date" mandatory style="width: 280px;  height: 40px;">
+          <v-btn-toggle
+            v-model="filter_date"
+            mandatory
+            style="width: 280px; height: 40px"
+          >
             <v-btn
               value="3일"
               style="width: 20%; border: 1px solid #ccc; padding: 5px"
@@ -39,7 +43,11 @@
             >
           </v-btn-toggle>
         </v-col>
-        <v-col v-if="filter_date === '직접입력'" cols="auto" style="padding-top: 0px">
+        <v-col
+          v-if="filter_date === '직접입력'"
+          cols="auto"
+          style="padding-top: 0px"
+        >
           <VueDatePicker
             v-model="dateRange"
             density="compact"
@@ -51,7 +59,11 @@
         </v-col>
 
         <v-col cols="auto" style="padding-top: 0px">
-          <v-btn-toggle v-model="filter_logtype" mandatory style="width: 200px;  height: 40px;">
+          <v-btn-toggle
+            v-model="filter_logtype"
+            mandatory
+            style="width: 200px; height: 40px"
+          >
             <v-btn
               value="webapp"
               style="width: 50%; border: 1px solid #ccc; padding: 5px"
@@ -67,7 +79,7 @@
 
         <v-col cols="auto" style="padding-top: 0px">
           <v-btn
-            style="width: 100px;"
+            style="width: 100px"
             color="blue-darken-1"
             @click="filterApply()"
             >적용</v-btn
@@ -76,7 +88,7 @@
 
         <v-col cols="auto" style="padding-top: 0px">
           <v-btn
-            style="width: 150px;"
+            style="width: 150px"
             color="blue-darken-1"
             @click="downloadCSV()"
             >로그 다운로드</v-btn
@@ -116,15 +128,8 @@
           hide-default-footer
           :density="'dense'"
           return-object
+          @click:row="handleRowClick"
         >
-          <template v-slot:[`item.log`]="{ item }">
-            <v-tooltip bottom>
-              <template v-slot:activator="{ on, attrs }">
-                <span v-bind="attrs" v-on="on">{{ item.log }}</span>
-              </template>
-              <span>{{ item.originalLog }}</span>
-            </v-tooltip>
-          </template>
           <template v-slot:bottom>
             <div class="text-center pt-2">
               <v-pagination
@@ -348,6 +353,24 @@
       </v-expand-transition>
     </v-card>
   </v-dialog>
+
+  <!-- 클릭 시 -->
+  <v-dialog v-model="detailLog" max-width="800" closable>
+    <v-card>
+      <v-card-title style="padding-bottom: 0px; font-size: 18px;">자세히</v-card-title>
+      <v-card-text style="padding-bottom: 0px;">
+        <v-container style="padding-bottom: 0px; padding-top: 0px;">
+          <p style="font-size: 14px;">{{ showDetail }}</p>
+        </v-container>
+      </v-card-text>
+      <v-card-actions style="padding-top: 0px;">
+        <v-spacer></v-spacer>
+        <v-btn color="blue-darken-1" variant="text" @click="detailLog = false"
+          >확인</v-btn
+        >
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -365,6 +388,7 @@ const searchInput = ref("");
 // ----------------------------- 조회 조건 검색 다이어로그 ----------------------------- //
 const showText = ref("3일 · 웹 서버 · 전체");
 const searchFilterDialog = ref(false);
+const detailLog = ref(false);
 const rsShow = ref(false);
 
 const filter_date = ref("3일");
@@ -584,7 +608,6 @@ onMounted(() => {
   webData();
 });
 
-
 // CSV 파일 다운로드 함수
 const downloadCSV = () => {
   console.log(items.value);
@@ -592,13 +615,13 @@ const downloadCSV = () => {
   const csvContent = createCSV(items.value);
 
   // Blob 생성
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
 
   // 가상 링크를 생성하여 다운로드
-  const link = document.createElement('a');
-  link.setAttribute('href', url);
-  link.setAttribute('download', 'log.csv');
+  const link = document.createElement("a");
+  link.setAttribute("href", url);
+  link.setAttribute("download", "log.csv");
   document.body.appendChild(link);
 
   link.click(); // 다운로드 실행
@@ -611,14 +634,25 @@ const createCSV = (data) => {
   const header = "timestamp,type,method,state,url,originalLog\n";
 
   // 데이터 생성
-  const rows = data.map((row) => {
-    return `${row.timestamp},${row.type},${row.method},${row.state},${row.url},${row.originalLog}`;
-  }).join("\n");
+  const rows = data
+    .map((row) => {
+      return `${row.timestamp},${row.type},${row.method},${row.state},${row.url},${row.originalLog}`;
+    })
+    .join("\n");
 
   return header + rows;
 };
 
-
+const showDetail = ref("");
+// Method to handle row click
+const handleRowClick = (item, index) => {
+  if (index.item.log != index.item.originalLog) {
+    detailLog.value = true;
+  }
+  showDetail.value = index.item.originalLog;
+  console.log(index.item.log);
+  console.log(index.item.originalLog);
+};
 </script>
 
 <style scoped>

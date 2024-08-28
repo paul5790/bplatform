@@ -161,9 +161,9 @@
                     <td>{{ file.lastModifiedDate.toLocaleString() }}</td>
                   </tr>
                   <tr>
-  <td><strong>유형:</strong></td>
-  <td>{{ readableFileType  }}</td>
-</tr>
+                    <td><strong>유형:</strong></td>
+                    <td>{{ readableFileType }}</td>
+                  </tr>
                   <tr>
                     <td><strong>용량:</strong></td>
                     <td>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</td>
@@ -175,13 +175,16 @@
               </div>
             </div>
           </div>
-          <button
-            @click="uploadFile"
-            :disabled="!file || loadingFile"
-            class="upload-button"
-          >
-            다운로드
-          </button>
+          <div class="action-row">
+            <button
+              @click="uploadFile"
+              :disabled="!file || loadingFile"
+              class="upload-button"
+            >
+              다운로드
+            </button>
+            <v-checkbox v-model="checkVTS" label="VTS 포함하기" class="checkbox-right" @change="handleCheckboxChange"></v-checkbox>
+          </div>
         </div>
       </v-card-text>
     </v-card>
@@ -1896,7 +1899,7 @@ const processData = (response) => {
   );
 
   console.log(newDataKeys);
-console.log(sortedDataKeys);
+  console.log(sortedDataKeys);
   dataKeys.value = sortedDataKeys;
   console.log(response);
 
@@ -1927,7 +1930,7 @@ console.log(sortedDataKeys);
   } catch (error) {
     // 에러
     console.log(error);
-    viewState.value === 'nodata'
+    viewState.value === "nodata";
   }
 };
 
@@ -2273,12 +2276,23 @@ const uploadFile = async () => {
   }
 };
 
+const checkVTS = ref(false);
+const handleCheckboxChange = () => {
+  console.log(checkVTS.value);
+  if (checkVTS.value) {
+    alert("VTS 데이터를 포함하여 다운로드 할 시 시간이 오래 소요될 수 있습니다.");
+  }
+};
+
 const mimeTypes = {
-  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Microsoft Excel 워크시트",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+    "Microsoft Excel 워크시트",
   "application/vnd.ms-excel": "Microsoft Excel 워크시트",
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Microsoft Word 문서",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
+    "Microsoft Word 문서",
   "application/msword": "Microsoft Word 문서",
-  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "Microsoft PowerPoint 프레젠테이션",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation":
+    "Microsoft PowerPoint 프레젠테이션",
   "application/vnd.ms-powerpoint": "Microsoft PowerPoint 프레젠테이션",
   "application/pdf": "PDF 문서",
   "text/plain": "텍스트 파일",
@@ -2575,6 +2589,24 @@ select.time-select {
   border-radius: 4px;
   margin-left: 5px;
   width: 50px;
+}
+
+.action-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  position: relative;
+}
+
+.upload-button {
+  margin: 0 auto;
+}
+
+.checkbox-right {
+  margin-top: 40px;
+  position: absolute;
+  right: 0;
 }
 </style>
 
