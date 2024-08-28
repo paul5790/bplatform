@@ -100,7 +100,10 @@
                       >*© 2024 [KRISO ASVERC]. All rights reserved.</span
                     >
                   </v-card-title>
-                  <div ref="chartRef" class="chart" autoresize></div>
+                  <div
+                    ref="chartRef"
+                    :style="{ height: `${70 - tableSize}vh` }"
+                  ></div>
                 </v-card-item>
               </v-card>
             </v-sheet>
@@ -300,12 +303,14 @@
                         분
                       </v-col>
                     </v-row>
-                    <p style="font-size: 12px; font-weight: bold">
-                      &nbsp;&nbsp;* 날짜 검색은 UTC를 기준으로 작성하며,
-                      &nbsp;&nbsp;
-                    </p>
-                    <p style="font-size: 12px; font-weight: bold">
-                      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로 보여짐
+                    <p
+                      style="
+                        font-size: 12px;
+                        font-weight: bold;
+                        margin-top: 5px;
+                      "
+                    >
+                      &nbsp;&nbsp;* 데이터는 UTC 기준으로 보여짐
                     </p>
                     <v-btn
                       style="margin-top: 10px"
@@ -350,6 +355,7 @@ import {
   watch,
   watchEffect,
   computed,
+  nextTick,
 } from "vue";
 import { use } from "echarts/core";
 import DatePicker from "vue3-datepicker";
@@ -393,19 +399,28 @@ provide(THEME_KEY);
 
 // =================================================== 셋업 ===================================================
 // 다크모드
-const {
-  btnColor,
-  textColor,
-  themeColor,
-  tableStyle,
-  selectColor,
-  selectTextColor,
-} = themeConfig;
+const { btnColor, textColor, themeColor, selectColor, selectTextColor } =
+  themeConfig;
 const tokenid = ref(sessionStorage.getItem("token") || "");
 
 onMounted(() => {
   sessionStorage.setItem("page", "데이터 분석");
   initializeChart();
+});
+
+const tableStyle = computed(() => {
+  const imageUrl =
+    themeMode.value === "light"
+      ? "/image/kriso_kren_n.png"
+      : "/image/kriso_kren_d.png";
+  return {
+    paddingTop: "5px",
+    paddingBottom: "10px",
+    backgroundImage: `url(${imageUrl})`,
+    backgroundSize: "auto 50%",
+    backgroundPosition: "center 50%",
+    backgroundRepeat: "no-repeat",
+  };
 });
 
 // // 화면 로딩 변수
@@ -819,7 +834,6 @@ const initChart = () => {
     axisLabel: {
       color: textColor.value, // 텍스트 색상을 흰색으로 설정
       formatter: (value) => {
-        console.log(value);
         const date = new Date(value);
         const formattedDate = `
     ${date.getUTCDate().toString().padStart(2, "0")} ${date
@@ -1021,10 +1035,18 @@ const fetchData = async (subComponent, contents) => {
     let apiReq = `table_data/information/test?test_name=TestCase1&signal_name=ais_vdo&signal_name=ais_vdm`;
     apiReq = `table_data/information/${requests.value.period}&signal_name=${subComponent}_${contents}`;
     let a = await readDataTrial(tokenid.value, apiReq);
-    console.log(a);
+    noPermission = false;
     return a;
   } catch (error) {
-    console.error(error);
+    if (error.response && error.response.status) {
+      if (error.response.status === 403) {
+        noPermission = true;
+        alert(error.response.data);
+      }
+    } else {
+      // error.response가 없으면 해당 오류를 무시하고 넘어감
+      console.error("정의되지 않은 오류 발생:", error.message || error);
+    }
     throw error; // 에러를 호출자에게 전파
   }
 };
@@ -1069,10 +1091,19 @@ const processData = (
 };
 
 let noData = true;
+let noPermission = false;
 let noDate = false;
 //데이터 검색
 const searchData = async () => {
   updateDate();
+  if (startDate.value > endDate.value) {
+    alert("종료시간이 시작시간보다 더 빠릅니다.");
+    return;
+  }
+  tableSize.value =
+      selectedItem.value.length < 3 ? (selectedItem.value.length - 1) * 5 : 10;
+  await nextTick();
+  
   // 차트 초기화
   if (myChart) {
     myChart.dispose(); // 기존 차트 인스턴스를 제거
@@ -1116,6 +1147,7 @@ const searchData = async () => {
       selectedItem.value.includes("altitude")
     ) {
       const fetchedData = await fetchData("DGPS", "GGA");
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.gga = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1123,14 +1155,17 @@ const searchData = async () => {
       selectedItem.value.includes("courseovergrounddegreestrue")
     ) {
       const fetchedData = await fetchData("DGPS", "VTG");
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.vtg = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("heading")) {
       const fetchedData = await fetchData("GYRO", "HDT");
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.hdt = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("rateofturn")) {
       const fetchedData = await fetchData("GYRO", "ROT");
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.rot = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1138,10 +1173,12 @@ const searchData = async () => {
       selectedItem.value.includes("anemometerspeed")
     ) {
       const fetchedData = await fetchData("ANEMOMETER", "MWV");
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.mwv = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("speedn")) {
       const fetchedData = await fetchData("SPEEDLOG", "VHW");
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.vhw = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1149,6 +1186,7 @@ const searchData = async () => {
       selectedItem.value.includes("portruddersensor")
     ) {
       const fetchedData = await fetchData("AUTOPILOT", "RSA");
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.rsa = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("1_Engine Speed")) {
@@ -1156,6 +1194,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_61444"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_SPEED = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("1_Engine Oil Temperature")) {
@@ -1163,6 +1202,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_65262"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_OIL_TEMPERATURE1 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1173,6 +1213,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_65263"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_OIL_PRESSURE = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("1_Transmission Oil Pressure")) {
@@ -1180,6 +1221,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_65272"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.transmission_OIL_PRESSURE = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1190,6 +1232,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_65271"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.charging_SYSTEM_POTENTIAL = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("1_Engine total hours")) {
@@ -1197,6 +1240,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_65253"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_TOTAL_HOURS = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1208,6 +1252,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_65270"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE =
         Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
@@ -1216,6 +1261,7 @@ const searchData = async () => {
         "NO1ENGINEPANEL",
         "NO1ENGINE_PANEL_65276"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.fuel_LEVEL_1 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("2_Engine Speed")) {
@@ -1223,6 +1269,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_61444"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_SPEED2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("2_Engine Oil Temperature")) {
@@ -1230,6 +1277,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_65262"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_OIL_TEMPERATURE2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1240,6 +1288,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_65263"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_OIL_PRESSURE2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("2_Transmission Oil Pressure")) {
@@ -1247,6 +1296,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_65272"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.transmission_OIL_PRESSURE2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1257,6 +1307,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_65271"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.charging_SYSTEM_POTENTIAL2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (selectedItem.value.includes("2_Engine total hours")) {
@@ -1264,6 +1315,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_65253"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_TOTAL_HOURS2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
     if (
@@ -1275,6 +1327,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_65270"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.engine_INTAKE_MANIFOLD_NO1_PRESSURE2 =
         Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
@@ -1283,6 +1336,7 @@ const searchData = async () => {
         "NO2ENGINEPANEL",
         "NO2ENGINE_PANEL_65276"
       );
+      if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.fuel_LEVEL_2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
 
@@ -1653,8 +1707,7 @@ const searchData = async () => {
       }
     });
 
-    tableSize.value =
-      selectedItem.value.length < 3 ? (selectedItem.value.length - 1) * 5 : 10;
+
   } catch (error) {
     console.error(error);
     noData = true;
@@ -1673,6 +1726,8 @@ const searchData = async () => {
 
   if (noDate) {
     alert("시간 형식이 맞지 않습니다.");
+  } else if (noPermission) {
+    console.log("권한없음");
   } else if (noData) {
     alert("데이터가 존재하지 않습니다.");
   }
@@ -1860,7 +1915,7 @@ body {
   border: 1px solid #ccc;
   padding: 0.3rem;
   border-radius: 4px;
-  width: 200px;
+  width: 100%;
   box-sizing: border-box;
 }
 

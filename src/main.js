@@ -14,7 +14,19 @@ import VueECharts from "vue-echarts";
 const pinia = createPinia();
 loadFonts();
 
-createApp(App)
+const app = createApp(App);
+
+// ResizeObserver 관련 에러 무시
+app.config.errorHandler = (err, vm, info) => {
+  if (err.message.includes("ResizeObserver")) {
+    // 에러 무시
+    return;
+  }
+  // 다른 에러는 콘솔에 출력
+  console.error(err, info);
+};
+
+app
   .use(Vue3Lottie)
   .use(router)
   .use(vuetify, {

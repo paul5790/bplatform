@@ -8,7 +8,7 @@
             v-model="tb1"
             density="compact"
             :append-inner-icon="
-              ShipData === '관제 데이터' ? 'mdi-radar' : 'mdi-ferry'
+              ShipData === 'VTS 데이터' ? 'mdi-radar' : 'mdi-ferry'
             "
             label="Data Source"
             variant="outlined"
@@ -32,7 +32,7 @@
             @click="
               (SelectedDataCardVisible = false),
                 (SelectedShipContentsCardVisible = ShipData === '선내 데이터'),
-                (SelectedVtsContentsCardVisible = ShipData === '관제 데이터'),
+                (SelectedVtsContentsCardVisible = ShipData === 'VTS 데이터'),
                 (DataTypeCardVisible = false),
                 (periodSettingCardVisible = false)
             "
@@ -161,6 +161,10 @@
                     <td>{{ file.lastModifiedDate.toLocaleString() }}</td>
                   </tr>
                   <tr>
+  <td><strong>유형:</strong></td>
+  <td>{{ readableFileType  }}</td>
+</tr>
+                  <tr>
                     <td><strong>용량:</strong></td>
                     <td>{{ (file.size / (1024 * 1024)).toFixed(2) }} MB</td>
                   </tr>
@@ -219,7 +223,7 @@
           >
           <v-btn
             :class="{
-              'selected-button': ShipData === '관제 데이터',
+              'selected-button': ShipData === 'VTS 데이터',
             }"
             width="43%"
             style="flex: 1; margin: 0 10px"
@@ -227,10 +231,10 @@
             class="secondBtn"
             @click="toggleSelectShipData('vts')"
           >
-            <v-icon v-if="ShipData === '관제 데이터'" left color="red"
+            <v-icon v-if="ShipData === 'VTS 데이터'" left color="red"
               >mdi-check</v-icon
             >
-            관제 데이터 (VTS)</v-btn
+            VTS 데이터</v-btn
           >
         </div>
         <v-divider></v-divider>
@@ -259,13 +263,15 @@
         left: '31%',
         zIndex: 1100,
         width: '50%',
-        overflow: 'visible',
+        maxHeight: '570px', // 최대 높이를 설정
+        overflowY: 'auto', // 자동 스크롤 처리
+        overflowX: 'hidden', // 가로 스크롤은 숨김
       }"
     >
       <v-card-title>
         <span>Ship Information Data Select</span>
       </v-card-title>
-      <v-card-text>
+      <v-card-text style="padding-bottom: 3px">
         <div class="destination-container">
           <v-list class="category-list category-list">
             <v-list-item-group v-model="selectedCategory">
@@ -286,7 +292,11 @@
                 :key="index"
                 @click="toggleDestination(destination)"
                 :class="{
-                  'selected-item': selectedDestination === destination,
+                  'selected-item':
+                    selectedDestination === destination ||
+                    (destination.name === '전체' &&
+                      selectedDestination &&
+                      selectedDestination.name === '전체'),
                 }"
               >
                 <v-list-item-title>{{ destination.name }}</v-list-item-title>
@@ -300,7 +310,10 @@
                 :key="index"
                 @click="toggleSubItem(subItem)"
                 :class="{
-                  'selected-item': selectedItems.includes(subItem),
+                  'selected-item':
+                    selectedItems.includes(subItem) ||
+                    (subItem === '전체' &&
+                      selectedItems.length === subItems.length),
                 }"
               >
                 <v-list-item-title>{{ subItem }}</v-list-item-title>
@@ -322,16 +335,28 @@
               {{ search }}
             </v-chip>
           </div>
-          <v-btn
+          <!-- <v-btn
             color="#5865f2"
             width="100px"
             variant="flat"
             @click="completeData1()"
             style="position: absolute; right: 16px; bottom: 8px"
             >선택</v-btn
-          >
+          > -->
         </div>
       </v-card-text>
+      <v-card-actions
+        style="justify-content: flex-end; padding: 16px; padding-top: 0px"
+      >
+        <v-btn
+          color="#5865f2"
+          width="100px"
+          variant="flat"
+          @click="completeData1()"
+        >
+          선택
+        </v-btn>
+      </v-card-actions>
     </v-card>
 
     <!-- 1번째 데이터 선택 카드(관제) -->
@@ -584,11 +609,8 @@
               />
               분
             </div>
-            <p style="font-size: 12px; font-weight: bold; margin-top: 20px">
-              &nbsp;&nbsp;* 날짜 검색은 UTC를 기준으로 작성하며, &nbsp;&nbsp;
-            </p>
-            <p style="font-size: 12px; font-weight: bold">
-              &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;데이터는 UTC 기준으로 보여짐
+            <p style="margin-top: 15px; font-size: 12px; font-weight: bold">
+              * 데이터는 UTC 기준으로 보여짐
             </p>
           </div>
         </div>
@@ -654,7 +676,7 @@
               <template v-if="activeTab === index">
                 <v-data-table
                   density="dence"
-                  style="height: 68vh; margin-top: 10px"
+                  style="height: 68.5vh; margin-top: 5px"
                   :headers="headers[data]"
                   :items="paginatedItems"
                   :search="search"
@@ -674,9 +696,11 @@
                       <v-text-field
                         label="Page"
                         variant="outlined"
+                        density="compact"
                         style="
                           max-width: 70px;
                           margin-left: 10px;
+                          margin-top: 8px;
                           text-align: center;
                         "
                         @keyup.enter="keyPage"
@@ -829,7 +853,7 @@
           <v-card-actions v-if="downloadPermission">
             <v-spacer></v-spacer>
             <v-progress-circular
-              v-if="!downloading"
+              v-if="downloading"
               style="margin-top: 5px"
               :size="25"
               color="primary"
@@ -896,7 +920,7 @@
         </div>
         <div style="text-align: center; margin-top: 3%">
           <v-btn color="red" @click="cancelRequest('1')" size="small"
-            >요청 취소하기?</v-btn
+            >요청 취소하기</v-btn
           >
         </div>
       </template>
@@ -996,13 +1020,6 @@ const selectBoxClick3 = () => {};
 
 const selectBoxClick4 = () => {};
 
-const search = ref("");
-const searchInput = ref("");
-
-watch(searchInput, async (newValue, oldValue) => {
-  search.value = searchInput.value;
-});
-
 // ------------------- 0번째 데이터 선정 Method ------------------------ //
 const ShipData = ref();
 const ShipDataState = ref();
@@ -1012,7 +1029,7 @@ const toggleSelectShipData = (data) => {
     ShipData.value = "선내 데이터";
     requests.value.data = "information";
   } else if (data === "vts") {
-    ShipData.value = "관제 데이터";
+    ShipData.value = "VTS 데이터";
     requests.value.data = "vts";
   } else {
     console.log("있을 수 없는 일");
@@ -1029,7 +1046,7 @@ const toggleSelectShipData = (data) => {
 
   if (ShipData.value === "선내 데이터") {
     SelectedShipContentsCardVisible.value = true;
-  } else if (ShipData.value === "관제 데이터") {
+  } else if (ShipData.value === "VTS 데이터") {
     SelectedVtsContentsCardVisible.value = true;
   } else {
     alert("항목을 선택해주세요.");
@@ -1054,7 +1071,7 @@ watch(ShipData, (newValue, oldValue) => {
 const shipCategories = ref([
   "Ship Information",
   "Kass Information",
-  "System Information",
+  "SYS Information",
   "Ctrl Information",
 ]);
 
@@ -1068,11 +1085,6 @@ const vtsCategories = ref([
 
 // SubComponents List
 const destinations = ref([
-  // { name: "로스앤젤레스, CA", code: "LAX", category: 1 },
-  // { name: "뉴욕 / 존 F 케네디, NY", code: "JFK", category: 3 },
-  // { name: "샌프란시스코, CA", code: "SFO", category: 3 },
-  // { name: "시애틀, WA", code: "SEA", category: 3 },
-  // { name: "호놀룰루, HI", code: "HNL", category: 3 },
   { name: "GYRO", category: 0 },
   { name: "DGPS", category: 0 },
   { name: "ANEMOMETER", category: 0 },
@@ -1107,17 +1119,24 @@ const destinations = ref([
 ]);
 // Contents List
 const destinationSubItems = {
-  GYRO: ["THS", "HDT", "ROT"],
-  DGPS: ["GLL", "GGA", "RMC", "VTG", "ZDA", "DTM", "GSV", "GSA"],
-  ANEMOMETER: ["MWV", "MWD", "VWR", "MTW", "VWT"],
-  RADAR: ["TTM", "TLL", "RADARSCREEN"],
-  AIS: ["VDM", "VDO"],
-  ECDIS: ["ROUTEINFO", "WAYPOINTS", "RTZ", "ECDISSCREEN"],
-  AUTOPILOT: ["RSA", "HTD"],
-  SPEEDLOG: ["VBW", "VHW", "VLW"],
-  CANTHROTTLE: ["CANONLINESTATE", "ENGINERPM", "RUDDER", "RUDDERSCALE"],
+  GYRO: ["GYRO_전체", "THS", "HDT", "ROT"],
+  DGPS: ["DGPS_전체", "GLL", "GGA", "RMC", "VTG", "ZDA", "DTM", "GSV", "GSA"],
+  ANEMOMETER: ["ANEMOMETER_전체", "MWV", "MWD", "VWR", "MTW", "VWT"],
+  RADAR: ["RADAR_전체", "TTM", "TLL", "RADARSCREEN"],
+  AIS: ["AIS_전체", "VDM", "VDO"],
+  ECDIS: ["ECDIS_전체", "ROUTEINFO", "WAYPOINTS", "RTZ", "ECDISSCREEN"],
+  AUTOPILOT: ["AUTOPILOT_전체", "RSA", "HTD"],
+  SPEEDLOG: ["SPEEDLOG_전체", "VBW", "VHW", "VLW"],
+  CANTHROTTLE: [
+    "CANTHROTTLE_전체",
+    "CANONLINESTATE",
+    "ENGINERPM",
+    "RUDDER",
+    "RUDDERSCALE",
+  ],
   AUTOPILOTCONTACT: ["AUTOPILOTCONTACT"],
   NO1ENGINEPANEL: [
+    "NO1ENGINEPANEL_전체",
     "NO1ENGINE_PANEL_61444",
     "NO1ENGINE_PANEL_65262",
     "NO1ENGINE_PANEL_65263",
@@ -1134,6 +1153,7 @@ const destinationSubItems = {
     "NO1ENGINE_PANEL_65379",
   ],
   NO2ENGINEPANEL: [
+    "NO2ENGINEPANEL_전체",
     "NO2ENGINE_PANEL_61444",
     "NO2ENGINE_PANEL_65262",
     "NO2ENGINE_PANEL_65263",
@@ -1158,6 +1178,7 @@ const destinationSubItems = {
   MOF1GNW: ["WAYPOINT"],
   MTIE5SAS: ["SAS"],
   MTIE4XINNOS_VDGS_EMUL: [
+    "VDGSEMUL_전체",
     "VIRTUALME1_1",
     "VIRTUALME1_2",
     "VIRTUALME1_3",
@@ -1203,6 +1224,7 @@ const destinationSubItems = {
   MTIE4XINNOS_STAS_EMUL: ["ME1", "ME2"],
   MTIE4XINNOS_STAS: ["ME1", "ME2"],
   MTIE4XINNOS_VDGS: [
+    "VDGS_전체",
     "NO1ENGINE_PANEL_61444",
     "NO1ENGINE_PANEL_65262",
     "NO1ENGINE_PANEL_65263",
@@ -1234,9 +1256,10 @@ const destinationSubItems = {
   ],
 
   MANAGEMENT: [
+    "MANAGEMENT_전체",
     "SUBSCRIBELIST",
     "CONNECTSTATE",
-    "SYSTEMSTATE",
+    "SYSSTATE",
     "ALARMINFO",
     "MODEINFO",
     "COM",
@@ -1254,11 +1277,14 @@ const destinationSubItems = {
   // 필요에 따라 다른 항목 추가
 };
 
-const filteredDestinations = computed(() =>
-  destinations.value.filter(
+const filteredDestinations = computed(() => {
+  // 필터된 목적지 목록
+  const filtered = destinations.value.filter(
     (destination) => destination.category === selectedCategory.value
-  )
-);
+  );
+
+  return filtered;
+});
 
 const recentSearches = ref([]);
 
@@ -1284,6 +1310,32 @@ const toggleDestination = (destination) => {
   }
 };
 
+// const toggleDestination = (destination) => {
+//   if (destination.name === "전체") {
+//     if (
+//       selectedDestination.value &&
+//       selectedDestination.value.name === "전체"
+//     ) {
+//       // "전체"가 이미 선택된 상태일 때 해제
+//       selectedDestination.value = null;
+//       selectedItems.value = [];
+//       searchTarget.value = [];
+//     } else {
+//       // "전체"가 선택되지 않은 상태일 때 선택
+//       selectedDestination.value = destination;
+//     }
+//   } else {
+//     if (selectedDestination.value === destination) {
+//       selectedDestination.value = null;
+//       selectedItems.value = [];
+//       searchTarget.value = [];
+//     } else {
+//       selectedDestination.value = destination;
+//       subItems.value = [...(destinationSubItems[destination.name] || [])];
+//     }
+//   }
+// };
+
 const removeItemFromArray = (array, item) => {
   const index = array.indexOf(item);
   if (index > -1) {
@@ -1292,33 +1344,137 @@ const removeItemFromArray = (array, item) => {
 };
 
 // ------------------------ 3번째 리스트 Contents ----------------------------- //
+// const toggleSubItem = (subItem) => {
+//   const itemName = `${selectedDestination.value.name}_${subItem}`;
+//   if (selectedItems.value.includes(subItem)) {
+//     selectedItems.value = selectedItems.value.filter(
+//       (item) => item !== subItem
+//     );
+//     removeItemFromArray(recentSearches.value, itemName);
+//     removeItemFromArray(searchTarget.value, itemName);
+//   } else {
+//     selectedItems.value.push(subItem);
+//     if (subItem === "ALL") {
+//       recentSearches.value.push(`${selectedDestination.value.name}`);
+//     } else {
+//       recentSearches.value.push(`${selectedDestination.value.name}_${subItem}`);
+//       searchTarget.value.push(`${selectedDestination.value.name}_${subItem}`);
+//     }
+//   }
+
+//   tb2 = formattedSearchTarget;
+
+//   let signalParams = "";
+
+//   for (let i = 0; i < recentSearches.value.length; i++) {
+//     signalParams += `&signal_name=${recentSearches.value[i]}`;
+//   }
+
+//   requests.value.signal = signalParams;
+// };
+let checkData = [];
 const toggleSubItem = (subItem) => {
-  const itemName = `${selectedDestination.value.name}_${subItem}`;
-  if (selectedItems.value.includes(subItem)) {
-    selectedItems.value = selectedItems.value.filter(
-      (item) => item !== subItem
-    );
-    removeItemFromArray(recentSearches.value, itemName);
-    removeItemFromArray(searchTarget.value, itemName);
+  const allSubItems = destinationSubItems[selectedDestination.value.name] || [];
+
+  const foundItem = selectedItems.value.find((item) => item.split("_")[1]);
+  let checkAll;
+  console.log(checkData.includes(subItem.split("_")[0]));
+  if (foundItem && checkData.includes(subItem.split("_")[0])) {
+    checkAll = foundItem.split("_")[1];
+    checkData = checkData.filter((item) => item !== subItem.split("_")[0]);
+    console.log("1");
+  } else if (subItem.split("_")[1] === "전체") {
+    checkData.push(subItem.split("_")[0]);
+    console.log("2");
   } else {
-    selectedItems.value.push(subItem);
-    if (subItem === "ALL") {
-      recentSearches.value.push(`${selectedDestination.value.name}`);
+    checkAll = "";
+    console.log("3");
+  }
+  console.log(checkData);
+
+  if (subItem.split("_")[1] === "전체") {
+    // 전체가 선택된 상태라면 모든 선택 해제
+    if (checkAll === "전체" && !checkData.includes(subItem.split("_")[0])) {
+      // 전체 및 allSubItems에 해당하는 항목만 제거
+      selectedItems.value = selectedItems.value.filter(
+        (item) => !allSubItems.includes(item)
+      );
+      searchTarget.value = searchTarget.value.filter(
+        (item) =>
+          !allSubItems.some((subItem) =>
+            item.includes(`${selectedDestination.value.name}_${subItem}`)
+          )
+      );
+      recentSearches.value = recentSearches.value.filter(
+        (item) =>
+          !allSubItems.some((subItem) =>
+            item.includes(`${selectedDestination.value.name}_${subItem}`)
+          )
+      );
     } else {
-      recentSearches.value.push(`${selectedDestination.value.name}_${subItem}`);
-      searchTarget.value.push(`${selectedDestination.value.name}_${subItem}`);
+      // 전체 선택: 기존 값에 새로운 전체 항목들을 추가
+      allSubItems.forEach((item) => {
+        const splitItem = item.split("_");
+        if (!selectedItems.value.includes(item)) {
+          selectedItems.value.push(item); // 중복 방지 후 항목 추가
+          searchTarget.value.push(`${selectedDestination.value.name}_${item}`);
+          if (splitItem[1] !== "전체") {
+            recentSearches.value.push(
+              `${selectedDestination.value.name}_${item}`
+            );
+          }
+        }
+      });
+    }
+  } else {
+    const itemName = `${selectedDestination.value.name}_${subItem}`;
+
+    // 개별 항목 선택 해제 로직
+    if (selectedItems.value.includes(subItem)) {
+      selectedItems.value = selectedItems.value.filter(
+        (item) => item !== subItem
+      );
+      removeItemFromArray(recentSearches.value, itemName);
+      removeItemFromArray(searchTarget.value, itemName);
+
+      // 개별 항목이 해제된 경우 '전체'도 해제
+      const allItem = `${selectedDestination.value.name}_전체`;
+      if (selectedItems.value.includes(allItem)) {
+        selectedItems.value = selectedItems.value.filter(
+          (item) => item !== allItem
+        );
+        removeItemFromArray(recentSearches.value, allItem);
+        removeItemFromArray(searchTarget.value, allItem);
+      }
+    } else {
+      selectedItems.value.push(subItem);
+      recentSearches.value.push(itemName);
+      searchTarget.value.push(itemName);
+
+      // 모든 항목이 선택된 경우 '전체' 항목도 추가
+      const nonAllItems = allSubItems.filter(
+        (item) => item.split("_")[1] !== "전체"
+      );
+
+      // 선택된 항목에서 nonAllItems가 모두 선택되었는지 확인
+      const allSelected = nonAllItems.every((item) =>
+        selectedItems.value.includes(item)
+      );
+
+      if (allSelected) {
+        const allItem = `${selectedDestination.value.name}_전체`;
+        if (!selectedItems.value.includes(allItem)) {
+          selectedItems.value.push(allItem);
+          // recentSearches.value.push(allItem);
+          searchTarget.value.push(allItem);
+          checkData.push(selectedDestination.value.name);
+
+          // '채웠습니다' 로그 출력
+          console.log("채웠습니다");
+        }
+      }
     }
   }
-
-  tb2 = formattedSearchTarget;
-
-  let signalParams = "";
-
-  for (let i = 0; i < recentSearches.value.length; i++) {
-    signalParams += `&signal_name=${recentSearches.value[i]}`;
-  }
-
-  requests.value.signal = signalParams;
 };
 
 // ---------------------------- 관제 --------------------------- //
@@ -1329,7 +1485,7 @@ const toggleVts = (vts) => {
   if (index === -1) {
     selectedItems.value.push(vts);
 
-    recentSearches.value.push(`integratedctrlsystem_${vtsWithoutSpaces}`);
+    recentSearches.value.push(`INTEGRATEDCTRLSYSTEM_${vtsWithoutSpaces}`);
     searchTarget.value.push(vts);
   }
   // 선택된 리스트를 한번더 클릭 시 선택 해제
@@ -1337,7 +1493,7 @@ const toggleVts = (vts) => {
     selectedItems.value.splice(index, 1);
     removeItemFromArray(
       recentSearches.value,
-      `integratedctrlsystem_${vtsWithoutSpaces}`
+      `INTEGRATEDCTRLSYSTEM_${vtsWithoutSpaces}`
     );
     removeItemFromArray(searchTarget.value, vts);
   }
@@ -1377,7 +1533,19 @@ const handleChipClick = (search) => {
     [destination, subItem] = parts;
   }
 
+  // destinations가 유효한지 검사
+  if (!destinations.value || !Array.isArray(destinations.value)) {
+    console.error("destinations.value is not properly initialized.");
+    return;
+  }
+
+  // 찾고자 하는 destination이 있는지 검사
   const destObj = destinations.value.find((dest) => dest.name === destination);
+  if (!destObj) {
+    console.error(`Destination '${destination}' not found.`);
+    alert(`Destination '${destination}'을 찾을 수 없습니다.`);
+    return;
+  }
 
   if (subItem) {
     selectedDestination.value = destObj;
@@ -1462,21 +1630,20 @@ const hours = Array.from({ length: 24 }, (_, i) =>
 const updateDate = () => {
   let start;
   let end;
-    // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
-    start = new Date(
-      `${startDateInput.value}T${startHour.value.padStart(
-        2,
-        "0"
-      )}:${startMinute.value.padStart(2, "0")}:00`
-    );
-    // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
-    end = new Date(
-      `${endDateInput.value}T${endHour.value.padStart(
-        2,
-        "0"
-      )}:${endMinute.value.padStart(2, "0")}:00`
-    );
-  
+  // 시작 날짜와 시간을 합쳐서 Date 객체로 변환
+  start = new Date(
+    `${startDateInput.value}T${startHour.value.padStart(
+      2,
+      "0"
+    )}:${startMinute.value.padStart(2, "0")}:00`
+  );
+  // 종료 날짜와 시간을 합쳐서 Date 객체로 변환
+  end = new Date(
+    `${endDateInput.value}T${endHour.value.padStart(
+      2,
+      "0"
+    )}:${endMinute.value.padStart(2, "0")}:00`
+  );
 
   start.setHours(start.getHours() + 9);
   end.setHours(end.getHours() + 9);
@@ -1529,7 +1696,7 @@ const completeData0 = () => {
 
   if (ShipData.value === "선내 데이터") {
     SelectedShipContentsCardVisible.value = true;
-  } else if (ShipData.value === "관제 데이터") {
+  } else if (ShipData.value === "VTS 데이터") {
     SelectedVtsContentsCardVisible.value = true;
   } else {
     alert("항목을 선택해주세요.");
@@ -1636,6 +1803,7 @@ const dataSearchBtn = async () => {
         }, {});
       }
       ShipDataState.value = ShipData.value;
+      activeTab.value = 0;
       viewState.value = "ondata";
 
       downloadReq.value.type = requests.value.type;
@@ -1720,34 +1888,83 @@ const processData = (response) => {
     "ship_ID",
   ];
 
-  dataKeys.value = Object.keys(response);
-  dataKeys.value.forEach((key) => {
-    if (response[key].length > 0) {
-      const fields = Object.keys(response[key][0]);
-      const sortedFields = [
-        ...importantKeys.filter((importantKey) =>
-          fields.includes(importantKey)
-        ),
-        ...fields.filter(
-          (field) => !importantKeys.includes(field) && field !== "id"
-        ),
-      ];
-      headers.value[key] = sortedFields.map((field) => ({
-        title:
-          field === "timestamp_EQUIPMENT" || field === "timestamp_PUBLISH"
-            ? ` ${field}          `
-            : field,
-        value: field,
-      }));
-    }
-    dataTables.value[key] = response[key];
-  });
+  const newDataKeys = Object.keys(response);
+
+  // recentSearches.value에 있는 값 중, newDataKeys에 존재하는 값만 추출하여 순서대로 정렬
+  const sortedDataKeys = recentSearches.value.filter((key) =>
+    newDataKeys.includes(key)
+  );
+
+  console.log(newDataKeys);
+console.log(sortedDataKeys);
+  dataKeys.value = sortedDataKeys;
+  console.log(response);
+
+  try {
+    dataKeys.value.forEach((key) => {
+      console.log(response[key]);
+      if (response[key].length > 0) {
+        const fields = Object.keys(response[key][0]);
+
+        const sortedFields = [
+          ...importantKeys.filter((importantKey) =>
+            fields.includes(importantKey)
+          ),
+          ...fields.filter(
+            (field) => !importantKeys.includes(field) && field !== "id"
+          ),
+        ];
+        headers.value[key] = sortedFields.map((field) => ({
+          title:
+            field === "timestamp_EQUIPMENT" || field === "timestamp_PUBLISH"
+              ? ` ${field}          `
+              : field,
+          value: field,
+        }));
+      }
+      dataTables.value[key] = response[key];
+    });
+  } catch (error) {
+    // 에러
+    console.log(error);
+    viewState.value === 'nodata'
+  }
 };
 
 // --------------------------- pagenation --------------------------------//
 const itemsPerPage = ref(24);
 const page = ref(1);
-const pageCount = ref(0);
+// 검색어 필터링된 데이터 계산 속성
+const filteredItems = computed(() => {
+  const currentTabData =
+    dataTables.value[dataKeys.value[activeTab.value]] || [];
+  if (!search.value) {
+    return currentTabData;
+  }
+  return currentTabData.filter((item) => {
+    return Object.values(item).some((value) =>
+      String(value).toLowerCase().includes(search.value.toLowerCase())
+    );
+  });
+});
+
+const pageCount = computed(() => {
+  return Math.ceil(filteredItems.value.length / itemsPerPage.value);
+});
+
+const search = ref("");
+const searchInput = ref("");
+
+// 검색어 입력이 변경되면 페이지를 1로 초기화
+watch(searchInput, (newValue) => {
+  search.value = newValue;
+  page.value = 1; // 검색어가 변경되면 페이지를 1로 리셋
+});
+
+watch(filteredItems, () => {
+  // 필터링된 항목의 길이에 따라 페이지 수 업데이트
+  pageCount.value = Math.ceil(filteredItems.value.length / itemsPerPage.value);
+});
 
 // 현재 활성화된 탭의 데이터를 기반으로 페이지네이션을 설정
 watch([activeTab, dataTables], () => {
@@ -1763,11 +1980,9 @@ const paginatedComputed = () => {
 
 // 현재 페이지에 표시할 항목 계산
 const paginatedItems = computed(() => {
-  const currentTabData =
-    dataTables.value[dataKeys.value[activeTab.value]] || [];
   const start = (page.value - 1) * itemsPerPage.value;
   const end = start + itemsPerPage.value;
-  return currentTabData.slice(start, end);
+  return filteredItems.value.slice(start, end);
 });
 
 //
@@ -1862,7 +2077,7 @@ const getCardName = (item) => {
 };
 
 const formattedSearchTarget = computed(() => {
-  return searchTarget.value.join(", ");
+  return recentSearches.value.join(", ");
 });
 
 // ----------------------------- 다운로드 ----------------------------- //
@@ -1871,18 +2086,19 @@ const sampleChoice1 = ref("GYRO_HDT, GYRO_ROT, ANEMOMETER_MWV");
 
 const checkPermission = async () => {
   const userDataResponse = await readMineData(tokenid.value);
-  console.log(userDataResponse);
   if (userDataResponse.userGroup === "ADMIN") {
     downloadPermission.value = true;
   } else {
     const getTime = userDataResponse.permissionsExpiryTime;
     const getPermission = userDataResponse.permissions;
-
+    console.log(getTime);
+    console.log(getPermission);
     const currentTime = new Date();
     const permissionTime = new Date(getTime);
 
     // 조건 1: 현재 시간이 getTime보다 이른지 확인
     const isTimeValid = currentTime < permissionTime;
+    console.log(isTimeValid);
 
     // 조건 2: sampleChoice1의 데이터가 getPermission에 포함되는지 확인
     const isDataValid = formattedSearchTarget.value
@@ -1892,9 +2108,9 @@ const checkPermission = async () => {
           choice.startsWith(permission)
         );
       });
-
+    console.log(isDataValid);
     // 두 조건을 모두 만족하는지 확인
-    downloadPermission.value = isTimeValid && isDataValid;
+    downloadPermission.value = isDataValid;
   }
 };
 
@@ -2056,6 +2272,29 @@ const uploadFile = async () => {
     cancelTokenSource = null; // 요청이 완료된 후 토큰 초기화
   }
 };
+
+const mimeTypes = {
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "Microsoft Excel 워크시트",
+  "application/vnd.ms-excel": "Microsoft Excel 워크시트",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": "Microsoft Word 문서",
+  "application/msword": "Microsoft Word 문서",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": "Microsoft PowerPoint 프레젠테이션",
+  "application/vnd.ms-powerpoint": "Microsoft PowerPoint 프레젠테이션",
+  "application/pdf": "PDF 문서",
+  "text/plain": "텍스트 파일",
+  "text/csv": "CSV 파일",
+  "application/json": "JSON 파일",
+  "image/jpeg": "JPEG 이미지",
+  "image/png": "PNG 이미지",
+  "application/zip": "ZIP 압축 파일",
+  "application/x-rar-compressed": "RAR 압축 파일",
+  "application/octet-stream": "일반 파일",
+  // 필요한 경우 추가적인 MIME 타입을 여기에 정의할 수 있습니다.
+};
+
+const readableFileType = computed(() => {
+  return mimeTypes[file.value.type] || "알 수 없는 파일 유형";
+});
 
 //////////////////////////////////// 스타일 관련 js /////////////////////////////////////////
 
@@ -2250,7 +2489,7 @@ const cardStyle = computed(() => {
   border: 1px solid #ccc;
   padding: 0.3rem;
   border-radius: 4px;
-  width: 200px;
+  width: 100%;
   box-sizing: border-box;
 }
 

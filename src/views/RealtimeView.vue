@@ -882,7 +882,7 @@ onMounted(async () => {
   };
 
   ws.onmessage = function (event) {
-    // console.log("Message received: " + event.data);
+    console.log("Message received: " + event.data);
     try {
       const parsedMessage = JSON.parse(event.data);
       let headerName = parsedMessage.Package.Header.Author;
@@ -1090,39 +1090,9 @@ onMounted(async () => {
             parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
               .Value[i] === "1"
           ) {
-            if (i === 0) checkdata1.value[9] = "ok";
-            if (i === 1) checkdata1.value[12] = "ok";
-            if (i === 2) checkdata1.value[14] = "ok";
-            if (i === 3) checkdata1.value[4] = "ok";
-            if (i === 4) checkdata1.value[2] = "ok";
-            if (i === 5) checkdata1.value[3] = "ok";
-            if (i === 6) checkdata1.value[1] = "ok";
-            if (i === 7) checkdata1.value[6] = "ok";
-            if (i === 8) checkdata1.value[5] = "ok";
-            if (i === 9) checkdata1.value[10] = "ok";
-            if (i === 10) checkdata1.value[15] = "ok";
-            if (i === 11) checkdata1.value[16] = "ok";
-            if (i === 12) checkdata1.value[11] = "ok";
-            if (i === 13) checkdata1.value[13] = "ok";
-            if (i === 14) checkdata1.value[7] = "ok";
-            if (i === 15) checkdata1.value[8] = "ok";
+            onlamp1(i);
           } else {
-            if (i === 0) checkdata1.value[9] = "no";
-            if (i === 1) checkdata1.value[12] = "no";
-            if (i === 2) checkdata1.value[14] = "no";
-            if (i === 3) checkdata1.value[4] = "no";
-            if (i === 4) checkdata1.value[2] = "no";
-            if (i === 5) checkdata1.value[3] = "no";
-            if (i === 6) checkdata1.value[1] = "no";
-            if (i === 7) checkdata1.value[6] = "no";
-            if (i === 8) checkdata1.value[5] = "no";
-            if (i === 9) checkdata1.value[10] = "no";
-            if (i === 10) checkdata1.value[15] = "no";
-            if (i === 11) checkdata1.value[16] = "no";
-            if (i === 12) checkdata1.value[11] = "no";
-            if (i === 13) checkdata1.value[13] = "no";
-            if (i === 14) checkdata1.value[7] = "no";
-            if (i === 15) checkdata1.value[8] = "no";
+            offlamp1(i);
           }
         }
         clearTimeout(NO1ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
@@ -1193,9 +1163,9 @@ onMounted(async () => {
             parsedMessage.Package.TimeSeriesData[0].TabularData[0].DataSet[0]
               .Value[i] === "1"
           ) {
-            onlamp(i);
+            onlamp2(i);
           } else {
-            offlamp(i);
+            offlamp2(i);
           }
         }
         clearTimeout(NO2ENGINE_PANEL_65361_LAMPtimeout1); // 이전 타임아웃을 취소
@@ -1213,13 +1183,15 @@ onMounted(async () => {
   ws.onerror = function (event) {
     console.error("WebSocket error observed:", event);
     resetCheckdata();
-    offlamp(16);
+    offlamp1(16);
+    offlamp2(16);
   };
 
   ws.onclose = function (event) {
     console.log("Connection closed");
     resetCheckdata();
-    offlamp(16);
+    offlamp1(16);
+    offlamp2(16);
   };
 });
 const loadConfig = async () => {
@@ -1966,26 +1938,70 @@ const resetCheckdata = () => {
   clearTimeout(ggaTimeout1); // 타임아웃도 초기화
 };
 
-const onlamp = (i) => {
-  if (i === 0) checkdata2.value[9] = "ok";
-  if (i === 1) checkdata2.value[12] = "ok";
-  if (i === 2) checkdata2.value[14] = "ok";
-  if (i === 3) checkdata2.value[4] = "ok";
-  if (i === 4) checkdata2.value[2] = "ok";
-  if (i === 5) checkdata2.value[3] = "ok";
-  if (i === 6) checkdata2.value[1] = "ok";
-  if (i === 7) checkdata2.value[6] = "ok";
-  if (i === 8) checkdata2.value[5] = "ok";
-  if (i === 9) checkdata2.value[10] = "ok";
-  if (i === 10) checkdata2.value[15] = "ok";
-  if (i === 11) checkdata2.value[16] = "ok";
-  if (i === 12) checkdata2.value[11] = "ok";
-  if (i === 13) checkdata2.value[13] = "ok";
-  if (i === 14) checkdata2.value[7] = "ok";
-  if (i === 15) checkdata2.value[8] = "ok";
+const onlamp1 = (i) => {
+  if (i === 0) engine1Data.value[9] = "ok";
+  if (i === 1) engine1Data.value[12] = "ok";
+  if (i === 2) engine1Data.value[14] = "ok";
+  if (i === 3) engine1Data.value[4] = "ok";
+  if (i === 4) engine1Data.value[2] = "ok";
+  if (i === 5) engine1Data.value[3] = "ok";
+  if (i === 6) engine1Data.value[1] = "ok";
+  if (i === 7) engine1Data.value[6] = "ok";
+  if (i === 8) engine1Data.value[5] = "ok";
+  if (i === 9) engine1Data.value[10] = "ok";
+  if (i === 10) engine1Data.value[15] = "ok";
+  if (i === 11) engine1Data.value[16] = "ok";
+  if (i === 12) engine1Data.value[11] = "ok";
+  if (i === 13) engine1Data.value[13] = "ok";
+  if (i === 14) engine1Data.value[7] = "ok";
+  if (i === 15) engine1Data.value[8] = "ok";
 };
 
-const offlamp = (i) => {
+const offlamp1 = (i) => {
+  if (i === 0) checkdata2.value[9] = "no";
+  if (i === 1) checkdata2.value[12] = "no";
+  if (i === 2) checkdata2.value[14] = "no";
+  if (i === 3) checkdata2.value[4] = "no";
+  if (i === 4) checkdata2.value[2] = "no";
+  if (i === 5) checkdata2.value[3] = "no";
+  if (i === 6) checkdata2.value[1] = "no";
+  if (i === 7) checkdata2.value[6] = "no";
+  if (i === 8) checkdata2.value[5] = "no";
+  if (i === 9) checkdata2.value[10] = "no";
+  if (i === 10) checkdata2.value[15] = "no";
+  if (i === 11) checkdata2.value[16] = "no";
+  if (i === 12) checkdata2.value[11] = "no";
+  if (i === 13) checkdata2.value[13] = "no";
+  if (i === 14) checkdata2.value[7] = "no";
+  if (i === 15) checkdata2.value[8] = "no";
+  if (i === 16) {
+    // i가 16인 경우 checkdata2의 값들을 전부 "no"로 변경
+    for (let key in checkdata2.value) {
+      checkdata2.value[key] = "no";
+    }
+  }
+};
+
+const onlamp2 = (i) => {
+  if (i === 0) engine1Data.value[9] = "ok";
+  if (i === 1) engine1Data.value[12] = "ok";
+  if (i === 2) engine1Data.value[14] = "ok";
+  if (i === 3) engine1Data.value[4] = "ok";
+  if (i === 4) engine1Data.value[2] = "ok";
+  if (i === 5) engine1Data.value[3] = "ok";
+  if (i === 6) engine1Data.value[1] = "ok";
+  if (i === 7) engine1Data.value[6] = "ok";
+  if (i === 8) engine1Data.value[5] = "ok";
+  if (i === 9) engine1Data.value[10] = "ok";
+  if (i === 10) engine1Data.value[15] = "ok";
+  if (i === 11) engine1Data.value[16] = "ok";
+  if (i === 12) engine1Data.value[11] = "ok";
+  if (i === 13) engine1Data.value[13] = "ok";
+  if (i === 14) engine1Data.value[7] = "ok";
+  if (i === 15) engine1Data.value[8] = "ok";
+};
+
+const offlamp2 = (i) => {
   if (i === 0) checkdata2.value[9] = "no";
   if (i === 1) checkdata2.value[12] = "no";
   if (i === 2) checkdata2.value[14] = "no";

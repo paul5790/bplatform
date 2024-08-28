@@ -58,7 +58,7 @@
           </v-list-item-subtitle>
         </v-list-item>
 
-        <v-list-item @click="realtimeStandardDialog = true, getMinMax();">
+        <v-list-item @click="(realtimeStandardDialog = true), getMinMax()">
           <v-list-item-title>실시간 데이터 기준 설정</v-list-item-title>
 
           <v-list-item-subtitle>
@@ -321,7 +321,10 @@
             <v-row>
               <v-col cols="4">
                 <v-sheet style="height: 63vh; display: flex">
-                  <v-card style="flex: 1">
+                  <v-card
+                    style="flex: 1; overflow-y: auto"
+                    class="scrollable-card-1"
+                  >
                     <v-card-item>
                       <v-radio-group
                         v-model="selectRadio"
@@ -343,8 +346,8 @@
                         <v-radio label="AUTOPILOT" value="AUTOPILOT"></v-radio>
                         <v-radio label="SPEEDLOG" value="SPEEDLOG"></v-radio>
                         <v-radio
-                          label="CanThrottle"
-                          value="CanThrottle"
+                          label="CANTHROTTLE"
+                          value="CANTHROTTLE"
                         ></v-radio>
                         <v-radio
                           label="AUTOPILOTCONTACT"
@@ -358,6 +361,12 @@
                           label="NO.2ENGINEPANEL"
                           value="NO.2ENGINEPANEL"
                         ></v-radio>
+                        <v-radio label="KASS" value="KASS"></v-radio>
+                        <v-radio
+                          label="MANAGEMENT"
+                          value="MANAGEMENT"
+                        ></v-radio>
+                        <v-radio label="VTS" value="VTS"></v-radio>
                         <v-radio label="ALL DATA" value="ALL DATA"></v-radio>
                       </v-radio-group>
                     </v-card-item>
@@ -799,7 +808,7 @@
                           <v-col cols="1"> </v-col>
                         </v-row>
                       </v-sheet>
-                      <v-sheet v-if="selectRadio === 'CanThrottle'">
+                      <v-sheet v-if="selectRadio === 'CANTHROTTLE'">
                         <!-- CAN_Online_State -->
                         <v-row>
                           <v-col cols="1"> </v-col>
@@ -1465,6 +1474,222 @@
                           <v-col cols="1"> </v-col>
                         </v-row>
                       </v-sheet>
+                      <v-sheet v-if="selectRadio === 'KASS'">
+                        <!-- SITUATIONAL -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                MTIE1ISA / SITUATIONAL
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.SITUATIONAL.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                        <!-- VIRTUALNAV -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                MTIE5VDGS / VIRTUALNAV
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.VIRTUALNAV.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                        <!-- ROUTEDECISION -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                MOF1ANS / ROUTEDECISION
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.ROUTEDECISION.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                      </v-sheet>
+                      <v-sheet v-if="selectRadio === 'MANAGEMENT'">
+                        <!-- SYSTEMSTATE -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                MANAGEMENT / SYSTEMSTATE
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.SYSTEMSTATE.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                        <!-- MODEINFO -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                MANAGEMENT / MODEINFO
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.MODEINFO.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                      </v-sheet>
+                      <v-sheet v-if="selectRadio === 'VTS'">
+                        <!-- AIS -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                INTEGRATEDCTRLSYSTEM / AIS
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.AIS.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                        <!-- DYNAMICAISINFO -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                INTEGRATEDCTRLSYSTEM / DYNAMICAISINFO
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.DYNAMICAISINFO.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                        <!-- OBJECTINFO -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                INTEGRATEDCTRLSYSTEM / OBJECTINFO
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.OBJECTINFO.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                        <!-- STATICAISINFO -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                INTEGRATEDCTRLSYSTEM / STATICAISINFO
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.STATICAISINFO.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                        <!-- WEATHERINFO -->
+                        <v-row>
+                          <v-col cols="1"> </v-col>
+                          <v-col cols="3">
+                            <v-list-subheader>
+                              <p style="padding-top: 15px">
+                                INTEGRATEDCTRLSYSTEM / WEATHERINFO
+                              </p>
+                            </v-list-subheader>
+                          </v-col>
+                          <v-col cols="2"> </v-col>
+                          <v-col cols="5">
+                            <v-text-field
+                              v-model="timeRefs.WEATHERINFO.value"
+                              variant="outlined"
+                              label="time"
+                              suffix="sec"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="1"> </v-col>
+                        </v-row>
+                      </v-sheet>
                       <v-sheet v-if="selectRadio === 'ALL DATA'">
                         <!-- RADARSCREEN -->
                         <v-row>
@@ -1611,14 +1836,18 @@
                       <v-text-field
                         v-model="item.minValue"
                         label="min"
-                        :rules="[standardRules.required, isNumber, isMinLessThanMax(index)]"
+                        :rules="[
+                          standardRules.required,
+                          isNumber,
+                          isMinLessThanMax(index),
+                        ]"
                         variant="underlined"
                         density="compact"
                         required
                       ></v-text-field>
                     </v-col>
                     <v-col cols="1.5">
-                      <v-list-subheader  class="compact-label-left">
+                      <v-list-subheader class="compact-label-left">
                         ~
                       </v-list-subheader></v-col
                     >
@@ -1626,7 +1855,11 @@
                       <v-text-field
                         v-model="item.maxValue"
                         label="max"
-                        :rules="[standardRules.required, isNumber, isMaxGreaterThanMin(index)]"
+                        :rules="[
+                          standardRules.required,
+                          isNumber,
+                          isMaxGreaterThanMin(index),
+                        ]"
                         variant="underlined"
                         density="compact"
                         required
@@ -1783,6 +2016,17 @@ const timeRefs = {
   NO2ENGINE_PANEL_65378: ref(),
   NO2ENGINE_PANEL_65376: ref(),
   NO2ENGINE_PANEL_65379: ref(),
+
+  SITUATIONAL: ref(),
+  VIRTUALNAV: ref(),
+  ROUTEDECISION: ref(),
+  SYSTEMSTATE: ref(),
+  MODEINFO: ref(),
+  AIS: ref(),
+  DYNAMICAISINFO: ref(),
+  OBJECTINFO: ref(),
+  STATICAISINFO: ref(),
+  WEATHERINFO: ref(),
 };
 
 const setTimeRefs = async () => {
@@ -1870,6 +2114,17 @@ const setTimeRefs = async () => {
     response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65376;
   timeRefs.NO2ENGINE_PANEL_65379.value =
     response.NO2ENGINEPANEL_NO2ENGINE_PANEL_65379;
+
+  timeRefs.SITUATIONAL.value = response.MTIE1ISA_SITUATIONAL;
+  timeRefs.VIRTUALNAV.value = response.MTIE5VDGS_VIRTUALNAV;
+  timeRefs.ROUTEDECISION.value = response.MOF1ANS_ROUTEDECISION;
+  timeRefs.SYSTEMSTATE.value = response.MANAGEMENT_SYSTEMSTATE;
+  timeRefs.MODEINFO.value = response.MANAGEMENT_MODEINFO;
+  timeRefs.AIS.value = response.INTEGRATEDCTRLSYSTEM_AIS;
+  timeRefs.DYNAMICAISINFO.value = response.INTEGRATEDCTRLSYSTEM_DYNAMICAISINFO;
+  timeRefs.OBJECTINFO.value = response.INTEGRATEDCTRLSYSTEM_OBJECTINFO;
+  timeRefs.STATICAISINFO.value = response.INTEGRATEDCTRLSYSTEM_STATICAISINFO;
+  timeRefs.WEATHERINFO.value = response.INTEGRATEDCTRLSYSTEM_WEATHERINFO;
 };
 
 const updateTimeRefs = async () => {
@@ -1943,6 +2198,17 @@ const updateTimeRefs = async () => {
     SPEEDLOG_VHW: timeRefs.VHW.value,
     AUTOPILOT_HTD: timeRefs.HTD.value,
     SPEEDLOG_VLW: timeRefs.VLW.value,
+
+    MTIE1ISA_SITUATIONAL: timeRefs.SITUATIONAL.value,
+    MTIE5VDGS_VIRTUALNAV: timeRefs.VIRTUALNAV.value,
+    MOF1ANS_ROUTEDECISION: timeRefs.ROUTEDECISION.value,
+    MANAGEMENT_SYSTEMSTATE: timeRefs.SYSTEMSTATE.value,
+    MANAGEMENT_MODEINFO: timeRefs.MODEINFO.value,
+    INTEGRATEDCTRLSYSTEM_AIS: timeRefs.AIS.value,
+    INTEGRATEDCTRLSYSTEM_DYNAMICAISINFO: timeRefs.DYNAMICAISINFO.value,
+    INTEGRATEDCTRLSYSTEM_OBJECTINFO: timeRefs.OBJECTINFO.value,
+    INTEGRATEDCTRLSYSTEM_STATICAISINFO: timeRefs.STATICAISINFO.value,
+    INTEGRATEDCTRLSYSTEM_WEATHERINFO: timeRefs.WEATHERINFO.value,
   };
   await updateLossTimeData(tokenid.value, data);
   setTimeRefs();
@@ -2193,13 +2459,15 @@ const standardRules = {
   required: (value) => !!value || "필수 입력 항목입니다.",
 };
 
-const isNumber = (value) => !isNaN(value) || 'Must be a number.';
+const isNumber = (value) => !isNaN(value) || "Must be a number.";
 
 const isMinLessThanMax = (index) => {
   return (value) => {
     const minValue = parseFloat(value);
     const maxValue = parseFloat(standardItems.value[index].maxValue);
-    return isNaN(maxValue) || minValue < maxValue || 'Min must be less than Max.';
+    return (
+      isNaN(maxValue) || minValue < maxValue || "Min must be less than Max."
+    );
   };
 };
 
@@ -2207,7 +2475,9 @@ const isMaxGreaterThanMin = (index) => {
   return (value) => {
     const maxValue = parseFloat(value);
     const minValue = parseFloat(standardItems.value[index].minValue);
-    return isNaN(minValue) || maxValue > minValue || 'Max must be greater than Min.';
+    return (
+      isNaN(minValue) || maxValue > minValue || "Max must be greater than Min."
+    );
   };
 };
 
@@ -2216,10 +2486,12 @@ const validateAllFields = () => {
     if (
       standardRules.required(item.minValue) !== true ||
       isNumber(item.minValue) !== true ||
-      isMinLessThanMax(standardItems.value.indexOf(item))(item.minValue) !== true ||
+      isMinLessThanMax(standardItems.value.indexOf(item))(item.minValue) !==
+        true ||
       standardRules.required(item.maxValue) !== true ||
       isNumber(item.maxValue) !== true ||
-      isMaxGreaterThanMin(standardItems.value.indexOf(item))(item.maxValue) !== true
+      isMaxGreaterThanMin(standardItems.value.indexOf(item))(item.maxValue) !==
+        true
     ) {
       return false;
     }
@@ -2231,7 +2503,7 @@ const handleSubmit = () => {
   if (validateAllFields()) {
     axiosMinMax();
   } else {
-    alert('올바르지 않은 데이터 요청입니다');
+    alert("올바르지 않은 데이터 요청입니다");
   }
 };
 
@@ -2246,33 +2518,32 @@ const standardItems = ref([
   { signalName: "Wind Speed", minValue: "-", maxValue: "-" },
   { signalName: "Engine Speed", minValue: "-", maxValue: "-" },
   { signalName: "Oil Pressure", minValue: "-", maxValue: "-" },
-  { signalName: "Oil Temp", minValue: "-", maxValue: "-"  },
+  { signalName: "Oil Temp", minValue: "-", maxValue: "-" },
   { signalName: "Trans Pressure", minValue: "-", maxValue: "-" },
-  { signalName: "Gas Temp", minValue: "-", maxValue: "-"  },
+  { signalName: "Gas Temp", minValue: "-", maxValue: "-" },
 ]);
 
 const getMinMax = async () => {
   const response = await readRealtimeMinMax(tokenid.value);
 
-    // 표준 항목을 response의 데이터로 업데이트
-  standardItems.value = response.map(item => {
+  // 표준 항목을 response의 데이터로 업데이트
+  standardItems.value = response.map((item) => {
     return {
       signalName: item.signalName,
       minValue: item.minValue,
-      maxValue: item.maxValue
+      maxValue: item.maxValue,
     };
   });
-
-}
+};
 
 const axiosMinMax = async () => {
-  const response = await updateRealtimeMinMax(tokenid.value, standardItems.value);
+  const response = await updateRealtimeMinMax(
+    tokenid.value,
+    standardItems.value
+  );
   alert(response);
   location.reload();
-}
-
-
-
+};
 </script>
 
 <style scoped>

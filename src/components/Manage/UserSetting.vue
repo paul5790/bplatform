@@ -76,7 +76,7 @@
                         ></v-select>
                       </v-col>
                       <v-col cols="6" style="padding-bottom: 0px">
-                        <VueDatePicker
+                        <!-- <VueDatePicker
                           v-if="selecteduserGroup === 'USER'"
                           time-picker-inline
                           :min-date="new Date()"
@@ -90,7 +90,7 @@
                           density="compact"
                           :dark="themeMode === 'dark'"
                           :readonly="date_readonly"
-                        />
+                        /> -->
                       </v-col>
                       <v-col
                         cols="6"
@@ -187,7 +187,14 @@
                       접근제어 가능 데이터 설정
                     </p>
                     <v-card
-                      style="flex: 1; display: flex; flex-direction: column"
+                      style="
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        height: 500px;
+                        overflow-y: auto;
+                      "
+                      class="scrollable-card-1"
                     >
                       <v-card-item style="padding-top: 10px">
                         <v-window>
@@ -387,8 +394,8 @@ const permissionFrame = ref([
   { name: "SPEEDLOG", download: false },
   { name: "CANTHROTTLE", download: false },
   { name: "AUTOPILOTCONTACT", download: false },
-  { name: "NO.1ENGINEPANEL", download: false },
-  { name: "NO.2ENGINEPANEL", download: false },
+  { name: "NO1ENGINEPANEL", download: false },
+  { name: "NO2ENGINEPANEL", download: false },
   { name: "MTIE1.ISA", download: false },
   { name: "MTIE5.VDGS", download: false },
   { name: "MTIE5.DBS", download: false },
@@ -484,8 +491,8 @@ const updateDate = () => {
   );
 
   // 시간대 변환
-  start.setHours(start.getHours() + 9);
-  end.setHours(end.getHours() + 9);
+  start.setHours(start.getHours());
+  end.setHours(end.getHours());
 
   // 유효한 날짜인지 확인
   if (!isNaN(start) && !isNaN(end)) {
@@ -586,7 +593,7 @@ const check = () => {
           endMM = endTimePart.split(":")[1]; // '18'
 
           //
-        } else {
+        } else if (selectedItems.value[0].permissionTime.length > 8) {
           startDay = "2020-01-01";
           startHH = "00"; // '00'
           startMM = "00"; // '18'
@@ -712,6 +719,7 @@ const resetPermissions = () => {
 const fetchData = async () => {
   try {
     const response = await readUserData(tokenid.value);
+    console.log(response);
     // for (let i = 0; i < response.length; i++) {
     //   items.value.push({
     //     userId: response[i].id || "",
@@ -753,9 +761,24 @@ fetchData();
 
 const changeData = async () => {
   try {
+    console.log(endDateInput.value);
+    if (endDateInput.value === "" || endDateInput.value === undefined) {
+      alert("기간을 선택하세요.")
+      return;
+    }
+    if (startDateInput.value === "" || startDateInput.value === undefined) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, "0"); // 월은 0부터 시작하므로 +1
+      const day = String(today.getDate()).padStart(2, "0");
+
+      startDateInput.value = `${year}-${month}-${day}`;
+    }
     updateDate();
-    console.log(getFormattedDate(startDate.value));
-    console.log(getFormattedDate(endDate.value));
+    
+    const date = `${getFormattedDate(startDate.value)},${getFormattedDate(
+      endDate.value
+    )}`;
     const data = {
       id: selectedId.value,
       userName: selecteduserName.value,
@@ -770,26 +793,22 @@ const changeData = async () => {
       .filter((permission) => permission.download)
       .map((permission) => permission.name);
 
-    const formattedDate = getFormattedDate(datePermission.value);
-
-    console.log(datePermission.value);
-    console.log(formattedDate);
-
     if (selecteduserGroup.value === "USER") {
-      if (
-        !datePermission.value ||
-        isNaN(new Date(datePermission.value).getTime())
-      ) {
+      if (endDateInput.value === "") {
         alert("접근 기간을 설정하세요");
+        return;
+      }else if(getFormattedDate(startDate.value) > getFormattedDate(endDate.value)){
+        alert("종료기간을 시작기간 이후로 설정하세요.");
         return;
       } else {
         data.permissions = selectedPermission;
-        data.permissionsExpiryTime = formattedDate;
+        data.permissionsExpiryTime = date;
       }
     } else {
       data.permissions = [];
       data.permissionsExpiryTime = "";
     }
+    console.log(data);
 
     try {
       await updateUserData(tokenid.value, data);
@@ -803,7 +822,7 @@ const changeData = async () => {
     console.error(error);
   }
   nullDialog();
-  // location.reload();
+  location.reload();
 };
 
 const cancel = () => {

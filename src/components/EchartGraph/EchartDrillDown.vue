@@ -251,6 +251,7 @@ const fetchData = async () => {
   loading.value = true;
   initializeRefs();
   let response = await readlossData(tokenid.value, selectedTestName.value);
+  console.log(response);
   await populateRefs(response);
 
   loading.value = false;

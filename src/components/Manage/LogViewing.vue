@@ -13,46 +13,45 @@
       <v-row
         align="center"
         justify="space-between"
-        style="height: 5vh; margin-top: 10px; margin-left: 10px"
+        style="height: 5vh; margin-top: 15px; margin-left: 10px"
       >
         <v-col cols="auto" style="padding-top: 0px">
-          <v-btn-toggle v-model="filter_date" mandatory style="width: 100%">
+          <v-btn-toggle v-model="filter_date" mandatory style="width: 280px;  height: 40px;">
             <v-btn
               value="3일"
-              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              style="width: 20%; border: 1px solid #ccc; padding: 5px"
               >3일</v-btn
             >
             <v-btn
               value="7일"
-              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              style="width: 20%; border: 1px solid #ccc; padding: 5px"
               >7일</v-btn
             >
             <v-btn
               value="30일"
-              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              style="width: 20%; border: 1px solid #ccc; padding: 5px"
               >30일</v-btn
             >
             <v-btn
               value="직접입력"
-              style="width: 25%; border: 1px solid #ccc; padding: 5px"
+              style="width: 30%; border: 1px solid #ccc; padding: 5px"
               >직접입력</v-btn
             >
           </v-btn-toggle>
         </v-col>
-        <v-col cols="auto" style="padding-top: 0px">
+        <v-col v-if="filter_date === '직접입력'" cols="auto" style="padding-top: 0px">
           <VueDatePicker
-            v-if="filter_date === '직접입력'"
             v-model="dateRange"
             density="compact"
             range
             :enableTimePicker="false"
-            style="padding-left: 10px; z-index: 1200"
+            style="z-index: 1200"
             @open="adjustDialogHeight()"
           />
         </v-col>
 
         <v-col cols="auto" style="padding-top: 0px">
-          <v-btn-toggle v-model="filter_logtype" mandatory style="width: 200px">
+          <v-btn-toggle v-model="filter_logtype" mandatory style="width: 200px;  height: 40px;">
             <v-btn
               value="webapp"
               style="width: 50%; border: 1px solid #ccc; padding: 5px"
@@ -68,10 +67,19 @@
 
         <v-col cols="auto" style="padding-top: 0px">
           <v-btn
-            style="width: 100px; height: 40px"
+            style="width: 100px;"
             color="blue-darken-1"
             @click="filterApply()"
             >적용</v-btn
+          ></v-col
+        >
+
+        <v-col cols="auto" style="padding-top: 0px">
+          <v-btn
+            style="width: 150px;"
+            color="blue-darken-1"
+            @click="downloadCSV()"
+            >로그 다운로드</v-btn
           ></v-col
         >
 
@@ -98,7 +106,7 @@
       </v-row>
       <v-window class="scrollable-card">
         <v-data-table
-          style="margin-top: 20px; height: 66vh"
+          style="margin-top: 40px; height: 64vh"
           v-model:page="page"
           class="elevation-1"
           :headers="headers"
@@ -349,7 +357,7 @@ import moment from "moment";
 import dayjs from "dayjs";
 
 const page = ref(1);
-const itemsPerPage = ref(20);
+const itemsPerPage = ref(22);
 
 const search = ref("");
 const searchInput = ref("");
@@ -398,7 +406,8 @@ const updateTimes = () => {
 };
 
 const updateManualTimes = () => {
-  if (dateRange.value.length === 2) {
+  // dateRange.value가 존재하고 배열이며 길이가 2인지 확인
+  if (Array.isArray(dateRange.value) && dateRange.value.length === 2) {
     startTime.value = dayjs(dateRange.value[0])
       .startOf("day")
       .format("YYYY-MM-DD HH:mm:ss");
@@ -469,6 +478,7 @@ const pageCount = computed(() => {
 });
 
 const filteredItems = computed(() => {
+  console.log(items);
   if (!search.value) {
     return items.value;
   }
@@ -502,7 +512,6 @@ const webData = async () => {
 
       // 원본 로그를 저장
       let originalLog = logText;
-      console.log(originalLog);
 
       // log가 75자 이상인 경우 자르기
       if (logText.length > 75) {
@@ -574,6 +583,42 @@ onMounted(() => {
   // 컴포넌트가 마운트될 때 실행되는 코드
   webData();
 });
+
+
+// CSV 파일 다운로드 함수
+const downloadCSV = () => {
+  console.log(items.value);
+  // CSV 데이터 생성
+  const csvContent = createCSV(items.value);
+
+  // Blob 생성
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+
+  // 가상 링크를 생성하여 다운로드
+  const link = document.createElement('a');
+  link.setAttribute('href', url);
+  link.setAttribute('download', 'log.csv');
+  document.body.appendChild(link);
+
+  link.click(); // 다운로드 실행
+  document.body.removeChild(link); // 링크 제거
+};
+
+// CSV 데이터를 생성하는 함수
+const createCSV = (data) => {
+  // 헤더 생성
+  const header = "timestamp,type,method,state,url,originalLog\n";
+
+  // 데이터 생성
+  const rows = data.map((row) => {
+    return `${row.timestamp},${row.type},${row.method},${row.state},${row.url},${row.originalLog}`;
+  }).join("\n");
+
+  return header + rows;
+};
+
+
 </script>
 
 <style scoped>

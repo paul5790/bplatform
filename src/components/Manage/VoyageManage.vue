@@ -1226,7 +1226,7 @@ const editData = async () => {
         alert("시험 추가가 완료되었습니다.");
         nullDialog2();
         // console.log("API 응답 데이터:", response.data);
-        //location.reload();
+        location.reload();
       } catch (error) {
         // 특정 에러인 경우에 따라 다르게 처리합니다.
         if (error instanceof TypeError && error.message.includes("toString")) {
