@@ -207,6 +207,7 @@
                           v-model="startDateInput"
                           min="2000-01-01"
                           max="9999-12-31"
+                          :disabled="date_readonly"
                         />
                       </v-col>
 
@@ -226,6 +227,7 @@
                             backgroundColor: selectColor,
                             color: selectTextColor,
                           }"
+                          :disabled="date_readonly"
                         >
                           <option
                             v-for="hour in hours"
@@ -247,6 +249,7 @@
                           type="text"
                           class="m-time-input"
                           placeholder="00"
+                          :disabled="date_readonly"
                         />
                         분
                       </v-col>
@@ -260,6 +263,7 @@
                           v-model="endDateInput"
                           min="1000-01-01"
                           max="9999-12-31"
+                          :disabled="date_readonly"
                         />
                       </v-col>
 
@@ -279,6 +283,7 @@
                             backgroundColor: selectColor,
                             color: selectTextColor,
                           }"
+                          :disabled="date_readonly"
                         >
                           <option
                             v-for="hour in hours"
@@ -299,6 +304,7 @@
                           type="text"
                           class="m-time-input"
                           placeholder="00"
+                          :disabled="date_readonly"
                         />
                         분
                       </v-col>
@@ -363,7 +369,7 @@ import { CanvasRenderer } from "echarts/renderers";
 import { LineChart } from "echarts/charts";
 import { UniversalTransition } from "echarts/features";
 import { themeMode, themeConfig } from "@/utils/theme.js";
-import { readTrialData, readDataTrial } from "../api/index.js";
+import { readTrialData, readDataTrial, readMineData } from "../api/index.js";
 import * as echarts from "echarts";
 import html2canvas from "html2canvas";
 import "@/styles/datepicker-theme.css";
@@ -406,6 +412,7 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 onMounted(() => {
   sessionStorage.setItem("page", "데이터 분석");
   initializeChart();
+  permissionUpdate();
 });
 
 const tableStyle = computed(() => {
@@ -422,6 +429,50 @@ const tableStyle = computed(() => {
     backgroundRepeat: "no-repeat",
   };
 });
+const userDataResponse = ref();
+
+const isAllowed = (destinationName) => {
+  // '.'이 있는 경우 제거한 이름으로 변경
+  if (userDataResponse.value.userGroup === "ADMIN") {
+    return true;
+  }
+  // 목적지 이름이 수정된 permissions 목록에 포함되어 있는지 확인
+  return userDataResponse.value.permissions.includes(destinationName);
+};
+
+const standard = [
+  "DGPS",
+  "GYRO",
+  "ANEMOMETER",
+  "SPEEDLOG",
+  "AUTOPILOT",
+  "NO1ENGINEPANEL",
+  "NO2ENGINEPANEL",
+  "WEATHERINFO",
+];
+const permissionUpdate = async () => {
+  userDataResponse.value = await readMineData(tokenid.value);
+  console.log(userDataResponse.value.permissions);
+
+  subComponents.value = [];
+
+  if (userDataResponse.value.userGroup === "ADMIN") {
+    subComponents.value = standard;
+    return;
+  }
+
+  // standard 배열과 겹치는 permissions만 필터링하여 subComponents에 추가
+  const filteredPermissions = userDataResponse.value.permissions.filter(
+    (permission) => standard.includes(permission)
+  );
+
+  subComponents.value.push(...filteredPermissions);
+
+  // permission에 INTEGRATEDCTRLSYSTEM이 포함되어 있으면 WEATHERINFO를 추가
+  if (userDataResponse.value.permissions.includes("INTEGRATEDCTRLSYSTEM")) {
+    subComponents.value.push("WEATHERINFO");
+  }
+};
 
 // // 화면 로딩 변수
 // const nodata = ref(true);
@@ -448,8 +499,8 @@ const subComponents = ref([
   "ANEMOMETER",
   "SPEEDLOG",
   "AUTOPILOT",
-  "NO.1ENGINEPANEL",
-  "NO.2ENGINEPANEL",
+  "NO1ENGINEPANEL",
+  "NO2ENGINEPANEL",
 ]);
 const items = ref([]);
 const selectedsubComponent = ref([]); // 선택된 구성 요소
@@ -482,7 +533,16 @@ watch(selectedsubComponent, (newVal) => {
     if (newVal.includes("AUTOPILOT")) {
       items.value.push("starboardruddersensor", "portruddersensor");
     }
-    if (newVal.includes("NO.1ENGINEPANEL")) {
+    if (newVal.includes("WEATHERINFO")) {
+      items.value.push(
+        "temperature",
+        "humidity",
+        "visibility",
+        "wind_speed",
+        "wind_direction"
+      );
+    }
+    if (newVal.includes("NO1ENGINEPANEL")) {
       items.value.push(
         "1_Engine Speed",
         "1_Engine Oil Temperature",
@@ -498,7 +558,7 @@ watch(selectedsubComponent, (newVal) => {
         "1_fuel_LEVEL"
       );
     }
-    if (newVal.includes("NO.2ENGINEPANEL")) {
+    if (newVal.includes("NO2ENGINEPANEL")) {
       items.value.push(
         "2_Engine Speed",
         "2_Engine Oil Temperature",
@@ -991,6 +1051,11 @@ const gData = {
   "2_Engine Intake Manifold Temp": [],
   "2_Engine Exhaust Gas Temperature": [],
   "2_fuel_LEVEL": [],
+  temperature: [],
+  humidity: [],
+  visibility: [],
+  wind_speed: [],
+  wind_direction: [],
 };
 
 // x축의 범위를 업데이트하는 dataZoom 이벤트 핸들러 추가
@@ -1032,9 +1097,13 @@ const fetchData = async (subComponent, contents) => {
       requests.value.period = `test?test_name=${selectedtrialrun.value}`;
     }
 
+    let vts = subComponent === "INTEGRATEDCTRLSYSTEM" ? "vts" : "information";
+
     let apiReq = `table_data/information/test?test_name=TestCase1&signal_name=ais_vdo&signal_name=ais_vdm`;
-    apiReq = `table_data/information/${requests.value.period}&signal_name=${subComponent}_${contents}`;
+    apiReq = `table_data/${vts}/${requests.value.period}&signal_name=${subComponent}_${contents}`;
+    console.log(apiReq);
     let a = await readDataTrial(tokenid.value, apiReq);
+    console.log(a);
     noPermission = false;
     return a;
   } catch (error) {
@@ -1062,7 +1131,6 @@ const processData = (
   analysisName
 ) => {
   // const dataArray = data.DGPS_GGA;
-
   analysisData.value[n] = dataArray.map((item) => item[dataKey]);
 
   // 중복된 타임스탬프를 제거하면서 analysisTime에 값을 추가
@@ -1101,9 +1169,9 @@ const searchData = async () => {
     return;
   }
   tableSize.value =
-      selectedItem.value.length < 3 ? (selectedItem.value.length - 1) * 5 : 10;
+    selectedItem.value.length < 3 ? (selectedItem.value.length - 1) * 5 : 10;
   await nextTick();
-  
+
   // 차트 초기화
   if (myChart) {
     myChart.dispose(); // 기존 차트 인스턴스를 제거
@@ -1141,6 +1209,7 @@ const searchData = async () => {
       ...template,
     }));
 
+    console.log(1);
     if (
       selectedItem.value.includes("latitude") ||
       selectedItem.value.includes("longitude") ||
@@ -1339,7 +1408,23 @@ const searchData = async () => {
       if (!fetchedData) return; // 데이터가 없으면 중단
       itemsData.fuel_LEVEL_2 = Object.values(fetchedData)[0]; // 동적으로 배열 추출
     }
+    if (
+      selectedItem.value.includes("temperature") ||
+      selectedItem.value.includes("humidity") ||
+      selectedItem.value.includes("visibility") ||
+      selectedItem.value.includes("wind_speed") ||
+      selectedItem.value.includes("wind_direction")
+    ) {
+      const fetchedData = await fetchData(
+        "INTEGRATEDCTRLSYSTEM",
+        "WEATHERINFO"
+      );
+      console.log(fetchedData);
+      if (!fetchedData) return; // 데이터가 없으면 중단
+      itemsData.WEATHERINFO = Object.values(fetchedData)[0]; // 동적으로 배열 추출
+    }
 
+    console.log(2);
     selectedItem.value.forEach((item) => {
       switch (item) {
         case "latitude":
@@ -1460,6 +1545,58 @@ const searchData = async () => {
             "degree(°)",
             "rsa/portruddersensor",
             "portruddersensor"
+          );
+          break;
+
+        case "temperature":
+          processData(
+            itemsData.WEATHERINFO,
+            "received_TIME",
+            "temperature",
+            "°C",
+            "weather/temperature",
+            "temperature"
+          );
+          break;
+
+        case "humidity":
+          processData(
+            itemsData.WEATHERINFO,
+            "received_TIME",
+            "humidity",
+            "%RH",
+            "weather/humidity",
+            "humidity"
+          );
+          break;
+        case "visibility":
+          processData(
+            itemsData.WEATHERINFO,
+            "received_TIME",
+            "visibility",
+            "m",
+            "weather/visibility",
+            "visibility"
+          );
+          break;
+        case "wind_speed":
+          processData(
+            itemsData.WEATHERINFO,
+            "received_TIME",
+            "wind_SPEED",
+            "m/s",
+            "weather/wind_speed",
+            "wind_speed"
+          );
+          break;
+        case "wind_direction":
+          processData(
+            itemsData.WEATHERINFO,
+            "received_TIME",
+            "wind_DIRECTION",
+            "degree(°)",
+            "weather/wind_direction",
+            "wind_direction"
           );
           break;
 
@@ -1707,7 +1844,8 @@ const searchData = async () => {
       }
     });
 
-
+    console.log(3);
+    console.log(analysisTime.value);
   } catch (error) {
     console.error(error);
     noData = true;
@@ -1827,21 +1965,14 @@ const pushTable = (data, reTime, n) => {
       standardDeviation.value / Math.sqrt(numericValues.length);
     // analysis.value[n].unit = unit.value;
     // console.log(`Minimum Value: ${minValue.value}`); // 최솟값
-    analysis.value[n].min = minValue.value.toFixed(4);
-    // console.log(`Maximum Value: ${maxValue.value}`); // 최댓값
-    analysis.value[n].max = maxValue.value.toFixed(4);
-    // console.log(`Average Value: ${averageValue.value}`); // 평균값
-    analysis.value[n].average = averageValue.value.toFixed(4);
-    // console.log(`Standard Deviation: ${standardDeviation.value}`); // 표준편차
-    analysis.value[n].rmse = standardDeviation.value.toFixed(4);
-    // console.log(`RMS (Root Mean Square): ${rms.value}`); // 제곱평균제곱근
-    analysis.value[n].rms = rms.value.toFixed(4);
-    // console.log(`Median: ${median.value}`); // 중앙값
-    analysis.value[n].median = median.value.toFixed(4);
-    // console.log(`Standard Error: ${standardError.value}`); // 표준 오차
-    analysis.value[n].error = standardError.value.toFixed(4);
-    // console.log(`Variance: ${variance.value}`); // 분산
-    analysis.value[n].variance = variance.value.toFixed(4);
+    analysis.value[n].min = formatNumber(minValue.value);
+    analysis.value[n].max = formatNumber(maxValue.value);
+    analysis.value[n].average = formatNumber(averageValue.value);
+    analysis.value[n].rmse = formatNumber(standardDeviation.value);
+    analysis.value[n].rms = formatNumber(rms.value);
+    analysis.value[n].median = formatNumber(median.value);
+    analysis.value[n].error = formatNumber(standardError.value);
+    analysis.value[n].variance = formatNumber(variance.value);
   } else {
     noData = true;
     averageValue.value = 0;
@@ -1850,6 +1981,11 @@ const pushTable = (data, reTime, n) => {
     median.value = 0;
     standardError.value = 0;
   }
+};
+
+const formatNumber = (value) => {
+  // 소수점 이하 4자리까지 반올림한 후, 불필요한 0 제거
+  return parseFloat(value.toFixed(4));
 };
 
 const clearChart = () => {

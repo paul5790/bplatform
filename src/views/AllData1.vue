@@ -36,7 +36,7 @@
                 (DataTypeCardVisible = false),
                 (periodSettingCardVisible = false)
             "
-            class="custom-text-field"
+            class="custom-text-field2"
             ><v-tooltip activator="parent" location="bottom">{{
               formattedSearchTarget
             }}</v-tooltip></v-text-field
@@ -76,8 +76,9 @@
                 (DataTypeCardVisible = false),
                 (periodSettingCardVisible = true)
             "
-            class="custom-text-field"
+            class="custom-text-field2"
           ></v-text-field>
+
           <v-btn
             @click="dataSearchBtn()"
             color="#5865f2"
@@ -183,7 +184,13 @@
             >
               다운로드
             </button>
-            <v-checkbox v-model="checkVTS" label="VTS 포함하기" class="checkbox-right" @change="handleCheckboxChange"></v-checkbox>
+            <v-checkbox
+              v-if="isAllowedVts"
+              v-model="checkVTS"
+              label="VTS 포함하기"
+              class="checkbox-right"
+              @change="handleCheckboxChange"
+            ></v-checkbox>
           </div>
         </div>
       </v-card-text>
@@ -228,6 +235,7 @@
             :class="{
               'selected-button': ShipData === 'VTS 데이터',
             }"
+            :disabled="!isAllowedVts"
             width="43%"
             style="flex: 1; margin: 0 10px"
             variant="outlined"
@@ -263,7 +271,7 @@
       :style="{
         position: 'absolute',
         top: searchState ? '150px' : '310px',
-        left: '31%',
+        left: '27.5%',
         zIndex: 1100,
         width: '50%',
         maxHeight: '570px', // 최대 높이를 설정
@@ -301,6 +309,7 @@
                       selectedDestination &&
                       selectedDestination.name === '전체'),
                 }"
+                :disabled="!isAllowed(destination.name)"
               >
                 <v-list-item-title>{{ destination.name }}</v-list-item-title>
               </v-list-item>
@@ -368,9 +377,9 @@
       :style="{
         position: 'absolute',
         top: searchState ? '150px' : '310px',
-        left: '31%',
+        left: '27.5%',
         zIndex: 1100,
-        width: '16%',
+        width: '18%',
         overflow: 'visible',
       }"
     >
@@ -479,9 +488,9 @@
       :style="{
         position: 'absolute',
         top: searchState ? '150px' : '310px',
-        left: selectedTest === 0 ? '67.5%' : '70.5%',
+        left: '67.5%',
         zIndex: 1100,
-        width: selectedTest === 0 ? '35%' : '17%',
+        width: '35%',
         overflow: 'visible',
         transform: 'translateX(-50%)',
       }"
@@ -494,8 +503,8 @@
           <v-list
             class="scrollable-card-1"
             :style="{
-              height: selectedTest === 0 ? '250px' : '250px',
-              width: selectedTest === 0 ? '30%' : '100%',
+              height: '250px',
+              width: '35%',
               borderRight: '1px solid #e0e0e0',
             }"
           >
@@ -512,12 +521,11 @@
           </v-list>
 
           <div
-            v-if="selectedTest === 0"
             :style="{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              width: '70%',
+              width: '65%',
             }"
           >
             <!-- <VueDatePicker
@@ -538,6 +546,7 @@
                 v-model="startDateInput"
                 min="2000-01-01"
                 max="9999-12-31"
+                :disabled="date_readonly"
               />
               <select
                 v-model="startHour"
@@ -547,6 +556,7 @@
                   backgroundColor: selectColor,
                   color: selectTextColor,
                 }"
+                :disabled="date_readonly"
               >
                 <option
                   v-for="hour in hours"
@@ -567,6 +577,7 @@
                 type="text"
                 class="m-time-input"
                 placeholder="00"
+                :disabled="date_readonly"
               />
               분
             </div>
@@ -579,6 +590,7 @@
                 v-model="endDateInput"
                 min="1000-01-01"
                 max="9999-12-31"
+                :disabled="date_readonly"
               />
               <select
                 v-model="endHour"
@@ -588,6 +600,7 @@
                   backgroundColor: selectColor,
                   color: selectTextColor,
                 }"
+                :disabled="date_readonly"
               >
                 <option
                   v-for="hour in hours"
@@ -609,6 +622,7 @@
                 type="text"
                 class="m-time-input"
                 placeholder="00"
+                :disabled="date_readonly"
               />
               분
             </div>
@@ -972,10 +986,10 @@ const tokenid = ref(sessionStorage.getItem("token") || "");
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // text field
-let tb1 = "";
+const tb1 = ref("");
 let tb2 = "";
-let tb3 = "";
-let tb4 = "";
+const tb3 = ref("");
+const tb4 = ref("");
 
 // for View API Request variable
 const requests = ref({
@@ -1038,7 +1052,7 @@ const toggleSelectShipData = (data) => {
     console.log("있을 수 없는 일");
   }
 
-  tb1 = ShipData.value;
+  tb1.value = ShipData.value;
 
   // 검색 조건 할당
   // requests.value.data =
@@ -1381,19 +1395,14 @@ const toggleSubItem = (subItem) => {
 
   const foundItem = selectedItems.value.find((item) => item.split("_")[1]);
   let checkAll;
-  console.log(checkData.includes(subItem.split("_")[0]));
   if (foundItem && checkData.includes(subItem.split("_")[0])) {
     checkAll = foundItem.split("_")[1];
     checkData = checkData.filter((item) => item !== subItem.split("_")[0]);
-    console.log("1");
   } else if (subItem.split("_")[1] === "전체") {
     checkData.push(subItem.split("_")[0]);
-    console.log("2");
   } else {
     checkAll = "";
-    console.log("3");
   }
-  console.log(checkData);
 
   if (subItem.split("_")[1] === "전체") {
     // 전체가 선택된 상태라면 모든 선택 해제
@@ -1573,7 +1582,7 @@ const toggleSelectDataType = (type) => {
   }
 
   // 데이터 선택 박스 text 할당
-  tb3 = selectDataType.value;
+  tb3.value = selectDataType.value;
 
   // 다음 선택 시, 다음 조건 CardView로 이동
   DataTypeCardVisible.value = false;
@@ -1583,7 +1592,7 @@ const toggleSelectDataType = (type) => {
 };
 
 // ------------------- 3번째 데이터 기간 Method ------------------------ //
-
+const date_readonly = ref(true);
 // 초기 날짜 설정
 const dateRange = ref(); // 초기 날짜를 설정합니다
 const startUtc = ref(); //검색용 직접선택 시작시간
@@ -1662,15 +1671,45 @@ const updateDate = () => {
 
 const selectTest = (index, category) => {
   selectedTest.value = index;
+
+  const start = selectedTestStartTime.value[index - 1];
+  const end = selectedTestEndTime.value[index - 1];
+
   if (index == 0) {
+    date_readonly.value = false;
+    updateDate();
+
     handleDateChange();
     requests.value.period = `period?start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`;
+    tb4.value = `${searchTimeRange.value}`;
   } else {
+    const startDay = start.split("T")[0]; // 2024-08-20
+    const endDay = end.split("T")[0]; // 2024-08-20
+    date_readonly.value = true;
+
+    // 시간 값 추출
+    const startTimePart = start.split("T")[1]; // '00:18:59.000000Z'
+    const startHH = startTimePart.split(":")[0]; // '00'
+    const startMM = startTimePart.split(":")[1]; // '18'
+
+    const endTimePart = end.split("T")[1]; // '00:18:59.000000Z'
+    const endHH = endTimePart.split(":")[0]; // '00'
+    const endMM = endTimePart.split(":")[1]; // '18'
+
+    startDateInput.value = startDay;
+    startHour.value = startHH;
+    startMinute.value = startMM;
+
+    endDateInput.value = endDay;
+    endHour.value = endHH;
+    endMinute.value = endMM;
+
     searchTimeRange.value = category;
     requests.value.period = `test?test_name=${searchTimeRange.value}`;
+    tb4.value = `${searchTimeRange.value} (${start}~${end})`;
   }
   // 데이터 선택 박스 text 할당
-  tb4 = searchTimeRange.value;
+  console.log(searchTimeRange.value);
 };
 
 const handleDateChange = () => {
@@ -1688,7 +1727,7 @@ const handleDateChange = () => {
 const showType = ref("none");
 const completeData0 = () => {
   // 데이터 선택 박스 text 할당
-  tb1 = ShipData.value;
+  tb1.value = ShipData.value;
 
   // 검색 조건 할당
   requests.value.data =
@@ -1747,7 +1786,7 @@ const completeData1_1 = () => {
 
 const completeData2 = () => {
   // 데이터 선택 박스 text 할당
-  tb3 = selectDataType.value;
+  tb3.value = selectDataType.value;
 
   // 검색 조건 할당
   requests.value.type =
@@ -1768,13 +1807,12 @@ const completeData3 = () => {
   if (selectedTest.value === 0) {
     requests.value.period = `period?start_time_utc=${startUtc.value}&end_time_utc=${endUtc.value}`;
     if (startUtc.value === undefined || endUtc.value === undefined) {
-      tb4 = "날짜를 입력하세요.";
+      tb4.value = "날짜를 입력하세요.";
     } else {
-      tb4 = `${startUtc.value}~${endUtc.value}`;
+      tb4.value = `${startUtc.value}~${endUtc.value}`;
     }
   } else {
     requests.value.period = `test?test_name=${searchTimeRange.value}`;
-    tb4 = testList.value[selectedTest.value];
   }
 
   // 다음 선택 시, 다음 조건 CardView로 이동
@@ -1787,7 +1825,8 @@ const completeData3 = () => {
 // --------------- 데이터 검색 버튼 -----------------------//
 ///////////////////////////////////////////////////////////
 const dataSearchBtn = async () => {
-  if (tb1 && tb2 && tb3 && tb4) {
+  if (tb1.value && tb2 && tb3.value && tb4.value) {
+    if(selectDataType.value === "비정형 데이터") alert("데이터 원문 조회 시, 처리 시간이 길어질 수 있습니다.")
     checkPermission();
     viewState.value = "loading";
     ShipDataState.value = ShipData.value;
@@ -1897,15 +1936,10 @@ const processData = (response) => {
   const sortedDataKeys = recentSearches.value.filter((key) =>
     newDataKeys.includes(key)
   );
-
-  console.log(newDataKeys);
-  console.log(sortedDataKeys);
   dataKeys.value = sortedDataKeys;
-  console.log(response);
 
   try {
     dataKeys.value.forEach((key) => {
-      console.log(response[key]);
       if (response[key].length > 0) {
         const fields = Object.keys(response[key][0]);
 
@@ -2011,6 +2045,7 @@ const windowClick = () => {
 onMounted(() => {
   getTrialDate();
   sessionStorage.setItem("page", "데이터 조회");
+  permissionUpdate();
 });
 
 // ----------------------------- 원문 데이터 테스트 ------------------------------ //
@@ -2087,6 +2122,31 @@ const formattedSearchTarget = computed(() => {
 const downloadPermission = ref(false);
 const sampleChoice1 = ref("GYRO_HDT, GYRO_ROT, ANEMOMETER_MWV");
 
+const userDataResponse = ref();
+// 사용자가 접근 가능한 SubComponent인지 확인하는 함수
+const isAllowed = (destinationName) => {
+  // '.'이 있는 경우 제거한 이름으로 변경
+  if (userDataResponse.value.userGroup === "ADMIN") {
+    return true;
+  }
+  const normalizedPermissions = userDataResponse.value.permissions.map(
+    (permission) => permission.replace(/\./g, "")
+  );
+
+  // 목적지 이름이 수정된 permissions 목록에 포함되어 있는지 확인
+  return normalizedPermissions.includes(destinationName);
+};
+
+const isAllowedVts = ref(false);
+
+
+const permissionUpdate = async () => {
+  userDataResponse.value = await readMineData(tokenid.value);
+  console.log(userDataResponse.value.permissions);
+  isAllowedVts.value = userDataResponse.value.userGroup === "ADMIN" || userDataResponse.value.permissions.includes("INTEGRATEDCTRLSYSTEM") ? true : false;
+  console.log(isAllowedVts.value);
+};
+
 const checkPermission = async () => {
   const userDataResponse = await readMineData(tokenid.value);
   if (userDataResponse.userGroup === "ADMIN") {
@@ -2101,7 +2161,6 @@ const checkPermission = async () => {
 
     // 조건 1: 현재 시간이 getTime보다 이른지 확인
     const isTimeValid = currentTime < permissionTime;
-    console.log(isTimeValid);
 
     // 조건 2: sampleChoice1의 데이터가 getPermission에 포함되는지 확인
     const isDataValid = formattedSearchTarget.value
@@ -2111,7 +2170,6 @@ const checkPermission = async () => {
           choice.startsWith(permission)
         );
       });
-    console.log(isDataValid);
     // 두 조건을 모두 만족하는지 확인
     downloadPermission.value = isDataValid;
   }
@@ -2244,6 +2302,7 @@ const uploadFile = async () => {
     const loadData = await downloadDataFileXml(
       tokenid.value,
       formData,
+      checkVTS.value,
       cancelTokenSource.token
     );
 
@@ -2278,9 +2337,10 @@ const uploadFile = async () => {
 
 const checkVTS = ref(false);
 const handleCheckboxChange = () => {
-  console.log(checkVTS.value);
   if (checkVTS.value) {
-    alert("VTS 데이터를 포함하여 다운로드 할 시 시간이 오래 소요될 수 있습니다.");
+    alert(
+      "VTS 데이터를 포함하여 다운로드 할 시 시간이 오래 소요될 수 있습니다."
+    );
   }
 };
 
@@ -2385,6 +2445,10 @@ const cardStyle = computed(() => {
 
 .custom-text-field {
   width: 300px !important;
+}
+
+.custom-text-field2 {
+  width: 500px !important;
 }
 
 .destination-container > .v-list {
@@ -2501,6 +2565,7 @@ const cardStyle = computed(() => {
 /* DatePicker 테두리 스타일 추가 */
 .date-picker {
   border: 1px solid #ccc;
+  font-size: 15px;
   padding: 0.3rem;
   border-radius: 4px;
   width: 100%;
@@ -2509,7 +2574,7 @@ const cardStyle = computed(() => {
 
 .time-select {
   padding: 5px;
-  font-size: 16px;
+  font-size: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-left: 5px;
@@ -2526,7 +2591,7 @@ const cardStyle = computed(() => {
   border: 1px solid #ccc;
   padding: 0.5rem;
   border-radius: 4px;
-  width: 50px;
+  width: 30px;
   text-align: center;
   margin: 0 5px;
 }
@@ -2538,7 +2603,7 @@ const cardStyle = computed(() => {
 
 .date-input {
   padding: 5px;
-  font-size: 16px;
+  font-size: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
   width: 100%;
@@ -2584,11 +2649,11 @@ select.time-select {
 
 .m-time-input {
   padding: 5px;
-  font-size: 14px;
+  font-size: 15px;
   border: 1px solid #ccc;
   border-radius: 4px;
   margin-left: 5px;
-  width: 50px;
+  width: 30px;
 }
 
 .action-row {

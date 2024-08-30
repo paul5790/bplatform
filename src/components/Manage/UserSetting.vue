@@ -418,7 +418,7 @@ const permissionFrame = ref([
   { name: "ENGINE", download: false },
   { name: "MODE", download: false },
 
-  { name: "INTEGRATEDCTRLSYSTEM", download: false },
+  { name: "VTS", download: false },
 ]);
 
 const toggleAll = (type) => {
@@ -623,9 +623,12 @@ const check = () => {
 
       resetPermissions();
       selectedItems.value[0].permission.forEach((permissionName) => {
-        const perm = permissionFrame.value.find(
-          (p) => p.name === permissionName
-        );
+        let perm = permissionFrame.value.find((p) => p.name === permissionName);
+
+        // 만약 permissionName이 'INTEGRATEDCTRLSYSTEM'이면 'VTS'를 찾도록 변경
+        if (permissionName === "INTEGRATEDCTRLSYSTEM") {
+          perm = permissionFrame.value.find((p) => p.name === "VTS");
+        }
         if (perm) {
           perm.download = true;
         }
@@ -763,7 +766,7 @@ const changeData = async () => {
   try {
     console.log(endDateInput.value);
     if (endDateInput.value === "" || endDateInput.value === undefined) {
-      alert("기간을 선택하세요.")
+      alert("기간을 선택하세요.");
       return;
     }
     if (startDateInput.value === "" || startDateInput.value === undefined) {
@@ -775,7 +778,7 @@ const changeData = async () => {
       startDateInput.value = `${year}-${month}-${day}`;
     }
     updateDate();
-    
+
     const date = `${getFormattedDate(startDate.value)},${getFormattedDate(
       endDate.value
     )}`;
@@ -791,13 +794,22 @@ const changeData = async () => {
 
     const selectedPermission = permissionFrame.value
       .filter((permission) => permission.download)
-      .map((permission) => permission.name);
+      .map((permission) => {
+        // "VTS"를 "INTEGRATEDCTRLSYSTEM"으로 변경
+        return permission.name === "VTS"
+          ? "INTEGRATEDCTRLSYSTEM"
+          : permission.name;
+      });
+
+    console.log(selectedPermission);
 
     if (selecteduserGroup.value === "USER") {
       if (endDateInput.value === "") {
         alert("접근 기간을 설정하세요");
         return;
-      }else if(getFormattedDate(startDate.value) > getFormattedDate(endDate.value)){
+      } else if (
+        getFormattedDate(startDate.value) > getFormattedDate(endDate.value)
+      ) {
         alert("종료기간을 시작기간 이후로 설정하세요.");
         return;
       } else {
@@ -822,7 +834,7 @@ const changeData = async () => {
     console.error(error);
   }
   nullDialog();
-  location.reload();
+  // location.reload();
 };
 
 const cancel = () => {

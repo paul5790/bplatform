@@ -50,8 +50,8 @@ let lat = ref(35.46);
 let lon = ref(129.38);
 let latview = ref(35.504503);
 let lonview = ref(129.365417);
-const latvalue = ref(35.504503);
-const lonvalue = ref(129.365417);
+const latvalue = ref(0.0);
+const lonvalue = ref(0.0);
 let intervalId = null;
 const updateMapCheck = ref(false);
 const zoomLevel = ref(12);
@@ -91,11 +91,6 @@ onMounted(() => {
 
   // OSM 타일 레이어 추가
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-  // 마커 추가 (예제 마커)
-  currentMarker = L.marker([latview.value, lonview.value], { icon: shipIcon })
-    .addTo(map)
-    .bindPopup("Realtime Location.")
 
   // 줌 레벨 변경 이벤트 리스너 추가
   map.on("zoomend", () => {

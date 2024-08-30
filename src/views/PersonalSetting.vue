@@ -1,6 +1,15 @@
 <template>
   <div class="my-app">
     <v-card class="mx-auto">
+      <v-alert v-if="userGroup === 'USER'" title="USER 접근 정보" type="info" variant="tonal">
+        <span class="profile-label">유지 기간 : </span>
+        <span class="profile-value"> {{ userPermissionsExpiryTime }}</span><br />
+        <span class="profile-label">접근 가능 데이터 : </span>
+        <span class="profile-value">
+          {{ userPermissions }}</span
+        >
+      </v-alert>
+
       <v-list lines="three" select-strategy="classic">
         <v-list-subheader>정보 설정</v-list-subheader>
 
@@ -2345,18 +2354,28 @@ const axiosrealtime = async () => {
   }
 };
 
+const userPermissions = ref();
+const userPermissionsExpiryTime = ref();
+
 // 초기 데이터
 const getInfo = async () => {
   try {
     // fetchData 함수를 호출하여 데이터를 가져옴
     const userDataResponse = await readMineData(tokenid.value);
+    console.log(userDataResponse);
     userName.value = userDataResponse.userName;
     userDepartment.value = userDataResponse.department;
     userGroup.value = userDataResponse.userGroup;
     userDescription.value = userDataResponse.description;
     userEmail.value = userDataResponse.email;
     userNumber.value = userDataResponse.phoneNumber;
+    // 쉼표(,)를 물결표(~)로 변환
+    userPermissionsExpiryTime.value = userDataResponse.permissionsExpiryTime.replace(/,/g, '~');
+
+    // 배열을 문자열로 변환하여 저장
+    userPermissions.value = userDataResponse.permissions.join(', ');
     realtime.value = userDataResponse.lampTime;
+
   } catch (error) {
     // 에러 처리
     console.error("Error in fetching data in component:", error);
@@ -2562,5 +2581,13 @@ const axiosMinMax = async () => {
 .v-text-field {
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+}
+
+.profile-label{
+  font-size: 14px;
+}
+
+.profile-value{
+  font-size: 14px;
 }
 </style>

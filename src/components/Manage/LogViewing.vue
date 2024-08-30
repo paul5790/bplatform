@@ -357,13 +357,15 @@
   <!-- 클릭 시 -->
   <v-dialog v-model="detailLog" max-width="800" closable>
     <v-card>
-      <v-card-title style="padding-bottom: 0px; font-size: 18px;">자세히</v-card-title>
-      <v-card-text style="padding-bottom: 0px;">
-        <v-container style="padding-bottom: 0px; padding-top: 0px;">
-          <p style="font-size: 14px;">{{ showDetail }}</p>
+      <v-card-title style="padding-bottom: 0px; font-size: 18px"
+        >자세히</v-card-title
+      >
+      <v-card-text style="padding-bottom: 0px">
+        <v-container style="padding-bottom: 0px; padding-top: 0px">
+          <p style="font-size: 14px">{{ showDetail }}</p>
         </v-container>
       </v-card-text>
-      <v-card-actions style="padding-top: 0px;">
+      <v-card-actions style="padding-top: 0px">
         <v-spacer></v-spacer>
         <v-btn color="blue-darken-1" variant="text" @click="detailLog = false"
           >확인</v-btn
@@ -646,9 +648,9 @@ const createCSV = (data) => {
 const showDetail = ref("");
 // Method to handle row click
 const handleRowClick = (item, index) => {
-  if (index.item.log != index.item.originalLog) {
-    detailLog.value = true;
-  }
+  // if (index.item.log != index.item.originalLog) {
+  detailLog.value = true;
+  // }
   showDetail.value = index.item.originalLog;
   console.log(index.item.log);
   console.log(index.item.originalLog);

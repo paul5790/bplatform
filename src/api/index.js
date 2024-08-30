@@ -544,10 +544,10 @@ export const downloadDataFile = async (tokenid, data, cancelToken) => {
   }
 };
 
-export const downloadDataFileXml = async (tokenid, formData, cancelToken) => {
+export const downloadDataFileXml = async (tokenid, formData, checkvts, cancelToken) => {
   try {
     const response = await axios.post(
-      `http://${apiLocation}/api/v1/table_data/batch_download`,
+      `http://${apiLocation}/api/v1/table_data/batch_download?vts=${checkvts}`,
       formData,
       {
         responseType: "blob",
