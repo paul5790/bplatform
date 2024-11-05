@@ -535,6 +535,7 @@ export const downloadDataFile = async (tokenid, data, cancelToken) => {
         Authorization: `Bearer ${tokenid}`,
       },
       cancelToken: cancelToken, // 취소 토큰 전달
+      timeout: 120000, // 120초 (2분)로 Timeout 설정
     });
     sessionStorage.setItem("downloading", false);
     return response;

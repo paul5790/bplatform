@@ -21,28 +21,39 @@ const props = defineProps({
   state: String,
 });
 
-watch([() => props.lat, () => props.lon], ([newLat, newLon]) => {
-  if (isNaN(newLat) || isNaN(newLon)) {
-    console.warn("Invalid coordinates detected. Skipping update.");
-    return;
-  }
-  updateValue();
-  console.log(
-    `Latitude changed to: ${newLat}, Longitude changed to: ${newLon}`
-  );
-  console.log(latview.value);
-  console.log(lonview.value);
+watch(
+  [() => props.lat, () => props.lon, () => props.state],
+  ([newLat, newLon, newState]) => {
+    if (newState === "stop") {
+      // state가 "stop"이면 latvalue를 0.0으로 설정하고 업데이트 중지
+      latvalue.value = null;
+      lonvalue.value = null;
+      console.log("State is 'stop'. Values reset to 0.0.");
+      return;
+    } else if (newState === "start") {
+      // state가 "start"이면 업데이트 실행
+      if (isNaN(newLat) || isNaN(newLon)) {
+        console.warn("Invalid coordinates detected. Skipping update.");
+        return;
+      }
 
-    // 기존 마커가 존재하면 제거
-  if (currentMarker) {
-    map.removeLayer(currentMarker);
-  }
+      updateValue();
+      console.log(`Latitude changed to: ${newLat}, Longitude changed to: ${newLon}`);
+      console.log(latview.value);
+      console.log(lonview.value);
 
-  // 새로운 마커 생성 및 추가
-  currentMarker = L.marker([latview.value, lonview.value], { icon: shipIcon })
-    .addTo(map)
-    .bindPopup("Realtime Location.")
-});
+      // 기존 마커가 존재하면 제거
+      if (currentMarker) {
+        map.removeLayer(currentMarker);
+      }
+
+      // 새로운 마커 생성 및 추가
+      currentMarker = L.marker([latview.value, lonview.value], { icon: shipIcon })
+        .addTo(map)
+        .bindPopup("Realtime Location.");
+    }
+  }
+);
 
 let map = null;
 const state = ref("wait");
@@ -50,8 +61,8 @@ let lat = ref(35.46);
 let lon = ref(129.38);
 let latview = ref(35.504503);
 let lonview = ref(129.365417);
-const latvalue = ref(0.0);
-const lonvalue = ref(0.0);
+const latvalue = ref(null);
+const lonvalue = ref(null);
 let intervalId = null;
 const updateMapCheck = ref(false);
 const zoomLevel = ref(12);
