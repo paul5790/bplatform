@@ -1415,6 +1415,12 @@ const checkdata = ref({
   Object_Info: "no",
   Weather_Info: "no",
   AIS_vts: "no",
+  AIS_Original: "no",
+  AIS_Dynamic: "no",
+  AIS_Static: "no",
+  Radar: "no",
+  Radar_Tracking: "no",
+  VHF: "no",
 });
 
 const ShipGroups = ref([
@@ -1628,7 +1634,8 @@ const ControlGroups = ref([
 const VtsGroups = ref([
   {
     title: "vts",
-    items: ["Object_Info", "Weather_Info", "AIS_vts"],
+    items: ["Object_Info", "Weather_Info", "AIS_Original"],
+    // items: ["Object_Info", "Weather_Info", "AIS_Original", "AIS_Dynamic", "AIS_Static", "Radar", "Radar_Tracking", "VHF"],
     singleColumn: true,
   },
 ]);
@@ -2049,14 +2056,16 @@ const getVariableName = (headerName) => {
 
     "RADAR/TTM": "TTM",
     "RADAR/TLL": "TLL",
-    "RADAR/RSCREEN": "RSCREEN",
+    "RADAR/RADAR SCREEN": "RSCREEN",
 
     "AIS/VDM": "VDM",
     "AIS/VDO": "VDO",
 
     "ECDIS/ROUTEINFO": "ROUTEINFO",
     "ECDIS/WAYPOINTS": "WAYPOINTS",
-    "ECDIS/ESCREEN": "ESCREEN",
+    "ECDIS/ECDIS SCREEN": "ESCREEN",
+    "ECDIS/RTZ": "RTZ",
+
 
     "AUTOPILOT/RSA": "RSA",
     "AUTOPILOT/MODE": "MODE",
@@ -2167,7 +2176,13 @@ const getVariableName = (headerName) => {
 
     WeatherInfo: "Weather_Info",
     ObjectInfo: "Object_Info",
-    "AIS 원문": "AIS_vts",
+    "AIS 원문": "AIS_Original",
+    "AIS 동적 정보": "AIS_Dynamic",
+    "AIS 정적 정보": "AIS_Static",
+    "Radar": "Radar",
+    "Radar 추적": "Radar_Tracking",
+    "VHF": "VHF",
+
 
     // 다른 headerName에 대한 매핑 추가
   };

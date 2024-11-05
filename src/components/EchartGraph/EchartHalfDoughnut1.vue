@@ -40,20 +40,16 @@ const serverRemainingSizeText = ref("");
 
 const fetchData = async () => {
   try {
-    // const response = await serverStorage(tokenid.value);
-    // console.log(`${parseFloat(response.serverInUsedSize)} serversize`);
-    // console.log(`${parseFloat(response.dbSize)} serversize`);
-    // console.log(`${parseFloat(response.serverRemainingSize)} serversize`);
+    const response = await serverStorage(tokenid.value);
+    console.log(`${parseFloat(response.serverInUsedSize)} serversize`);
+    console.log(`${parseFloat(response.dbSize)} serversize`);
+    console.log(`${parseFloat(response.serverRemainingSize)} serversize`);
 
-    // serverInUsedSize.value = parseFloat(response.serverInUsedSize).toFixed(2);
-    // dbSize.value = parseFloat(response.dbSize).toFixed(2);
-    // serverRemainingSize.value = parseFloat(
-    //   response.serverRemainingSize
-    // ).toFixed(2);
-
-    serverInUsedSize.value = 88.88;
-    dbSize.value = 12.35;
-    serverRemainingSize.value = 155.23;
+    serverInUsedSize.value = parseFloat(response.serverInUsedSize).toFixed(2);
+    dbSize.value = parseFloat(response.dbSize).toFixed(2);
+    serverRemainingSize.value = parseFloat(
+      response.serverRemainingSize
+    ).toFixed(2);
 
   } catch (error) {
     console.error(error);
